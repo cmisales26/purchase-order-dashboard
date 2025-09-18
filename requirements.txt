@@ -1,0 +1,6 @@
+streamlit
+fpdf
+num2words
+pandas
+openpyxl
+xlrd

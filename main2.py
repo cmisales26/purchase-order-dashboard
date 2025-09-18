@@ -217,7 +217,18 @@ with tab4:
         sanitized_prepared_by = pdf.sanitize_text(prepared_by)
         sanitized_authorized_by = pdf.sanitize_text(authorized_by)
         
-        # Vendor & Bill/Ship
+        # # Vendor & Bill/Ship
+        # pdf.section_title("Vendor & Addresses")
+        # pdf.set_font("Arial", "", 8)
+        # pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
+        # pdf.set_xy(110, pdf.get_y() - 20)
+        # pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+        # pdf.ln(1)
+        # pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")
+
+        # pdf.ln(2)
+
+        # --- Vendor & Bill/Ship ---
         pdf.section_title("Vendor & Addresses")
         pdf.set_font("Arial", "", 8)
         pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
@@ -225,13 +236,42 @@ with tab4:
         pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
         pdf.ln(1)
         pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")
-
         pdf.ln(2)
 
-        # Products Table
+
+        # # Products Table
+        # pdf.section_title("Products & Services")
+        # col_widths = [65, 22, 25, 25, 15, 22]
+        # headers = ["Product", "Basic", "GST TAX @ 18%","Per Unit Price", "Qty", "Total"]
+        # pdf.set_fill_color(220, 220, 220)
+        # pdf.set_font("Arial", "B", 8)
+        # for h, w in zip(headers, col_widths):
+        #     pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
+        # pdf.ln()
+        # pdf.set_font("Arial", "", 8)
+        # for p in st.session_state.products:
+        #     gst_amt = p["basic"] * p["gst_percent"] / 100
+        #     per_unit_price = (p["basic"] + gst_amt) 
+        #     total = (p["basic"] + gst_amt) * p["qty"]
+        #     name = pdf.sanitize_text(p["name"])
+        #     name = name if len(name) <= 25 else name[:25] + "..."
+        #     pdf.cell(col_widths[0], 6, name, border=1)
+        #     pdf.cell(col_widths[1], 6, f"{p['basic']:.2f}", border=1, align="R")
+        #     # pdf.cell(col_widths[2], 6, f"{p['gst_percent']}%", border=1, align="C")
+        #     pdf.cell(col_widths[2], 6, f"{gst_amt:.2f}", border=1, align="R")
+        #     pdf.cell(col_widths[3], 6, f"{per_unit_price:.2f}",border=1,align="R")
+        #     pdf.cell(col_widths[4], 6, f"{p['qty']:.2f}", border=1, align="C")
+        #     pdf.cell(col_widths[5], 6, f"{total:.2f}", border=1, align="R")
+        #     pdf.ln()
+        # pdf.set_font("Arial", "B", 8)
+        # pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
+        # pdf.cell(col_widths[5], 6, f"{grand_total:.2f}", border=1, align="R")
+        # pdf.ln(4)
+
+        # --- Products Table ---
         pdf.section_title("Products & Services")
         col_widths = [65, 22, 25, 25, 15, 22]
-        headers = ["Product", "Basic", "GST TAX @ 18%","Per Unit Price", "Qty", "Total"]
+        headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
         pdf.set_fill_color(220, 220, 220)
         pdf.set_font("Arial", "B", 8)
         for h, w in zip(headers, col_widths):
@@ -240,15 +280,14 @@ with tab4:
         pdf.set_font("Arial", "", 8)
         for p in st.session_state.products:
             gst_amt = p["basic"] * p["gst_percent"] / 100
-            per_unit_price = (p["basic"] + gst_amt) 
+            per_unit_price = p["basic"] + gst_amt
             total = (p["basic"] + gst_amt) * p["qty"]
             name = pdf.sanitize_text(p["name"])
             name = name if len(name) <= 25 else name[:25] + "..."
             pdf.cell(col_widths[0], 6, name, border=1)
             pdf.cell(col_widths[1], 6, f"{p['basic']:.2f}", border=1, align="R")
-            # pdf.cell(col_widths[2], 6, f"{p['gst_percent']}%", border=1, align="C")
             pdf.cell(col_widths[2], 6, f"{gst_amt:.2f}", border=1, align="R")
-            pdf.cell(col_widths[3], 6, f"{per_unit_price:.2f}",border=1,align="R")
+            pdf.cell(col_widths[3], 6, f"{per_unit_price:.2f}", border=1, align="R")
             pdf.cell(col_widths[4], 6, f"{p['qty']:.2f}", border=1, align="C")
             pdf.cell(col_widths[5], 6, f"{total:.2f}", border=1, align="R")
             pdf.ln()
@@ -257,14 +296,37 @@ with tab4:
         pdf.cell(col_widths[5], 6, f"{grand_total:.2f}", border=1, align="R")
         pdf.ln(4)
 
-        # Amount in Words
+        # --- Amount in Words ---
         pdf.set_font("Arial", "B", 8)
         pdf.cell(0, 8, "Amount in Words:", ln=True)
         pdf.set_font("Arial", "", 8)
         pdf.multi_cell(0, 5, pdf.sanitize_text(amount_words))
         pdf.ln(4)
 
-        # Terms
+
+        # # Amount in Words
+        # pdf.set_font("Arial", "B", 8)
+        # pdf.cell(0, 8, "Amount in Words:", ln=True)
+        # pdf.set_font("Arial", "", 8)
+        # pdf.multi_cell(0, 5, pdf.sanitize_text(amount_words))
+        # pdf.ln(4)
+
+        # --- Amount in Words ---
+        pdf.set_font("Arial", "B", 8)
+        pdf.cell(0, 8, "Amount in Words:", ln=True)
+        pdf.set_font("Arial", "", 8)
+        pdf.multi_cell(0, 5, pdf.sanitize_text(amount_words))
+        pdf.ln(4)
+
+        # # Terms
+        # pdf.section_title("Terms & Conditions")
+        # pdf.set_font("Arial", "", 8)
+        # pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {sanitized_payment_terms}\nDelivery: {sanitized_delivery_terms}")
+        # if sanitized_additional_terms:
+        #     pdf.multi_cell(0, 4, f"Additional: {sanitized_additional_terms}")
+        # pdf.ln(2)
+
+        # --- Terms ---
         pdf.section_title("Terms & Conditions")
         pdf.set_font("Arial", "", 8)
         pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {sanitized_payment_terms}\nDelivery: {sanitized_delivery_terms}")
@@ -272,22 +334,48 @@ with tab4:
             pdf.multi_cell(0, 4, f"Additional: {sanitized_additional_terms}")
         pdf.ln(2)
 
-        # End User
+        # # End User
+        # pdf.section_title("End User Details")
+        # pdf.set_font("Arial", "", 8)
+        # pdf.multi_cell(0, 4, f"{sanitized_end_company}\n{sanitized_end_address}\nContact: {sanitized_end_person} | {sanitized_end_contact}\nEmail: {sanitized_end_email}")
+        # pdf.ln(2)
+
+            # --- End User ---
         pdf.section_title("End User Details")
         pdf.set_font("Arial", "", 8)
         pdf.multi_cell(0, 4, f"{sanitized_end_company}\n{sanitized_end_address}\nContact: {sanitized_end_person} | {sanitized_end_contact}\nEmail: {sanitized_end_email}")
         pdf.ln(2)
 
-        # Authorization
+        # # Authorization
+        # pdf.set_font("Arial", "", 8)
+        # pdf.cell(65, 5, f"Prepared By: {sanitized_prepared_by}", border=0)
+        # pdf.cell(65, 5, f"Authorized By: {sanitized_authorized_by}", border=0)
+        # pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=1, align="R")
+
+        # # Save in memory
+        # buffer = BytesIO()
+        # pdf.output(buffer)
+        # pdf_data = buffer.getvalue()
+
+        # if auto_increment:
+        #     st.session_state.po_seq += 1
+
+        # st.success("Purchase Order generated!")
+        # st.download_button(
+        #     "⬇ Download Purchase Order",
+        #     pdf_data,
+        #     f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
+        #     "application/pdf"
+        # )
+
+            # --- Authorization ---
         pdf.set_font("Arial", "", 8)
         pdf.cell(65, 5, f"Prepared By: {sanitized_prepared_by}", border=0)
         pdf.cell(65, 5, f"Authorized By: {sanitized_authorized_by}", border=0)
         pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=1, align="R")
 
-        # Save in memory
-        buffer = BytesIO()
-        pdf.output(buffer)
-        pdf_data = buffer.getvalue()
+        # --- Save in memory (for Streamlit) ---
+        pdf_data = pdf.output(dest="S").encode("latin-1")
 
         if auto_increment:
             st.session_state.po_seq += 1

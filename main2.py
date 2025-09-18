@@ -23,37 +23,55 @@ class PDF(FPDF):
         self.set_right_margin(15)
         self.logo_path = 'D:\DashBoard\CM LOGO.png'
 
+        # Register Calibri fonts (regular + bold)
+        font_dir = os.path.join(os.getcwd(), "fonts")  # folder where your ttf files are
+        self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
+        self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
+        self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
+        self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
+
+
     def header(self):
         if self.page_no() == 1:
             # Logo (if available)
             if self.logo_path and os.path.exists(self.logo_path):
-                self.image(self.logo_path, x=175, y=8, w=25)
+                self.image(self.logo_path, x=163, y=8, w=45)
 
             # Company name (right side)
             # self.set_font("Arial", "B", 16)
             # self.cell(0, 10, self.sanitize_text(st.session_state.company_name), ln=True, align="R")
 
             # Title
-            self.set_font("Arial", "B", 14)
+            self.set_font("Calibri", "B", 15)
             self.cell(0, 10, "PURCHASE ORDER", ln=True, align="C")
             self.ln(2)
 
             # PO info
-            self.set_font("Arial", "", 10)
+            self.set_font("Calibri", "", 12)
             self.cell(95, 8, f"PO No: {self.sanitize_text(st.session_state.po_number)}", ln=0)
             self.cell(95, 8, f"Date: {self.sanitize_text(st.session_state.po_date)}", ln=1)
             self.ln(2)
 
     def footer(self):
         self.set_y(-18)
-        self.set_font("Arial", "I", 8)
+        self.set_font("Calibri", "I", 10)
 
-        # Address
+        # # Address
         self.multi_cell(0, 4,
-            "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n"
-            "Email: cad@cmi.com | support@cmi.com",
+            "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n",
+        #     "Email: cad@cmi.com | support@cmi.com",
             align="C"
         )
+
+        # Emails (clickable)
+        self.set_text_color(0, 0, 255)
+        email1 = "cad@cmi.com"
+        email2 = "support@cmi.com"
+        self.cell(0, 4, f"{email1} | {email2}", ln=True, align="C", link=f"mailto:{email1}")
+        # Add second link separately (on same text)
+        self.set_x((self.w - 80) / 2)
+        self.cell(0, 0, "", link=f"mailto:{email2}")
+
 
         # Clickable Phone Number
         self.set_x((self.w - 60) / 2)
@@ -78,7 +96,7 @@ class PDF(FPDF):
     #     )
 
     def section_title(self, title):
-        self.set_font("Arial", "B", 10)
+        self.set_font("Calibri", "B", 12)
         self.cell(0, 6, self.sanitize_text(title), ln=True)
         self.ln(1)
 
@@ -101,7 +119,7 @@ st.session_state.po_number = f"C/CP/{today.year}/Q{(today.month-1)//3+1}/{st.ses
 
 # --- UI ---
 st.set_page_config(page_title="Purchase Order Generator", page_icon="📄", layout="wide")
-st.title("📄 Clean One-Page Purchase Order Generator")
+st.title("📄 Purchase Order Generator")
 
 with st.sidebar:
     st.header("Company Info")
@@ -128,14 +146,14 @@ with tab1:
         vendor_address = st.text_area("Vendor Address", "Unit 801-802, 8th Floor, Tower 1...")
         vendor_contact = st.text_input("Contact Person", "Ms/Mr")
         vendor_mobile = st.text_input("Mobile", "‪+91 1234567890‬")
-        gst_no = st.text_input("GST No", "GSTIN123456789")
-        pan_no = st.text_input("PAN No", "ABCDE1234F")
-        msme_no = st.text_input("MSME No", "MSME000000123")
+        gst_no = st.text_input("GST No", "24ANMPP4891R1ZX")
+        pan_no = st.text_input("PAN No", "ANMPP4891R")
+        msme_no = st.text_input("MSME No", "UDYAM-GJ-01-0117646")
     with col2:
         bill_to_company = st.text_input("Bill To", "CM INFOTECH")
-        bill_to_address = st.text_area("Bill To Address", "E/402, Ganesh Glory 11, Ahmedabad")
+        bill_to_address = st.text_area("Bill To Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
         ship_to_company = st.text_input("Ship To", "CM INFOTECH")
-        ship_to_address = st.text_area("Ship To Address", "E/402, Ganesh Glory 11, Ahmedabad")
+        ship_to_address = st.text_area("Ship To Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
         end_company = st.text_input("End User Company", "Baldridge & Associates Pvt Ltd.")
         end_address = st.text_area("End User Address", "406 Sakar East, Vadodara 390009")
         end_person = st.text_input("End User Contact", "Mr. Dev")
@@ -177,7 +195,7 @@ with tab3:
         payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date")
         delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2)
         delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days")
-        additional_terms = st.text_area("Additional Terms", "")
+        # additional_terms = st.text_area("Additional Terms", "")
     with col2:
         prepared_by = st.text_input("Prepared By", "Finance Department")
         authorized_by = st.text_input("Authorized By", "CM INFOTECH")
@@ -213,7 +231,7 @@ with tab4:
         sanitized_end_email = pdf.sanitize_text(end_email)
         sanitized_payment_terms = pdf.sanitize_text(payment_terms)
         sanitized_delivery_terms = pdf.sanitize_text(delivery_terms)
-        sanitized_additional_terms = pdf.sanitize_text(additional_terms)
+        # sanitized_additional_terms = pdf.sanitize_text(additional_terms)
         sanitized_prepared_by = pdf.sanitize_text(prepared_by)
         sanitized_authorized_by = pdf.sanitize_text(authorized_by)
         
@@ -230,7 +248,7 @@ with tab4:
 
         # --- Vendor & Bill/Ship ---
         pdf.section_title("Vendor & Addresses")
-        pdf.set_font("Arial", "", 8)
+        pdf.set_font("Calibri", "", 10)
         pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
         pdf.set_xy(110, pdf.get_y() - 20)
         pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
@@ -273,11 +291,11 @@ with tab4:
         col_widths = [65, 22, 25, 25, 15, 22]
         headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
         pdf.set_fill_color(220, 220, 220)
-        pdf.set_font("Arial", "B", 8)
+        pdf.set_font("Calibri", "B", 10)
         for h, w in zip(headers, col_widths):
             pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
         pdf.ln()
-        pdf.set_font("Arial", "", 8)
+        pdf.set_font("Calibri", "", 10)
         for p in st.session_state.products:
             gst_amt = p["basic"] * p["gst_percent"] / 100
             per_unit_price = p["basic"] + gst_amt
@@ -291,15 +309,15 @@ with tab4:
             pdf.cell(col_widths[4], 6, f"{p['qty']:.2f}", border=1, align="C")
             pdf.cell(col_widths[5], 6, f"{total:.2f}", border=1, align="R")
             pdf.ln()
-        pdf.set_font("Arial", "B", 8)
+        pdf.set_font("Calibri", "B", 10)
         pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
         pdf.cell(col_widths[5], 6, f"{grand_total:.2f}", border=1, align="R")
         pdf.ln(4)
 
         # --- Amount in Words ---
-        pdf.set_font("Arial", "B", 8)
+        pdf.set_font("Calibri", "B", 10)
         pdf.cell(0, 8, "Amount in Words:", ln=True)
-        pdf.set_font("Arial", "", 8)
+        pdf.set_font("Calibri", "", 10)
         pdf.multi_cell(0, 5, pdf.sanitize_text(amount_words))
         pdf.ln(4)
 
@@ -311,12 +329,12 @@ with tab4:
         # pdf.multi_cell(0, 5, pdf.sanitize_text(amount_words))
         # pdf.ln(4)
 
-        # --- Amount in Words ---
-        pdf.set_font("Arial", "B", 8)
-        pdf.cell(0, 8, "Amount in Words:", ln=True)
-        pdf.set_font("Arial", "", 8)
-        pdf.multi_cell(0, 5, pdf.sanitize_text(amount_words))
-        pdf.ln(4)
+        # # --- Amount in Words ---
+        # pdf.set_font("Calibri", "B", 10)
+        # pdf.cell(0, 8, "Amount in Words:", ln=True)
+        # pdf.set_font("Calibri", "", 10)
+        # pdf.multi_cell(0, 5, pdf.sanitize_text(amount_words))
+        # pdf.ln(4)
 
         # # Terms
         # pdf.section_title("Terms & Conditions")
@@ -326,13 +344,40 @@ with tab4:
         #     pdf.multi_cell(0, 4, f"Additional: {sanitized_additional_terms}")
         # pdf.ln(2)
 
-        # --- Terms ---
+        # # --- Terms ---
         pdf.section_title("Terms & Conditions")
-        pdf.set_font("Arial", "", 8)
+        pdf.set_font("Calibri", "", 10)
         pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {sanitized_payment_terms}\nDelivery: {sanitized_delivery_terms}")
-        if sanitized_additional_terms:
-            pdf.multi_cell(0, 4, f"Additional: {sanitized_additional_terms}")
+        # if sanitized_additional_terms:
+        #     pdf.multi_cell(0, 4, f"Additional: {sanitized_additional_terms}")
         pdf.ln(2)
+
+        # --- Terms ---
+    # pdf.section_title("Terms & Conditions")
+    # pdf.set_font("Calibri", "", 10)
+
+    # # Main terms
+    # safe_terms = (
+    #     f"Taxes: As specified above\n"
+    #     f"Payment: {sanitized_payment_terms}\n"
+    #     f"Delivery: {sanitized_delivery_terms}"
+    # )
+    # usable_width = pdf.w - 2 * pdf.l_margin
+    # pdf.multi_cell(usable_width, 4, safe_terms)
+
+    # # Additional terms, if any
+    # if sanitized_additional_terms:
+    #     pdf.set_font("Calibri", "", 10)  # reset font in case changed
+    #     # Use usable width for safety
+    #     try:
+    #         pdf.multi_cell(usable_width, 4, f"Additional: {sanitized_additional_terms}")
+    #     except Exception:
+    #         # fallback: reduce font if text too wide
+    #         pdf.set_font("Calibri", "", 8)
+    #         pdf.multi_cell(usable_width, 4, f"Additional: {sanitized_additional_terms}")
+
+    # pdf.ln(2)
+
 
         # # End User
         # pdf.section_title("End User Details")
@@ -342,40 +387,47 @@ with tab4:
 
             # --- End User ---
         pdf.section_title("End User Details")
-        pdf.set_font("Arial", "", 8)
+        pdf.set_font("Calibri", "", 10)
         pdf.multi_cell(0, 4, f"{sanitized_end_company}\n{sanitized_end_address}\nContact: {sanitized_end_person} | {sanitized_end_contact}\nEmail: {sanitized_end_email}")
         pdf.ln(2)
 
         # # Authorization
-        # pdf.set_font("Arial", "", 8)
-        # pdf.cell(65, 5, f"Prepared By: {sanitized_prepared_by}", border=0)
-        # pdf.cell(65, 5, f"Authorized By: {sanitized_authorized_by}", border=0)
-        # pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=1, align="R")
+        # pdf.set_font("Calibri", "", 10)
+        # pdf.multi_cell(65, 5, f"Prepared By: {sanitized_prepared_by}", border=0)
+        # pdf.multi_cell(65, 5, f"Authorized By: {sanitized_authorized_by}", border=0)
+        # pdf.multi_cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=1, align="R")
 
-        # # Save in memory
-        # buffer = BytesIO()
-        # pdf.output(buffer)
-        # pdf_data = buffer.getvalue()
 
-        # if auto_increment:
-        #     st.session_state.po_seq += 1
+        # Authorization Section
+        pdf.set_font("Calibri", "", 10)
 
-        # st.success("Purchase Order generated!")
-        # st.download_button(
-        #     "⬇ Download Purchase Order",
-        #     pdf_data,
-        #     f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
-        #     "application/pdf"
-        # )
+        # Move to left margin
+        pdf.set_x(pdf.l_margin)
+        pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
 
-            # --- Authorization ---
-        pdf.set_font("Arial", "", 8)
-        pdf.cell(65, 5, f"Prepared By: {sanitized_prepared_by}", border=0)
-        pdf.cell(65, 5, f"Authorized By: {sanitized_authorized_by}", border=0)
-        pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=1, align="R")
+        pdf.set_x(pdf.l_margin)
+        pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
 
-        # --- Save in memory (for Streamlit) ---
-        pdf_data = pdf.output(dest="S").encode("latin-1")
+        # pdf.set_font("Calibri","",10)
+        # pdf.set_x(pdf.l_margin)
+        # pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=2, border=0, align="L")
+
+
+        # Path to your uploaded image
+        pdf.set_y(-110)
+        pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=2, border=0, align="L")
+        stamp_path = "D:\DashBoard\stamp.jpg"
+
+        # Position the stamp above the footer
+        pdf.set_y(-105)  # 50 mm from bottom, adjust as needed
+        pdf.set_x(15)  # center the stamp, assuming width 40
+        pdf.image(stamp_path, w=30)  # width 40 mm, height auto
+
+
+        # Save in memory
+        buffer = BytesIO()
+        pdf.output(buffer)
+        pdf_data = buffer.getvalue()
 
         if auto_increment:
             st.session_state.po_seq += 1
@@ -387,6 +439,26 @@ with tab4:
             f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
             "application/pdf"
         )
+
+        #     # --- Authorization ---
+        # pdf.set_font("Arial", "", 8)
+        # pdf.cell(65, 5, f"Prepared By: {sanitized_prepared_by}", border=0)
+        # pdf.cell(65, 5, f"Authorized By: {sanitized_authorized_by}", border=0)
+        # pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=1, align="R")
+
+        # # --- Save in memory (for Streamlit) ---
+        # pdf_data = pdf.output(dest="S")#.encode("latin-1")
+
+        # if auto_increment:
+        #     st.session_state.po_seq += 1
+
+        # st.success("Purchase Order generated!")
+        # st.download_button(
+        #     "⬇ Download Purchase Order",
+        #     pdf_data,
+        #     f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
+        #     "application/pdf"
+        # )
 
 st.divider()
 st.caption("© 2025 Purchase Order Generator")

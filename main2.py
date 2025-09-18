@@ -224,7 +224,8 @@ with tab4:
         pdf.set_xy(110, pdf.get_y() - 20)
         pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
         pdf.ln(1)
-        pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}", ln=True)
+        pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")
+
         pdf.ln(2)
 
         # Products Table

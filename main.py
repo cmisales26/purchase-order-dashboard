@@ -720,10 +720,25 @@ with tab4:
             pdf.set_x(15)
             pdf.image(stamp_path, w=30)
 
-        # Save in memory
-        buffer = BytesIO()
-        pdf.output(buffer)
-        pdf_data = buffer.getvalue()
+        # # Save in memory
+        # buffer = BytesIO()
+        # pdf.output(buffer)
+        # pdf_data = buffer.getvalue()
+
+        # if auto_increment:
+        #     st.session_state.po_seq += 1
+
+        # st.success("Purchase Order generated!")
+        # st.download_button(
+        #     "⬇ Download Purchase Order",
+        #     pdf_data,
+        #     f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
+        #     "application/pdf"
+        # )
+
+        # --- Save in memory (Fixed) ---
+        pdf_bytes = pdf.output(dest="S").encode("latin1")  # return PDF as string and encode
+        pdf_data = BytesIO(pdf_bytes)
 
         if auto_increment:
             st.session_state.po_seq += 1
@@ -735,6 +750,7 @@ with tab4:
             f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
             "application/pdf"
         )
+
 
 st.divider()
 st.caption("© 2025 Purchase Order Generator")

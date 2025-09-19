@@ -1020,12 +1020,17 @@ with tab4:
         # Path to your uploaded image
         pdf.set_y(-110)
         pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=2, border=0, align="L")
-        stamp_path = r"D:\DashBoard\stamp.jpg" 
+        # stamp_path = r"D:\DashBoard\stamp.jpg" 
+        stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
+        if os.path.exists(stamp_path):
+            pdf.image(stamp_path, w=30)
+        else:
+            print("Stamp image not found, skipping.")
 
         # Position the stamp above the footer
         pdf.set_y(-105)  # 50 mm from bottom, adjust as needed
         pdf.set_x(15)  # center the stamp, assuming width 40
-        pdf.image(stamp_path, w=30)  # width 40 mm, height auto
+        # pdf.image(stamp_path, w=30)  # width 40 mm, height auto
 
 
         # Save in memory

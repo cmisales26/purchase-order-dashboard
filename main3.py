@@ -694,7 +694,7 @@ with tab4:
         # Save in memory
         buffer = BytesIO()
         pdf.output(buffer)
-        pdf_data = buffer.getvalue()
+        pdf_data = pdf.output(dest="S").encode("latin-1")
 
         if auto_increment:
             st.session_state.po_seq += 1

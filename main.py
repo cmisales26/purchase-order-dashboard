@@ -485,7 +485,7 @@ PRODUCT_CATALOG = {
 
 # --- PDF Class ---
 class PDF(FPDF):
-    def __init__(self, logo_path=None, stamp_path=None):
+    def __init__(self, logo_path="D:\DashBoard\CM LOGO.png", stamp_path="D:\DashBoard\stamp.jpg"):
         super().__init__()
         self.set_auto_page_break(auto=False, margin=0)
         self.set_left_margin(15)

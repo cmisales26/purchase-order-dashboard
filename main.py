@@ -1034,20 +1034,20 @@ with tab4:
 
 
         # Save in memory
-        buffer = BytesIO()
-        pdf.output(buffer)
-        pdf_data = buffer.getvalue()
+        # buffer = BytesIO()
+        # pdf.output(buffer)
+        # pdf_data = buffer.getvalue()
 
-        if auto_increment:
-            st.session_state.po_seq += 1
+        # if auto_increment:
+        #     st.session_state.po_seq += 1
 
-        st.success("Purchase Order generated!")
-        st.download_button(
-            "⬇ Download Purchase Order",
-            pdf_data,
-            f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
-            "application/pdf"
-        )
+        # st.success("Purchase Order generated!")
+        # st.download_button(
+        #     "⬇ Download Purchase Order",
+        #     pdf_data,
+        #     f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
+        #     "application/pdf"
+        # )
 
         #     # --- Authorization ---
         # pdf.set_font("Arial", "", 8)
@@ -1068,6 +1068,15 @@ with tab4:
         #     f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
         #     "application/pdf"
         # )
+
+        pdf_bytes = pdf.output(dest='S').encode('latin1')  # FPDF returns str, encode to bytes
+
+        st.download_button(
+        label="Download PDF",
+        data=pdf_bytes,
+        file_name="po.pdf",
+        mime="application/pdf"
+    )
 
 st.divider()
 st.caption("© 2025 Purchase Order Generator")

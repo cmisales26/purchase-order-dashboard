@@ -692,29 +692,9 @@ with tab4:
 
 
         # Save in memory
-        buffer = BytesIO()
-        pdf.output(buffer)
-        pdf_data = pdf.output(dest="S").encode("latin-1")
-
-        if auto_increment:
-            st.session_state.po_seq += 1
-
-        st.success("Purchase Order generated!")
-        st.download_button(
-            "⬇ Download Purchase Order",
-            pdf_data,
-            f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
-            "application/pdf"
-        )
-
-        #     # --- Authorization ---
-        # pdf.set_font("Arial", "", 8)
-        # pdf.cell(65, 5, f"Prepared By: {sanitized_prepared_by}", border=0)
-        # pdf.cell(65, 5, f"Authorized By: {sanitized_authorized_by}", border=0)
-        # pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=1, align="R")
-
-        # # --- Save in memory (for Streamlit) ---
-        # pdf_data = pdf.output(dest="S")#.encode("latin-1")
+        # buffer = BytesIO()
+        # pdf.output(buffer)
+        # pdf_data = buffer.getvalue()
 
         # if auto_increment:
         #     st.session_state.po_seq += 1
@@ -726,6 +706,26 @@ with tab4:
         #     f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
         #     "application/pdf"
         # )
+
+        #     # --- Authorization ---
+        # pdf.set_font("Arial", "", 8)
+        # pdf.cell(65, 5, f"Prepared By: {sanitized_prepared_by}", border=0)
+        # pdf.cell(65, 5, f"Authorized By: {sanitized_authorized_by}", border=0)
+        # pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=1, align="R")
+
+        # --- Save in memory (for Streamlit) ---
+        pdf_data = pdf.output(dest="S")#.encode("latin-1")
+
+        if auto_increment:
+            st.session_state.po_seq += 1
+
+        st.success("Purchase Order generated!")
+        st.download_button(
+            "⬇ Download Purchase Order",
+            pdf_data,
+            f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
+            "application/pdf"
+        )
 
 st.divider()
 st.caption("© 2025 Purchase Order Generator")

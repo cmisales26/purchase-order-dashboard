@@ -745,19 +745,15 @@ with tab4:
                 pass
 
         # Save in memory
-        buffer = BytesIO()
-        pdf.output(buffer)
-        pdf_data = buffer.getvalue()
+        pdf_bytes = pdf.output(dest="S").encode("latin1")
+        pdf_buffer = BytesIO(pdf_bytes)
 
-        if auto_increment:
-            st.session_state.po_seq += 1
-
-        st.success("Purchase Order generated!")
+        st.success("✅ Purchase Order generated!")
         st.download_button(
             "⬇ Download Purchase Order",
-            pdf_data,
-            f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
-            "application/pdf"
+            pdf_buffer,
+            file_name=f"PO_{po_number.replace('/', '_')}.pdf",
+            mime="application/pdf"
         )
 
 st.divider()

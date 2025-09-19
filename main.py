@@ -1020,7 +1020,7 @@ with tab4:
         # Path to your uploaded image
         pdf.set_y(-110)
         pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=2, border=0, align="L")
-        stamp_path = "D:\DashBoard\stamp.jpg"
+        stamp_path = r"D:\DashBoard\stamp.jpg"
 
         # Position the stamp above the footer
         pdf.set_y(-105)  # 50 mm from bottom, adjust as needed

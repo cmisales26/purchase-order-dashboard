@@ -1457,6 +1457,296 @@
 
 
 
+# import streamlit as st
+# from fpdf import FPDF
+# from num2words import num2words
+# import datetime
+# import os
+
+# # --- Product Catalog ---
+# PRODUCT_CATALOG = {
+#     "Autodesk Commercial Software License": {"basic": 2000.0, "gst_percent": 18.0},
+#     "Solidworks Premium": {"basic": 50000.0, "gst_percent": 18.0},
+#     "Catia License": {"basic": 75000.0, "gst_percent": 18.0},
+#     "Mastercam Module": {"basic": 30000.0, "gst_percent": 18.0},
+#     "Siemens NX": {"basic": 65000.0, "gst_percent": 18.0},
+# }
+
+# # --- PDF Class with Unicode Support and Auto-Wrapping ---
+# class PDF(FPDF):
+#     def __init__(self):
+#         super().__init__()
+#         self.set_auto_page_break(auto=False, margin=0)
+#         self.set_left_margin(15)
+#         self.set_right_margin(15)
+#         self.logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+#         font_path = os.path.join(os.path.dirname(__file__), "DejaVuSans.ttf")
+#         self.add_font("DejaVu", "", font_path, uni=True)
+#         self.set_font("DejaVu", "", 12)
+#         # self.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
+#         # self.set_font("DejaVu", "", 12)
+
+#     def header(self):
+#         if self.page_no() == 1:
+#             if self.logo_path and os.path.exists(self.logo_path):
+#                 self.image(self.logo_path, x=162.5, y=2.5, w=45)
+#             self.set_font("DejaVu", "B", 15)
+#             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
+#             self.ln(2)
+
+#             self.set_font("DejaVu", "", 12)
+#             po_no = st.session_state.get("po_number", "")
+#             po_date = st.session_state.get("po_date", "")
+#             self.cell(95, 8, f"PO No: {po_no}", ln=0)
+#             self.cell(95, 8, f"Date: {po_date}", ln=1)
+#             self.ln(2)
+
+#     def footer(self):
+#         self.set_y(-18)
+#         self.set_font("DejaVu", "I", 10)
+#         self.multi_cell(0, 4,
+#             "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n",
+#             align="C"
+#         )
+#         self.set_text_color(0, 0, 255)
+#         email1 = "cad@cmi.com"
+#         email2 = "support@cmi.com"
+#         self.cell(0, 4, f"{email1} | {email2}", ln=True, align="C", link=f"mailto:{email1}")
+#         self.set_x((self.w - 80) / 2)
+#         self.cell(0, 0, "", link=f"mailto:{email2}")
+#         self.set_x((self.w - 60) / 2)
+#         phone_number = "+918798159721"
+#         self.cell(60, 4, f"Call: {phone_number}", ln=True, align="C", link=f"tel:{phone_number}")
+#         self.set_text_color(0, 0, 0)
+
+#     def section_title(self, title):
+#         self.set_font("DejaVu", "B", 12)
+#         self.cell(0, 6, title, ln=True)
+#         self.ln(1)
+
+#     def row(self, data, col_widths, border=1, alignments=None):
+#         """
+#         Draws a table row with auto-wrapping for each cell.
+#         data: list of strings
+#         col_widths: list of column widths
+#         alignments: list of alignments for each cell
+#         """
+#         if alignments is None:
+#             alignments = ["L"] * len(data)
+#         # Calculate max number of lines in this row
+#         nb_lines = []
+#         for datum, width in zip(data, col_widths):
+#             nb_lines.append(self.get_string_width(datum) / width)
+#         max_lines = max(1, int(max(nb_lines) + 1))
+
+#         # Save current x,y
+#         x_start = self.get_x()
+#         y_start = self.get_y()
+#         line_height = 5
+
+#         # Draw cells
+#         for i, (datum, width, align) in enumerate(zip(data, col_widths, alignments)):
+#             self.multi_cell(width, line_height, datum, border=border, align=align, ln=3 if i==len(data)-1 else 0)
+#             x_current = x_start + sum(col_widths[:i+1])
+#             self.set_xy(x_current, y_start)
+#         self.ln(line_height * max_lines)
+
+
+# # --- Initialize Session ---
+# if "po_seq" not in st.session_state: st.session_state.po_seq = 1
+# if "products" not in st.session_state: st.session_state.products = []
+# if "company_name" not in st.session_state: st.session_state.company_name = "CM Infotech"
+
+# today = datetime.date.today()
+# st.session_state.po_date = today.strftime("%d-%m-%Y")
+# st.session_state.po_number = f"C/CP/{today.year}/Q{(today.month-1)//3+1}/{st.session_state.po_seq:03d}"
+
+# # --- Streamlit UI ---
+# st.set_page_config(page_title="Purchase Order Generator", page_icon="📄", layout="wide")
+# st.title("📄 Purchase Order Generator")
+
+# with st.sidebar:
+#     st.header("Company Info")
+#     logo_file = st.file_uploader("Upload Company Logo", type=["png", "jpg", "jpeg"])
+#     logo_path = None
+#     if logo_file:
+#         logo_path = "logo_temp.png"
+#         with open(logo_path, "wb") as f:
+#             f.write(logo_file.getbuffer())
+#     st.divider()
+#     auto_increment = st.checkbox("Auto-increment PO Number", value=True)
+#     if st.button("Reset PO Sequence"):
+#         st.session_state.po_seq = 1
+#         st.success("PO sequence reset to 1")
+
+# tab1, tab2, tab3, tab4 = st.tabs(["Vendor Details", "Products", "Terms", "Preview & Generate"])
+
+# # --- Vendor & Addresses ---
+# with tab1:
+#     col1, col2 = st.columns(2)
+#     with col1:
+#         vendor_name = st.text_input("Vendor Name", "Arkance IN Pvt. Ltd.")
+#         vendor_address = st.text_area("Vendor Address", "Unit 801-802, 8th Floor, Tower 1...")
+#         vendor_contact = st.text_input("Contact Person", "Ms/Mr")
+#         vendor_mobile = st.text_input("Mobile", "+91 1234567890")
+#         gst_no = st.text_input("GST No", "24ANMPP4891R1ZX")
+#         pan_no = st.text_input("PAN No", "ANMPP4891R")
+#         msme_no = st.text_input("MSME No", "UDYAM-GJ-01-0117646")
+#     with col2:
+#         bill_to_company = st.text_input("Bill To", "CM INFOTECH")
+#         bill_to_address = st.text_area("Bill To Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Ahmedabad - 382481")
+#         ship_to_company = st.text_input("Ship To", "CM INFOTECH")
+#         ship_to_address = st.text_area("Ship To Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Ahmedabad - 382481")
+#         end_company = st.text_input("End User Company", "Baldridge & Associates Pvt Ltd.")
+#         end_address = st.text_area("End User Address", "406 Sakar East, Vadodara 390009")
+#         end_person = st.text_input("End User Contact", "Mr. Dev")
+#         end_contact = st.text_input("End User Phone", "+91 9876543210")
+#         end_email = st.text_input("End User Email", "info@company.com")
+
+# # --- Products ---
+# with tab2:
+#     st.header("Products")
+#     selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()))
+#     if st.button("➕ Add Selected Product"):
+#         if selected_product:
+#             details = PRODUCT_CATALOG[selected_product]
+#             st.session_state.products.append({
+#                 "name": selected_product,
+#                 "basic": details["basic"],
+#                 "gst_percent": details["gst_percent"],
+#                 "qty": 1.0,
+#             })
+#             st.success(f"{selected_product} added!")
+
+#     if st.button("➕ Add Empty Product"):
+#         st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+
+#     for i, p in enumerate(st.session_state.products):
+#         with st.expander(f"Product {i+1}: {p['name']}", expanded=i==0):
+#             st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"name_{i}")
+#             st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"basic_{i}")
+#             st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"gst_{i}")
+#             st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"qty_{i}")
+#             if st.button("Remove", key=f"remove_{i}"):
+#                 st.session_state.products.pop(i)
+#                 st.rerun()
+
+# # --- Terms & Authorization ---
+# with tab3:
+#     st.header("Terms & Authorization")
+#     col1, col2 = st.columns(2)
+#     with col1:
+#         payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date")
+#         delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2)
+#         delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days")
+#     with col2:
+#         prepared_by = st.text_input("Prepared By", "Finance Department")
+#         authorized_by = st.text_input("Authorized By", "CM INFOTECH")
+
+# # --- Preview & Generate ---
+# with tab4:
+#     st.header("Preview & Generate")
+#     total_base = sum(p["basic"] * p["qty"] for p in st.session_state.products)
+#     total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.products)
+#     grand_total = total_base + total_gst
+#     try:
+#         amount_words = num2words(grand_total, to="currency", currency="INR").title()
+#     except:
+#         amount_words = num2words(grand_total).title()
+#     st.metric("Grand Total", f"₹{grand_total:,.2f}")
+
+#     if st.button("Generate PO", type="primary"):
+#         pdf = PDF()
+#         if logo_file:
+#             pdf.logo_path = logo_path
+
+#         pdf.add_page()
+
+#         # Vendor & Addresses
+#         pdf.section_title("Vendor & Addresses")
+#         pdf.set_font("DejaVu", "", 10)
+#         pdf.multi_cell(95, 5, f"{vendor_name}\n{vendor_address}\nAttn: {vendor_contact}\nMobile: {vendor_mobile}")
+#         pdf.set_xy(110, pdf.get_y() - 20)
+#         pdf.multi_cell(90, 5, f"Bill: {bill_to_company}\n{bill_to_address}\nShip: {ship_to_company}\n{ship_to_address}")
+#         pdf.ln(1)
+#         pdf.multi_cell(0, 5, f"GST: {gst_no}\nPAN: {pan_no}\nMSME: {msme_no}")
+#         pdf.ln(2)
+
+#         # Products Table with Auto-Wrapping
+#         pdf.section_title("Products & Services")
+#         col_widths = [65, 22, 25, 25, 15, 22]
+#         headers = ["Product", "Basic", "GST TAX @", "Per Unit Price", "Qty", "Total"]
+#         pdf.set_fill_color(220, 220, 220)
+#         pdf.set_font("DejaVu", "B", 10)
+#         for h, w in zip(headers, col_widths):
+#             pdf.multi_cell(w, 6, h, border=1, align="C", fill=True, ln=3 if w==col_widths[-1] else 0)
+#         pdf.ln()
+
+#         pdf.set_font("DejaVu", "", 10)
+#         for p in st.session_state.products:
+#             gst_amt = p["basic"] * p["gst_percent"] / 100
+#             per_unit_price = p["basic"] + gst_amt
+#             total = (p["basic"] + gst_amt) * p["qty"]
+#             row_data = [
+#                 p["name"], f"{p['basic']:.2f}", f"{gst_amt:.2f}", f"{per_unit_price:.2f}", f"{p['qty']:.2f}", f"{total:.2f}"
+#             ]
+#             pdf.row(row_data, col_widths, alignments=["L","R","R","R","C","R"])
+
+#         # Grand Total
+#         pdf.set_font("DejaVu", "B", 10)
+#         pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
+#         pdf.cell(col_widths[5], 6, f"{grand_total:.2f}", border=1, align="R")
+#         pdf.ln(4)
+
+#         # Amount in words
+#         pdf.set_font("DejaVu", "B", 10)
+#         pdf.cell(0, 8, "Amount in Words:", ln=True)
+#         pdf.set_font("DejaVu", "", 10)
+#         pdf.multi_cell(0, 5, amount_words)
+#         pdf.ln(4)
+
+#         # Terms
+#         pdf.section_title("Terms & Conditions")
+#         pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {payment_terms}\nDelivery: {delivery_terms}")
+#         pdf.ln(2)
+
+#         # End User
+#         pdf.section_title("End User Details")
+#         pdf.multi_cell(0, 4, f"{end_company}\n{end_address}\nContact: {end_person} | {end_contact}\nEmail: {end_email}")
+#         pdf.ln(2)
+
+#         # Authorization
+#         pdf.cell(0, 5, f"Prepared By: {prepared_by}", ln=1)
+#         pdf.cell(0, 5, f"Authorized By: {authorized_by}", ln=1)
+#         pdf.set_y(-110)
+#         pdf.cell(0, 5, f"For, {st.session_state.company_name}", ln=2)
+
+#         # Stamp if exists
+#         stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
+#         if os.path.exists(stamp_path):
+#             pdf.image(stamp_path, x=15, y=pdf.get_y() - 5, w=30)
+
+#         pdf_bytes = pdf.output(dest='S')
+#         if auto_increment:
+#             st.session_state.po_seq += 1
+
+#         st.success("Purchase Order generated!")
+#         st.download_button(
+#             "⬇ Download Purchase Order",
+#             pdf_bytes,
+#             f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
+#             "application/pdf"
+#         )
+
+# st.divider()
+# st.caption("© 2025 Purchase Order Generator")
+
+
+
+
+
+
+
 import streamlit as st
 from fpdf import FPDF
 from num2words import num2words
@@ -1472,7 +1762,7 @@ PRODUCT_CATALOG = {
     "Siemens NX": {"basic": 65000.0, "gst_percent": 18.0},
 }
 
-# --- PDF Class with Unicode Support and Auto-Wrapping ---
+# --- PDF Class with Unicode Support ---
 class PDF(FPDF):
     def __init__(self):
         super().__init__()
@@ -1480,11 +1770,13 @@ class PDF(FPDF):
         self.set_left_margin(15)
         self.set_right_margin(15)
         self.logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+
+        # Add DejaVu Unicode font (must exist in same folder)
         font_path = os.path.join(os.path.dirname(__file__), "DejaVuSans.ttf")
         self.add_font("DejaVu", "", font_path, uni=True)
+        self.add_font("DejaVu", "B", font_path, uni=True)
+        self.add_font("DejaVu", "I", font_path, uni=True)
         self.set_font("DejaVu", "", 12)
-        # self.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
-        # self.set_font("DejaVu", "", 12)
 
     def header(self):
         if self.page_no() == 1:
@@ -1493,7 +1785,6 @@ class PDF(FPDF):
             self.set_font("DejaVu", "B", 15)
             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
             self.ln(2)
-
             self.set_font("DejaVu", "", 12)
             po_no = st.session_state.get("po_number", "")
             po_date = st.session_state.get("po_date", "")
@@ -1524,35 +1815,36 @@ class PDF(FPDF):
         self.cell(0, 6, title, ln=True)
         self.ln(1)
 
-    def row(self, data, col_widths, border=1, alignments=None):
-        """
-        Draws a table row with auto-wrapping for each cell.
-        data: list of strings
-        col_widths: list of column widths
-        alignments: list of alignments for each cell
-        """
+    def row(self, data, col_widths, line_height=5, alignments=None):
+        """Draw a table row with automatic text wrapping."""
         if alignments is None:
             alignments = ["L"] * len(data)
-        # Calculate max number of lines in this row
-        nb_lines = []
-        for datum, width in zip(data, col_widths):
-            nb_lines.append(self.get_string_width(datum) / width)
-        max_lines = max(1, int(max(nb_lines) + 1))
 
-        # Save current x,y
+        # Calculate max number of lines
+        max_lines = 1
+        for d, w in zip(data, col_widths):
+            lines = self.multi_cell_width(d, w)
+            max_lines = max(max_lines, lines)
+
         x_start = self.get_x()
         y_start = self.get_y()
-        line_height = 5
 
-        # Draw cells
-        for i, (datum, width, align) in enumerate(zip(data, col_widths, alignments)):
-            self.multi_cell(width, line_height, datum, border=border, align=align, ln=3 if i==len(data)-1 else 0)
+        for i, (d, w, a) in enumerate(zip(data, col_widths, alignments)):
+            self.multi_cell(w, line_height, d, border=1, align=a, ln=3 if i==len(data)-1 else 0)
             x_current = x_start + sum(col_widths[:i+1])
             self.set_xy(x_current, y_start)
+
         self.ln(line_height * max_lines)
 
+    def multi_cell_width(self, text, width):
+        """Estimate number of lines needed in multi_cell"""
+        if not text:
+            return 1
+        # approximate: total string width / column width
+        return max(1, int(self.get_string_width(text) / width) + 1)
 
-# --- Initialize Session ---
+
+# --- Session Initialization ---
 if "po_seq" not in st.session_state: st.session_state.po_seq = 1
 if "products" not in st.session_state: st.session_state.products = []
 if "company_name" not in st.session_state: st.session_state.company_name = "CM Infotech"
@@ -1581,7 +1873,7 @@ with st.sidebar:
 
 tab1, tab2, tab3, tab4 = st.tabs(["Vendor Details", "Products", "Terms", "Preview & Generate"])
 
-# --- Vendor & Addresses ---
+# --- Vendor Details ---
 with tab1:
     col1, col2 = st.columns(2)
     with col1:
@@ -1659,7 +1951,6 @@ with tab4:
         pdf = PDF()
         if logo_file:
             pdf.logo_path = logo_path
-
         pdf.add_page()
 
         # Vendor & Addresses
@@ -1672,7 +1963,7 @@ with tab4:
         pdf.multi_cell(0, 5, f"GST: {gst_no}\nPAN: {pan_no}\nMSME: {msme_no}")
         pdf.ln(2)
 
-        # Products Table with Auto-Wrapping
+        # Products Table
         pdf.section_title("Products & Services")
         col_widths = [65, 22, 25, 25, 15, 22]
         headers = ["Product", "Basic", "GST TAX @", "Per Unit Price", "Qty", "Total"]
@@ -1681,12 +1972,12 @@ with tab4:
         for h, w in zip(headers, col_widths):
             pdf.multi_cell(w, 6, h, border=1, align="C", fill=True, ln=3 if w==col_widths[-1] else 0)
         pdf.ln()
-
         pdf.set_font("DejaVu", "", 10)
+
         for p in st.session_state.products:
             gst_amt = p["basic"] * p["gst_percent"] / 100
             per_unit_price = p["basic"] + gst_amt
-            total = (p["basic"] + gst_amt) * p["qty"]
+            total = per_unit_price * p["qty"]
             row_data = [
                 p["name"], f"{p['basic']:.2f}", f"{gst_amt:.2f}", f"{per_unit_price:.2f}", f"{p['qty']:.2f}", f"{total:.2f}"
             ]
@@ -1698,7 +1989,7 @@ with tab4:
         pdf.cell(col_widths[5], 6, f"{grand_total:.2f}", border=1, align="R")
         pdf.ln(4)
 
-        # Amount in words
+        # Amount in Words
         pdf.set_font("DejaVu", "B", 10)
         pdf.cell(0, 8, "Amount in Words:", ln=True)
         pdf.set_font("DejaVu", "", 10)

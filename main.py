@@ -1437,7 +1437,7 @@ with tab4:
             print("Stamp image not found, skipping.")
 
         # Output PDF as bytes (S) and encode for Streamlit
-        pdf_bytes = pdf.output(dest='S').encode('utf-8')
+        pdf_bytes = pdf.output(dest='S')#.encode('utf-8')
 
         # increment PO counter if requested
         if auto_increment:

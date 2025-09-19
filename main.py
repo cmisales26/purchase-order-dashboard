@@ -1481,8 +1481,8 @@ class PDF(FPDF):
         self.set_right_margin(15)
         self.logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
         font_path = os.path.join(os.path.dirname(__file__), "DejaVuSans.ttf")
-        pdf.add_font("DejaVu", "", font_path, uni=True)
-        pdf.set_font("DejaVu", "B", 15)
+        self.add_font("DejaVu", "", font_path, uni=True)
+        self.set_font("DejaVu", "", 12)
         # self.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
         # self.set_font("DejaVu", "", 12)
 

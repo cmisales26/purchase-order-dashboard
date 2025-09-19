@@ -1967,11 +1967,12 @@ with tab4:
         pdf.section_title("Products & Services")
         col_widths = [65, 22, 25, 25, 15, 22]
         headers = ["Product", "Basic", "GST TAX @", "Per Unit Price", "Qty", "Total"]
+        # Products Table Header
         pdf.set_fill_color(220, 220, 220)
         pdf.set_font("DejaVu", "B", 10)
         for h, w in zip(headers, col_widths):
-            pdf.multi_cell(w, 6, h, border=1, align="C", fill=True, ln=3 if w==col_widths[-1] else 0)
-        pdf.ln()
+            pdf.multi_cell(w, 6, h, border=1, align="C", fill=True)
+        pdf.ln()  # move to next line after header
         pdf.set_font("DejaVu", "", 10)
 
         for p in st.session_state.products:

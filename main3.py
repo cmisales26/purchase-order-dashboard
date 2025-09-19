@@ -713,8 +713,8 @@ with tab4:
         # pdf.cell(65, 5, f"Authorized By: {sanitized_authorized_by}", border=0)
         # pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=1, align="R")
 
-        # --- Save in memory (for Streamlit) ---
-        pdf_data = pdf.output(dest="S")#.encode("latin-1")
+        # --- Save in memory for Streamlit ---
+        pdf_bytes = pdf.output(dest="S").encode('latin-1')
 
         if auto_increment:
             st.session_state.po_seq += 1
@@ -722,7 +722,7 @@ with tab4:
         st.success("Purchase Order generated!")
         st.download_button(
             "⬇ Download Purchase Order",
-            pdf_data,
+            pdf_bytes,
             f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
             "application/pdf"
         )

@@ -620,12 +620,12 @@ PRODUCT_CATALOG = {
 
 # --- PDF Class ---
 class PDF(FPDF):
-    def __init__(self, logo_path="D:\DashBoard\CM LOGO"):
+    def __init__(self, logo_path=r"D:\DashBoard\CM LOGO"):
         super().__init__()
         self.set_auto_page_break(auto=False, margin=0)
         self.set_left_margin(15)
         self.set_right_margin(15)
-        self.logo_path = 'D:\DashBoard\CM LOGO.png'
+        self.logo_path = r'D:\DashBoard\CM LOGO.png'
 
         # Register Calibri fonts (regular + bold)
         # font_dir = os.path.join(os.getcwd(), "fonts")  # folder where your ttf files are

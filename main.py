@@ -620,7 +620,7 @@ PRODUCT_CATALOG = {
 
 # --- PDF Class ---
 class PDF(FPDF):
-    def __init__(self, logo_path="D:\\DashBoard\\CM LOGO"):
+    def __init__(self, logo_path="D:\DashBoard\CM LOGO"):
         super().__init__()
         self.set_auto_page_break(auto=False, margin=0)
         self.set_left_margin(15)
@@ -628,11 +628,11 @@ class PDF(FPDF):
         self.logo_path = 'D:\DashBoard\CM LOGO.png'
 
         # Register Calibri fonts (regular + bold)
-        font_dir = os.path.join(os.getcwd(), "fonts")  # folder where your ttf files are
-        self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
-        self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
-        self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
-        self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
+        # font_dir = os.path.join(os.getcwd(), "fonts")  # folder where your ttf files are
+        # self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
+        # self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
+        # self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
+        # self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
 
 
     def header(self):

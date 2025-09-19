@@ -282,13 +282,19 @@ class PDF(FPDF):
         self.set_right_margin(15)
         self.logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
 
-        # Register Calibri fonts (regular + bold)
-        font_dir = os.path.join(os.path.dirname(__file__),"calibri.ttf","calibrib.ttf","calibrii.ttf","calibril.ttf","calibrili.ttf","calibriz.ttf")  # folder where your ttf files are
+        # # Register Calibri fonts (regular + bold)
+        # font_dir = os.path.join(os.path.dirname(__file__),"calibri.ttf","calibrib.ttf","calibrii.ttf","calibril.ttf","calibrili.ttf","calibriz.ttf")  # folder where your ttf files are
+        # self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
+        # self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
+        # self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
+        # self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
+
+        font_dir = os.path.join(os.path.dirname(__file__), "fonts")
+
         self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
         self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
         self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
         self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
-
 
     def header(self):
         if self.page_no() == 1:

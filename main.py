@@ -814,7 +814,7 @@ with tab4:
     st.metric("Grand Total", f"₹{grand_total:,.2f}")
 
     if st.button("Generate PO", type="primary"):
-        pdf = PDF(logo_path=logo_path)
+        pdf =  FPDF() #PDF(logo_path=logo_path)
         pdf.add_page()
         
         # Sanitize all input strings

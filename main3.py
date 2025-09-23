@@ -282,7 +282,7 @@ class PDF(FPDF):
         self.set_left_margin(15)
         self.set_right_margin(15)
         # self.logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
-        self.logo_path = os.path.join(os.path.dirname(__file__),"assets","logo_safe.png")
+        self.logo_path = os.path.join(os.path.dirname(__file__),"logo_safe.png")
         # # Register Calibri fonts (regular + bold)
         # font_dir = os.path.join(os.path.dirname(__file__),"calibri.ttf","calibrib.ttf","calibrii.ttf","calibril.ttf","calibrili.ttf","calibriz.ttf")  # folder where your ttf files are
         # self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
@@ -301,11 +301,8 @@ class PDF(FPDF):
         if self.page_no() == 1:
             # Logo (if available)
             if self.logo_path and os.path.exists(self.logo_path):
-                try:
-                    # self.image(self.logo_path, x=162.5, y=2.5, w=45)
-                    self.image(self.logo_path, x=150, y=10, w=40)
-                except RuntimeError:
-                    pass
+                self.image(self.logo_path, x=162.5, y=2.5, w=45)
+                # self.image(self.logo_path, x=150, y=10, w=40)
 
             # Company name (right side)
             # self.set_font("Arial", "B", 16)

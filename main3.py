@@ -584,6 +584,7 @@ with tab4:
         pdf.ln(4)
 
         # --- Amount in Words ---
+        pdf.ln(5)
         pdf.set_font("Calibri", "B", 10)
         pdf.cell(0, 8, "Amount in Words:", ln=True)
         pdf.set_font("Calibri", "", 10)

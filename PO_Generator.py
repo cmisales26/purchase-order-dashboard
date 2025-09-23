@@ -28,12 +28,12 @@ class PDF(FPDF):
         self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
         self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
         self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
-    
+        self.website_url = "https://cminfotech.com/"
     def header(self):
         if self.page_no() == 1:
             # Logo (if available)
             if self.logo_path and os.path.exists(self.logo_path):
-                self.image(self.logo_path, x=162.5, y=2.5, w=45)
+                self.image(self.logo_path, x=162.5, y=2.5, w=45,link=self.website_url)
                 # self.image(self.logo_path, x=150, y=10, w=40)
 
             

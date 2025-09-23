@@ -519,28 +519,9 @@ with tab4:
         pdf.section_title("Vendor & Addresses")
         pdf.set_font("Calibri", "", 10)
         pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
-        # pdf.set_xy(110, pdf.get_y() - 20)
-        # pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
-        # pdf.ln(1)
-        # Bill /Ship block
-        pdf.set_xy(110, pdf.get_y() -20)
-        # Bill
-        pdf.set_font("Calibri","B",10) #Bold
-        pdf.cell(0, 5, "Bill:", ln=0)
-
-        pdf.set_font("Calibri", "", 10) # Normal
-        pdf.multi_cell(0, 5, f"{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
-
-        # Ship
-        pdf.set_x(110)
-        pdf.set_font("Calibri", "B", 10)   # Bold
-        pdf.cell(0, 5, "Ship: ", ln=0)
-
-        pdf.set_font("Calibri", "", 10)    # Normal
-        pdf.multi_cell(0, 5, f"{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
-
+        pdf.set_xy(110, pdf.get_y() - 20)
+        pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
         pdf.ln(1)
-
         pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")
         pdf.ln(2)
 

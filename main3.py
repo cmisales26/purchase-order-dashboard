@@ -302,7 +302,8 @@ class PDF(FPDF):
             # Logo (if available)
             if self.logo_path and os.path.exists(self.logo_path):
                 try:
-                    self.image(self.logo_path, x=162.5, y=2.5, w=45)
+                    # self.image(self.logo_path, x=162.5, y=2.5, w=45)
+                    self.image(self.logo_path, x=150, y=10, w=40)
                 except RuntimeError:
                     pass
 

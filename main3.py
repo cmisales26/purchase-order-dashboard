@@ -262,6 +262,7 @@ from fpdf import FPDF
 from num2words import num2words
 import datetime
 from io import BytesIO
+from PIL import Image
 import os
 
 # --- Product Catalog (Dropdown Options) ---
@@ -280,8 +281,8 @@ class PDF(FPDF):
         self.set_auto_page_break(auto=False, margin=0)
         self.set_left_margin(15)
         self.set_right_margin(15)
-        self.logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
-
+        # self.logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+        self.logo_path = os.path.join(os.path.dirname(__file__), "logo_safe.png")
         # # Register Calibri fonts (regular + bold)
         # font_dir = os.path.join(os.path.dirname(__file__),"calibri.ttf","calibrib.ttf","calibrii.ttf","calibril.ttf","calibrili.ttf","calibriz.ttf")  # folder where your ttf files are
         # self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
@@ -300,7 +301,10 @@ class PDF(FPDF):
         if self.page_no() == 1:
             # Logo (if available)
             if self.logo_path and os.path.exists(self.logo_path):
-                self.image(self.logo_path, x=162.5, y=2.5, w=45)
+                try:
+                    self.image(self.logo_path, x=162.5, y=2.5, w=45)
+                except RuntimeError:
+                    pass
 
             # Company name (right side)
             # self.set_font("Arial", "B", 16)

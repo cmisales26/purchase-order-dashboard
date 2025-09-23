@@ -230,49 +230,38 @@ with tab4:
 
         # --- Products Table ---
         pdf.section_title("Products & Services")
-        col_widths = [65, 22, 25, 25, 15, 22]
+        col_widths = [65, 22, 25, 25, 15, 22]  # column widths
         headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
+
+        # Header
         pdf.set_fill_color(220, 220, 220)
         pdf.set_font("Calibri", "B", 10)
         for h, w in zip(headers, col_widths):
             pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
         pdf.ln()
-        # pdf.set_font("Calibri", "", 10)
-        # for p in st.session_state.products:
-        #     gst_amt = p["basic"] * p["gst_percent"] / 100
-        #     per_unit_price = p["basic"] + gst_amt
-        #     total = (p["basic"] + gst_amt) * p["qty"]
-        #     name = pdf.sanitize_text(p["name"])
-        #     name = name if len(name) <= 25 else name[:25] + "..."
-        #     pdf.cell(col_widths[0], 6, name, border=1)
-        #     pdf.cell(col_widths[1], 6, f"{p['basic']:.2f}", border=1, align="R")
-        #     pdf.cell(col_widths[2], 6, f"{gst_amt:.2f}", border=1, align="R")
-        #     pdf.cell(col_widths[3], 6, f"{per_unit_price:.2f}", border=1, align="R")
-        #     pdf.cell(col_widths[4], 6, f"{p['qty']:.2f}", border=1, align="C")
-        #     pdf.cell(col_widths[5], 6, f"{total:.2f}", border=1, align="R")
-        #     pdf.ln()
 
+        # Rows
         pdf.set_font("Calibri", "", 10)
         line_height = 5
         for p in st.session_state.products:
             gst_amt = p["basic"] * p["gst_percent"] / 100
             per_unit_price = p["basic"] + gst_amt
-            total = (p["basic"] + gst_amt) * p["qty"]
+            total = per_unit_price * p["qty"]
             name = pdf.sanitize_text(p["name"])
 
-            # Calculate how many lines the product name will take
+            # Determine row height based on product name wrapping
             num_lines = pdf.multi_cell(col_widths[0], line_height, name, border=0, split_only=True)
             max_lines = max(len(num_lines), 1)
             row_height = line_height * max_lines
 
-            # Draw the row
+            # Save current X, Y for row
             x_start = pdf.get_x()
             y_start = pdf.get_y()
 
             # Product Name
             pdf.multi_cell(col_widths[0], line_height, name, border=1)
 
-            # Other columns
+            # Other columns (aligned with row height)
             pdf.set_xy(x_start + col_widths[0], y_start)
             pdf.cell(col_widths[1], row_height, f"{p['basic']:.2f}", border=1, align="R")
             pdf.cell(col_widths[2], row_height, f"{gst_amt:.2f}", border=1, align="R")
@@ -281,11 +270,72 @@ with tab4:
             pdf.cell(col_widths[5], row_height, f"{total:.2f}", border=1, align="R")
             pdf.ln(row_height)
 
-
+        # Grand Total Row
         pdf.set_font("Calibri", "B", 10)
         pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
+        grand_total = sum((p["basic"] + p["basic"] * p["gst_percent"] / 100) * p["qty"] for p in st.session_state.products)
         pdf.cell(col_widths[5], 6, f"{grand_total:.2f}", border=1, align="R")
         pdf.ln(4)
+
+
+        # # --- Products Table ---
+        # pdf.section_title("Products & Services")
+        # col_widths = [65, 22, 25, 25, 15, 22]
+        # headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
+        # pdf.set_fill_color(220, 220, 220)
+        # pdf.set_font("Calibri", "B", 10)
+        # for h, w in zip(headers, col_widths):
+        #     pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
+        # pdf.ln()
+        # # pdf.set_font("Calibri", "", 10)
+        # # for p in st.session_state.products:
+        # #     gst_amt = p["basic"] * p["gst_percent"] / 100
+        # #     per_unit_price = p["basic"] + gst_amt
+        # #     total = (p["basic"] + gst_amt) * p["qty"]
+        # #     name = pdf.sanitize_text(p["name"])
+        # #     name = name if len(name) <= 25 else name[:25] + "..."
+        # #     pdf.cell(col_widths[0], 6, name, border=1)
+        # #     pdf.cell(col_widths[1], 6, f"{p['basic']:.2f}", border=1, align="R")
+        # #     pdf.cell(col_widths[2], 6, f"{gst_amt:.2f}", border=1, align="R")
+        # #     pdf.cell(col_widths[3], 6, f"{per_unit_price:.2f}", border=1, align="R")
+        # #     pdf.cell(col_widths[4], 6, f"{p['qty']:.2f}", border=1, align="C")
+        # #     pdf.cell(col_widths[5], 6, f"{total:.2f}", border=1, align="R")
+        # #     pdf.ln()
+
+        # pdf.set_font("Calibri", "", 10)
+        # line_height = 5
+        # for p in st.session_state.products:
+        #     gst_amt = p["basic"] * p["gst_percent"] / 100
+        #     per_unit_price = p["basic"] + gst_amt
+        #     total = (p["basic"] + gst_amt) * p["qty"]
+        #     name = pdf.sanitize_text(p["name"])
+
+        #     # Calculate how many lines the product name will take
+        #     num_lines = pdf.multi_cell(col_widths[0], line_height, name, border=0, split_only=True)
+        #     max_lines = max(len(num_lines), 1)
+        #     row_height = line_height * max_lines
+
+        #     # Draw the row
+        #     x_start = pdf.get_x()
+        #     y_start = pdf.get_y()
+
+        #     # Product Name
+        #     pdf.multi_cell(col_widths[0], line_height, name, border=1)
+
+        #     # Other columns
+        #     pdf.set_xy(x_start + col_widths[0], y_start)
+        #     pdf.cell(col_widths[1], row_height, f"{p['basic']:.2f}", border=1, align="R")
+        #     pdf.cell(col_widths[2], row_height, f"{gst_amt:.2f}", border=1, align="R")
+        #     pdf.cell(col_widths[3], row_height, f"{per_unit_price:.2f}", border=1, align="R")
+        #     pdf.cell(col_widths[4], row_height, f"{p['qty']:.2f}", border=1, align="C")
+        #     pdf.cell(col_widths[5], row_height, f"{total:.2f}", border=1, align="R")
+        #     pdf.ln(row_height)
+
+
+        # pdf.set_font("Calibri", "B", 10)
+        # pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
+        # pdf.cell(col_widths[5], 6, f"{grand_total:.2f}", border=1, align="R")
+        # pdf.ln(4)
 
         # --- Amount in Words ---
         pdf.ln(5)

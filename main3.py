@@ -333,7 +333,7 @@ class PDF(FPDF):
         # Emails (clickable)
         self.set_text_color(0, 0, 255)
         email1 = "cad@cmi.com"
-        email2 = "support@cmi.com"
+        email2 = "info@cminfotech.com "
         self.cell(0, 4, f"{email1} | {email2}", ln=True, align="C", link=f"mailto:{email1}")
         # Add second link separately (on same text)
         self.set_x((self.w - 80) / 2)
@@ -342,7 +342,7 @@ class PDF(FPDF):
 
         # Clickable Phone Number
         self.set_x((self.w - 60) / 2)
-        phone_number = "+918798159721"
+        phone_number ="+91 873 391 5721" #"+918798159721"
         self.set_text_color(0, 0, 255)  # blue
         self.cell(60, 4, f"Call: {phone_number}", ln=True, align="C", link=f"tel:{phone_number}")
         self.set_text_color(0, 0, 0)
@@ -519,9 +519,28 @@ with tab4:
         pdf.section_title("Vendor & Addresses")
         pdf.set_font("Calibri", "", 10)
         pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
-        pdf.set_xy(110, pdf.get_y() - 20)
-        pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+        # pdf.set_xy(110, pdf.get_y() - 20)
+        # pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+        # pdf.ln(1)
+        # Bill /Ship block
+        pdf.set_xy(110, pdf.get_y() -20)
+        # Bill
+        pdf.set_font("Calibri","B",10) #Bold
+        pdf.cell(0, 5, "Bill:", ln=0)
+
+        pdf.set_font("Calibri", "", 10) # Normal
+        pdf.multi_cell(0, 5, f"{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+
+        # Ship
+        pdf.set_x(110)
+        pdf.set_font("Calibri", "B", 10)   # Bold
+        pdf.cell(0, 5, "Ship: ", ln=0)
+
+        pdf.set_font("Calibri", "", 10)    # Normal
+        pdf.multi_cell(0, 5, f"{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+
         pdf.ln(1)
+
         pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")
         pdf.ln(2)
 

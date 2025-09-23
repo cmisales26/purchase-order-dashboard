@@ -288,15 +288,28 @@ with tab4:
         pdf.set_x(pdf.l_margin)
         pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
 
-        # Path to your uploaded image
-        pdf.set_y(-110)
-        pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=2, border=0, align="L")
-        stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
+        # # Path to your uploaded image
+        # pdf.set_y(-110)
+        # pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=2, border=0, align="L")
+        # stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
 
-        # Position the stamp above the footer
-        pdf.set_y(-105)  # 105 mm from bottom, adjust as needed
-        pdf.set_x(15)  # center the stamp, assuming width 40
-        pdf.image(stamp_path, w=30)  # width 40 mm, height auto
+        # # Position the stamp above the footer
+        # pdf.set_y(-105)  # 105 mm from bottom, adjust as needed
+        # pdf.set_x(15)  # center the stamp, assuming width 40
+        # pdf.image(stamp_path, w=30)  # width 40 mm, height auto
+
+        # --- Footer (Company Name + Stamp) that floats) ---
+        pdf.ln(5)  # small space before footer
+        pdf.set_font("Calibri", "", 10)
+
+        # Write company name
+        pdf.cell(0, 5, f"For, {pdf.sanitize_text(st.session_state.company_name)}", ln=True, border=0, align="L")
+
+        # Add the stamp just below the company name
+        stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
+        pdf.ln(2)  # small space between text and stamp
+        pdf.image(stamp_path, x=pdf.get_x(), y=pdf.get_y(), w=30)  # width 30 mm, height auto
+        pdf.ln(15)  # space after stamp if needed
 
         # --- Save in memory for Streamlit ---
         pdf_bytes = pdf.output(dest="S").encode('latin-1')

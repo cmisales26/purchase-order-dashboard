@@ -95,8 +95,9 @@ if "company_name" not in st.session_state:
 
 today = datetime.date.today()
 st.session_state.po_date = today.strftime("%d-%m-%Y")
-st.session_state.po_number = f"C/CP/{today.year}/Q{(today.month-1)//3+1}/{st.session_state.po_seq:03d}"
-
+# st.session_state.po_number = f"C/CP/{today.year}/Q{(today.month-1)//3+1}/{st.session_state.po_seq:03d}"
+default_po_number = f"C/CP/{today.year}/Q{(today.month-1)//3+1}/{st.session_state.get('po_seq', 1):03d}"
+st.session_state.po_number = st.text_input("PO Number", value=default_po_number)
 # --- UI ---
 st.set_page_config(page_title="Purchase Order Generator", page_icon="📄", layout="wide")
 st.title("📄 Purchase Order Generator")

@@ -14,10 +14,10 @@ class PDF(FPDF):
         self.set_right_margin(15)
         font_dir = os.path.join(os.path.dirname(__file__), "fonts")
         # Ensure these fonts exist in your 'fonts' directory
-        self.add_font("Calibri", "", "calibri.ttf", uni=True)
-        self.add_font("Calibri", "B", "calibrib.ttf", uni=True)
-        self.add_font("Calibri", "I", "calibrii.ttf", uni=True)
-        self.add_font("Calibri", "BI", "calibriz.ttf", uni=True)
+        self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
+        self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
+        self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
+        self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
         self.website_url = "https://cminfotech.com/"
 
     def header(self):

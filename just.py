@@ -7,8 +7,8 @@ from io import BytesIO
 
 # --- PDF Class for Tax Invoice ---
 class PDF(FPDF):
-    def _init_(self):
-        super()._init_()
+    def __init__(self):
+        super().__init__()
         self.set_auto_page_break(auto=False, margin=0)
         self.set_left_margin(15)
         self.set_right_margin(15)

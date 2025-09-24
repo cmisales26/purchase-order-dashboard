@@ -5,8 +5,8 @@ import io
 
 # --- PDF Class for Tax Invoice ---
 class PDF(FPDF):
-    def __init__(self):
-        super().__init__()
+    def _init_(self):
+        super()._init_()
         self.set_auto_page_break(auto=True, margin=15)
         self.set_font("Helvetica", "", 10)
         self.set_left_margin(15)

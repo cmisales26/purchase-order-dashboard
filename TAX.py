@@ -5,8 +5,8 @@ import io
 
 # --- PDF Class for Tax Invoice ---
 class PDF(FPDF):
-    def __init__(self):
-        super().__init__()
+    def _init_(self):
+        super()._init_()
         self.set_auto_page_break(auto=True, margin=15)
         self.set_font("Helvetica", "", 10)
         self.set_left_margin(15)
@@ -263,6 +263,82 @@ def create_invoice_pdf(invoice_data):
 
     return io.BytesIO(pdf.output())
 
+# --- Main Streamlit Application ---
+
+st.title("Tax Invoice Generator")
+
+# Sample data dictionary to pre-populate the fields
+sample_invoice_data = {
+    "supplier": {
+        "name": "CM Infotech",
+        "address": "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481",
+        "gst_no": "24ANMPP4",
+        "msme_reg_no": "UDYAM-",
+        "email": "cm.infot",
+        "mobile_no": "873391"
+    },
+    "buyer": {
+        "name": "Baldridge Pvt Ltd.",
+        "address": "406, Sakar East, 40mt Tarsali - Danteshwar Ring Road, Vadodara 390009",
+        "gst_no": "24AAHCB9",
+        "email": "dmistry@b",
+        "tel_no": "98987",
+        "destination": "Vadodara"
+    },
+    "invoice": {
+        "invoice_no": "CMI/25-26/Q1/010",
+        "invoice_date": "28 April 2025",
+        "buyers_order_no": "",
+        "buyers_order_date": "17 April 2025",
+        "terms_of_payment": "100% Advance with Purchase Order",
+        "dispatch_doc_no": "",
+        "dispatched_through": "Online",
+        "delivery_note_date": "",
+        "terms_of_delivery": "Within Month",
+        "other_references": ""
+    },
+    "items": [
+        {
+            "description": "Autodesk BIM Collaborate Pro - Single-user CLOUD Commercial New Annual Subscription Serial #575-26831580 Contract #110004988191 End Date: 17/04/2026",
+            "hsn_sac": "997331",
+            "quantity": 1.00,
+            "unit_rate": 36500.00
+        }
+    ],
+    "totals": {
+        "sgst": 3285.00,
+        "cgst": 3285.00,
+        "final_amount": 43070.00,
+        "amount_in_words": "Rs. Forty Three Thousand And Seventy Only/-"
+    },
+    "tax_details": {
+        "hsn_sac": "997331",
+        "taxable_value": 36500.00,
+        "central_rate": 9,
+        "central_amount": 3285.00,
+        "state_rate": 9,
+        "state_amount": 3285.00,
+        "total_taxable": 36500.00,
+        "total_tax": 6570.00
+    },
+    "bank_details": {
+        "bank_name": "XYZ bank",
+        "branch": "AHMED",
+        "account_no": "881304",
+        "ifs_code": "IDFB004"
+    },
+    "declaration": "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE"
+}
+
+# Generate PDF button and download link
+if st.button("Generate Invoice PDF"):
+    pdf_bytes = create_invoice_pdf(sample_invoice_data)
+    
+    st.download_button(
+        label="Download PDF",
+        data=pdf_bytes,
+        file_name="tax_invoice.pdf",
+        mime="application/pdf")
 
 # import streamlit as st
 # from fpdf import FPDF

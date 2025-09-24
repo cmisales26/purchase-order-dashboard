@@ -237,7 +237,9 @@ def create_invoice_pdf(invoice_data):
     pdf.set_font("Helvetica", "I", 10)
     pdf.cell(0, 7, "Authorized Signatory", ln=1, align="R")
 
-    return io.BytesIO(pdf.output())
+    # At the end of create_invoice_pdf
+    return io.BytesIO(pdf.output(dest='S').encode('latin1'))
+
 
 # --- Streamlit UI ---
 st.set_page_config(page_title="Tax Invoice Generator", page_icon="📄", layout="wide")

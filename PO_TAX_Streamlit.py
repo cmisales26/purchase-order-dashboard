@@ -244,7 +244,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.set_y(-30)
     pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 5, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-    pdf.set_y(-30)
+    pdf.set_y(-27)
     pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 5, "Email: info@cminfotech.com Mo.+91 873 391 5721", ln=True, align="C")
     # pdf_output = io.BytesIO()

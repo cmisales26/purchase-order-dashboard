@@ -104,7 +104,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # --- Items ---
     pdf.set_font("Helvetica", "", 8)
     col_widths = [10, 85, 20, 20, 25, 30]
-    line_height = 3
+    line_height = 4
 
     for i, item in enumerate(invoice_data["items"], start=1):
         x_start = pdf.get_x()
@@ -238,13 +238,13 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.ln(10)
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
-    pdf.set_y(-40)
+    pdf.set_y(-35)
     pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 5, "This is a Computer Generated Invoice", ln=True, align="C")
-    pdf.set_y(-30)
+    pdf.set_y(-25)
     pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 5, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-    pdf.set_y(-20)
+    pdf.set_y(-15)
     pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 5, "Email: info@cminfotech.com Mo.+91 873 391 5721", ln=True, align="C")
     # pdf_output = io.BytesIO()
@@ -362,7 +362,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.ln()
 
     pdf.set_font("Calibri", "", 10)
-    line_height = 4
+    line_height = 5
     for p in po_data["products"]:
         gst_amt = p["basic"] * p["gst_percent"] / 100
         per_unit_price = p["basic"] + gst_amt

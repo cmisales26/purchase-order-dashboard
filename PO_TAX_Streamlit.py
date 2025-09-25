@@ -28,7 +28,7 @@ class PDF(FPDF):
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
         self.ln(3)
 
-def create_invoice_pdf(invoice_data,logo_file=None,stamp_file=None):
+def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "stamp.jpg"):
     pdf = PDF()
     pdf.add_page()
 
@@ -541,16 +541,16 @@ def main():
                     "declaration": declaration
                 }
 
-                logo_path, stamp_path = None, None
-                if logo_file:
-                    logo_path = "temp_logo.png"
-                    with open(logo_path, "wb") as f:
-                        f.write(logo_file.getbuffer())
+                # logo_path, stamp_path = None, None
+                # if logo_file:
+                #     logo_path = "temp_logo.png"
+                #     with open(logo_path, "wb") as f:
+                #         f.write(logo_file.getbuffer())
 
-                if stamp_file:
-                    stamp_path = "temp_stamp.png"
-                    with open(stamp_path, "wb") as f:
-                        f.write(stamp_file.getbuffer())
+                # if stamp_file:
+                #     stamp_path = "temp_stamp.png"
+                #     with open(stamp_path, "wb") as f:
+                #         f.write(stamp_file.getbuffer())
 
                 pdf_file = create_invoice_pdf(invoice_data)
 

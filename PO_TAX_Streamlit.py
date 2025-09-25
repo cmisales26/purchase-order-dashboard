@@ -251,8 +251,10 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # pdf.output(pdf_output)
     # pdf_output.seek(0)
     # return pdf_output
-    pdf_bytes = pdf.output(dest="S").encode('latin-1')  # make it bytes
+    pdf_bytes = pdf.output(dest="S")  # generate PDF as string
+    pdf_bytes = pdf_bytes.encode('latin-1')  # convert to bytes
     return pdf_bytes
+
 
 
 # --- PDF Class ---

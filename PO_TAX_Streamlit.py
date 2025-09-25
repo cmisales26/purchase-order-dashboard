@@ -28,7 +28,7 @@ class PDF(FPDF):
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
         self.ln(3)
 
-def create_invoice_pdf(invoice_data,logo_file,stamp_file):
+def create_invoice_pdf(invoice_data,logo_file=None,stamp_file=None):
     pdf = PDF()
     pdf.add_page()
 
@@ -251,8 +251,7 @@ def create_invoice_pdf(invoice_data,logo_file,stamp_file):
     # pdf.output(pdf_output)
     # pdf_output.seek(0)
     # return pdf_output
-    pdf_bytes = pdf.output(dest="S")  # generate PDF as string
-    pdf_bytes = pdf_bytes.encode('latin-1')  # convert to bytes
+    pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
 
 

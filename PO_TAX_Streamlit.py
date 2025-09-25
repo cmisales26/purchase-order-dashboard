@@ -636,7 +636,7 @@ def main():
             logo_file = st.file_uploader("Upload Company Logo", type=["png", "jpg", "jpeg"], key="po_logo")
             logo_path = None
             if logo_file:
-                logo_path = "po_logo_temp.png"
+                logo_path = "logo_final.jpg"
                 with open(logo_path, "wb") as f:
                     f.write(logo_file.getbuffer())
             

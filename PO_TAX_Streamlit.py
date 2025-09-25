@@ -104,7 +104,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # --- Items ---
     pdf.set_font("Helvetica", "", 8)
     col_widths = [10, 85, 20, 20, 25, 30]
-    line_height = 4
+    line_height = 3
 
     for i, item in enumerate(invoice_data["items"], start=1):
         x_start = pdf.get_x()
@@ -362,7 +362,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.ln()
 
     pdf.set_font("Calibri", "", 10)
-    line_height = 5
+    line_height = 4
     for p in po_data["products"]:
         gst_amt = p["basic"] * p["gst_percent"] / 100
         per_unit_price = p["basic"] + gst_amt

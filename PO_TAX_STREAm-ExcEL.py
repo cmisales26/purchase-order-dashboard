@@ -468,6 +468,7 @@ def main():
         st.session_state.po_end_person = end_user["End User Contact"]
         st.session_state.po_end_contact = end_user["End User Phone"]
         st.session_state.po_end_email = end_user["End User Email"]
+        st.session_state.po_end_gst_no = end_user["GST NO"]
 
         st.info("Vendor & End User details auto-filled from Excel ✅")
 
@@ -528,7 +529,7 @@ def main():
             )
             buyer_gst = st.text_input(
                 "Buyer GST No.",
-                value=st.session_state.get("po_gst_no","24AAHCB9")
+                value=st.session_state.get("po_end_gst_no","24AAHCB9")
             )
 
             

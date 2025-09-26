@@ -622,7 +622,7 @@ def main():
                 vendor_name = st.text_input("Vendor Name", "Arkance IN Pvt. Ltd.", key="po_vendor_name")
                 vendor_address = st.text_area("Vendor Address", "Unit 801-802, 8th Floor, Tower 1...", key="po_vendor_address")
                 vendor_contact = st.text_input("Contact Person", "Ms/Mr", key="po_vendor_contact")
-                vendor_mobile = st.text_input("Mobile", "‪‪+91 1234567890‬‬", key="po_vendor_mobile")
+                vendor_mobile = st.text_input("Mobile", "+91 1234567890", key="po_vendor_mobile")
                 gst_no = st.text_input("GST No", "24ANMPP4891R1ZX", key="po_gst_no")
                 pan_no = st.text_input("PAN No", "ANMPP4891R", key="po_pan_no")
                 msme_no = st.text_input("MSME No", "UDYAM-GJ-01-0117646", key="po_msme_no")

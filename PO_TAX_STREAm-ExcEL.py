@@ -459,9 +459,9 @@ def main():
         st.session_state.po_vendor_address = vendor["Vendor Address"]
         st.session_state.po_vendor_contact = vendor["Contact Person"]
         st.session_state.po_vendor_mobile = vendor["Mobile"]
-        st.session_state.po_gst_no = vendor["GST No"]
-        st.session_state.po_pan_no = vendor["PAN No"]
-        st.session_state.po_msme_no = vendor["MSME No"]
+        # st.session_state.po_gst_no = vendor["GST No"]
+        # st.session_state.po_pan_no = vendor["PAN No"]
+        # st.session_state.po_msme_no = vendor["MSME No"]
 
         st.session_state.po_end_company = end_user["End User Company"]
         st.session_state.po_end_address = end_user["End User Address"]

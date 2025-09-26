@@ -640,7 +640,7 @@ def main():
                 end_company = st.text_input("End User Company", "Baldridge & Associates Pvt Ltd.", key="po_end_company")
                 end_address = st.text_area("End User Address", "406 Sakar East, Vadodara 390009", key="po_end_address")
                 end_person = st.text_input("End User Contact", "Mr. Dev", key="po_end_person")
-                end_contact = st.text_input("End User Phone", "‪+91 9876543210‬", key="po_end_contact")
+                end_contact = st.text_input("End User Phone", "+91 9876543210", key="po_end_contact")
                 end_email = st.text_input("End User Email", "info@company.com", key="po_end_email")
 
         with tab_products:

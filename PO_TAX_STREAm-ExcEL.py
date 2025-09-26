@@ -437,35 +437,40 @@ def main():
     st.set_page_config(page_title="Invoice & PO Generator", page_icon="📑", layout="wide")
     st.title("📑 Invoice & PO Generator")
 
-     # Upload Excel
+    # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
 
     if uploaded_excel:
         vendors_df = pd.read_excel(uploaded_excel, sheet_name="Vendors")
         endusers_df = pd.read_excel(uploaded_excel, sheet_name="EndUsers")
 
-        # Select Vendor
+        st.success("✅ Excel loaded successfully!")
+
+        # --- Select Vendor ---
         vendor_name = st.selectbox("Select Vendor", vendors_df["Vendor Name"].unique())
         vendor = vendors_df[vendors_df["Vendor Name"] == vendor_name].iloc[0]
 
-        # Select End User
+        # --- Select End User ---
         end_user_name = st.selectbox("Select End User", endusers_df["End User Company"].unique())
         end_user = endusers_df[endusers_df["End User Company"] == end_user_name].iloc[0]
 
-        # Collect data
-        po_data = {
-            "vendor_name": vendor["Vendor Name"],
-            "vendor_address": vendor["Vendor Address"],
-            "vendor_contact": vendor["Contact Person"],
-            "vendor_mobile": vendor["Mobile"],
-            "end_user_company": end_user["End User Company"],
-            "end_user_address": end_user["End User Address"],
-            "end_user_contact": end_user["End User Contact"],
-            "end_user_phone": end_user["End User Phone"],
-            "end_user_email": end_user["End User Email"],
-        }
+        # Save to session_state (so Invoice & PO can use)
+        st.session_state.po_vendor_name = vendor["Vendor Name"]
+        st.session_state.po_vendor_address = vendor["Vendor Address"]
+        st.session_state.po_vendor_contact = vendor["Contact Person"]
+        st.session_state.po_vendor_mobile = vendor["Mobile"]
+        st.session_state.po_gst_no = vendor["GST No"]
+        st.session_state.po_pan_no = vendor["PAN No"]
+        st.session_state.po_msme_no = vendor["MSME No"]
 
-        st.write("✅ Vendor & End User details loaded successfully!")
+        st.session_state.po_end_company = end_user["End User Company"]
+        st.session_state.po_end_address = end_user["End User Address"]
+        st.session_state.po_end_person = end_user["End User Contact"]
+        st.session_state.po_end_contact = end_user["End User Phone"]
+        st.session_state.po_end_email = end_user["End User Email"]
+
+        st.info("Vendor & End User details auto-filled from Excel ✅")
+
 
 
     # --- Initialize Session State ---

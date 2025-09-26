@@ -481,12 +481,18 @@ def main():
             # buyer_name = st.text_input("Buyer Name", "Baldridge Pvt Ltd.")
             # buyer_address = st.text_area("Buyer Address", "406, Sakar East, 40mt Tarsali - Danteshwar Ring Road, Vadodara 390009")
             # buyer_gst = st.text_input("Buyer GST No.", "24AAHCB9")
-            buyer_name = st.session_state.get("po_end_company", "Baldridge Pvt Ltd.")
-            buyer_address = st.session_state.get("po_end_address", "406, Sakar East, ...")
-            buyer_gst = st.session_state.get("po_gst_no", "24AAHCB9")
-            st.write(f"Buyer Name (from PO): {buyer_name}")
-            st.write(f"Buyer Address (from PO): {buyer_address}")
-            st.write(f"Buyer GST No. (from PO): {buyer_gst}")
+            buyer_name = st.text_input(
+                "Buyer Name",
+                value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
+            )
+            buyer_address = st.text_area(
+                "Buyer Address",
+                value=st.session_state.get("po_end_address","406, Sakar East,...")
+            )
+            buyer_gst = st.text_input(
+                "Buyer GST No.",
+                value=st.session_state.get("po_gst_no","24AAHCB9")
+            )
 
             
             st.subheader("Products")

@@ -610,38 +610,129 @@ def main():
                     file_name=f"Invoice_{invoice_no}.pdf",
                     mime="application/pdf")
                 
+
+    # --- Utility to safely get string from session_state ---
+    def safe_str_state(key, default=""):
+        """Ensure session_state value exists and is always a string."""
+        if key not in st.session_state or not isinstance(st.session_state[key], str):
+            st.session_state[key] = str(default)
+        return st.session_state[key]         
+      
     # --- Tab 2: Purchase Order Generator ---
     with tab2:
         st.header("Purchase Order Generator")
         
         tab_vendor, tab_products, tab_terms, tab_preview = st.tabs(["Vendor Details", "Products", "Terms", "Preview & Generate"])
-
         with tab_vendor:
             col1, col2 = st.columns(2)
             with col1:
-                vendor_name = st.text_input("Vendor Name", "Arkance IN Pvt. Ltd.", key="po_vendor_name")
-                vendor_address = st.text_area("Vendor Address", "Unit 801-802, 8th Floor, Tower 1...", key="po_vendor_address")
-                vendor_contact = st.text_input("Contact Person", "Ms/Mr", key="po_vendor_contact")
-                if "po_vendor_mobile" not in st.session_state or not isinstance(st.session_state["po_vendor_mobile"], str):
-                    st.session_state["po_vendor_mobile"] = "+91 1234567890"
+                vendor_name = st.text_input(
+                    "Vendor Name",
+                    value=safe_str_state("po_vendor_name", "Arkance IN Pvt. Ltd."),
+                    key="po_vendor_name"
+                )
+                vendor_address = st.text_area(
+                    "Vendor Address",
+                    value=safe_str_state("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1..."),
+                    key="po_vendor_address"
+                )
+                vendor_contact = st.text_input(
+                    "Contact Person",
+                    value=safe_str_state("po_vendor_contact", "Ms/Mr"),
+                    key="po_vendor_contact"
+                )
+                vendor_mobile = st.text_input(
+                    "Mobile",
+                    value=safe_str_state("po_vendor_mobile", "+91 1234567890"),
+                    key="po_vendor_mobile"
+                )
+                gst_no = st.text_input(
+                    "GST No",
+                    value=safe_str_state("po_gst_no", "24ANMPP4891R1ZX"),
+                    key="po_gst_no"
+                )
+                pan_no = st.text_input(
+                    "PAN No",
+                    value=safe_str_state("po_pan_no", "ANMPP4891R"),
+                    key="po_pan_no"
+                )
+                msme_no = st.text_input(
+                    "MSME No",
+                    value=safe_str_state("po_msme_no", "UDYAM-GJ-01-0117646"),
+                    key="po_msme_no"
+                )
+        # with tab_vendor:
+        #     col1, col2 = st.columns(2)
+        #     with col1:
+        #         vendor_name = st.text_input("Vendor Name", "Arkance IN Pvt. Ltd.", key="po_vendor_name")
+        #         vendor_address = st.text_area("Vendor Address", "Unit 801-802, 8th Floor, Tower 1...", key="po_vendor_address")
+        #         vendor_contact = st.text_input("Contact Person", "Ms/Mr", key="po_vendor_contact")
+        #         if "po_vendor_mobile" not in st.session_state or not isinstance(st.session_state["po_vendor_mobile"], str):
+        #             st.session_state["po_vendor_mobile"] = "+91 1234567890"
 
-                vendor_mobile = st.text_input("Mobile", st.session_state["po_vendor_mobile"], key="po_vendor_mobile")
+        #         vendor_mobile = st.text_input("Mobile", st.session_state["po_vendor_mobile"], key="po_vendor_mobile")
 
-                # vendor_mobile = st.text_input("Mobile", "+91 1234567890", key="po_vendor_mobile")
-                gst_no = st.text_input("GST No", "24ANMPP4891R1ZX", key="po_gst_no")
-                pan_no = st.text_input("PAN No", "ANMPP4891R", key="po_pan_no")
-                msme_no = st.text_input("MSME No", "UDYAM-GJ-01-0117646", key="po_msme_no")
-            
+        #         # vendor_mobile = st.text_input("Mobile", "+91 1234567890", key="po_vendor_mobile")
+        #         gst_no = st.text_input("GST No", "24ANMPP4891R1ZX", key="po_gst_no")
+        #         pan_no = st.text_input("PAN No", "ANMPP4891R", key="po_pan_no")
+        #         msme_no = st.text_input("MSME No", "UDYAM-GJ-01-0117646", key="po_msme_no")
             with col2:
-                bill_to_company = st.text_input("Bill To", "CM INFOTECH", key="po_bill_to_company")
-                bill_to_address = st.text_area("Bill To Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481", key="po_bill_to_address")
-                ship_to_company = st.text_input("Ship To", "CM INFOTECH", key="po_ship_to_company")
-                ship_to_address = st.text_area("Ship To Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481", key="po_ship_to_address")
-                end_company = st.text_input("End User Company", "Baldridge & Associates Pvt Ltd.", key="po_end_company")
-                end_address = st.text_area("End User Address", "406 Sakar East, Vadodara 390009", key="po_end_address")
-                end_person = st.text_input("End User Contact", "Mr. Dev", key="po_end_person")
-                end_contact = st.text_input("End User Phone", "+91 9876543210", key="po_end_contact")
-                end_email = st.text_input("End User Email", "info@company.com", key="po_end_email")
+                bill_to_company = st.text_input(
+                    "Bill To",
+                    value=safe_str_state("po_bill_to_company", "CM INFOTECH"),
+                    key="po_bill_to_company"
+                )
+                bill_to_address = st.text_area(
+                    "Bill To Address",
+                    value=safe_str_state("po_bill_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
+                    key="po_bill_to_address"
+                )
+                ship_to_company = st.text_input(
+                    "Ship To",
+                    value=safe_str_state("po_ship_to_company", "CM INFOTECH"),
+                    key="po_ship_to_company"
+                )
+                ship_to_address = st.text_area(
+                    "Ship To Address",
+                    value=safe_str_state("po_ship_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
+                    key="po_ship_to_address"
+                )
+                end_company = st.text_input(
+                    "End User Company",
+                    value=safe_str_state("po_end_company", "Baldridge & Associates Pvt Ltd."),
+                    key="po_end_company"
+                )
+                end_address = st.text_area(
+                    "End User Address",
+                    value=safe_str_state("po_end_address", "406 Sakar East, Vadodara 390009"),
+                    key="po_end_address"
+                )
+                end_person = st.text_input(
+                    "End User Contact",
+                    value=safe_str_state("po_end_person", "Mr. Dev"),
+                    key="po_end_person"
+                )
+                end_contact = st.text_input(
+                    "End User Phone",
+                    value=safe_str_state("po_end_contact", "+91 9876543210"),
+                    key="po_end_contact"
+                )
+                end_email = st.text_input(
+                    "End User Email",
+                    value=safe_str_state("po_end_email", "info@company.com"),
+                    key="po_end_email"
+                )
+
+            # with col2:
+            #     bill_to_company = st.text_input("Bill To", "CM INFOTECH", key="po_bill_to_company")
+            #     bill_to_address = st.text_area("Bill To Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481", key="po_bill_to_address")
+            #     ship_to_company = st.text_input("Ship To", "CM INFOTECH", key="po_ship_to_company")
+            #     ship_to_address = st.text_area("Ship To Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481", key="po_ship_to_address")
+            #     end_company = st.text_input("End User Company", "Baldridge & Associates Pvt Ltd.", key="po_end_company")
+            #     end_address = st.text_area("End User Address", "406 Sakar East, Vadodara 390009", key="po_end_address")
+            #     end_person = st.text_input("End User Contact", "Mr. Dev", key="po_end_person")
+            #     end_contact = st.text_input("End User Phone", "+91 9876543210", key="po_end_contact")
+            #     end_email = st.text_input("End User Email", "info@company.com", key="po_end_email")
 
         with tab_products:
             st.header("Products")

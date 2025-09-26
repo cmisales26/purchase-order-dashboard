@@ -471,11 +471,11 @@ def main():
             terms_of_delivery = st.text_input("Terms of delivery", "Within Month")
             destination = st.text_input("Destination", "Vadodara")
             
-            st.subheader("Vendor Details")
-            vendor_name = st.text_input("Vendor Name", "CM Infotech")
-            vendor_address = st.text_area("Vendor Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
-            vendor_gst = st.text_input("Vendor GST No.", "24ANMPP4")
-            vendor_msme = st.text_input("Vendor MSME Registration No.", "UDYAM-")
+            st.subheader("Seller Details")
+            vendor_name = st.text_input("Seller Name", "CM Infotech")
+            vendor_address = st.text_area("Seller Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
+            vendor_gst = st.text_input("Seller GST No.", "24ANMPP4")
+            vendor_msme = st.text_input("Seller MSME Registration No.", "UDYAM-")
 
             st.subheader("Buyer Details")
             # buyer_name = st.text_input("Buyer Name", "Baldridge Pvt Ltd.")

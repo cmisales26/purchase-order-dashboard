@@ -9,7 +9,7 @@ import os
 
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {
-    "Autodesk Commercial Software License": {"basic": 2000.0, "gst_percent": 18.0},
+    "Autodesk Commercial Software License": {"basic": 27500.0, "gst_percent": 18.0},
     "Solidworks Premium": {"basic": 50000.0, "gst_percent": 18.0},
     "Catia License": {"basic": 75000.0, "gst_percent": 18.0},
     "Mastercam Module": {"basic": 30000.0, "gst_percent": 18.0},
@@ -318,6 +318,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf = PO_PDF()
     pdf.logo_path = logo_path
     pdf.add_page()
+
     
     # Sanitize all input strings
     sanitized_vendor_name = pdf.sanitize_text(po_data['vendor_name'])
@@ -647,21 +648,46 @@ def main():
                     value=safe_str_state("po_vendor_mobile", "+91 1234567890"),
                     key="po_vendor_mobile"
                 )
-                gst_no = st.text_input(
-                    "GST No",
-                    value=safe_str_state("po_gst_no", "24ANMPP4891R1ZX"),
-                    key="po_gst_no"
+                end_company = st.text_input(
+                    "End User Company",
+                    value=safe_str_state("po_end_company", "Baldridge & Associates Pvt Ltd."),
+                    key="po_end_company"
                 )
-                pan_no = st.text_input(
-                    "PAN No",
-                    value=safe_str_state("po_pan_no", "ANMPP4891R"),
-                    key="po_pan_no"
+                end_address = st.text_area(
+                    "End User Address",
+                    value=safe_str_state("po_end_address", "406 Sakar East, Vadodara 390009"),
+                    key="po_end_address"
                 )
-                msme_no = st.text_input(
-                    "MSME No",
-                    value=safe_str_state("po_msme_no", "UDYAM-GJ-01-0117646"),
-                    key="po_msme_no"
+                end_person = st.text_input(
+                    "End User Contact",
+                    value=safe_str_state("po_end_person", "Mr. Dev"),
+                    key="po_end_person"
                 )
+                end_contact = st.text_input(
+                    "End User Phone",
+                    value=safe_str_state("po_end_contact", "+91 9876543210"),
+                    key="po_end_contact"
+                )
+                end_email = st.text_input(
+                    "End User Email",
+                    value=safe_str_state("po_end_email", "info@company.com"),
+                    key="po_end_email"
+                )
+                # gst_no = st.text_input(
+                #     "GST No",
+                #     value=safe_str_state("po_gst_no", "24ANMPP4891R1ZX"),
+                #     key="po_gst_no"
+                # )
+                # pan_no = st.text_input(
+                #     "PAN No",
+                #     value=safe_str_state("po_pan_no", "ANMPP4891R"),
+                #     key="po_pan_no"
+                # )
+                # msme_no = st.text_input(
+                #     "MSME No",
+                #     value=safe_str_state("po_msme_no", "UDYAM-GJ-01-0117646"),
+                #     key="po_msme_no"
+                # )
         # with tab_vendor:
         #     col1, col2 = st.columns(2)
         #     with col1:
@@ -698,31 +724,46 @@ def main():
                     value=safe_str_state("po_ship_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
                     key="po_ship_to_address"
                 )
-                end_company = st.text_input(
-                    "End User Company",
-                    value=safe_str_state("po_end_company", "Baldridge & Associates Pvt Ltd."),
-                    key="po_end_company"
+                gst_no = st.text_input(
+                    "GST No",
+                    value=safe_str_state("po_gst_no", "24ANMPP4891R1ZX"),
+                    key="po_gst_no"
                 )
-                end_address = st.text_area(
-                    "End User Address",
-                    value=safe_str_state("po_end_address", "406 Sakar East, Vadodara 390009"),
-                    key="po_end_address"
+                pan_no = st.text_input(
+                    "PAN No",
+                    value=safe_str_state("po_pan_no", "ANMPP4891R"),
+                    key="po_pan_no"
                 )
-                end_person = st.text_input(
-                    "End User Contact",
-                    value=safe_str_state("po_end_person", "Mr. Dev"),
-                    key="po_end_person"
+                msme_no = st.text_input(
+                    "MSME No",
+                    value=safe_str_state("po_msme_no", "UDYAM-GJ-01-0117646"),
+                    key="po_msme_no"
                 )
-                end_contact = st.text_input(
-                    "End User Phone",
-                    value=safe_str_state("po_end_contact", "+91 9876543210"),
-                    key="po_end_contact"
-                )
-                end_email = st.text_input(
-                    "End User Email",
-                    value=safe_str_state("po_end_email", "info@company.com"),
-                    key="po_end_email"
-                )
+                # end_company = st.text_input(
+                #     "End User Company",
+                #     value=safe_str_state("po_end_company", "Baldridge & Associates Pvt Ltd."),
+                #     key="po_end_company"
+                # )
+                # end_address = st.text_area(
+                #     "End User Address",
+                #     value=safe_str_state("po_end_address", "406 Sakar East, Vadodara 390009"),
+                #     key="po_end_address"
+                # )
+                # end_person = st.text_input(
+                #     "End User Contact",
+                #     value=safe_str_state("po_end_person", "Mr. Dev"),
+                #     key="po_end_person"
+                # )
+                # end_contact = st.text_input(
+                #     "End User Phone",
+                #     value=safe_str_state("po_end_contact", "+91 9876543210"),
+                #     key="po_end_contact"
+                # )
+                # end_email = st.text_input(
+                #     "End User Email",
+                #     value=safe_str_state("po_end_email", "info@company.com"),
+                #     key="po_end_email"
+                # )
 
             # with col2:
             #     bill_to_company = st.text_input("Bill To", "CM INFOTECH", key="po_bill_to_company")

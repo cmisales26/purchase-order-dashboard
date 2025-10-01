@@ -32,6 +32,7 @@ class PDF(FPDF):
 def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "stamp.jpg"):
     pdf = PDF()
     pdf.add_page()
+    pdf.set_font("Helvetica",size=10)
 
     # --- Logo on top right ---
     if logo_file:
@@ -243,7 +244,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.cell(0, 5, "Email: info@cminfotech.com Mo.+91 873 391 5721", ln=True, align="C")
     
     # Fix: output directly to bytes
-    pdf_bytes = pdf.output(dest="S")
+    pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
 
 
@@ -254,7 +255,12 @@ class PO_PDF(FPDF):
         self.set_auto_page_break(auto=False, margin=0)
         self.set_left_margin(15)
         self.set_right_margin(15)
-        # Removed external font paths
+        self.logo_path = os.path.join(os.path.dirname(__file__),"logo_final.jpg")
+        font_dir = os.path.join(os.path.dirname(__file__), "fonts")
+        self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
+        self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
+        self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
+        self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
         self.set_font("Helvetica", "", 10) 
         self.website_url = "https://cminfotech.com/"
         self.po_number = po_number
@@ -262,20 +268,24 @@ class PO_PDF(FPDF):
     
     def header(self):
         if self.page_no() == 1:
+            # Logo (if available)
+            if self.logo_path and os.path.exists(self.logo_path):
+                self.image(self.logo_path, x=162.5, y=2.5, w=45,link=self.website_url)
+                # self.image(self.logo_path, x=150, y=10, w=40)
             # Title
-            self.set_font("Helvetica", "B", 15)
+            self.set_font("calibri", "B", 15)
             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
             self.ln(2)
 
             # PO info
-            self.set_font("Helvetica", "", 12)
+            self.set_font("calibri", "", 12)
             self.cell(95, 8, f"PO No: {self.sanitize_text(self.po_number)}", ln=0)
             self.cell(95, 8, f"Date: {self.sanitize_text(self.po_date)}", ln=1)
             self.ln(2)
 
     def footer(self):
         self.set_y(-18)
-        self.set_font("Helvetica", "I", 10)
+        self.set_font("calibri", "I", 10)
         self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
         self.set_text_color(0, 0, 255)
         email1 = "cad@cmi.com"
@@ -290,17 +300,14 @@ class PO_PDF(FPDF):
         self.set_text_color(0, 0, 0)
 
     def section_title(self, title):
-        self.set_font("Helvetica", "B", 12)
+        self.set_font("calibri", "B", 12)
         self.cell(0, 6, self.sanitize_text(title), ln=True)
         self.ln(1)
 
     def sanitize_text(self, text):
         # Fix for fpdf compatibility
-        try:
             return text.encode('latin-1', 'ignore').decode('latin-1')
-        except:
-            return text
-
+        
 def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # Pass dynamic data to PDF constructor
     pdf = PO_PDF(po_number=po_data['po_number'], po_date=po_data['po_date'])
@@ -308,16 +315,36 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.add_page()
     
     # Sanitize all input strings
-    data = po_data
+    sanitized_vendor_name = pdf.sanitize_text(po_data['vendor_name'])
+    sanitized_vendor_address = pdf.sanitize_text(po_data['vendor_address'])
+    sanitized_vendor_contact = pdf.sanitize_text(po_data['vendor_contact'])
+    sanitized_vendor_mobile = pdf.sanitize_text(po_data['vendor_mobile'])
+    sanitized_gst_no = pdf.sanitize_text(po_data['gst_no'])
+    sanitized_pan_no = pdf.sanitize_text(po_data['pan_no'])
+    sanitized_msme_no = pdf.sanitize_text(po_data['msme_no'])
+    sanitized_bill_to_company = pdf.sanitize_text(po_data['bill_to_company'])
+    sanitized_bill_to_address = pdf.sanitize_text(po_data['bill_to_address'])
+    sanitized_ship_to_company = pdf.sanitize_text(po_data['ship_to_company'])
+    sanitized_ship_to_address = pdf.sanitize_text(po_data['ship_to_address'])
+    sanitized_end_company = pdf.sanitize_text(po_data['end_company'])
+    sanitized_end_address = pdf.sanitize_text(po_data['end_address'])
+    sanitized_end_person = pdf.sanitize_text(po_data['end_person'])
+    sanitized_end_contact = pdf.sanitize_text(po_data['end_contact'])
+    sanitized_end_email = pdf.sanitize_text(po_data['end_email'])
+    sanitized_payment_terms = pdf.sanitize_text(po_data['payment_terms'])
+    sanitized_delivery_terms = pdf.sanitize_text(po_data['delivery_terms'])
+    sanitized_prepared_by = pdf.sanitize_text(po_data['prepared_by'])
+    sanitized_authorized_by = pdf.sanitize_text(po_data['authorized_by'])
+    sanitized_company_name = pdf.sanitize_text(po_data['company_name'])
     
     # --- Vendor & Bill/Ship ---
     pdf.section_title("Vendor & Addresses")
-    pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(95, 5, f"{pdf.sanitize_text(data['vendor_name'])}\n{pdf.sanitize_text(data['vendor_address'])}\nAttn: {pdf.sanitize_text(data['vendor_contact'])}\nMobile: {pdf.sanitize_text(data['vendor_mobile'])}")
+    pdf.set_font("Calibri", "", 10)
+    pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
     pdf.set_xy(110, pdf.get_y() - 20)
-    pdf.multi_cell(90, 5, f"Bill: {pdf.sanitize_text(data['bill_to_company'])}\n{pdf.sanitize_text(data['bill_to_address'])}\nShip: {pdf.sanitize_text(data['ship_to_company'])}\n{pdf.sanitize_text(data['ship_to_address'])}")
+    pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
     pdf.ln(1)
-    pdf.multi_cell(0, 5, f"GST: {pdf.sanitize_text(data['gst_no'])}\nPAN: {pdf.sanitize_text(data['pan_no'])}\nMSME: {pdf.sanitize_text(data['msme_no'])}")
+    pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")
     pdf.ln(2)
 
     # --- Products Table ---
@@ -325,14 +352,14 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     col_widths = [65, 22, 25, 25, 15, 22]
     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
     pdf.set_fill_color(220, 220, 220)
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font("Calibri", "B", 10)
     for h, w in zip(headers, col_widths):
         pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
     pdf.ln()
 
     pdf.set_font("Helvetica", "", 10)
     line_height = 5
-    for p in data["products"]:
+    for p in po_data["products"]:
         gst_amt = p["basic"] * p["gst_percent"] / 100
         per_unit_price = p["basic"] + gst_amt
         total = per_unit_price * p["qty"]
@@ -355,46 +382,50 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
         pdf.ln(row_height)
 
     # Grand Total Row
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
-    pdf.cell(col_widths[5], 6, f"{data['grand_total']:.2f}", border=1, align="R")
+    pdf.cell(col_widths[5], 6, f"{po_data['grand_total']:.2f}", border=1, align="R")
     pdf.ln(4)
 
     # --- Amount in Words ---
     pdf.ln(5)
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(0, 5, "Amount in Words:", ln=True)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 5, pdf.sanitize_text(data['amount_words']))
+    pdf.set_font("Calibri", "", 10)
+    pdf.multi_cell(0, 5, pdf.sanitize_text(po_data['amount_words']))
     pdf.ln(4)
 
     # # --- Terms ---
     pdf.section_title("Terms & Conditions")
-    pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {pdf.sanitize_text(data['payment_terms'])}\nDelivery: {pdf.sanitize_text(data['delivery_terms'])}")
+    pdf.set_font("Calibri", "", 10)
+    pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {sanitized_payment_terms}\nDelivery: {sanitized_delivery_terms}")
     pdf.ln(2)
 
     # --- End User ---
     pdf.section_title("End User Details")
-    pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"{pdf.sanitize_text(data['end_company'])}\n{pdf.sanitize_text(data['end_address'])}\nContact: {pdf.sanitize_text(data['end_person'])} | {pdf.sanitize_text(data['end_contact'])}\nEmail: {pdf.sanitize_text(data['end_email'])}")
+    pdf.set_font("Calibri", "", 10)
+    pdf.multi_cell(0, 4, f"{sanitized_end_company}\n{sanitized_end_address}\nContact: {sanitized_end_person} | {sanitized_end_contact}\nEmail: {sanitized_end_email}")
     pdf.ln(2)
 
     # Authorization Section
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Calibri", "", 10)
     pdf.set_x(pdf.l_margin)
-    pdf.cell(0, 5, f"Prepared By: {pdf.sanitize_text(data['prepared_by'])}", ln=1, border=0)
+    pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
 
     pdf.set_x(pdf.l_margin)
-    pdf.cell(0, 5, f"Authorized By: {pdf.sanitize_text(data['authorized_by'])}", ln=1, border=0)
+    pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
 
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 5, f"For, {pdf.sanitize_text(data['company_name'])}", ln=True, border=0, align="L")
-    # Stamp logic removed for portability
+    pdf.set_font("Calibri", "", 10)
+    pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
+    stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
+    if os.path.exists(stamp_path):
+        pdf.ln(2)
+        pdf.image(stamp_path, x=pdf.get_x(), y=pdf.get_y(), w=30)
+        pdf.ln(15)
 
-    pdf_bytes = pdf.output(dest="S")
+    pdf_bytes = pdf.output(dest="S").encode('latin-1')
     return pdf_bytes
 
 # --- New PDF Class for Quotation ---
@@ -672,11 +703,11 @@ def main():
                     "declaration": declaration
                 }
 
-                pdf_file = create_invoice_pdf(invoice_data, logo_file, stamp_file)
+                pdf_bytes = create_invoice_pdf(invoice_data, logo_file, stamp_file)
 
                 st.download_button(
                     "⬇ Download Invoice PDF",
-                    data=pdf_file,
+                    data=pdf_bytes,
                     file_name=f"Invoice_{invoice_no.replace('/', '_')}.pdf",
                     mime="application/pdf"
                 )

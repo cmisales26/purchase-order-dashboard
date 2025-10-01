@@ -435,7 +435,12 @@ class QUOTATION_PDF(FPDF):
         self.set_auto_page_break(auto=False, margin=0)
         self.set_left_margin(15)
         self.set_right_margin(15)
-        self.set_font("Helvetica", "", 10) 
+        font_dir = os.path.join(os.path.dirname(__file__), "fonts")
+        self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
+        self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
+        self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
+        self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
+        self.set_font("calibri", "", 10) 
         self.website_url = "https://cminfotech.com/"
         self.quotation_number = quotation_number
         self.quotation_date = quotation_date
@@ -443,12 +448,12 @@ class QUOTATION_PDF(FPDF):
     def header(self):
         if self.page_no() == 1:
             # Title changed to QUOTATION
-            self.set_font("Helvetica", "B", 15)
+            self.set_font("calibri", "B", 15)
             self.cell(0, 15, "PROPOSAL / QUOTATION", ln=True, align="C")
             self.ln(2)
 
             # Quotation info
-            self.set_font("Helvetica", "", 12)
+            self.set_font("calibri", "", 12)
             self.cell(95, 8, f"Quotation No: {self.sanitize_text(self.quotation_number)}", ln=0)
             self.cell(95, 8, f"Date: {self.sanitize_text(self.quotation_date)}", ln=1)
             self.ln(2)
@@ -456,7 +461,7 @@ class QUOTATION_PDF(FPDF):
     # Reusing common methods from PO_PDF
     def footer(self):
         self.set_y(-18)
-        self.set_font("Helvetica", "I", 10)
+        self.set_font("Calibri", "I", 10)
         self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
         self.set_text_color(0, 0, 255)
         email1 = "cad@cmi.com"
@@ -471,15 +476,12 @@ class QUOTATION_PDF(FPDF):
         self.set_text_color(0, 0, 0)
         
     def section_title(self, title):
-        self.set_font("Helvetica", "B", 12)
+        self.set_font("Calibri", "B", 12)
         self.cell(0, 6, self.sanitize_text(title), ln=True)
         self.ln(1)
 
     def sanitize_text(self, text):
-        try:
-            return text.encode('latin-1', 'ignore').decode('latin-1')
-        except:
-            return text
+        return text.encode('ascii', 'ignore').decode('ascii')
 
 # Define the new Quotation generation function (identical body to create_po_pdf)
 def create_quotation_pdf(quotation_data, logo_path = "logo_final.jpg"):
@@ -572,8 +574,12 @@ def create_quotation_pdf(quotation_data, logo_path = "logo_final.jpg"):
     pdf.ln(5)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(0, 5, f"For, {pdf.sanitize_text(data['company_name'])}", ln=True, border=0, align="L")
-    
-    pdf_bytes = pdf.output(dest="S")
+    stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
+    if os.path.exists(stamp_path):
+        pdf.ln(2)
+        pdf.image(stamp_path, x=pdf.get_x(), y=pdf.get_y(), w=30)
+        pdf.ln(15)
+    pdf_bytes = pdf.output(dest="S").encode('latin-1')
     return pdf_bytes
 
 def main():

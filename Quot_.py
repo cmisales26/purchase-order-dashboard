@@ -568,7 +568,7 @@ def create_quotation_pdf(quotation_data, logo_path = "logo_final.jpg"):
     # Use small cells for numbering to create the list look
     for i, term in enumerate(terms):
         pdf.cell(5, 4, f"{i+1}.", ln=0)
-        pdf.multi_cell(0, 4, pdf.sanitize_text(term), ln=1)
+        pdf.multi_cell(0, 4, pdf.sanitize_text(term))
         
     pdf.ln(5)
 

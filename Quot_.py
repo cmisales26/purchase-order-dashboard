@@ -1086,6 +1086,7 @@ def main():
                     "products": st.session_state.quotation_products,
                     "grand_total": grand_total_q,
                     "amount_words": amount_words_q,
+                    "price_validity": st.session_state.quotation_date,
                     "payment_terms": payment_terms_q,
                     "delivery_terms": delivery_terms_q,
                     "prepared_by": prepared_by_q,

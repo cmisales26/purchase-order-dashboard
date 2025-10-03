@@ -1341,7 +1341,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.section_title("Vendor & Addresses")
     pdf.set_font("Helvetica", "", 10)
     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
-    pdf.ln(3)
+    pdf.ln(4)
     # pdf.set_xy(110, pdf.get_y() - 20)
     pdf.multi_cell(95, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
     pdf.set_xy(120, pdf.get_y() - 20)

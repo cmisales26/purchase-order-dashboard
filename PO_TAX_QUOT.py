@@ -943,6 +943,13 @@ def main():
         st.session_state.last_quotation_number = ""
     if "po_seq" not in st.session_state:
         st.session_state.po_seq = 1
+
+    today = datetime.date.today()
+
+    if "po_date" not in st.session_state:
+        st.session_state.po_date = today.strftime("%d-%m-%Y")
+    # if "po_seq" not in st.session_state:
+    #     st.session_state.po_seq = 1
     if "products" not in st.session_state:
         st.session_state.products = []
     if "company_name" not in st.session_state:

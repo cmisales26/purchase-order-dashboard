@@ -79,12 +79,12 @@ def get_next_sequence_number_po(po_number):
         pass
     return 1
 # Sales Person Mapping
-SALES_PERSON_MAPPING = {
-    "SD": {"name": "Sakshi Darji", "email": "sak@cminfotech.com", "mobile": "+91 98765 43210"},
-    "CP": {"name": "Chirag Prajapati", "email": "chii@cminfotech.com", "mobile": "+91 98765 43211"},
-    "HP": {"name": "Hiral Patel", "email": "hir@cminfotech.com", "mobile": "+91 98765 43212"},
-    "KP": {"name": "Khushi Patel", "email": "khus@cminfotech.com", "mobile": "+91 98765 43213"}
-}
+# SALES_PERSON_MAPPING = {
+#     "SD": {"name": "Sakshi Darji", "email": "sak@cminfotech.com", "mobile": "+91 98765 43210"},
+#     "CP": {"name": "Chirag Prajapati", "email": "chii@cminfotech.com", "mobile": "+91 98765 43211"},
+#     "HP": {"name": "Hiral Patel", "email": "hir@cminfotech.com", "mobile": "+91 98765 43212"},
+#     "KP": {"name": "Khushi Patel", "email": "khus@cminfotech.com", "mobile": "+91 98765 43213"}
+# }
 
 # --- Helper Functions ---
 def get_current_quarter():

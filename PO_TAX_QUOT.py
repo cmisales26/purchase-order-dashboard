@@ -30,7 +30,7 @@ SALES_PERSON_MAPPING = {
     "KP": {"name": "Khushi Patel", "email": "khus@cminfotech.com", "mobile": "+91 98765 43213"}
 }
 
-# --- Helper Functions for Quotation ---
+# --- Helper Functions for Quotation and PO ---
 def get_current_quarter():
     """Get current quarter (Q1, Q2, Q3, Q4) based on current month"""
     month = datetime.datetime.now().month
@@ -42,6 +42,42 @@ def get_current_quarter():
         return "Q3"
     else:
         return "Q4"
+
+def parse_po_number(po_number):
+    """Parse PO number to extract components"""
+    try:
+        parts = po_number.split('/')
+        if len(parts) >= 4:
+            prefix = parts[0]  # C
+            sales_person = parts[1]  # CP, SD, HP, KP
+            year = parts[2]  # 2025
+            quarter_sequence = parts[3]  # Q4_001
+            quarter = quarter_sequence.split('_')[0]  # Q4
+            sequence = quarter_sequence.split('_')[1] if '_' in quarter_sequence else "001"  # 001, 002, etc.
+            return prefix, sales_person, year, quarter, sequence
+    except:
+        pass
+    return "C", "CP", str(datetime.datetime.now().year), get_current_quarter(), "001"
+
+def generate_po_number(sales_person, sequence_number):
+    """Generate PO number with current quarter and sequence"""
+    current_date = datetime.datetime.now()
+    quarter = get_current_quarter()
+    year = str(current_date.year)
+    sequence = f"{sequence_number:03d}"
+    
+    return f"C/{sales_person}/{year}/{quarter}_{sequence}"
+
+def get_next_sequence_number_po(po_number):
+    """Extract and increment sequence number from PO number"""
+    try:
+        parts = po_number.split('_')
+        if len(parts) > 1:
+            sequence = parts[-1]
+            return int(sequence) + 1
+    except:
+        pass
+    return 1
 
 def parse_quotation_number(quotation_number):
     """Parse quotation number to extract components"""
@@ -78,6 +114,8 @@ def get_next_sequence_number(quotation_number):
     except:
         pass
     return 1
+
+# ... (rest of your PDF classes and functions remain the same) ...
 
 # --- PDF Class for Two-Page Quotation ---
 class QUOTATION_PDF(FPDF):
@@ -146,777 +184,7 @@ class QUOTATION_PDF(FPDF):
         self.set_font("Helvetica", "I", 7)
         self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
 
-# --- Quotation Page Content Generation Helpers ---
-def add_clickable_email(pdf, email, label="Email: "):
-    """Add clickable email with label - FIXED OVERLAP"""
-    pdf.set_font("Helvetica", "B", 10)
-    label_width = pdf.get_string_width(label)
-    pdf.cell(label_width, 4, label, ln=0)
-    
-    pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
-    pdf.set_text_color(0, 0, 0)  # Reset to black
-
-def add_clickable_phone(pdf, phone, label="Mobile: "):
-    """Add clickable phone number with label - FIXED OVERLAP"""
-    pdf.set_font("Helvetica", "B", 10)
-    label_width = pdf.get_string_width(label)
-    pdf.cell(label_width, 4, label, ln=0)
-    
-    pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Helvetica", "", 10)
-    # Remove spaces and + for tel link
-    tel_number = phone.replace(' ', '').replace('+', '')
-    pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
-    pdf.set_text_color(0, 0, 0)  # Reset to black
-
-def add_page_one_intro(pdf, data):
-    # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.set_y(25)
-    pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
-    pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
-    pdf.ln(10)
-
-    # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 5, "To,", ln=True)
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-    pdf.set_font("Helvetica", "", 10)
-    
-    # Address handling
-    pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
-    
-    pdf.ln(3)
-    
-    # Clickable Email - FIXED
-    if data.get('vendor_email'):
-        add_clickable_email(pdf, data['vendor_email'])
-    
-    # Clickable Mobile - FIXED
-    if data.get('vendor_mobile'):
-        add_clickable_phone(pdf, data['vendor_mobile'])
-    
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", ln=True)
-    pdf.ln(8)
-
-    # Subject Line (from user input)
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
-    pdf.ln(5)
-
-    # Introductory Paragraph (from user input)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 5, pdf.sanitize_text(data['intro_paragraph']))
-    pdf.ln(5)
-
-    # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
-    page_width = pdf.w - 2 * pdf.l_margin
-    pdf.set_font("Helvetica", "", 10)
-    pdf.set_text_color(0, 0, 0)
-
-    # Normal text
-    pdf.write(5, "Please revert back to us, if you need any clarification / information "
-                "at the below mentioned address or email at ")
-
-    # Email clickable
-    pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 10)  # underline
-    pdf.write(5, "chirag@cminfotech.com", link="mailto:chirag@cminfotech.com")
-
-    # Back to normal for separator + Mobile:
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.write(5, "  Mobile: ")
-
-    # First mobile
-    pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 10)
-    pdf.write(5, "+91 740 511 5721 ", link="tel:+91 740 511 5721")
-
-    # Separator + second mobile
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.write(5, ", ")
-
-    pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 10)
-    pdf.write(5, "+91 873 391 5721", link="tel:+91 873 391 5721")
-
-    # Reset back to normal for anything after
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.ln(10)  # move cursor down for next section
-    
-    pdf.ln(3)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-    pdf.set_font("Helvetica", "", 10)
-    
-    # Clickable website
-    pdf.set_font("Helvetica", "U", 10)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, link="https://www.cminfotech.com/")
-    pdf.cell(0, 4, "https://www.linkedin.com/", ln=True, link="https://www.linkedin.com/")
-    pdf.cell(0, 4, "https://wa.me/message/8733915721", ln=True, link="https://wa.me/message/8733915721")
-    pdf.cell(0, 4, "https://www.facebook.com/", ln=True, link="https://www.facebook.com/")
-    pdf.cell(0, 4, "https://www.instagram.com/", ln=True, link="https://www.instagram.com/")
-    pdf.set_text_color(0, 0, 0)
-
-def add_page_two_commercials(pdf, data):
-    pdf.add_page()
-    
-    # Annexure Title - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "B", 14)
-    pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 6, "Quotation for Adobe Software", ln=True, align="C")
-    pdf.ln(8)
-
-    # --- Products Table - FIXED COLUMN WIDTHS ---
-    col_widths = [70, 25, 25, 25, 15, 25]  # Adjusted for better fit
-    headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
-    
-    # Table Header
-    pdf.set_fill_color(220, 220, 220)
-    pdf.set_font("Helvetica", "B", 9)
-    for width, header in zip(col_widths, headers):
-        pdf.cell(width, 7, header, border=1, align="C", fill=True)
-    pdf.ln()
-
-    # Table Rows
-    pdf.set_font("Helvetica", "", 9)
-    grand_total = 0.0
-    
-    for product in data["products"]:
-        basic_price = product["basic"]
-        qty = product["qty"]
-        gst_amount = basic_price * 0.18
-        per_unit_price = basic_price + gst_amount
-        total = per_unit_price * qty
-        grand_total += total
-        
-        # Description (wrap long text)
-        desc = product["name"]
-        if len(desc) > 35:
-            desc = desc[:32] + "..."
-        
-        pdf.cell(col_widths[0], 6, pdf.sanitize_text(desc), border=1)
-        pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
-        pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
-        pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
-        pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
-        pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
-        pdf.ln()
-
-    # Grand Total Row - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
-    pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
-    pdf.ln(15)
-
-    # --- Enhanced Box for Terms & Conditions and Bank Details ---
-    pdf.set_font("Helvetica", "", 9)
-
-    # Terms & Conditions
-    terms = [
-        "Above charges are Inclusive of GST.",
-        "Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.",
-        "TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.",
-        "ELD licenses are paper licenses that do not contain media.",
-        "An Internet connection is required to access cloud services.",
-        "Training will be charged at extra cost depending on no. of participants.",
-        f"Price Validity: {data['price_validity']}",
-        "Payment: 100% Advance along with purchase order.",
-        "Delivery period: 1-2 Weeks from the date of Purchase Order",
-        'Cheque to be issued on name of: "CM INFOTECH"',
-        "Order to be placed on: CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481"
-    ]
-
-    # Bank Details
-    bank_info = [
-        ("Name", "CM INFOTECH"),
-        ("Account Number", "0232054321"),
-        ("IFSC Code", "KCCB0SWASTI"),
-        ("Bank Name", "THE KALUPUR COMMERCIAL CO-OPERATIVE BANK LTD."),
-        ("Branch", "SWASTIK SOCIETY, AHMEDABAD"),
-        ("MSME", "UDYAM-GJ-01-1234567"),
-        ("GSTIN", "24ANMPP4891R1ZX"),
-        ("PAN No", "ANMPP4891R")
-    ]
-
-    # Box dimensions and styling
-    x_start = pdf.get_x()
-    y_start = pdf.get_y()
-    page_width = pdf.w - 2 * pdf.l_margin
-    col1_width = page_width * 0.6  # 60% for Terms
-    col2_width = page_width * 0.4  # 40% for Bank Details
-    padding = 4
-    line_height = 4.5
-    section_spacing = 2
-
-    # Calculate required height for both columns
-    def calculate_column_height(items, col_width):
-        height = 0
-        for item in items:
-            lines = pdf.multi_cell(col_width - 2*padding, line_height, item, split_only=True)
-            height += len(lines) * line_height + section_spacing
-        return height + 3*padding  # Add padding
-
-    terms_height = calculate_column_height(terms, col1_width)
-    bank_height = calculate_column_height([f"{label}: {value}" for label, value in bank_info], col2_width)
-    
-    # Use the maximum height
-    box_height = max(terms_height, bank_height) + padding
-
-    # Draw the main box
-    pdf.rect(x_start, y_start, page_width, box_height)
-    
-    # Draw vertical separator line
-    pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
-
-    # Add section headers
-    pdf.set_font("Helvetica", "B", 10)
-    
-    # Terms & Conditions header
-    pdf.set_xy(x_start + padding, y_start + padding)
-    pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
-    pdf.set_font("Helvetica", "", 9)
-    
-    # Terms content
-    terms_y = pdf.get_y()
-    for i, term in enumerate(terms):
-        pdf.set_xy(x_start + padding, terms_y)
-        pdf.multi_cell(col1_width - 2*padding, line_height, f"{i+1}. {term}")
-        terms_y = pdf.get_y()
-
-    # Bank Details header
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.set_xy(x_start + col1_width + padding, y_start + padding)
-    pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-    pdf.set_font("Helvetica", "", 9)
-    
-    # Bank details content
-    bank_y = pdf.get_y()
-    for label, value in bank_info:
-        pdf.set_xy(x_start + col1_width + padding, bank_y)
-        pdf.multi_cell(col2_width - 2*padding, line_height, f"{label}: {value}")
-        bank_y = pdf.get_y()
-
-    # Move cursor below the box
-    pdf.set_xy(x_start, y_start + box_height + 10)
-
-    # --- Signature Block ---
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(0, 5, "Yours Truly,", ln=True)
-    pdf.cell(0, 5, "For CM INFOTECH", ln=True)
-    pdf.ln(8)
-    
-    # --- Signature Block with Dynamic Sales Person ---
-    sales_person_code = data.get('sales_person_code', 'SD')
-    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-    
-    # Add stamp if available
-    if data.get('stamp_path') and os.path.exists(data['stamp_path']):
-        try:
-            # Position stamp on the right side
-            pdf.image(data['stamp_path'], x=160, y=pdf.get_y()-5, w=30)
-        except:
-            pass
-    
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 5, sales_person_info["name"], ln=True)
-    pdf.cell(0, 5, "Inside Sales Executive", ln=True)
-    
-    # Clickable email in signature
-    pdf.set_font("Helvetica", "", 10)
-    pdf.set_text_color(0, 0, 0)
-    label = "Email: "
-    pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(0, 5, sales_person_info["email"], ln=1, link=f"mailto:{sales_person_info['email']}")
-    
-    # Clickable phone in signature
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 10)
-    label = "Mobile: "
-    pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(0, 5, sales_person_info["mobile"], ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-    pdf.set_text_color(0, 0, 0)
-
-def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
-    """Orchestrates the creation of the two-page PDF."""
-    sales_person_code = quotation_data.get('sales_person_code', 'SD')
-    pdf = QUOTATION_PDF(quotation_number=quotation_data['quotation_number'], 
-                        quotation_date=quotation_data['quotation_date'],
-                        sales_person_code=sales_person_code)
-    
-    # Set logo path for header
-    if logo_path and os.path.exists(logo_path):
-        pdf.logo_path = logo_path
-    
-    quotation_data['stamp_path'] = stamp_path
-
-    pdf.add_page()
-    
-    # 1. Add Page 1 (Introduction Letter)
-    add_page_one_intro(pdf, quotation_data)
-
-    # 2. Add Page 2 (Commercials, Terms, Bank Details)
-    add_page_two_commercials(pdf, quotation_data)
-    
-    # Handle PDF output properly
-    try:
-        pdf_output = pdf.output(dest='S')
-        
-        if isinstance(pdf_output, str):
-            return pdf_output.encode('latin-1')
-        elif isinstance(pdf_output, bytearray):
-            return bytes(pdf_output)
-        elif isinstance(pdf_output, bytes):
-            return pdf_output
-        else:
-            return str(pdf_output).encode('latin-1')
-            
-    except Exception:
-        # Fallback method
-        try:
-            buffer = io.BytesIO()
-            pdf.output(dest=buffer)
-            return buffer.getvalue()
-        except Exception as e:
-            st.error(f"PDF generation failed: {e}")
-            return b""
-
-# --- PDF Class for Tax Invoice ---
-class PDF(FPDF):
-    def __init__(self):
-        super().__init__()
-        self.set_font("Helvetica", "", 8)
-        self.set_left_margin(15)
-        self.set_right_margin(15)
-
-    def header(self):
-        self.set_font("Helvetica", "B", 12)
-        self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
-        self.ln(3)
-
-def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "stamp.jpg"):
-    pdf = PDF()
-    pdf.add_page()
-
-    # --- Logo on top right ---
-    if logo_file:
-        try:
-            pdf.image(logo_file, x=170, y=2.5, w=35)
-        except Exception as e:
-            st.warning(f"Could not add logo: {e}")
-    # --- Header ---
-    # pdf.set_font("Helvetica", "B", 12)
-    # pdf.cell(0, 6, "TAX INVOICE", ln=True, align="C")
-    # pdf.ln(3)
-
-    # --- Invoice Details (top-right) ---
-    pdf.set_font("Helvetica", "", 8)
-    pdf.set_xy(140, 20)
-    pdf.multi_cell(60, 4,
-        f"Invoice No.: {invoice_data['invoice']['invoice_no']}\n"
-        f"Invoice Date: {invoice_data['invoice']['date']}"
-    )
-
-    # --- Vendor & Buyer ---
-    pdf.set_y(35)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(95, 5, "CM Infotech", ln=False)
-    pdf.set_xy(110, 35)
-    pdf.cell(95, 5, "Buyer", ln=True)
-
-    pdf.set_font("Helvetica", "", 8)
-    pdf.set_xy(15, 40)
-    pdf.multi_cell(95, 4, invoice_data['vendor']['address'])
-    y_after_vendor = pdf.get_y()
-
-    pdf.set_xy(110, 40)
-    pdf.multi_cell(95, 4,
-        f"{invoice_data['buyer']['name']}\n"
-        f"{invoice_data['buyer']['address']}"
-    )
-    y_after_buyer = pdf.get_y()
-    
-    # --- GST, MSME ---
-    pdf.set_xy(15, max(y_after_vendor, y_after_buyer) + 2)
-    pdf.multi_cell(95, 4,
-        f"GST No.: {invoice_data['vendor']['gst']}\n"
-        f"MSME Registration No.: {invoice_data['vendor']['msme']}"
-    )
-    
-    pdf.set_xy(110, max(y_after_vendor, y_after_buyer) + 2)
-    pdf.multi_cell(95, 4,
-        f"GST No.: {invoice_data['buyer']['gst']}"
-    )
-
-    # --- Invoice Specifics ---
-    pdf.ln(5)
-    pdf.set_font("Helvetica", "", 8)
-    pdf.cell(95, 4, f"Buyer's Order No.: {invoice_data['invoice_details']['buyers_order_no']}")
-    pdf.cell(95, 4, f"Buyer's Order Date: {invoice_data['invoice_details']['buyers_order_date']}", ln=True)
-    pdf.cell(95, 4, f"Dispatch Through: {invoice_data['invoice_details']['dispatched_through']}")
-    pdf.cell(95, 4, f"Terms of delivery: {invoice_data['invoice_details']['terms_of_delivery']}", ln=True)
-    pdf.cell(95, 4, f"Destination: {invoice_data['invoice_details']['destination']}", ln=True)
-
-    # --- Item Table Header ---
-    pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(10, 5, "Sr. No.", border=1, align="C")
-    pdf.cell(85, 5, "Description of Goods", border=1, align="C")
-    pdf.cell(20, 5, "HSN/SAC", border=1, align="C")
-    pdf.cell(20, 5, "Quantity", border=1, align="C")
-    pdf.cell(25, 5, "Unit Rate", border=1, align="C")
-    pdf.cell(30, 5, "Amount", border=1, ln=True, align="C")
-
-    # --- Items ---
-    pdf.set_font("Helvetica", "", 8)
-    col_widths = [10, 85, 20, 20, 25, 30]
-    line_height = 4
-
-    for i, item in enumerate(invoice_data["items"], start=1):
-        x_start = pdf.get_x()
-        y_start = pdf.get_y()
-
-        pdf.set_font("Helvetica", "", 8)
-        
-        # Description
-        pdf.set_xy(x_start + col_widths[0], y_start)
-        pdf.multi_cell(col_widths[1], line_height, item['description'], border=1)
-        y_after_desc = pdf.get_y()
-
-        row_height = y_after_desc - y_start
-        
-        # Other cells for the row
-        pdf.set_xy(x_start, y_start)
-        pdf.multi_cell(col_widths[0], row_height, str(i), border=1, align="C")
-        
-        pdf.set_xy(x_start + col_widths[0] + col_widths[1], y_start)
-        pdf.multi_cell(col_widths[2], row_height, item['hsn'], border=1, align="C")
-        
-        pdf.set_xy(x_start + sum(col_widths[:3]), y_start)
-        pdf.multi_cell(col_widths[3], row_height, str(item['quantity']), border=1, align="C")
-        
-        pdf.set_xy(x_start + sum(col_widths[:4]), y_start)
-        pdf.multi_cell(col_widths[4], row_height, f"{item['unit_rate']:.2f}", border=1, align="R")
-        
-        amount = item['quantity'] * item['unit_rate']
-        pdf.set_xy(x_start + sum(col_widths[:-1]), y_start)
-        pdf.multi_cell(col_widths[5], row_height, f"{amount:.2f}", border=1, align="R")
-
-        pdf.set_xy(x_start, y_start + row_height)
-
-    # --- Totals ---
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")   #"R" for right align
-    pdf.cell(30, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
-    
-    pdf.cell(sum(col_widths[:5]), 5, "SGST @ 9%", border=1, align="L")   #"R" for right align
-    pdf.cell(30, 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
-    
-    pdf.cell(sum(col_widths[:5]), 5, "CGST @ 9%", border=1, align="L")   #"R" for right align
-    pdf.cell(30, 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
-
-    pdf.cell(sum(col_widths[:5]), 5, "Final Amount to be Paid", border=1, align="L")   #"R" for right align
-    pdf.cell(30, 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
-    
-    # --- Amount in Words ---
-    pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
-
-    # --- Tax Summary Table ---
-    pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(35, 5, "HSN/SAN", border=1, align="C")
-    pdf.cell(35, 5, "Taxable Value", border=1, align="C")
-    pdf.cell(60, 5, "Central Tax", border=1, align="C")
-    pdf.cell(60, 5, "State Tax", border=1, ln=True, align="C")
-
-    pdf.cell(35, 5, "", border="L", ln=False)
-    pdf.cell(35, 5, "", border="L", ln=False)
-    pdf.cell(30, 5, "Rate", border="L", align="C")
-    pdf.cell(30, 5, "Amount", border="LR", align="C")
-    pdf.cell(30, 5, "Rate", border="L", align="C")
-    pdf.cell(30, 5, "Amount", border="LR", ln=True, align="C")
-
-    pdf.set_font("Helvetica", "", 8)
-    hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
-    hsn_sgst = hsn_tax_value * 0.09
-    hsn_cgst = hsn_tax_value * 0.09
-    
-    pdf.cell(35, 5, "997331", border=1, align="C")
-    pdf.cell(35, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(30, 5, "9%", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(30, 5, "9%", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
-
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(35, 5, "Total", border=1, align="C")
-    pdf.cell(35, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(30, 5, "", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(30, 5, "", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
-    
-    pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
-
-    # --- Bank Details ---
-    pdf.ln(5)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, "Company's Bank Details", ln=True)
-    pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(0, 4,
-        f"Bank Name: {invoice_data['bank']['name']}\n"
-        f"Branch: {invoice_data['bank']['branch']}\n"
-        f"Account No.: {invoice_data['bank']['account_no']}\n"
-        f"IFS Code: {invoice_data['bank']['ifsc']}"
-    )
-
-    # --- Declaration ---
-    pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, "Declaration:", ln=True)
-    pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(0, 4, invoice_data['declaration'])
-    
-    # --- Signature ---
-    pdf.ln(5)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
-
-    if stamp_file:
-        try:
-            # Calculate position to place the stamp above the signature line
-            # The 'x' coordinate is calculated to align the stamp to the right side
-            # The 'y' coordinate is 10mm above the signature line
-            stamp_width = 25
-            pdf.image(stamp_file, x=210 - 15 - stamp_width, y=pdf.get_y(), w=stamp_width)
-            pdf.ln(15) # Move down for the signature text
-        except Exception as e:
-            st.warning(f"Could not add stamp: {e}")
-    else:
-        pdf.ln(10) # maintain spacing if no stamp is uploded
-    # pdf.ln(5)
-    # pdf.set_font("Helvetica", "B", 8)
-    # pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
-    pdf.ln(10)
-    pdf.set_font("Helvetica", "", 8)
-    pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
-    pdf.set_y(-42)
-    pdf.set_font("Helvetica", "I", 8)
-    pdf.cell(0, 5, "This is a Computer Generated Invoice", ln=True, align="C")
-    pdf.set_y(-32)
-    pdf.set_font("Helvetica", "I", 8)
-    pdf.cell(0, 5, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-    pdf.set_y(-27)
-    pdf.set_font("Helvetica", "I", 8)
-    pdf.cell(0, 5, "Email: info@cminfotech.com Mo.+91 873 391 5721", ln=True, align="C")
-    # pdf_output = io.BytesIO()
-    # pdf.output(pdf_output)
-    # pdf_output.seek(0)
-    # return pdf_output
-    pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
-    return pdf_bytes
-
-
-
-# --- PDF Class ---
-class PO_PDF(FPDF):
-    def __init__(self):
-        super().__init__()
-        self.set_auto_page_break(auto=False, margin=0)
-        self.set_left_margin(15)
-        self.set_right_margin(15)
-        self.logo_path = os.path.join(os.path.dirname(__file__),"logo_final.jpg")
-        font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-        # Comment out font loading to avoid errors if fonts don't exist
-        # self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
-        # self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
-        # self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
-        # self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
-        self.website_url = "https://cminfotech.com/"
-    def header(self):
-        if self.page_no() == 1:
-            # Logo (if available)
-            if self.logo_path and os.path.exists(self.logo_path):
-                self.image(self.logo_path, x=162.5, y=2.5, w=45,link=self.website_url)
-                # self.image(self.logo_path, x=150, y=10, w=40)
-
-            
-            # Title
-            self.set_font("Helvetica", "B", 15)
-            self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
-            self.ln(2)
-
-            # PO info
-            self.set_font("Helvetica", "", 12)
-            self.cell(95, 8, f"PO No: {self.sanitize_text(st.session_state.po_number)}", ln=0)
-            self.cell(95, 8, f"Date: {self.sanitize_text(st.session_state.po_date)}", ln=1)
-            self.ln(2)
-
-    def footer(self):
-        self.set_y(-18)
-        self.set_font("Helvetica", "I", 10)
-        self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
-        self.set_text_color(0, 0, 255)
-        email1 = "cad@cmi.com"
-        email2 = "info@cminfotech.com "
-        self.cell(0, 4, f"{email1} | {email2}", ln=True, align="C", link=f"mailto:{email1}")
-        self.set_x((self.w - 80) / 2)
-        self.cell(0, 0, "", link=f"mailto:{email2}")
-        self.set_x((self.w - 60) / 2)
-        phone_number ="+91 873 391 5721"
-        self.set_text_color(0, 0, 255)
-        self.cell(60, 4, f"Call: {phone_number}", ln=True, align="C", link=f"tel:{phone_number}")
-        self.set_text_color(0, 0, 0)
-
-    def section_title(self, title):
-        self.set_font("Helvetica", "B", 12)
-        self.cell(0, 6, self.sanitize_text(title), ln=True)
-        self.ln(1)
-
-    def sanitize_text(self, text):
-        return text.encode('ascii', 'ignore').decode('ascii')
-
-def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
-    pdf = PO_PDF()
-    pdf.logo_path = logo_path
-    pdf.add_page()
-
-    
-    # Sanitize all input strings
-    sanitized_vendor_name = pdf.sanitize_text(po_data['vendor_name'])
-    sanitized_vendor_address = pdf.sanitize_text(po_data['vendor_address'])
-    sanitized_vendor_contact = pdf.sanitize_text(po_data['vendor_contact'])
-    sanitized_vendor_mobile = pdf.sanitize_text(po_data['vendor_mobile'])
-    sanitized_gst_no = pdf.sanitize_text(po_data['gst_no'])
-    sanitized_pan_no = pdf.sanitize_text(po_data['pan_no'])
-    sanitized_msme_no = pdf.sanitize_text(po_data['msme_no'])
-    sanitized_bill_to_company = pdf.sanitize_text(po_data['bill_to_company'])
-    sanitized_bill_to_address = pdf.sanitize_text(po_data['bill_to_address'])
-    sanitized_ship_to_company = pdf.sanitize_text(po_data['ship_to_company'])
-    sanitized_ship_to_address = pdf.sanitize_text(po_data['ship_to_address'])
-    sanitized_end_company = pdf.sanitize_text(po_data['end_company'])
-    sanitized_end_address = pdf.sanitize_text(po_data['end_address'])
-    sanitized_end_person = pdf.sanitize_text(po_data['end_person'])
-    sanitized_end_contact = pdf.sanitize_text(po_data['end_contact'])
-    sanitized_end_email = pdf.sanitize_text(po_data['end_email'])
-    sanitized_payment_terms = pdf.sanitize_text(po_data['payment_terms'])
-    sanitized_delivery_terms = pdf.sanitize_text(po_data['delivery_terms'])
-    sanitized_prepared_by = pdf.sanitize_text(po_data['prepared_by'])
-    sanitized_authorized_by = pdf.sanitize_text(po_data['authorized_by'])
-    sanitized_company_name = pdf.sanitize_text(po_data['company_name'])
-    
-    # --- Vendor & Bill/Ship ---
-    pdf.section_title("Vendor & Addresses")
-    pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
-    pdf.set_xy(110, pdf.get_y() - 20)
-    pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
-    pdf.ln(1)
-    pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")
-    pdf.ln(2)
-
-    # --- Products Table ---
-    pdf.section_title("Products & Services")
-    col_widths = [65, 22, 25, 25, 15, 22]
-    headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
-    pdf.set_fill_color(220, 220, 220)
-    pdf.set_font("Helvetica", "B", 10)
-    for h, w in zip(headers, col_widths):
-        pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
-    pdf.ln()
-
-    pdf.set_font("Helvetica", "", 10)
-    line_height = 5
-    for p in po_data["products"]:
-        gst_amt = p["basic"] * p["gst_percent"] / 100
-        per_unit_price = p["basic"] + gst_amt
-        total = per_unit_price * p["qty"]
-        name = pdf.sanitize_text(p["name"])
-
-        num_lines = pdf.multi_cell(col_widths[0], line_height, name, border=0, split_only=True)
-        max_lines = max(len(num_lines), 1)
-        row_height = line_height * max_lines
-
-        x_start = pdf.get_x()
-        y_start = pdf.get_y()
-
-        pdf.multi_cell(col_widths[0], line_height, name, border=1)
-        pdf.set_xy(x_start + col_widths[0], y_start)
-        pdf.cell(col_widths[1], row_height, f"{p['basic']:.2f}", border=1, align="R")
-        pdf.cell(col_widths[2], row_height, f"{gst_amt:.2f}", border=1, align="R")
-        pdf.cell(col_widths[3], row_height, f"{per_unit_price:.2f}", border=1, align="R")
-        pdf.cell(col_widths[4], row_height, f"{p['qty']:.2f}", border=1, align="C")
-        pdf.cell(col_widths[5], row_height, f"{total:.2f}", border=1, align="R")
-        pdf.ln(row_height)
-
-    # Grand Total Row
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
-    pdf.cell(col_widths[5], 6, f"{po_data['grand_total']:.2f}", border=1, align="R")
-    pdf.ln(4)
-
-    # --- Amount in Words ---
-    pdf.ln(5)
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(0, 5, "Amount in Words:", ln=True)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 5, pdf.sanitize_text(po_data['amount_words']))
-    pdf.ln(4)
-
-    # # --- Terms ---
-    pdf.section_title("Terms & Conditions")
-    pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {sanitized_payment_terms}\nDelivery: {sanitized_delivery_terms}")
-    pdf.ln(2)
-
-    # --- End User ---
-    pdf.section_title("End User Details")
-    pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"{sanitized_end_company}\n{sanitized_end_address}\nContact: {sanitized_end_person} | {sanitized_end_contact}\nEmail: {sanitized_end_email}")
-    pdf.ln(2)
-
-    # Authorization Section
-    pdf.set_font("Helvetica", "", 10)
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
-
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
-
-    # --- Footer (Company Name + Stamp) that floats) ---
-    pdf.ln(5)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
-    stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
-    if os.path.exists(stamp_path):
-        pdf.ln(2)
-        pdf.image(stamp_path, x=pdf.get_x(), y=pdf.get_y(), w=30)
-        pdf.ln(15)
-
-    pdf_bytes = pdf.output(dest="S").encode('latin-1')
-    return pdf_bytes
-
-# --- Utility to safely get string from session_state ---
-def safe_str_state(key, default=""):
-    """Ensure session_state value exists and is always a string."""
-    if key not in st.session_state or not isinstance(st.session_state[key], str):
-        st.session_state[key] = str(default)
-    return st.session_state[key] 
+# ... (rest of your existing PDF classes and functions remain exactly the same until the main function) ...
 
 def main():
     st.set_page_config(page_title="Document Generator", page_icon="📑", layout="wide")
@@ -936,11 +204,12 @@ def main():
     if "company_name" not in st.session_state:
         st.session_state.company_name = "CM Infotech"
     if "po_number" not in st.session_state:
-        today = datetime.date.today()
-        default_po_number = f"C/CP/{today.year}/Q{(today.month-1)//3+1}/{st.session_state.get('po_seq', 1):03d}"
+        default_po_number = generate_po_number("CP", st.session_state.po_seq)
         st.session_state.po_number = default_po_number
     if "po_date" not in st.session_state:
         st.session_state.po_date = datetime.date.today().strftime("%d-%m-%Y")
+    if "last_po_number" not in st.session_state:
+        st.session_state.last_po_number = ""
 
     # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
@@ -1085,13 +354,39 @@ def main():
         
         # PO Settings in sidebar for this tab
         st.sidebar.header("PO Settings")
-        today = datetime.date.today()
-        default_po_number = f"C/CP/{today.year}/Q{(today.month-1)//3+1}/{st.session_state.get('po_seq', 1):03d}"
         
-        st.session_state.po_number = st.sidebar.text_input("PO Number", value=default_po_number, key="po_number_input")
-        auto_increment = st.sidebar.checkbox("Auto-increment PO Number", value=True, key="po_auto_increment")
+        # Sales Person Selection for PO
+        po_sales_person = st.sidebar.selectbox("Select Sales Person", 
+                                              options=list(SALES_PERSON_MAPPING.keys()), 
+                                              format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+                                              key="po_sales_person")
+        
+        # Generate default PO number
+        default_po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
+        
+        # Check if we need to increment sequence
+        if st.session_state.last_po_number:
+            last_sales_person = parse_po_number(st.session_state.last_po_number)[1]
+            if last_sales_person == po_sales_person:
+                # Same sales person, increment sequence
+                next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
+                default_po_number = generate_po_number(po_sales_person, next_sequence)
+        
+        # Editable PO number
+        po_number = st.sidebar.text_input("PO Number", value=default_po_number, key="po_number_input")
+        
+        # Parse the current PO number to get sequence
+        _, _, _, _, current_sequence = parse_po_number(po_number)
+        
+        # Display current sales person info
+        current_sales_person_info = SALES_PERSON_MAPPING.get(po_sales_person, SALES_PERSON_MAPPING['CP'])
+        st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
+        
+        po_auto_increment = st.sidebar.checkbox("Auto-increment PO Number", value=True, key="po_auto_increment")
+        
         if st.sidebar.button("Reset PO Sequence"):
             st.session_state.po_seq = 1
+            st.session_state.last_po_number = ""
             st.sidebar.success("PO sequence reset to 1")
         
         tab_vendor, tab_products, tab_terms, tab_preview = st.tabs(["Vendor Details", "Products", "Terms", "Preview & Generate"])
@@ -1234,7 +529,7 @@ def main():
             
             if st.button("Generate PO", type="primary"):
                 po_data = {
-                    "po_number": st.session_state.po_number,
+                    "po_number": po_number,
                     "po_date": st.session_state.po_date,
                     "vendor_name": vendor_name,
                     "vendor_address": vendor_address,
@@ -1264,14 +559,21 @@ def main():
 
                 pdf_bytes = create_po_pdf(po_data, logo_path)
 
-                if auto_increment:
-                    st.session_state.po_seq += 1
+                # Store the last PO number for sequence tracking
+                st.session_state.last_po_number = po_number
+                
+                # Auto-increment for next PO
+                if po_auto_increment:
+                    next_sequence = get_next_sequence_number_po(po_number)
+                    st.session_state.po_seq = next_sequence
 
                 st.success("Purchase Order generated!")
+                st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
+                
                 st.download_button(
                     "⬇ Download Purchase Order",
                     data=pdf_bytes,
-                    file_name=f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
+                    file_name=f"PO_{po_number.replace('/', '_')}.pdf",
                     mime="application/pdf"
                 )
 
@@ -1285,7 +587,8 @@ def main():
         # Sales Person Selection
         st.sidebar.header("Quotation Settings")
         sales_person = st.sidebar.selectbox("Select Sales Person", options=list(SALES_PERSON_MAPPING.keys()), 
-                                           format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}")
+                                           format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+                                           key="quote_sales_person")
         
         # Generate default quotation number
         default_quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
@@ -1299,7 +602,7 @@ def main():
                 default_quotation_number = generate_quotation_number(sales_person, next_sequence)
         
         # Editable quotation number
-        quotation_number = st.sidebar.text_input("Quotation Number", value=default_quotation_number)
+        quotation_number = st.sidebar.text_input("Quotation Number", value=default_quotation_number, key="quote_number_input")
         
         # Parse the current quotation number to get sequence
         _, _, _, _, _, current_sequence = parse_quotation_number(quotation_number)
@@ -1308,7 +611,7 @@ def main():
         current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
         st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
         
-        quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True)
+        quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True, key="quote_auto_increment")
         
         if st.sidebar.button("Reset Quotation Sequence"):
             st.session_state.quotation_seq = 1

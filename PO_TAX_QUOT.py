@@ -930,6 +930,11 @@ def main():
     st.title("📑 Document Generator - Invoice, PO & Quotation")
 
     # --- Initialize Session State for all modules ---
+    if "po_number" not in st.session_state:
+        today = datetime.date.today()
+        default_po_number = f"C/CP/{today.year}/Q{(today.month-1)//3+1}/{st.session_state.get('po_seq', 1):03d}"
+        st.session_state.po_number = default_po_number
+
     if "quotation_seq" not in st.session_state:
         st.session_state.quotation_seq = 1
     if "quotation_products" not in st.session_state:

@@ -811,15 +811,17 @@ class PO_PDF(FPDF):
         self.set_font("Helvetica", "I", 10)
         self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
         self.set_text_color(0, 0, 255)
-        email1 = "cad@cmi.com"
-        email2 = "info@cminfotech.com "
-        self.cell(0, 4, f"{email1} | {email2}", ln=True, align="C", link=f"mailto:{email1}")
-        self.set_x((self.w - 80) / 2)
-        self.cell(0, 0, "", link=f"mailto:{email2}")
-        self.set_x((self.w - 60) / 2)
+        # email1 = "cad@cmi.com"
+        email1 = "info@cminfotech.com "
         phone_number ="+91 873 391 5721"
         self.set_text_color(0, 0, 255)
-        self.cell(60, 4, f"Call: {phone_number}", ln=True, align="C", link=f"tel:{phone_number}")
+        self.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
+        self.set_x((self.w - 80) / 2)
+        self.cell(0, 0, "", link=f"tel:{phone_number}")
+        self.set_x((self.w - 60) / 2)
+        website ="www.cminfotech.com"
+        self.set_text_color(0, 0, 255)
+        self.cell(60, 4, f"{website}", ln=True, align="C", link=website)
         self.set_text_color(0, 0, 0)
 
     def section_title(self, title):

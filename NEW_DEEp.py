@@ -316,7 +316,7 @@ def add_page_two_commercials(pdf, data):
     pdf.ln(8)
 
     # --- Products Table - FIXED COLUMN WIDTHS ---
-    col_widths = [70, 25, 25, 25, 15, 25]  # Adjusted for better fit
+    col_widths = [70, 25, 30, 25, 15, 25]  # Adjusted for better fit
     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
     
     # Table Header

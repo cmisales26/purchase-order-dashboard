@@ -78,6 +78,26 @@ def get_next_sequence_number_po(po_number):
     except:
         pass
     return 1
+# Sales Person Mapping
+SALES_PERSON_MAPPING = {
+    "SD": {"name": "Sakshi Darji", "email": "sak@cminfotech.com", "mobile": "+91 98765 43210"},
+    "CP": {"name": "Chirag Prajapati", "email": "chii@cminfotech.com", "mobile": "+91 98765 43211"},
+    "HP": {"name": "Hiral Patel", "email": "hir@cminfotech.com", "mobile": "+91 98765 43212"},
+    "KP": {"name": "Khushi Patel", "email": "khus@cminfotech.com", "mobile": "+91 98765 43213"}
+}
+
+# --- Helper Functions ---
+def get_current_quarter():
+    """Get current quarter (Q1, Q2, Q3, Q4) based on current month"""
+    month = datetime.datetime.now().month
+    if month in [1, 2, 3]:
+        return "Q1"
+    elif month in [4, 5, 6]:
+        return "Q2"
+    elif month in [7, 8, 9]:
+        return "Q3"
+    else:
+        return "Q4"
 
 def parse_quotation_number(quotation_number):
     """Parse quotation number to extract components"""
@@ -93,7 +113,7 @@ def parse_quotation_number(quotation_number):
             return prefix, sales_person, quarter, date_part, year_range, sequence
     except:
         pass
-    return "CMI", {sales_person}, get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
+    return "CMI", "SD", get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
 
 def generate_quotation_number(sales_person, sequence_number):
     """Generate quotation number with current quarter and sequence"""
@@ -114,6 +134,42 @@ def get_next_sequence_number(quotation_number):
     except:
         pass
     return 1
+
+# def parse_quotation_number(quotation_number):
+#     """Parse quotation number to extract components"""
+#     try:
+#         parts = quotation_number.split('/')
+#         if len(parts) >= 5:
+#             prefix = parts[0]  # CMI
+#             sales_person = parts[1]  # SD, CP, HP, KP
+#             quarter = parts[2]  # Q1, Q2, Q3, Q4
+#             date_part = parts[3]  # DD-MM-YYYY
+#             year_range = parts[4].split('_')[0]  # 2025-2026
+#             sequence = parts[4].split('_')[1] if '_' in parts[4] else "001"  # 001, 002, etc.
+#             return prefix, sales_person, quarter, date_part, year_range, sequence
+#     except:
+#         pass
+#     return "CMI", {sales_person}, get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
+
+# def generate_quotation_number(sales_person, sequence_number):
+#     """Generate quotation number with current quarter and sequence"""
+#     current_date = datetime.datetime.now()
+#     quarter = get_current_quarter()
+#     year_range = f"{current_date.year}-{current_date.year+1}"
+#     sequence = f"{sequence_number:03d}"
+    
+#     return f"CMI/{sales_person}/{quarter}/{current_date.strftime('%d-%m-%Y')}/{year_range}_{sequence}"
+
+# def get_next_sequence_number(quotation_number):
+#     """Extract and increment sequence number from quotation number"""
+#     try:
+#         parts = quotation_number.split('_')
+#         if len(parts) > 1:
+#             sequence = parts[-1]
+#             return int(sequence) + 1
+#     except:
+#         pass
+#     return 1
 
 # ... (rest of your PDF classes and functions remain the same) ...
 

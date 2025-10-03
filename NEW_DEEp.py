@@ -1613,17 +1613,36 @@ def main():
                                               format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
                                               key="po_sales_person")
         
+        # # Generate default PO number
+        # default_po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
+        
+        # # Check if we need to increment sequence
+        # if st.session_state.last_po_number:
+        #     last_sales_person = parse_po_number(st.session_state.last_po_number)[1]
+        #     if last_sales_person == po_sales_person:
+        #         # Same sales person, increment sequence
+        #         next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
+        #         default_po_number = generate_po_number(po_sales_person, next_sequence)
         # Generate default PO number
         default_po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
-        
-        # Check if we need to increment sequence
+
+# Check if we need to increment sequence - FIXED LOGIC
         if st.session_state.last_po_number:
-            last_sales_person = parse_po_number(st.session_state.last_po_number)[1]
-            if last_sales_person == po_sales_person:
-                # Same sales person, increment sequence
-                next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
-                default_po_number = generate_po_number(po_sales_person, next_sequence)
-        
+            try:
+                last_prefix, last_sales_person, last_year, last_quarter, last_sequence = parse_po_number(st.session_state.last_po_number)
+                
+                if last_sales_person == po_sales_person:
+                    # Same sales person, increment sequence
+                    next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
+                    default_po_number = generate_po_number(po_sales_person, next_sequence)
+                    st.session_state.po_seq = next_sequence
+                else:
+                    # Different sales person, start from sequence 1
+                    default_po_number = generate_po_number(po_sales_person, 1)
+                    st.session_state.po_seq = 1
+            except:
+                # If parsing fails, use default
+                default_po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
         # Editable PO number
         po_number = st.sidebar.text_input("PO Number", value=default_po_number, key="po_number_input")
         
@@ -1829,6 +1848,46 @@ def main():
                     mime="application/pdf"
                 )
 
+    # # --- Tab 3: Quotation Generator ---
+    # with tab3:
+    #     st.header("📑 Adobe Software Quotation Generator")
+        
+    #     today = datetime.date.today()
+    #     current_quarter = get_current_quarter()
+        
+    #     # Sales Person Selection
+    #     st.sidebar.header("Quotation Settings")
+    #     sales_person = st.sidebar.selectbox("Select Sales Person", options=list(SALES_PERSON_MAPPING.keys()), 
+    #                                        format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+    #                                        key="quote_sales_person")
+        
+    #     # Generate default quotation number
+    #     default_quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
+        
+    #     # Check if we need to increment sequence
+    #     if st.session_state.last_quotation_number:
+    #         last_sales_person = parse_quotation_number(st.session_state.last_quotation_number)[1]
+    #         if last_sales_person == sales_person:
+    #             # Same sales person, increment sequence
+    #             next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
+    #             default_quotation_number = generate_quotation_number(sales_person, next_sequence)
+        
+    #     # Editable quotation number
+    #     quotation_number = st.sidebar.text_input("Quotation Number", value=default_quotation_number, key="quote_number_input")
+        
+    #     # Parse the current quotation number to get sequence
+    #     _, _, _, _, _, current_sequence = parse_quotation_number(quotation_number)
+        
+    #     # Display current sales person info
+    #     current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
+    #     st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
+        
+    #     quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True, key="quote_auto_increment")
+        
+    #     if st.sidebar.button("Reset Quotation Sequence"):
+    #         st.session_state.quotation_seq = 1
+    #         st.session_state.last_quotation_number = ""
+    #         st.sidebar.success("Quotation sequence reset to 1")
     # --- Tab 3: Quotation Generator ---
     with tab3:
         st.header("📑 Adobe Software Quotation Generator")
@@ -1839,25 +1898,33 @@ def main():
         # Sales Person Selection
         st.sidebar.header("Quotation Settings")
         sales_person = st.sidebar.selectbox("Select Sales Person", options=list(SALES_PERSON_MAPPING.keys()), 
-                                           format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
-                                           key="quote_sales_person")
+                                        format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+                                        key="quote_sales_person")
         
         # Generate default quotation number
         default_quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
         
-        # Check if we need to increment sequence
+        # Check if we need to increment sequence - FIXED LOGIC
         if st.session_state.last_quotation_number:
-            last_sales_person = parse_quotation_number(st.session_state.last_quotation_number)[1]
-            if last_sales_person == sales_person:
-                # Same sales person, increment sequence
-                next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
-                default_quotation_number = generate_quotation_number(sales_person, next_sequence)
+            try:
+                # Parse the last quotation number to get the sales person code
+                last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
+                
+                if last_sales_person == sales_person:
+                    # Same sales person, increment sequence
+                    next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
+                    default_quotation_number = generate_quotation_number(sales_person, next_sequence)
+                    st.session_state.quotation_seq = next_sequence
+                else:
+                    # Different sales person, start from sequence 1
+                    default_quotation_number = generate_quotation_number(sales_person, 1)
+                    st.session_state.quotation_seq = 1
+            except:
+                # If parsing fails, use default
+                default_quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
         
         # Editable quotation number
         quotation_number = st.sidebar.text_input("Quotation Number", value=default_quotation_number, key="quote_number_input")
-        
-        # Parse the current quotation number to get sequence
-        _, _, _, _, _, current_sequence = parse_quotation_number(quotation_number)
         
         # Display current sales person info
         current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
@@ -1868,8 +1935,7 @@ def main():
         if st.sidebar.button("Reset Quotation Sequence"):
             st.session_state.quotation_seq = 1
             st.session_state.last_quotation_number = ""
-            st.sidebar.success("Quotation sequence reset to 1")
-        
+            st.sidebar.success("Quotation sequence reset to 1")    
         # Main form
         col1, col2 = st.columns([1, 1])
         
@@ -2000,8 +2066,6 @@ As one of our privileged customers, we look forward to having you take part in o
             except Exception as e:
                 st.warning(f"Could not process stamp: {e}")
                 stamp_path = None
-        
-        # Generate Quotation button
         if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
             if not st.session_state.quotation_products:
                 st.error("Please add at least one product to generate the quotation.")
@@ -2019,7 +2083,7 @@ As one of our privileged customers, we look forward to having you take part in o
                     "grand_total": grand_total,
                     "subject": subject_line,
                     "intro_paragraph": intro_paragraphs,
-                    "sales_person_code": sales_person
+                    "sales_person_code": sales_person  # Make sure this is passed
                 }
                 
                 try:
@@ -2035,7 +2099,10 @@ As one of our privileged customers, we look forward to having you take part in o
                     
                     st.success("✅ Quotation generated successfully!")
                     st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
-                    st.info("📧 All emails and phone numbers in the PDF are clickable!")
+                    
+                    # Verify the sales person code in the generated quotation number
+                    generated_prefix, generated_sales_person, generated_quarter, generated_date, generated_year, generated_sequence = parse_quotation_number(quotation_number)
+                    st.info(f"📄 Quotation Number Breakdown: {generated_sales_person} - {generated_sequence}")
                     
                     # Download button
                     st.download_button(
@@ -2048,6 +2115,53 @@ As one of our privileged customers, we look forward to having you take part in o
                     
                 except Exception as e:
                     st.error(f"Error generating PDF: {str(e)}")
+        # Generate Quotation button
+        # if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
+        #     if not st.session_state.quotation_products:
+        #         st.error("Please add at least one product to generate the quotation.")
+        #     else:
+        #         quotation_data = {
+        #             "quotation_number": quotation_number,
+        #             "quotation_date": today.strftime("%d-%m-%Y"),
+        #             "vendor_name": vendor_name,
+        #             "vendor_address": vendor_address,
+        #             "vendor_email": vendor_email,
+        #             "vendor_contact": vendor_contact,
+        #             "vendor_mobile": vendor_mobile,
+        #             "products": st.session_state.quotation_products,
+        #             "price_validity": price_validity,
+        #             "grand_total": grand_total,
+        #             "subject": subject_line,
+        #             "intro_paragraph": intro_paragraphs,
+        #             "sales_person_code": sales_person
+        #         }
+                
+        #         try:
+        #             pdf_bytes = create_quotation_pdf(quotation_data, logo_path, stamp_path)
+                    
+        #             # Store the last quotation number for sequence tracking
+        #             st.session_state.last_quotation_number = quotation_number
+                    
+        #             # Auto-increment for next quotation
+        #             if quotation_auto_increment:
+        #                 next_sequence = get_next_sequence_number(quotation_number)
+        #                 st.session_state.quotation_seq = next_sequence
+                    
+        #             st.success("✅ Quotation generated successfully!")
+        #             st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
+        #             st.info("📧 All emails and phone numbers in the PDF are clickable!")
+                    
+        #             # Download button
+        #             st.download_button(
+        #                 "⬇ Download Quotation PDF",
+        #                 data=pdf_bytes,
+        #                 file_name=f"Quotation_{quotation_number.replace('/', '_')}.pdf",
+        #                 mime="application/pdf",
+        #                 use_container_width=True
+        #             )
+                    
+        #         except Exception as e:
+        #             st.error(f"Error generating PDF: {str(e)}")
 
     # Clean up temporary files
     for path in ["temp_logo.jpg", "temp_stamp.jpg", "temp_logo_quote.jpg", "temp_stamp_quote.jpg"]:

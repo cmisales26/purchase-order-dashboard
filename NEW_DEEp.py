@@ -184,8 +184,8 @@ class QUOTATION_PDF(FPDF):
         self.set_font("Helvetica", "I", 7)
         self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
 
-# ... (rest of your existing PDF classes and functions remain exactly the same until the main function) ...
-# --- Quotation Page Content Generation Helpers ---
+# --- Page Content Generation Helpers ---
+
 def add_clickable_email(pdf, email, label="Email: "):
     """Add clickable email with label - FIXED OVERLAP"""
     pdf.set_font("Helvetica", "B", 10)
@@ -316,7 +316,7 @@ def add_page_two_commercials(pdf, data):
     pdf.ln(8)
 
     # --- Products Table - FIXED COLUMN WIDTHS ---
-    col_widths = [70, 25, 40, 25, 15, 25]  # Adjusted for better fit
+    col_widths = [70, 25, 25, 25, 15, 25]  # Adjusted for better fit
     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
     
     # Table Header
@@ -458,6 +458,12 @@ def add_page_two_commercials(pdf, data):
     sales_person_code = data.get('sales_person_code', 'SD')
     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
     
+    # pdf.set_font("Helvetica", "B", 10)
+    # pdf.cell(0, 5, "Yours Truly,", ln=True)
+    # pdf.cell(0, 5, "For CM INFOTECH", ln=True)
+    # pdf.ln(8)
+
+
     # Add stamp if available
     if data.get('stamp_path') and os.path.exists(data['stamp_path']):
         try:
@@ -477,6 +483,7 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 5, sales_person_info["email"], ln=1, link=f"mailto:{sales_person_info['email']}")
+    # pdf.cell(0, 5, "chirag@cminfotech.com", ln=1, link="mailto:chirag@cminfotech.com")
     
     # Clickable phone in signature
     pdf.set_text_color(0, 0, 0)
@@ -485,6 +492,7 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 5, sales_person_info["mobile"], ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+    # pdf.cell(0, 5, "+91 74051 12345", ln=True, link="tel:917405112345")
     pdf.set_text_color(0, 0, 0)
 
 def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
@@ -530,6 +538,418 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
         except Exception as e:
             st.error(f"PDF generation failed: {e}")
             return b""
+# class QUOTATION_PDF(FPDF):
+#     def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="SD"):
+#         super().__init__()
+#         self.set_auto_page_break(auto=True, margin=15)
+#         self.set_left_margin(15)
+#         self.set_right_margin(15)
+#         self.quotation_number = quotation_number
+#         self.quotation_date = quotation_date
+#         self.sales_person_code = sales_person_code
+        
+#     def sanitize_text(self, text):
+#         try:
+#             return text.encode('latin-1', 'ignore').decode('latin-1')
+#         except:
+#             return text
+
+#     def header(self):
+#         # Logo placement (top right) - FIXED
+#         if hasattr(self, 'logo_path') and self.logo_path and os.path.exists(self.logo_path):
+#             try:
+#                 self.image(self.logo_path, x=160, y=8, w=40)
+#             except:
+#                 # If image fails, show placeholder
+#                 self.set_font("Helvetica", "B", 8)
+#                 self.set_xy(150, 8)
+#                 self.cell(40, 5, "[LOGO]", border=0, align="C")
+            
+#         # Main Title (Centered)
+#         self.set_font("Helvetica", "B", 16)
+#         self.set_y(15)
+#         self.ln(5)
+
+#     def footer(self):
+#         self.set_y(-20)
+#         self.set_font("Helvetica", "I", 8)
+#         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
+        
+#         # Make footer emails and phone clickable - FIXED OVERLAP
+#         self.set_text_color(0, 0, 255)  # Blue color for links
+        
+#         # Website link
+#         self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
+        
+#         # Email and phone on same line - FIXED
+#         email_text = " info@cminfotech.com"
+#         phone_text = " +91 873 391 5721"
+        
+#         # Calculate positions for proper alignment
+#         page_width = self.w - 2 * self.l_margin
+#         email_width = self.get_string_width(email_text)
+#         phone_width = self.get_string_width(phone_text)
+#         separator_width = self.get_string_width(" | ")
+        
+#         total_width = email_width + separator_width + phone_width
+#         start_x = (page_width - total_width) / 2 + self.l_margin
+        
+#         self.set_x(start_x)
+#         self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text}")
+#         self.cell(separator_width, 4, " | ", ln=0)
+#         self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
+        
+#         self.set_text_color(0, 0, 0)  # Reset to black
+#         self.set_y(-8)
+#         self.set_font("Helvetica", "I", 7)
+#         self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
+
+# # ... (rest of your existing PDF classes and functions remain exactly the same until the main function) ...
+# # --- Quotation Page Content Generation Helpers ---
+# def add_clickable_email(pdf, email, label="Email: "):
+#     """Add clickable email with label - FIXED OVERLAP"""
+#     pdf.set_font("Helvetica", "B", 10)
+#     label_width = pdf.get_string_width(label)
+#     pdf.cell(label_width, 4, label, ln=0)
+    
+#     pdf.set_text_color(0, 0, 255)  # Blue for clickable
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
+#     pdf.set_text_color(0, 0, 0)  # Reset to black
+
+# def add_clickable_phone(pdf, phone, label="Mobile: "):
+#     """Add clickable phone number with label - FIXED OVERLAP"""
+#     pdf.set_font("Helvetica", "B", 10)
+#     label_width = pdf.get_string_width(label)
+#     pdf.cell(label_width, 4, label, ln=0)
+    
+#     pdf.set_text_color(0, 0, 255)  # Blue for clickable
+#     pdf.set_font("Helvetica", "", 10)
+#     # Remove spaces and + for tel link
+#     tel_number = phone.replace(' ', '').replace('+', '')
+#     pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
+#     pdf.set_text_color(0, 0, 0)  # Reset to black
+
+# def add_page_one_intro(pdf, data):
+#     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
+#     pdf.set_font("Helvetica", "B", 10)
+#     pdf.set_y(25)
+#     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
+#     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
+#     pdf.ln(10)
+
+#     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.cell(0, 5, "To,", ln=True)
+#     pdf.set_font("Helvetica", "B", 12)
+#     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
+#     pdf.set_font("Helvetica", "", 10)
+    
+#     # Address handling
+#     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
+    
+#     pdf.ln(3)
+    
+#     # Clickable Email - FIXED
+#     if data.get('vendor_email'):
+#         add_clickable_email(pdf, data['vendor_email'])
+    
+#     # Clickable Mobile - FIXED
+#     if data.get('vendor_mobile'):
+#         add_clickable_phone(pdf, data['vendor_mobile'])
+    
+#     pdf.set_font("Helvetica", "B", 10)
+#     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", ln=True)
+#     pdf.ln(8)
+
+#     # Subject Line (from user input)
+#     pdf.set_font("Helvetica", "B", 12)
+#     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
+#     pdf.ln(5)
+
+#     # Introductory Paragraph (from user input)
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.multi_cell(0, 5, pdf.sanitize_text(data['intro_paragraph']))
+#     pdf.ln(5)
+
+#     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
+#     page_width = pdf.w - 2 * pdf.l_margin
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.set_text_color(0, 0, 0)
+
+#     # Normal text
+#     pdf.write(5, "Please revert back to us, if you need any clarification / information "
+#                 "at the below mentioned address or email at ")
+
+#     # Email clickable
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.set_font("Helvetica", "U", 10)  # underline
+#     pdf.write(5, "chirag@cminfotech.com", link="mailto:chirag@cminfotech.com")
+
+#     # Back to normal for separator + Mobile:
+#     pdf.set_text_color(0, 0, 0)
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.write(5, "  Mobile: ")
+
+#     # First mobile
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.set_font("Helvetica", "U", 10)
+#     pdf.write(5, "+91 740 511 5721 ", link="tel:+91 740 511 5721")
+
+#     # Separator + second mobile
+#     pdf.set_text_color(0, 0, 0)
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.write(5, ", ")
+
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.set_font("Helvetica", "U", 10)
+#     pdf.write(5, "+91 873 391 5721", link="tel:+91 873 391 5721")
+
+#     # Reset back to normal for anything after
+#     pdf.set_text_color(0, 0, 0)
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.ln(10)  # move cursor down for next section
+    
+#     pdf.ln(3)
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
+#     pdf.set_font("Helvetica", "", 10)
+    
+#     # Clickable website
+#     pdf.set_font("Helvetica", "U", 10)
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, link="https://www.cminfotech.com/")
+#     pdf.cell(0, 4, "https://www.linkedin.com/", ln=True, link="https://www.linkedin.com/")
+#     pdf.cell(0, 4, "https://wa.me/message/8733915721", ln=True, link="https://wa.me/message/8733915721")
+#     pdf.cell(0, 4, "https://www.facebook.com/", ln=True, link="https://www.facebook.com/")
+#     pdf.cell(0, 4, "https://www.instagram.com/", ln=True, link="https://www.instagram.com/")
+#     pdf.set_text_color(0, 0, 0)
+
+# def add_page_two_commercials(pdf, data):
+#     pdf.add_page()
+    
+#     # Annexure Title - FIXED ALIGNMENT
+#     pdf.set_font("Helvetica", "B", 14)
+#     pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
+#     pdf.set_font("Helvetica", "B", 12)
+#     pdf.cell(0, 6, "Quotation for Adobe Software", ln=True, align="C")
+#     pdf.ln(8)
+
+#     # --- Products Table - FIXED COLUMN WIDTHS ---
+#     col_widths = [70, 25, 40, 25, 15, 25]  # Adjusted for better fit
+#     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
+    
+#     # Table Header
+#     pdf.set_fill_color(220, 220, 220)
+#     pdf.set_font("Helvetica", "B", 9)
+#     for width, header in zip(col_widths, headers):
+#         pdf.cell(width, 7, header, border=1, align="C", fill=True)
+#     pdf.ln()
+
+#     # Table Rows
+#     pdf.set_font("Helvetica", "", 9)
+#     grand_total = 0.0
+    
+#     for product in data["products"]:
+#         basic_price = product["basic"]
+#         qty = product["qty"]
+#         gst_amount = basic_price * 0.18
+#         per_unit_price = basic_price + gst_amount
+#         total = per_unit_price * qty
+#         grand_total += total
+        
+#         # Description (wrap long text)
+#         desc = product["name"]
+#         if len(desc) > 35:
+#             desc = desc[:32] + "..."
+        
+#         pdf.cell(col_widths[0], 6, pdf.sanitize_text(desc), border=1)
+#         pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
+#         pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
+#         pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
+#         pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
+#         pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
+#         pdf.ln()
+
+#     # Grand Total Row - FIXED ALIGNMENT
+#     pdf.set_font("Helvetica", "B", 10)
+#     pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
+#     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
+#     pdf.ln(15)
+
+#     # --- Enhanced Box for Terms & Conditions and Bank Details ---
+#     pdf.set_font("Helvetica", "", 9)
+
+#     # Terms & Conditions
+#     terms = [
+#         "Above charges are Inclusive of GST.",
+#         "Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.",
+#         "TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.",
+#         "ELD licenses are paper licenses that do not contain media.",
+#         "An Internet connection is required to access cloud services.",
+#         "Training will be charged at extra cost depending on no. of participants.",
+#         f"Price Validity: {data['price_validity']}",
+#         "Payment: 100% Advance along with purchase order.",
+#         "Delivery period: 1-2 Weeks from the date of Purchase Order",
+#         'Cheque to be issued on name of: "CM INFOTECH"',
+#         "Order to be placed on: CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481"
+#     ]
+
+#     # Bank Details
+#     bank_info = [
+#         ("Name", "CM INFOTECH"),
+#         ("Account Number", "0232054321"),
+#         ("IFSC Code", "KCCB0SWASTI"),
+#         ("Bank Name", "THE KALUPUR COMMERCIAL CO-OPERATIVE BANK LTD."),
+#         ("Branch", "SWASTIK SOCIETY, AHMEDABAD"),
+#         ("MSME", "UDYAM-GJ-01-1234567"),
+#         ("GSTIN", "24ANMPP4891R1ZX"),
+#         ("PAN No", "ANMPP4891R")
+#     ]
+
+#     # Box dimensions and styling
+#     x_start = pdf.get_x()
+#     y_start = pdf.get_y()
+#     page_width = pdf.w - 2 * pdf.l_margin
+#     col1_width = page_width * 0.6  # 60% for Terms
+#     col2_width = page_width * 0.4  # 40% for Bank Details
+#     padding = 4
+#     line_height = 4.5
+#     section_spacing = 2
+
+#     # Calculate required height for both columns
+#     def calculate_column_height(items, col_width):
+#         height = 0
+#         for item in items:
+#             lines = pdf.multi_cell(col_width - 2*padding, line_height, item, split_only=True)
+#             height += len(lines) * line_height + section_spacing
+#         return height + 3*padding  # Add padding
+
+#     terms_height = calculate_column_height(terms, col1_width)
+#     bank_height = calculate_column_height([f"{label}: {value}" for label, value in bank_info], col2_width)
+    
+#     # Use the maximum height
+#     box_height = max(terms_height, bank_height) + padding
+
+#     # Draw the main box
+#     pdf.rect(x_start, y_start, page_width, box_height)
+    
+#     # Draw vertical separator line
+#     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
+
+#     # Add section headers
+#     pdf.set_font("Helvetica", "B", 10)
+    
+#     # Terms & Conditions header
+#     pdf.set_xy(x_start + padding, y_start + padding)
+#     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
+#     pdf.set_font("Helvetica", "", 9)
+    
+#     # Terms content
+#     terms_y = pdf.get_y()
+#     for i, term in enumerate(terms):
+#         pdf.set_xy(x_start + padding, terms_y)
+#         pdf.multi_cell(col1_width - 2*padding, line_height, f"{i+1}. {term}")
+#         terms_y = pdf.get_y()
+
+#     # Bank Details header
+#     pdf.set_font("Helvetica", "B", 10)
+#     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
+#     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
+#     pdf.set_font("Helvetica", "", 9)
+    
+#     # Bank details content
+#     bank_y = pdf.get_y()
+#     for label, value in bank_info:
+#         pdf.set_xy(x_start + col1_width + padding, bank_y)
+#         pdf.multi_cell(col2_width - 2*padding, line_height, f"{label}: {value}")
+#         bank_y = pdf.get_y()
+
+#     # Move cursor below the box
+#     pdf.set_xy(x_start, y_start + box_height + 10)
+
+#     # --- Signature Block ---
+#     pdf.set_font("Helvetica", "B", 10)
+#     pdf.cell(0, 5, "Yours Truly,", ln=True)
+#     pdf.cell(0, 5, "For CM INFOTECH", ln=True)
+#     pdf.ln(8)
+    
+#     # --- Signature Block with Dynamic Sales Person ---
+#     sales_person_code = data.get('sales_person_code', 'SD')
+#     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+    
+#     # Add stamp if available
+#     if data.get('stamp_path') and os.path.exists(data['stamp_path']):
+#         try:
+#             # Position stamp on the right side
+#             pdf.image(data['stamp_path'], x=160, y=pdf.get_y()-5, w=30)
+#         except:
+#             pass
+    
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.cell(0, 5, sales_person_info["name"], ln=True)
+#     pdf.cell(0, 5, "Inside Sales Executive", ln=True)
+    
+#     # Clickable email in signature
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.set_text_color(0, 0, 0)
+#     label = "Email: "
+#     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.cell(0, 5, sales_person_info["email"], ln=1, link=f"mailto:{sales_person_info['email']}")
+    
+#     # Clickable phone in signature
+#     pdf.set_text_color(0, 0, 0)
+#     pdf.set_font("Helvetica", "", 10)
+#     label = "Mobile: "
+#     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.cell(0, 5, sales_person_info["mobile"], ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+#     pdf.set_text_color(0, 0, 0)
+
+# def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
+#     """Orchestrates the creation of the two-page PDF."""
+#     sales_person_code = quotation_data.get('sales_person_code', 'SD')
+#     pdf = QUOTATION_PDF(quotation_number=quotation_data['quotation_number'], 
+#                         quotation_date=quotation_data['quotation_date'],
+#                         sales_person_code=sales_person_code)
+    
+#     # Set logo path for header
+#     if logo_path and os.path.exists(logo_path):
+#         pdf.logo_path = logo_path
+    
+#     quotation_data['stamp_path'] = stamp_path
+
+#     pdf.add_page()
+    
+#     # 1. Add Page 1 (Introduction Letter)
+#     add_page_one_intro(pdf, quotation_data)
+
+#     # 2. Add Page 2 (Commercials, Terms, Bank Details)
+#     add_page_two_commercials(pdf, quotation_data)
+    
+#     # Handle PDF output properly
+#     try:
+#         pdf_output = pdf.output(dest='S')
+        
+#         if isinstance(pdf_output, str):
+#             return pdf_output.encode('latin-1')
+#         elif isinstance(pdf_output, bytearray):
+#             return bytes(pdf_output)
+#         elif isinstance(pdf_output, bytes):
+#             return pdf_output
+#         else:
+#             return str(pdf_output).encode('latin-1')
+            
+#     except Exception:
+#         # Fallback method
+#         try:
+#             buffer = io.BytesIO()
+#             pdf.output(dest=buffer)
+#             return buffer.getvalue()
+#         except Exception as e:
+#             st.error(f"PDF generation failed: {e}")
+#             return b""
 
 # --- PDF Class for Tax Invoice ---
 class PDF(FPDF):

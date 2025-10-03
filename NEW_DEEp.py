@@ -66,7 +66,7 @@ def generate_po_number(sales_person, sequence_number):
     year = str(current_date.year)
     sequence = f"{sequence_number:03d}"
     
-    return f"C/{sales_person}/{year}/{quarter}_{sequence}"
+    return f"CMI/{sales_person}/{year}/{quarter}_{sequence}"
 
 def get_next_sequence_number_po(po_number):
     """Extract and increment sequence number from PO number"""

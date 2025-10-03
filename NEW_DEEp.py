@@ -868,7 +868,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.ln(2)
     # pdf.set_xy(110, pdf.get_y() - 20)
     pdf.multi_cell(95, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
-    pdf.set_xy(120, pdf.get_y() - 15)
+    pdf.set_xy(110, pdf.get_y() - 15)
     pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
     pdf.ln(2)
     pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")

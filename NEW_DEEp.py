@@ -765,33 +765,27 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
 
-    if stamp_file:
+    # Stamp left-aligned (optional)
+    if stamp_file and os.path.exists(stamp_file):
         try:
-            # Calculate position to place the stamp above the signature line
-            # The 'x' coordinate is calculated to align the stamp to the right side
-            # The 'y' coordinate is 10mm above the signature line
             stamp_width = 25
-            pdf.image(stamp_file, x=210 - 15 - stamp_width, y=pdf.get_y(), w=stamp_width)
-            pdf.ln(15) # Move down for the signature text
+            pdf.image(stamp_file, x=pdf.l_margin, y=pdf.get_y(), w=stamp_width)  # left-aligned
+            pdf.ln(15)  # spacing below stamp
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
     else:
-        pdf.ln(10) # maintain spacing if no stamp is uploded
-    # pdf.ln(5)
-    # pdf.set_font("Helvetica", "B", 8)
-    # pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
-    pdf.ln(10)
+        pdf.ln(10)
+
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
-    pdf.set_y(-41)
+
+    # Move to bottom safely
+    pdf.set_y(-25)  # 25 units from bottom
     pdf.set_font("Helvetica", "I", 8)
-    pdf.cell(0, 5, "This is a Computer Generated Invoice", ln=True, align="C")
-    pdf.set_y(-31)
-    pdf.set_font("Helvetica", "I", 8)
-    pdf.cell(0, 5, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-    pdf.set_y(-26)
-    pdf.set_font("Helvetica", "I", 8)
-    pdf.cell(0, 5, "Email: info@cminfotech.com Mo.+91 873 391 5721", ln=True, align="C")
+    pdf.multi_cell(0, 4, "This is a Computer Generated Invoice", align="C")
+    pdf.multi_cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", align="C")
+    pdf.multi_cell(0, 4, "Email: info@cminfotech.com Mo.+91 873 391 5721", align="C")
+
     # pdf_output = io.BytesIO()
     # pdf.output(pdf_output)
     # pdf_output.seek(0)

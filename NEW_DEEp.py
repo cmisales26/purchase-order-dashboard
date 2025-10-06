@@ -1402,8 +1402,16 @@ def main():
                 return generate_quotation_number(sales_person, 1)
         
         # Get the quotation number
-        quotation_number = get_quotation_number(sales_person)
-        
+        # Auto-generate quotation number first
+        auto_generated_number = get_quotation_number()
+
+        # Show it as editable input (default = auto-generated)
+        quotation_number = st.sidebar.text_input(
+            "Quotation Number",
+            value=auto_generated_number,
+            key="quote_number_display"
+        )
+                
         # Display current sales person info
         current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
         st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")

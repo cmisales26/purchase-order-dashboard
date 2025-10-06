@@ -1365,129 +1365,99 @@ def main():
                     mime="application/pdf"
                 )
 
-    # --- Tab 3: Quotation Generator (WITH PROPER AUTOMATIC QUOTATION NUMBER UPDATING) ---
+        # --- Tab 3: Quotation Generator (WITH PROPER SESSION STATE HANDLING) ---
     with tab3:
         st.header("📑 Adobe Software Quotation Generator")
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
         
-        # # Sales Person Selection
-        # st.sidebar.header("Quotation Settings")
-        # sales_person = st.sidebar.selectbox("Select Sales Person", 
-        #                                 options=list(SALES_PERSON_MAPPING.keys()), 
-        #                                 format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
-        #                                 key="quote_sales_person")
         # Sales Person Selection
-        st.sidebar.header("Sales Person Settings")
-        sales_person = st.sidebar.selectbox("Select Sales Person", options=list(SALES_PERSON_MAPPING.keys()), 
-                                        format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}")
+        st.sidebar.header("Quotation Settings")
+        sales_person = st.sidebar.selectbox("Select Sales Person", 
+                                        options=list(SALES_PERSON_MAPPING.keys()), 
+                                        format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+                                        key="quote_sales_person")
         
-        # Generate default quotation number
-        default_quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
-        
-        # # Get current sales person info
-        # current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
+        # Get current sales person info
+        current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
         
         # Generate quotation number based on selected sales person
-        # def get_quotation_number():
-        #     # Check if we need to increment sequence
-        #     if st.session_state.last_quotation_number:
-        #         try:
-        #             last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
+        def get_quotation_number():
+            # Check if we need to increment sequence
+            if st.session_state.last_quotation_number:
+                try:
+                    last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
                     
-        #             if last_sales_person == sales_person:
-        #                 # Same sales person, increment sequence
-        #                 next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
-        #                 return generate_quotation_number(sales_person, next_sequence)
-        #             else:
-        #                 # Different sales person, start from sequence 1
-        #                 return generate_quotation_number(sales_person, 1)
-        #         except:
-        #             # If parsing fails, use current sequence
-        #             return generate_quotation_number(sales_person, st.session_state.quotation_seq)
-        #     else:
-        #         # No previous quotation, start from current sequence
-        #         return generate_quotation_number(sales_person, st.session_state.quotation_seq)
+                    if last_sales_person == sales_person:
+                        # Same sales person, increment sequence
+                        next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
+                        return generate_quotation_number(sales_person, next_sequence)
+                    else:
+                        # Different sales person, start from sequence 1
+                        return generate_quotation_number(sales_person, 1)
+                except:
+                    # If parsing fails, use current sequence
+                    return generate_quotation_number(sales_person, st.session_state.quotation_seq)
+            else:
+                # No previous quotation, start from current sequence
+                return generate_quotation_number(sales_person, st.session_state.quotation_seq)
         
-        # # Initialize or update quotation number when sales person changes
-        # if "current_quote_sales_person" not in st.session_state:
-        #     st.session_state.current_quote_sales_person = sales_person
-        #     st.session_state.quotation_number = get_quotation_number()
+        # Initialize or update quotation number when sales person changes
+        if "current_quote_sales_person" not in st.session_state:
+            st.session_state.current_quote_sales_person = sales_person
+            st.session_state.quotation_number = get_quotation_number()
         
-        # # Update quotation number if sales person changes
-        # if st.session_state.current_quote_sales_person != sales_person:
-        #     st.session_state.current_quote_sales_person = sales_person
-        #     st.session_state.quotation_number = get_quotation_number()
-        
-        # # Display current sales person info
-        # st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
-        
-        # # Show auto-generated breakdown
-        # try:
-        #     prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(st.session_state.quotation_number)
-        #     st.sidebar.success(f"**Auto-generated:** {current_sp} - Sequence {sequence}")
-        # except:
-        #     st.sidebar.warning("Could not parse quotation number")
-        
-        # # Editable quotation number with manual override
-        # st.sidebar.subheader("Quotation Number")
-        
-        # # Auto-generate button
-        # if st.sidebar.button("🔄 Auto-generate Number", use_container_width=True):
-        #     st.session_state.quotation_number = get_quotation_number()
-        #     st.rerun()
-        
-        # # Manual editing of quotation number
-        # new_quotation_number = st.sidebar.text_input(
-        #     "Edit Quotation Number", 
-        #     value=st.session_state.quotation_number,
-        #     key="quote_number_edit"
-        # )
-        
-        # # Update session state if manually edited
-        # if new_quotation_number != st.session_state.quotation_number:
-        #     st.session_state.quotation_number = new_quotation_number
-        
-        # # Show current breakdown
-        # try:
-        #     edited_prefix, edited_sp, edited_quarter, edited_date, edited_year, edited_sequence = parse_quotation_number(st.session_state.quotation_number)
-        #     st.sidebar.info(f"**Format:** {edited_sp}/{edited_quarter}/{edited_date}/{edited_year}_{edited_sequence}")
-        # except:
-        #     st.sidebar.warning("Invalid quotation number format")
-        
-        # quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True, key="quote_auto_increment")
-        
-        # if st.sidebar.button("Reset Quotation Sequence", use_container_width=True):
-        #     st.session_state.quotation_seq = 1
-        #     st.session_state.last_quotation_number = ""
-        #     st.session_state.quotation_number = get_quotation_number()
-        #     st.sidebar.success("Quotation sequence reset to 1")
-        #     st.rerun()
-        # Check if we need to increment sequence
-        if st.session_state.last_quotation_number:
-            last_sales_person = parse_quotation_number(st.session_state.last_quotation_number)[1]
-            if last_sales_person == sales_person:
-                # Same sales person, increment sequence
-                next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
-                default_quotation_number = generate_quotation_number(sales_person, next_sequence)
-        
-        # Editable quotation number
-        quotation_number = st.sidebar.text_input("Quotation Number", value=default_quotation_number)
-        
-        # Parse the current quotation number to get sequence
-        _, _, _, _, _, current_sequence = parse_quotation_number(quotation_number)
+        # Update quotation number if sales person changes
+        if st.session_state.current_quote_sales_person != sales_person:
+            st.session_state.current_quote_sales_person = sales_person
+            st.session_state.quotation_number = get_quotation_number()
         
         # Display current sales person info
-        current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
         st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
         
-        quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True)
+        # Show auto-generated breakdown
+        try:
+            prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(st.session_state.quotation_number)
+            st.sidebar.success(f"**Auto-generated:** {current_sp} - Sequence {sequence}")
+        except:
+            st.sidebar.warning("Could not parse quotation number")
         
-        if st.sidebar.button("Reset Quotation Sequence"):
+        # Editable quotation number with manual override
+        st.sidebar.subheader("Quotation Number")
+        
+        # Auto-generate button
+        if st.sidebar.button("🔄 Auto-generate Number", use_container_width=True):
+            st.session_state.quotation_number = get_quotation_number()
+            st.rerun()
+        
+        # Manual editing of quotation number
+        new_quotation_number = st.sidebar.text_input(
+            "Edit Quotation Number", 
+            value=st.session_state.quotation_number,
+            key="quote_number_edit"
+        )
+        
+        # Update session state if manually edited
+        if new_quotation_number != st.session_state.quotation_number:
+            st.session_state.quotation_number = new_quotation_number
+        
+        # Show current breakdown
+        try:
+            edited_prefix, edited_sp, edited_quarter, edited_date, edited_year, edited_sequence = parse_quotation_number(st.session_state.quotation_number)
+            st.sidebar.info(f"**Format:** {edited_sp}/{edited_quarter}/{edited_date}/{edited_year}_{edited_sequence}")
+        except:
+            st.sidebar.warning("Invalid quotation number format")
+        
+        quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True, key="quote_auto_increment")
+        
+        if st.sidebar.button("Reset Quotation Sequence", use_container_width=True):
             st.session_state.quotation_seq = 1
             st.session_state.last_quotation_number = ""
+            st.session_state.quotation_number = get_quotation_number()
             st.sidebar.success("Quotation sequence reset to 1")
+            st.rerun()
+        
         # Main form
         col1, col2 = st.columns([1, 1])
         
@@ -1511,16 +1481,17 @@ def main():
             
     Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.
             
-    As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"""
+    As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!""",
+            key="quote_intro"
             )
         
         with col2:
             st.header("Products & Services")
             
             # Product selection from catalog
-            selected_product = st.selectbox("Select from Product Catalog", [""] + list(PRODUCT_CATALOG.keys()))
+            selected_product = st.selectbox("Select from Product Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="quote_product_select")
             
-            if st.button("➕ Add Selected Product"):
+            if st.button("➕ Add Selected Product", key="add_selected_quote"):
                 if selected_product:
                     details = PRODUCT_CATALOG[selected_product]
                     st.session_state.quotation_products.append({
@@ -1571,8 +1542,8 @@ def main():
         st.header("Preview & Generate Quotation")
         
         # Show the current quotation number prominently with sales person info
-        # st.info(f"**Current Quotation Number:** {st.session_state.quotation_number}")
-        # st.info(f"**Sales Person:** {current_sales_person_info['name']} ({sales_person}) - {current_sales_person_info['email']}")
+        st.info(f"**Current Quotation Number:** {st.session_state.quotation_number}")
+        st.info(f"**Sales Person:** {current_sales_person_info['name']} ({sales_person}) - {current_sales_person_info['email']}")
         
         # Calculate totals
         total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
@@ -1656,12 +1627,12 @@ def main():
                     st.success("✅ Quotation generated successfully!")
                     st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
                     
-                    # # Verify the sales person code in the generated quotation number
-                    # try:
-                    #     generated_prefix, generated_sales_person, generated_quarter, generated_date, generated_year, generated_sequence = parse_quotation_number(st.session_state.quotation_number)
-                    #     st.info(f"📄 Quotation Number: {generated_sales_person} - Sequence {generated_sequence}")
-                    # except:
-                    #     st.info(f"📄 Quotation Number: {st.session_state.quotation_number}")
+                    # Verify the sales person code in the generated quotation number
+                    try:
+                        generated_prefix, generated_sales_person, generated_quarter, generated_date, generated_year, generated_sequence = parse_quotation_number(st.session_state.quotation_number)
+                        st.info(f"📄 Quotation Number: {generated_sales_person} - Sequence {generated_sequence}")
+                    except:
+                        st.info(f"📄 Quotation Number: {st.session_state.quotation_number}")
                     
                     # Download button
                     st.download_button(

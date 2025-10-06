@@ -805,9 +805,31 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # pdf.set_y(-31)
     # pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
+    pdf.set_y(-26)
+    pdf.set_font("Helvetica", "I", 8)
+
+    # Email link
+    pdf.cell(0, 5, "Email: ", ln=0, align="C")
+    pdf.set_text_color(0, 0, 255)  # Blue for hyperlink
+    pdf.set_font("Helvetica", "U", 8)  # Underlined
+    pdf.cell(40, 5, "info@cminfotech.com", ln=0, align="C", link="mailto:info@cminfotech.com")
+
+    pdf.ln(5)
+
+    # Mobile link
+    pdf.set_font("Helvetica", "I", 8)
+    pdf.set_text_color(0, 0, 0)  # Reset to black
+    pdf.cell(0, 5, "Mobile: ", ln=0, align="C")
+    pdf.set_text_color(0, 0, 255)
+    pdf.set_font("Helvetica", "U", 8)
+    pdf.cell(40, 5, "+91 873 391 5721", ln=0, align="C", link="tel:+918733915721")
+
+    # Reset font and color for safety
+    pdf.set_font("Helvetica", "I", 8)
+    pdf.set_text_color(0, 0, 0)
     # pdf.set_y(-25)
     # pdf.set_font("Helvetica", "I", 8)
-    pdf.cell(0, 4, "Email: info@cminfotech.com Mo.+91 873 391 5721", ln=True, align="C")
+    # pdf.cell(0, 4, "Email: info@cminfotech.com Mo.+91 873 391 5721", ln=True, align="C")
     # pdf_output = io.BytesIO()
     # pdf.output(pdf_output)
     # pdf_output.seek(0)

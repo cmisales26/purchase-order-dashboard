@@ -1623,7 +1623,7 @@ def main():
                 st.error("Please add at least one product to generate the quotation.")
             else:
                 quotation_data = {
-                    "quotation_number": st.session_state.quotation_number,
+                    "quotation_number": quotation_number,
                     "quotation_date": today.strftime("%d-%m-%Y"),
                     "vendor_name": vendor_name,
                     "vendor_address": vendor_address,

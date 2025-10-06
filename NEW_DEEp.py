@@ -640,7 +640,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(10, 5, "Sr. No.", border=1, align="C")
-    pdf.cell(85, 5, "Description of Goods", border=1, align="C")
+    pdf.cell(80, 5, "Description of Goods", border=1, align="C")
     pdf.cell(20, 5, "HSN/SAC", border=1, align="C")
     pdf.cell(20, 5, "Quantity", border=1, align="C")
     pdf.cell(25, 5, "Unit Rate", border=1, align="C")
@@ -648,7 +648,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 
     # --- Items ---
     pdf.set_font("Helvetica", "", 8)
-    col_widths = [10, 85, 20, 20, 25, 30]
+    col_widths = [10, 80, 20, 20, 25, 30]
     line_height = 4
 
     for i, item in enumerate(invoice_data["items"], start=1):

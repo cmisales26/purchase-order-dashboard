@@ -34,11 +34,11 @@ SALES_PERSON_MAPPING = {
 def get_current_quarter():
     """Get current quarter (Q1, Q2, Q3, Q4) based on current month"""
     month = datetime.datetime.now().month
-    if month in [1, 2, 3]:
+    if month in [4, 5, 6]:
         return "Q1"
-    elif month in [4, 5, 6]:
-        return "Q2"
     elif month in [7, 8, 9]:
+        return "Q2"
+    elif month in [10, 11, 12]:
         return "Q3"
     else:
         return "Q4"
@@ -79,21 +79,23 @@ def get_next_sequence_number_po(po_number):
         pass
     return 1
 
-def parse_quotation_number(quotation_number,fallback_sales_person="SD"):
-    """Parse quotation number to extract components"""
+
+def parse_quotation_number(quotation_number, fallback_sales_person="SD"):
+    """Parse existing quotation number or fallback if invalid"""
     try:
         parts = quotation_number.split('/')
         if len(parts) >= 5:
-            prefix = parts[0]  # CMI
-            sales_person = parts[1]  # SD, CP, HP, KP
-            quarter = parts[2]  # Q1, Q2, Q3, Q4
-            date_part = parts[3]  # DD-MM-YYYY
-            year_range = parts[4].split('_')[0]  # 2025-2026
-            sequence = parts[4].split('_')[1] if '_' in parts[4] else "001"  # 001, 002, etc.
+            prefix = parts[0]  
+            sales_person = parts[1]  
+            quarter = parts[2]       
+            date_part = parts[3]     
+            year_range = parts[4].split('_')[0]  
+            sequence = parts[4].split('_')[1] if '_' in parts[4] else "001"
             return prefix, sales_person, quarter, date_part, year_range, sequence
     except:
         pass
-        return (
+
+    return (
         "CMI",
         fallback_sales_person,
         get_current_quarter(),
@@ -102,14 +104,15 @@ def parse_quotation_number(quotation_number,fallback_sales_person="SD"):
         "001",
     )
 
-def generate_quotation_number(sales_person, sequence_number):
-    """Generate quotation number with current quarter and sequence"""
-    current_date = datetime.datetime.now()
+def generate_quotation_number(sales_person, sequence=1):
+    """Generate new quotation number"""
+    prefix = "CMI"
     quarter = get_current_quarter()
-    year_range = f"{current_date.year}-{current_date.year+1}"
-    sequence = f"{sequence_number:03d}"
-    
-    return f"CMI/{sales_person}/{quarter}/{current_date.strftime('%d-%m-%Y')}/{year_range}_{sequence}"
+    date_str = datetime.datetime.now().strftime("%d-%m-%Y")
+    year = datetime.datetime.now().year
+    next_year = year + 1
+    year_range = f"{year}-{next_year}"
+    return f"{prefix}/{sales_person}/{quarter}/{date_str}/{year_range}_{str(sequence).zfill(3)}"
 
 def get_next_sequence_number(quotation_number):
     """Extract and increment sequence number from quotation number"""
@@ -1373,8 +1376,8 @@ def main():
         
         # Generate quotation number based on selected sales person
         def get_quotation_number(sales_person):
-            """Generate the next quotation number for the selected sales person"""
-            if st.session_state.last_quotation_number:
+            """Get the next quotation number, keeping track of session state"""
+            if "last_quotation_number" in st.session_state and st.session_state.last_quotation_number:
                 try:
                     (
                         last_prefix,
@@ -1383,23 +1386,18 @@ def main():
                         last_date,
                         last_year_range,
                         last_sequence,
-                    ) = parse_quotation_number(
-                        st.session_state.last_quotation_number, fallback_sales_person=sales_person
-                    )
+                    ) = parse_quotation_number(st.session_state.last_quotation_number, fallback_sales_person=sales_person)
 
                     if last_sales_person == sales_person:
-                        # Same sales person → increment sequence
-                        next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
-                        return generate_quotation_number(sales_person, next_sequence)
+                        next_seq = get_next_sequence_number(st.session_state.last_quotation_number)
+                        return generate_quotation_number(sales_person, next_seq)
                     else:
-                        # Different sales person → restart sequence
                         return generate_quotation_number(sales_person, 1)
                 except:
-                    # If parsing fails → start fresh for selected person
                     return generate_quotation_number(sales_person, 1)
             else:
-                # First quotation → start fresh
                 return generate_quotation_number(sales_person, 1)
+
         
         # Get the quotation number
         # Auto-generate quotation number first

@@ -799,44 +799,39 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # pdf.ln(10)
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
+     # --- Footer with clickable email and mobile ---
     pdf.set_y(-25)
     pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
-    # pdf.set_y(-31)
-    # pdf.set_font("Helvetica", "I", 8)
+    
+    # Company address
     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-    pdf.set_y(-26)
-    pdf.set_font("Helvetica", "I", 8)
-
-    # Email link
-    pdf.cell(0, 5, "Email: ", ln=0, align="C")
-    pdf.set_text_color(0, 0, 255)  # Blue for hyperlink
-    pdf.set_font("Helvetica", "U", 8)  # Underlined
-    pdf.cell(40, 5, "info@cminfotech.com", ln=0, align="C", link="mailto:info@cminfotech.com")
-
-    pdf.ln(5)
-
-    # Mobile link
-    pdf.set_font("Helvetica", "I", 8)
-    pdf.set_text_color(0, 0, 0)  # Reset to black
-    pdf.cell(0, 5, "Mobile: ", ln=0, align="C")
-    pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 8)
-    pdf.cell(40, 5, "+91 873 391 5721", ln=0, align="C", link="tel:+918733915721")
-
-    # Reset font and color for safety
-    pdf.set_font("Helvetica", "I", 8)
-    pdf.set_text_color(0, 0, 0)
-    # pdf.set_y(-25)
-    # pdf.set_font("Helvetica", "I", 8)
-    # pdf.cell(0, 4, "Email: info@cminfotech.com Mo.+91 873 391 5721", ln=True, align="C")
-    # pdf_output = io.BytesIO()
-    # pdf.output(pdf_output)
-    # pdf_output.seek(0)
-    # return pdf_output
+    
+    # Clickable email and mobile
+    pdf.set_text_color(0, 0, 255)  # Blue color for clickable links
+    
+    # Email
+    email_text = "Email: info@cminfotech.com"
+    email_width = pdf.get_string_width(email_text)
+    page_center = pdf.w / 2
+    email_x = page_center - (email_width / 2)
+    pdf.set_x(email_x)
+    pdf.cell(email_width, 4, email_text, ln=False, align="C", link="mailto:info@cminfotech.com")
+    
+    # Separator
+    separator = "  |  "
+    separator_width = pdf.get_string_width(separator)
+    pdf.cell(separator_width, 4, separator, ln=False, align="C")
+    
+    # Mobile
+    mobile_text = "Mo. +91 873 391 5721"
+    mobile_width = pdf.get_string_width(mobile_text)
+    pdf.cell(mobile_width, 4, mobile_text, ln=True, align="C", link="tel:+918733915721")
+    
+    pdf.set_text_color(0, 0, 0)  # Reset to black color
+    
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
-
 
 
 # --- PDF Class ---

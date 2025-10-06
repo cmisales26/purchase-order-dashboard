@@ -303,6 +303,195 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 4, "https://www.instagram.com/", ln=True, link="https://www.instagram.com/")
     pdf.set_text_color(0, 0, 0)
 
+# def add_page_two_commercials(pdf, data):
+#     pdf.add_page()
+    
+#     # Annexure Title - FIXED ALIGNMENT
+#     pdf.set_font("Helvetica", "B", 14)
+#     pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
+#     pdf.set_font("Helvetica", "B", 12)
+#     pdf.cell(0, 6, "Quotation for Adobe Software", ln=True, align="C")
+#     pdf.ln(8)
+
+#     # --- Products Table - FIXED COLUMN WIDTHS ---
+#     col_widths = [70, 25, 25, 25, 15, 25]  # Adjusted for better fit
+#     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
+    
+#     # Table Header
+#     pdf.set_fill_color(220, 220, 220)
+#     pdf.set_font("Helvetica", "B", 9)
+#     for width, header in zip(col_widths, headers):
+#         pdf.cell(width, 7, header, border=1, align="C", fill=True)
+#     pdf.ln()
+
+#     # Table Rows
+#     pdf.set_font("Helvetica", "", 9)
+#     grand_total = 0.0
+    
+#     for product in data["products"]:
+#         basic_price = product["basic"]
+#         qty = product["qty"]
+#         gst_amount = basic_price * 0.18
+#         per_unit_price = basic_price + gst_amount
+#         total = per_unit_price * qty
+#         grand_total += total
+        
+#         # Description (wrap long text)
+#         desc = product["name"]
+#         if len(desc) > 35:
+#             desc = desc[:32] + "..."
+        
+#         pdf.cell(col_widths[0], 6, pdf.sanitize_text(desc), border=1)
+#         pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
+#         pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
+#         pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
+#         pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
+#         pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
+#         pdf.ln()
+
+#     # Grand Total Row - FIXED ALIGNMENT
+#     pdf.set_font("Helvetica", "B", 10)
+#     pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
+#     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
+#     pdf.ln(15)
+
+#     # --- Enhanced Box for Terms & Conditions and Bank Details ---
+#     pdf.set_font("Helvetica", "", 9)
+
+#     # Terms & Conditions
+#     terms = [
+#         "Above charges are Inclusive of GST.",
+#         "Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.",
+#         "TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.",
+#         "ELD licenses are paper licenses that do not contain media.",
+#         "An Internet connection is required to access cloud services.",
+#         "Training will be charged at extra cost depending on no. of participants.",
+#         f"Price Validity: {data['price_validity']}",
+#         "Payment: 100% Advance along with purchase order.",
+#         "Delivery period: 1-2 Weeks from the date of Purchase Order",
+#         'Cheque to be issued on name of: "CM INFOTECH"',
+#         "Order to be placed on: CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481"
+#     ]
+
+#     # Bank Details
+#     bank_info = [
+#         ("Name", "CM INFOTECH"),
+#         ("Account Number", "0232054321"),
+#         ("IFSC Code", "KCCB0SWASTI"),
+#         ("Bank Name", "THE KALUPUR COMMERCIAL CO-OPERATIVE BANK LTD."),
+#         ("Branch", "SWASTIK SOCIETY, AHMEDABAD"),
+#         ("MSME", "UDYAM-GJ-01-1234567"),
+#         ("GSTIN", "24ANMPP4891R1ZX"),
+#         ("PAN No", "ANMPP4891R")
+#     ]
+
+#     # Box dimensions and styling
+#     x_start = pdf.get_x()
+#     y_start = pdf.get_y()
+#     page_width = pdf.w - 2 * pdf.l_margin
+#     col1_width = page_width * 0.6  # 60% for Terms
+#     col2_width = page_width * 0.4  # 40% for Bank Details
+#     padding = 4
+#     line_height = 4.5
+#     section_spacing = 2
+
+#     # Calculate required height for both columns
+#     def calculate_column_height(items, col_width):
+#         height = 0
+#         for item in items:
+#             lines = pdf.multi_cell(col_width - 2*padding, line_height, item, split_only=True)
+#             height += len(lines) * line_height + section_spacing
+#         return height + 3*padding  # Add padding
+
+#     terms_height = calculate_column_height(terms, col1_width)
+#     bank_height = calculate_column_height([f"{label}: {value}" for label, value in bank_info], col2_width)
+    
+#     # Use the maximum height
+#     box_height = max(terms_height, bank_height) + padding
+
+#     # Draw the main box
+#     pdf.rect(x_start, y_start, page_width, box_height)
+    
+#     # Draw vertical separator line
+#     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
+
+#     # Add section headers
+#     pdf.set_font("Helvetica", "B", 10)
+    
+#     # Terms & Conditions header
+#     pdf.set_xy(x_start + padding, y_start + padding)
+#     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
+#     pdf.set_font("Helvetica", "", 9)
+    
+#     # Terms content
+#     terms_y = pdf.get_y()
+#     for i, term in enumerate(terms):
+#         pdf.set_xy(x_start + padding, terms_y)
+#         pdf.multi_cell(col1_width - 2*padding, line_height, f"{i+1}. {term}")
+#         terms_y = pdf.get_y()
+
+#     # Bank Details header
+#     pdf.set_font("Helvetica", "B", 10)
+#     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
+#     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
+#     pdf.set_font("Helvetica", "", 9)
+    
+#     # Bank details content
+#     bank_y = pdf.get_y()
+#     for label, value in bank_info:
+#         pdf.set_xy(x_start + col1_width + padding, bank_y)
+#         pdf.multi_cell(col2_width - 2*padding, line_height, f"{label}: {value}")
+#         bank_y = pdf.get_y()
+
+#     # Move cursor below the box
+#     pdf.set_xy(x_start, y_start + box_height + 10)
+
+#     # --- Signature Block ---
+#     pdf.set_font("Helvetica", "B", 10)
+#     pdf.cell(0, 5, "Yours Truly,", ln=True)
+#     pdf.cell(0, 5, "For CM INFOTECH", ln=True)
+#     pdf.ln(8)
+    
+#     # --- Signature Block with Dynamic Sales Person ---
+#     sales_person_code = data.get('sales_person_code', 'SD')
+#     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+    
+#     # pdf.set_font("Helvetica", "B", 10)
+#     # pdf.cell(0, 5, "Yours Truly,", ln=True)
+#     # pdf.cell(0, 5, "For CM INFOTECH", ln=True)
+#     # pdf.ln(8)
+
+
+#     # Add stamp if available
+#     if data.get('stamp_path') and os.path.exists(data['stamp_path']):
+#         try:
+#             # Position stamp on the right side
+#             pdf.image(data['stamp_path'], x=160, y=pdf.get_y()-5, w=30)
+#         except:
+#             pass
+    
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.cell(0, 5, sales_person_info["name"], ln=True)
+#     pdf.cell(0, 5, "Inside Sales Executive", ln=True)
+    
+#     # Clickable email in signature
+#     pdf.set_font("Helvetica", "", 10)
+#     pdf.set_text_color(0, 0, 0)
+#     label = "Email: "
+#     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.cell(0, 5, sales_person_info["email"], ln=1, link=f"mailto:{sales_person_info['email']}")
+#     # pdf.cell(0, 5, "chirag@cminfotech.com", ln=1, link="mailto:chirag@cminfotech.com")
+    
+#     # Clickable phone in signature
+#     pdf.set_text_color(0, 0, 0)
+#     pdf.set_font("Helvetica", "", 10)
+#     label = "Mobile: "
+#     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.cell(0, 5, sales_person_info["mobile"], ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+#     # pdf.cell(0, 5, "+91 74051 12345", ln=True, link="tel:917405112345")
+#     pdf.set_text_color(0, 0, 0)
 def add_page_two_commercials(pdf, data):
     pdf.add_page()
     
@@ -358,7 +547,7 @@ def add_page_two_commercials(pdf, data):
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
     pdf.set_font("Helvetica", "", 9)
 
-    # Terms & Conditions
+    # Terms & Conditions (SIMPLIFIED - removed address and PAN)
     terms = [
         "Above charges are Inclusive of GST.",
         "Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.",
@@ -369,11 +558,10 @@ def add_page_two_commercials(pdf, data):
         f"Price Validity: {data['price_validity']}",
         "Payment: 100% Advance along with purchase order.",
         "Delivery period: 1-2 Weeks from the date of Purchase Order",
-        'Cheque to be issued on name of: "CM INFOTECH"',
-        "Order to be placed on: CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481"
+        'Cheque to be issued on name of: "CM INFOTECH"'
     ]
 
-    # Bank Details
+    # Bank Details (EXPANDED - added address and PAN)
     bank_info = [
         ("Name", "CM INFOTECH"),
         ("Account Number", "0232054321"),
@@ -382,7 +570,8 @@ def add_page_two_commercials(pdf, data):
         ("Branch", "SWASTIK SOCIETY, AHMEDABAD"),
         ("MSME", "UDYAM-GJ-01-1234567"),
         ("GSTIN", "24ANMPP4891R1ZX"),
-        ("PAN No", "ANMPP4891R")
+        ("PAN No", "ANMPP4891R"),
+        ("Address", "E/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481")
     ]
 
     # Box dimensions and styling
@@ -456,12 +645,6 @@ def add_page_two_commercials(pdf, data):
     sales_person_code = data.get('sales_person_code', 'SD')
     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
     
-    # pdf.set_font("Helvetica", "B", 10)
-    # pdf.cell(0, 5, "Yours Truly,", ln=True)
-    # pdf.cell(0, 5, "For CM INFOTECH", ln=True)
-    # pdf.ln(8)
-
-
     # Add stamp if available
     if data.get('stamp_path') and os.path.exists(data['stamp_path']):
         try:
@@ -481,7 +664,6 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 5, sales_person_info["email"], ln=1, link=f"mailto:{sales_person_info['email']}")
-    # pdf.cell(0, 5, "chirag@cminfotech.com", ln=1, link="mailto:chirag@cminfotech.com")
     
     # Clickable phone in signature
     pdf.set_text_color(0, 0, 0)
@@ -490,9 +672,8 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 5, sales_person_info["mobile"], ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-    # pdf.cell(0, 5, "+91 74051 12345", ln=True, link="tel:917405112345")
     pdf.set_text_color(0, 0, 0)
-
+    
 def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
     """Orchestrates the creation of the two-page PDF."""
     sales_person_code = quotation_data.get('sales_person_code', 'SD')

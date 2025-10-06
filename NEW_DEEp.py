@@ -771,16 +771,16 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
             # The 'x' coordinate is calculated to align the stamp to the right side
             # The 'y' coordinate is 10mm above the signature line
             stamp_width = 25
-            pdf.image(stamp_file, x=210 - 15 - stamp_width, y=pdf.get_y(), w=stamp_width)
-            pdf.ln(15) # Move down for the signature text
+            pdf.image(stamp_file, x=pdf.w - pdf.r_margin - stamp_width, y=pdf.get_y(), w=stamp_width)
+            pdf.ln(20) # Move down for the signature text
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
     else:
-        pdf.ln(10) # maintain spacing if no stamp is uploded
+        pdf.ln(15) # maintain spacing if no stamp is uploded
     # pdf.ln(5)
     # pdf.set_font("Helvetica", "B", 8)
     # pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
-    pdf.ln(10)
+    # pdf.ln(10)
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
     pdf.set_y(-35)

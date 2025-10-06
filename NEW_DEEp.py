@@ -1352,7 +1352,7 @@ def main():
                     mime="application/pdf"
                 )
 
-    # --- Tab 3: Quotation Generator (WITH AUTOMATIC QUOTATION NUMBER UPDATING) ---
+# --- Tab 3: Quotation Generator (WITH AUTOMATIC QUOTATION NUMBER UPDATING) ---
     with tab3:
         st.header("📑 Adobe Software Quotation Generator")
         
@@ -1386,8 +1386,8 @@ def main():
                 # No previous quotation, start from sequence 1
                 return generate_quotation_number(sales_person, st.session_state.quotation_seq)
         
-        # Get the quotation number
-        quotation_number = get_quotation_number()
+        # Get the default quotation number
+        default_quotation_number = get_quotation_number()
         
         # Display current sales person info
         current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
@@ -1395,13 +1395,22 @@ def main():
         
         # Show quotation breakdown
         try:
-            prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(quotation_number)
-            st.sidebar.success(f"**Quotation Number:** {current_sp} - Sequence {sequence}")
+            prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(default_quotation_number)
+            st.sidebar.success(f"**Auto-generated:** {current_sp} - Sequence {sequence}")
         except:
             st.sidebar.warning("Could not parse quotation number")
         
-        # Display the quotation number (read-only) so users can see it
-        st.sidebar.text_input("Quotation Number Display", value=quotation_number, key="quote_number_display", disabled=True)
+        # Editable quotation number field
+        quotation_number = st.sidebar.text_input("Quotation Number (Editable)", 
+                                            value=default_quotation_number, 
+                                            key="quote_number_input")
+        
+        # Show current breakdown of the edited number
+        try:
+            edited_prefix, edited_sp, edited_quarter, edited_date, edited_year, edited_sequence = parse_quotation_number(quotation_number)
+            st.sidebar.info(f"**Current:** {edited_sp} - Sequence {edited_sequence}")
+        except:
+            st.sidebar.warning("Invalid quotation number format")
         
         quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True, key="quote_auto_increment")
         

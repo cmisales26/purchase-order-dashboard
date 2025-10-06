@@ -1352,7 +1352,7 @@ def main():
                     mime="application/pdf"
                 )
 
-# --- Tab 3: Quotation Generator (WITH AUTOMATIC QUOTATION NUMBER UPDATING) ---
+    # --- Tab 3: Quotation Generator (WITH AUTOMATIC QUOTATION NUMBER UPDATING) ---
     with tab3:
         st.header("📑 Adobe Software Quotation Generator")
         
@@ -1393,22 +1393,28 @@ def main():
         current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
         st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
         
-        # Show quotation breakdown
+        # Show auto-generated breakdown
         try:
             prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(default_quotation_number)
             st.sidebar.success(f"**Auto-generated:** {current_sp} - Sequence {sequence}")
         except:
             st.sidebar.warning("Could not parse quotation number")
         
-        # Editable quotation number field
-        quotation_number = st.sidebar.text_input("Quotation Number (Editable)", 
-                                            value=default_quotation_number, 
-                                            key="quote_number_input")
-        
-        # Show current breakdown of the edited number
+        # Editable quotation number with manual override option
+        col_auto, col_manual = st.sidebar.columns([2, 1])
+        with col_auto:
+            quotation_number = st.text_input("Quotation Number", 
+                                        value=default_quotation_number, 
+                                        key="quote_number_input")
+        with col_manual:
+            if st.button("↺ Auto", help="Reset to auto-generated number"):
+                quotation_number = default_quotation_number
+                st.rerun()
+
+        # Show current breakdown
         try:
             edited_prefix, edited_sp, edited_quarter, edited_date, edited_year, edited_sequence = parse_quotation_number(quotation_number)
-            st.sidebar.info(f"**Current:** {edited_sp} - Sequence {edited_sequence}")
+            st.sidebar.info(f"**Format:** {edited_sp}/{edited_quarter}/{edited_date}/{edited_year}_{edited_sequence}")
         except:
             st.sidebar.warning("Invalid quotation number format")
         
@@ -1437,13 +1443,13 @@ def main():
             intro_paragraphs = st.text_area("Introduction Paragraphs",
             """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization.
             
-Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.
+    Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.
             
-CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.
+    CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.
             
-Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.
+    Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.
             
-As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!""",
+    As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!""",
             key="quote_intro"
             )
         
@@ -1603,6 +1609,7 @@ As one of our privileged customers, we look forward to having you take part in o
                     
                 except Exception as e:
                     st.error(f"Error generating PDF: {str(e)}")
+                    
     # Clean up temporary files
     for path in ["temp_logo.jpg", "temp_stamp.jpg", "temp_logo_quote.jpg", "temp_stamp_quote.jpg"]:
         if os.path.exists(path):

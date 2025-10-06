@@ -778,7 +778,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
             stamp_x = pdf.w - pdf.r_margin - stamp_width
             stamp_y = pdf.get_y()
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
-            pdf.ln(20)
+            pdf.ln(25)
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
     else:
@@ -799,7 +799,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # pdf.ln(10)
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
-    pdf.set_y(-32)
+    pdf.set_y(-30)
     pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     # pdf.set_y(-31)

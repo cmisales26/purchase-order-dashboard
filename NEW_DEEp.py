@@ -712,10 +712,10 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 
     pdf.cell(35, 5, "", border="L", ln=False)
     pdf.cell(35, 5, "", border="L", ln=False)
-    pdf.cell(30, 5, "Rate", border="L", align="C")
-    pdf.cell(30, 5, "Amount", border="LR", align="C")
-    pdf.cell(30, 5, "Rate", border="L", align="C")
-    pdf.cell(30, 5, "Amount", border="LR", ln=True, align="C")
+    pdf.cell(28, 5, "Rate", border="L", align="C")
+    pdf.cell(28, 5, "Amount", border="LR", align="C")
+    pdf.cell(28, 5, "Rate", border="L", align="C")
+    pdf.cell(28, 5, "Amount", border="LR", ln=True, align="C")
 
     pdf.set_font("Helvetica", "", 8)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
@@ -739,7 +739,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    pdf.cell(185, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # --- Bank Details ---
     pdf.ln(5)

@@ -360,6 +360,12 @@ def add_page_two_commercials(pdf, data):
 
     # Terms & Conditions (UPDATED TO MATCH SECOND VERSION)
     terms = [
+        "Above charges are Inclusive of GST.",
+        "Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.",
+        "TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.",
+        "ELD licenses are paper licenses that do not contain media.",
+        "An Internet connection is required to access cloud services.",
+        "Training will be charged at extra cost depending on no. of participants.",
         f"Price Validity: {data['price_validity']}",
         "Payment: 100% Advance along with purchase order.",
         "Delivery period: 1-2 Weeks from the date of Purchase Order",

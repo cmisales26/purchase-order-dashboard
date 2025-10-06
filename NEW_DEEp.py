@@ -1365,14 +1365,14 @@ def main():
                     mime="application/pdf"
                 )
 
-    # --- Tab 3: Quotation Generator (WITH AUTOMATIC QUARTER AND EDITABLE SEQUENCE) ---
+    # --- Tab 3: Quotation Generator (SINGLE SALES PERSON SELECTION) ---
     with tab3:
         st.header("📑 Adobe Software Quotation Generator")
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
         
-        # Sales Person Selection
+        # Sales Person Selection - ONLY ONE SELECTION
         st.sidebar.header("Quotation Settings")
         sales_person = st.sidebar.selectbox("Select Sales Person", 
                                         options=list(SALES_PERSON_MAPPING.keys()), 
@@ -1427,42 +1427,35 @@ def main():
         except:
             st.sidebar.warning("Could not parse quotation number")
         
-        # Editable quotation number with sequence control
-        st.sidebar.subheader("Quotation Number")
+        # Editable quotation number WITHOUT sales person selection
+        st.sidebar.subheader("Quotation Number Editor")
         
         # Parse current quotation number for editing
         try:
             current_prefix, current_sp, current_q, current_date, current_year_range, current_seq = parse_quotation_number(st.session_state.quotation_number)
             
-            # Create editable components
-            col1, col2, col3, col4, col5 = st.sidebar.columns([2, 1, 3, 3, 2])
+            # Create editable components (NO SALES PERSON SELECTION)
+            col1, col2, col3, col4 = st.sidebar.columns([1, 2, 2, 1])
             
             with col1:
-                new_sales_person = st.selectbox("Sales Person", 
-                                            options=list(SALES_PERSON_MAPPING.keys()),
-                                            index=list(SALES_PERSON_MAPPING.keys()).index(current_sp) if current_sp in SALES_PERSON_MAPPING else 0,
-                                            key="quote_sp_edit")
+                # Show current sales person (read-only)
+                st.text_input("Sales Person", value=current_sp, key="quote_sp_display", disabled=True)
             
             with col2:
-                new_quarter = st.selectbox("Quarter", ["Q1", "Q2", "Q3", "Q4"], 
-                                        index=["Q1", "Q2", "Q3", "Q4"].index(current_q) if current_q in ["Q1", "Q2", "Q3", "Q4"] else 0,
-                                        key="quote_quarter_edit")
-            
-            with col3:
                 new_date = st.text_input("Date", value=current_date, key="quote_date_edit")
             
-            with col4:
+            with col3:
                 new_year_range = st.text_input("Year Range", value=current_year_range, key="quote_year_edit")
             
-            with col5:
+            with col4:
                 new_sequence = st.number_input("Sequence", 
                                             min_value=1, 
                                             value=int(current_seq), 
                                             step=1,
                                             key="quote_seq_edit")
             
-            # Construct new quotation number
-            new_quotation_number = f"CMI/{new_sales_person}/{new_quarter}/{new_date}/{new_year_range}_{new_sequence:03d}"
+            # Construct new quotation number using the SELECTED sales person, not the edited one
+            new_quotation_number = f"CMI/{sales_person}/{current_q}/{new_date}/{new_year_range}_{new_sequence:03d}"
             
             # Update if changed
             if new_quotation_number != st.session_state.quotation_number:
@@ -1570,15 +1563,7 @@ def main():
         
         # Show the current quotation number prominently with sales person info
         st.info(f"**Quotation Number:** {st.session_state.quotation_number}")
-        
-        # Get the current sales person from the quotation number for display
-        try:
-            display_prefix, display_sp, display_quarter, display_date, display_year, display_sequence = parse_quotation_number(st.session_state.quotation_number)
-            display_sales_person_info = SALES_PERSON_MAPPING.get(display_sp, SALES_PERSON_MAPPING['SD'])
-            st.info(f"**Sales Person:** {display_sales_person_info['name']} ({display_sp}) - {display_sales_person_info['email']}")
-            st.info(f"**Quarter:** {display_quarter} | **Sequence:** {display_sequence}")
-        except:
-            st.warning("Could not parse quotation number details")
+        st.info(f"**Sales Person:** {current_sales_person_info['name']} ({sales_person}) - {current_sales_person_info['email']}")
         
         # Calculate totals
         total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
@@ -1632,12 +1617,6 @@ def main():
             if not st.session_state.quotation_products:
                 st.error("Please add at least one product to generate the quotation.")
             else:
-                # Get the sales person code from the current quotation number for the PDF
-                try:
-                    pdf_prefix, pdf_sales_person, pdf_quarter, pdf_date, pdf_year, pdf_sequence = parse_quotation_number(st.session_state.quotation_number)
-                except:
-                    pdf_sales_person = sales_person  # Fallback to selected sales person
-                
                 quotation_data = {
                     "quotation_number": st.session_state.quotation_number,
                     "quotation_date": today.strftime("%d-%m-%Y"),
@@ -1651,7 +1630,7 @@ def main():
                     "grand_total": grand_total,
                     "subject": subject_line,
                     "intro_paragraph": intro_paragraphs,
-                    "sales_person_code": pdf_sales_person
+                    "sales_person_code": sales_person  # Use the selected sales person
                 }
                 
                 try:
@@ -1670,10 +1649,7 @@ def main():
                             st.session_state.quotation_seq += 1
                     
                     st.success("✅ Quotation generated successfully!")
-                    
-                    # Show sales person details
-                    final_sales_person_info = SALES_PERSON_MAPPING.get(pdf_sales_person, SALES_PERSON_MAPPING['SD'])
-                    st.info(f"📧 Sales Person: {final_sales_person_info['name']}")
+                    st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
                     
                     # Download button
                     st.download_button(

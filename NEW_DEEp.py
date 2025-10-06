@@ -799,7 +799,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # pdf.ln(10)
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
-    pdf.set_y(-26)
+    pdf.set_y(-25)
     pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     # pdf.set_y(-31)

@@ -470,7 +470,7 @@ def add_page_two_commercials(pdf, data):
         try:
             # Position stamp centered between "For CM INFOTECH" and sales person name
             stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
-            stamp_x = x_start + col1_width + padding + (col2_width - 2*padding - 20) / 2  # Center the stamp
+            stamp_x = x_start + col1_width + padding# + (col2_width - 2*padding - 20) / 2  # Center the stamp
             pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
             # Move cursor down after stamp
             pdf.set_y(stamp_y + 25)  # Space for stamp + some padding
@@ -505,7 +505,7 @@ def add_page_two_commercials(pdf, data):
     pdf.set_text_color(0, 0, 255)
     pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
              ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-    pdf.set_text_color(0, 0, 0)
+    pdf.set_text_color(0, 0, 0)         
 
     # Move cursor below the box
     pdf.set_xy(x_start, y_start + box_height + 10)

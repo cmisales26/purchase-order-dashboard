@@ -34,11 +34,11 @@ SALES_PERSON_MAPPING = {
 def get_current_quarter():
     """Get current quarter (Q1, Q2, Q3, Q4) based on current month"""
     month = datetime.datetime.now().month
-    if month in [4, 5, 6]:
+    if month in [1, 2, 3]:
         return "Q1"
-    elif month in [7, 8, 9]:
+    elif month in [4, 5, 6]:
         return "Q2"
-    elif month in [10, 11, 12]:
+    elif month in [7, 8, 9]:
         return "Q3"
     else:
         return "Q4"
@@ -79,40 +79,30 @@ def get_next_sequence_number_po(po_number):
         pass
     return 1
 
-
-def parse_quotation_number(quotation_number, fallback_sales_person="SD"):
-    """Parse existing quotation number or fallback if invalid"""
+def parse_quotation_number(quotation_number):
+    """Parse quotation number to extract components"""
     try:
         parts = quotation_number.split('/')
         if len(parts) >= 5:
-            prefix = parts[0]  
-            sales_person = parts[1]  
-            quarter = parts[2]       
-            date_part = parts[3]     
-            year_range = parts[4].split('_')[0]  
-            sequence = parts[4].split('_')[1] if '_' in parts[4] else "001"
+            prefix = parts[0]  # CMI
+            sales_person = parts[1]  # SD, CP, HP, KP
+            quarter = parts[2]  # Q1, Q2, Q3, Q4
+            date_part = parts[3]  # DD-MM-YYYY
+            year_range = parts[4].split('_')[0]  # 2025-2026
+            sequence = parts[4].split('_')[1] if '_' in parts[4] else "001"  # 001, 002, etc.
             return prefix, sales_person, quarter, date_part, year_range, sequence
     except:
         pass
+    return "CMI", "SD", get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
 
-    return (
-        "CMI",
-        fallback_sales_person,
-        get_current_quarter(),
-        datetime.datetime.now().strftime("%d-%m-%Y"),
-        f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}",
-        "001",
-    )
-
-def generate_quotation_number(sales_person, sequence=1):
-    """Generate new quotation number"""
-    prefix = "CMI"
+def generate_quotation_number(sales_person, sequence_number):
+    """Generate quotation number with current quarter and sequence"""
+    current_date = datetime.datetime.now()
     quarter = get_current_quarter()
-    date_str = datetime.datetime.now().strftime("%d-%m-%Y")
-    year = datetime.datetime.now().year
-    next_year = year + 1
-    year_range = f"{year}-{next_year}"
-    return f"{prefix}/{sales_person}/{quarter}/{date_str}/{year_range}_{str(sequence).zfill(3)}"
+    year_range = f"{current_date.year}-{current_date.year+1}"
+    sequence = f"{sequence_number:03d}"
+    
+    return f"CMI/{sales_person}/{quarter}/{current_date.strftime('%d-%m-%Y')}/{year_range}_{sequence}"
 
 def get_next_sequence_number(quotation_number):
     """Extract and increment sequence number from quotation number"""
@@ -538,8 +528,6 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
             st.error(f"PDF generation failed: {e}")
             return b""
 
-# [Rest of your code for Invoice and PO remains the same...]
-# Continue with your existing Invoice and PO classes and functions
 # --- PDF Class for Tax Invoice ---
 class PDF(FPDF):
     def __init__(self):
@@ -820,15 +808,17 @@ class PO_PDF(FPDF):
         self.set_font("Helvetica", "I", 10)
         self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
         self.set_text_color(0, 0, 255)
-        email1 = "cad@cmi.com"
-        email2 = "info@cminfotech.com "
-        self.cell(0, 4, f"{email1} | {email2}", ln=True, align="C", link=f"mailto:{email1}")
-        self.set_x((self.w - 80) / 2)
-        self.cell(0, 0, "", link=f"mailto:{email2}")
-        self.set_x((self.w - 60) / 2)
+        # email1 = "cad@cmi.com"
+        email1 = "info@cminfotech.com "
         phone_number ="+91 873 391 5721"
         self.set_text_color(0, 0, 255)
-        self.cell(60, 4, f"Call: {phone_number}", ln=True, align="C", link=f"tel:{phone_number}")
+        self.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
+        self.set_x((self.w - 80) / 2)
+        self.cell(0, 0, "", link=f"tel:{phone_number}")
+        self.set_x((self.w - 60) / 2)
+        website ="www.cminfotech.com"
+        self.set_text_color(0, 0, 255)
+        self.cell(60, 4, f"{website}", ln=True, align="C", link=website)
         self.set_text_color(0, 0, 0)
 
     def section_title(self, title):
@@ -872,15 +862,18 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.section_title("Vendor & Addresses")
     pdf.set_font("Helvetica", "", 10)
     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
-    pdf.set_xy(110, pdf.get_y() - 20)
-    pdf.multi_cell(90, 5, f"Bill: {sanitized_bill_to_company}\n{sanitized_bill_to_address}\nShip: {sanitized_ship_to_company}\n{sanitized_ship_to_address}")
-    pdf.ln(1)
+    pdf.ln(7)
+    # pdf.set_xy(110, pdf.get_y() - 20)
+    pdf.multi_cell(95, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    pdf.set_xy(120, pdf.get_y() - 20)
+    pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+    # pdf.ln(2)
     pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")
     pdf.ln(2)
 
     # --- Products Table ---
     pdf.section_title("Products & Services")
-    col_widths = [65, 22, 25, 25, 15, 22]
+    col_widths = [65, 22, 30, 25, 15, 22]
     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
     pdf.set_fill_color(220, 220, 220)
     pdf.set_font("Helvetica", "B", 10)
@@ -1023,8 +1016,6 @@ def main():
 
         st.info("Vendor & End User details auto-filled from Excel ✅")
     
-    # [Rest of your main function code...]
-    # Your existing code for Excel upload, Invoice tab, PO tab...
 
     # Create tabs for different document types
     tab1, tab2, tab3 = st.tabs(["Tax Invoice Generator", "Purchase Order Generator", "Quotation Generator"])
@@ -1361,85 +1352,66 @@ def main():
                     mime="application/pdf"
                 )
 
-    # --- Tab 3: Quotation Generator ---
-    # --- Tab 3: Quotation Generator ---
+    # --- Tab 3: Quotation Generator (WITH AUTOMATIC QUOTATION NUMBER UPDATING) ---
     with tab3:
         st.header("📑 Adobe Software Quotation Generator")
         
         today = datetime.date.today()
         
-        # Sales Person Selection (Sidebar)
+        # Sales Person Selection
         st.sidebar.header("Quotation Settings")
-        sales_person = st.sidebar.selectbox(
-            "Select Sales Person", 
-            options=list(SALES_PERSON_MAPPING.keys()), 
-            format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
-            key="quote_sales_person"
-        )
-
-        # --- Functions ---
-        def get_quotation_number(sales_person):
-            """Generate the next quotation number for the selected sales person"""
-            if "last_quotation_number" not in st.session_state:
-                st.session_state.last_quotation_number = ""
-            if "quotation_seq" not in st.session_state:
-                st.session_state.quotation_seq = 1
-
+        sales_person = st.sidebar.selectbox("Select Sales Person", 
+                                        options=list(SALES_PERSON_MAPPING.keys()), 
+                                        format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+                                        key="quote_sales_person")
+        
+        # Generate quotation number based on selected sales person
+        def get_quotation_number():
+            # Check if we need to increment sequence
             if st.session_state.last_quotation_number:
                 try:
-                    (
-                        last_prefix,
-                        last_sales_person,
-                        last_quarter,
-                        last_date,
-                        last_year_range,
-                        last_sequence,
-                    ) = parse_quotation_number(st.session_state.last_quotation_number, fallback_sales_person=sales_person)
-
+                    last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
+                    
                     if last_sales_person == sales_person:
+                        # Same sales person, increment sequence
                         next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
                         return generate_quotation_number(sales_person, next_sequence)
                     else:
+                        # Different sales person, start from sequence 1
                         return generate_quotation_number(sales_person, 1)
                 except:
-                    return generate_quotation_number(sales_person, 1)
+                    # If parsing fails, use default
+                    return generate_quotation_number(sales_person, st.session_state.quotation_seq)
             else:
+                # No previous quotation, start from sequence 1
                 return generate_quotation_number(sales_person, st.session_state.quotation_seq)
-
-        # --- Quotation Number ---
-        auto_generated_number = get_quotation_number(sales_person)
         
-        # Editable Quotation Number
-        quotation_number = st.sidebar.text_input(
-            "Quotation Number",
-            value=auto_generated_number,
-            key="quote_number_editable"
-        )
+        # Get the quotation number
+        quotation_number = get_quotation_number()
         
-        # Show current sales person info
+        # Display current sales person info
         current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
         st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
-
+        
         # Show quotation breakdown
         try:
-            prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(
-                quotation_number, fallback_sales_person=sales_person
-            )
+            prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(quotation_number)
             st.sidebar.success(f"**Quotation Number:** {current_sp} - Sequence {sequence}")
         except:
             st.sidebar.warning("Could not parse quotation number")
-
-        # Auto-increment toggle
+        
+        # Display the quotation number (read-only) so users can see it
+        st.sidebar.text_input("Quotation Number Display", value=quotation_number, key="quote_number_display", disabled=True)
+        
         quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True, key="quote_auto_increment")
         
-        # Reset sequence button
         if st.sidebar.button("Reset Quotation Sequence"):
             st.session_state.quotation_seq = 1
             st.session_state.last_quotation_number = ""
             st.sidebar.success("Quotation sequence reset to 1")
             st.rerun()
-
-        # --- Main Form ---
+        
+        # Main form
         col1, col2 = st.columns([1, 1])
         
         with col1:
@@ -1456,16 +1428,16 @@ def main():
             intro_paragraphs = st.text_area("Introduction Paragraphs",
             """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization.
             
-    Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.
+Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.
             
-    CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.
+CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.
             
-    Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.
+Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.
             
-    As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!""",
+As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!""",
             key="quote_intro"
             )
-
+        
         with col2:
             st.header("Products & Services")
             
@@ -1482,7 +1454,7 @@ def main():
                         "qty": 1.0,
                     })
                     st.success(f"{selected_product} added!")
-
+            
             # Custom product addition
             with st.expander("➕ Add Custom Product"):
                 custom_name = st.text_input("Product Name", key="quote_custom_name")
@@ -1499,7 +1471,7 @@ def main():
                             "qty": custom_qty,
                         })
                         st.success(f"Custom product '{custom_name}' added!")
-
+            
             # Display current products
             st.subheader("Current Products")
             if not st.session_state.quotation_products:
@@ -1518,11 +1490,11 @@ def main():
                         if st.button("Remove", key=f"quote_remove_{i}"):
                             st.session_state.quotation_products.pop(i)
                             st.rerun()
-
-        # --- Preview & Generate Quotation ---
+        
+        # Preview and Generate Section
         st.header("Preview & Generate Quotation")
         
-        # Show current quotation number prominently
+        # Show the current quotation number prominently
         st.info(f"**Current Quotation Number:** {quotation_number}")
         
         # Calculate totals
@@ -1537,7 +1509,7 @@ def main():
             st.metric("Total GST (18%)", f"₹{total_gst:,.2f}")
         with col5:
             st.metric("Grand Total", f"₹{grand_total:,.2f}")
-
+        
         # File uploaders
         st.subheader("Upload Images")
         logo_file = st.file_uploader("Company Logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="quote_logo")
@@ -1572,8 +1544,7 @@ def main():
             except Exception as e:
                 st.warning(f"Could not process stamp: {e}")
                 stamp_path = None
-
-        # Generate PDF button
+        
         if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
             if not st.session_state.quotation_products:
                 st.error("Please add at least one product to generate the quotation.")
@@ -1597,15 +1568,20 @@ def main():
                 try:
                     pdf_bytes = create_quotation_pdf(quotation_data, logo_path, stamp_path)
                     
-                    # Store last quotation number for sequence tracking
+                    # Store the last quotation number for sequence tracking
                     st.session_state.last_quotation_number = quotation_number
                     
                     # Auto-increment for next quotation
                     if quotation_auto_increment:
-                        st.session_state.quotation_seq = get_next_sequence_number(quotation_number)
+                        next_sequence = get_next_sequence_number(quotation_number)
+                        st.session_state.quotation_seq = next_sequence
                     
                     st.success("✅ Quotation generated successfully!")
                     st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
+                    
+                    # Verify the sales person code in the generated quotation number
+                    generated_prefix, generated_sales_person, generated_quarter, generated_date, generated_year, generated_sequence = parse_quotation_number(quotation_number)
+                    st.info(f"📄 Quotation Number: {generated_sales_person} - Sequence {generated_sequence}")
                     
                     # Download button
                     st.download_button(
@@ -1618,267 +1594,6 @@ def main():
                     
                 except Exception as e:
                     st.error(f"Error generating PDF: {str(e)}")
-
-    # with tab3:
-    #     st.session_state.sales_person = st.selectbox("Select Sales Person", ["SD", "CP", "HP", "KP"])
-
-    #     st.header("📑 Adobe Software Quotation Generator")
-        
-    #     today = datetime.date.today()
-        
-    #     # Sales Person Selection
-    #     st.sidebar.header("Quotation Settings")
-    #     sales_person = st.sidebar.selectbox("Select Sales Person", 
-    #                                     options=list(SALES_PERSON_MAPPING.keys()), 
-    #                                     format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
-    #                                     key="quote_sales_person")
-        
-    #     # Generate quotation number based on selected sales person
-    #     def get_quotation_number(sales_person):
-            
-    #         if "last_quotation_number" in st.session_state and st.session_state.last_quotation_number:
-    #             try:
-    #                 (
-    #                     last_prefix,
-    #                     last_sales_person,
-    #                     last_quarter,
-    #                     last_date,
-    #                     last_year_range,
-    #                     last_sequence,
-    #                 ) = parse_quotation_number(st.session_state.last_quotation_number, fallback_sales_person=sales_person)
-
-    #                 if last_sales_person == sales_person:
-    #                     next_seq = get_next_sequence_number(st.session_state.last_quotation_number)
-    #                     return generate_quotation_number(sales_person, next_seq)
-    #                 else:
-    #                     return generate_quotation_number(sales_person, 1)
-    #             except:
-    #                 return generate_quotation_number(sales_person, 1)
-    #         if "last_quotation_number" not in st.session_state:
-    #             st.session_state.last_quotation_number = ""
-    #         if "quotation_seq" not in st.session_state:
-    #                 st.session_state.quotation_seq = 1
-    #         else:
-    #             return generate_quotation_number(sales_person, 1)
-        
-    #     # Get the quotation number
-    #     # Auto-generate quotation number first
-    #     # quotation_number = get_quotation_number(sales_person)
-
-    #     auto_generated_number = get_quotation_number(st.session_state.sales_person)
-
-    #     # Show it as editable input (default = auto-generated)
-    #     quotation_number = st.sidebar.text_input(
-    #         "Quotation Number",
-    #         value=auto_generated_number,
-    #         key="quote_number_display"
-    #     )
-                
-    #     # Display current sales person info
-    #     current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
-    #     st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
-        
-    #     # Show quotation breakdown
-    #     try:
-    #         prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(quotation_number, fallback_sales_person=sales_person)
-    #         st.sidebar.success(f"**Quotation Number:** {current_sp} - Sequence {sequence}")
-    #     except:
-    #         st.sidebar.warning("Could not parse quotation number")
-        
-    #     # Display the quotation number (read-only) so users can see it
-    #     st.sidebar.text_input("Quotation Number Display", value=quotation_number, key="quote_number_display", disabled=True)
-        
-    #     quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True, key="quote_auto_increment")
-        
-    #     if st.sidebar.button("Reset Quotation Sequence"):
-    #         st.session_state.quotation_seq = 1
-    #         st.session_state.last_quotation_number = ""
-    #         st.sidebar.success("Quotation sequence reset to 1")
-    #         st.rerun()
-        
-    #     # Main form
-    #     col1, col2 = st.columns([1, 1])
-        
-    #     with col1:
-    #         st.header("Recipient Details")
-    #         vendor_name = st.text_input("Company Name", "Creation Studio", key="quote_vendor_name")
-    #         vendor_address = st.text_area("Company Address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389", key="quote_vendor_address")
-    #         vendor_email = st.text_input("Email", "info@dreamcreationstudio.com", key="quote_vendor_email")
-    #         vendor_contact = st.text_input("Contact Person (Kind Attention)", "Mr. Musta", key="quote_vendor_contact")
-    #         vendor_mobile = st.text_input("Mobile", "+91 9876543210", key="quote_vendor_mobile")
-            
-    #         st.header("Quotation Details")
-    #         price_validity = st.text_input("Price Validity", "September 29, 2025", key="quote_price_validity")
-    #         subject_line = st.text_input("Subject", "Proposal for Adobe Commercial Software Licenses", key="quote_subject")
-    #         intro_paragraphs = st.text_area("Introduction Paragraphs",
-    #         """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization.
-            
-    # Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.
-            
-    # CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.
-            
-    # Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.
-            
-    # As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!""",
-    #         key="quote_intro"
-    #         )
-        
-    #     with col2:
-    #         st.header("Products & Services")
-            
-    #         # Product selection from catalog
-    #         selected_product = st.selectbox("Select from Product Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="quote_product_select")
-            
-    #         if st.button("➕ Add Selected Product", key="add_selected_quote"):
-    #             if selected_product:
-    #                 details = PRODUCT_CATALOG[selected_product]
-    #                 st.session_state.quotation_products.append({
-    #                     "name": selected_product,
-    #                     "basic": details["basic"],
-    #                     "gst_percent": details["gst_percent"],
-    #                     "qty": 1.0,
-    #                 })
-    #                 st.success(f"{selected_product} added!")
-            
-    #         # Custom product addition
-    #         with st.expander("➕ Add Custom Product"):
-    #             custom_name = st.text_input("Product Name", key="quote_custom_name")
-    #             custom_basic = st.number_input("Basic Price (₹)", min_value=0.0, value=0.0, format="%.2f", key="quote_custom_basic")
-    #             custom_gst = st.number_input("GST %", min_value=0.0, max_value=100.0, value=18.0, format="%.1f", key="quote_custom_gst")
-    #             custom_qty = st.number_input("Quantity", min_value=1.0, value=1.0, format="%.0f", key="quote_custom_qty")
-                
-    #             if st.button("Add Custom Product", key="add_custom_quote"):
-    #                 if custom_name:
-    #                     st.session_state.quotation_products.append({
-    #                         "name": custom_name,
-    #                         "basic": custom_basic,
-    #                         "gst_percent": custom_gst,
-    #                         "qty": custom_qty,
-    #                     })
-    #                     st.success(f"Custom product '{custom_name}' added!")
-            
-    #         # Display current products
-    #         st.subheader("Current Products")
-    #         if not st.session_state.quotation_products:
-    #             st.info("No products added yet.")
-    #         else:
-    #             for i, product in enumerate(st.session_state.quotation_products):
-    #                 with st.expander(f"Product {i+1}: {product['name']}", expanded=True):
-    #                     col_a, col_b, col_c = st.columns([3, 1, 1])
-    #                     with col_a:
-    #                         st.text_input("Name", product["name"], key=f"quote_name_{i}", disabled=True)
-    #                     with col_b:
-    #                         st.number_input("Basic Price", value=product["basic"], format="%.2f", key=f"quote_basic_{i}", disabled=True)
-    #                     with col_c:
-    #                         st.number_input("Qty", value=product["qty"], format="%.0f", key=f"quote_qty_{i}", disabled=True)
-                        
-    #                     if st.button("Remove", key=f"quote_remove_{i}"):
-    #                         st.session_state.quotation_products.pop(i)
-    #                         st.rerun()
-        
-    #     # Preview and Generate Section
-    #     st.header("Preview & Generate Quotation")
-        
-    #     # Show the current quotation number prominently
-    #     st.info(f"**Current Quotation Number:** {quotation_number}")
-        
-    #     # Calculate totals
-    #     total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
-    #     total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.quotation_products)
-    #     grand_total = total_base + total_gst
-        
-    #     col3, col4, col5 = st.columns(3)
-    #     with col3:
-    #         st.metric("Total Base Amount", f"₹{total_base:,.2f}")
-    #     with col4:
-    #         st.metric("Total GST (18%)", f"₹{total_gst:,.2f}")
-    #     with col5:
-    #         st.metric("Grand Total", f"₹{grand_total:,.2f}")
-        
-    #     # File uploaders
-    #     st.subheader("Upload Images")
-    #     logo_file = st.file_uploader("Company Logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="quote_logo")
-    #     stamp_file = st.file_uploader("Company Stamp/Signature (PNG, JPG)", type=["png", "jpg", "jpeg"], key="quote_stamp")
-        
-    #     logo_path = None
-    #     stamp_path = None
-        
-    #     # Process uploaded files
-    #     if logo_file:
-    #         logo_path = "temp_logo_quote.jpg"
-    #         try:
-    #             image_bytes = io.BytesIO(logo_file.getbuffer())
-    #             img = Image.open(image_bytes)
-    #             if img.mode != 'RGB':
-    #                 img = img.convert('RGB')
-    #             img.save(logo_path, format="JPEG", quality=95)
-    #             st.success("✓ Logo uploaded successfully")
-    #         except Exception as e:
-    #             st.warning(f"Could not process logo: {e}")
-    #             logo_path = None
-        
-    #     if stamp_file:
-    #         stamp_path = "temp_stamp_quote.jpg"
-    #         try:
-    #             image_bytes = io.BytesIO(stamp_file.getbuffer())
-    #             img = Image.open(image_bytes)
-    #             if img.mode != 'RGB':
-    #                 img = img.convert('RGB')
-    #             img.save(stamp_path, format="JPEG", quality=95)
-    #             st.success("✓ Stamp uploaded successfully")
-    #         except Exception as e:
-    #             st.warning(f"Could not process stamp: {e}")
-    #             stamp_path = None
-        
-    #     if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
-    #         if not st.session_state.quotation_products:
-    #             st.error("Please add at least one product to generate the quotation.")
-    #         else:
-    #             quotation_data = {
-    #                 "quotation_number": quotation_number,
-    #                 "quotation_date": today.strftime("%d-%m-%Y"),
-    #                 "vendor_name": vendor_name,
-    #                 "vendor_address": vendor_address,
-    #                 "vendor_email": vendor_email,
-    #                 "vendor_contact": vendor_contact,
-    #                 "vendor_mobile": vendor_mobile,
-    #                 "products": st.session_state.quotation_products,
-    #                 "price_validity": price_validity,
-    #                 "grand_total": grand_total,
-    #                 "subject": subject_line,
-    #                 "intro_paragraph": intro_paragraphs,
-    #                 "sales_person_code": sales_person
-    #             }
-                
-    #             try:
-    #                 pdf_bytes = create_quotation_pdf(quotation_data, logo_path, stamp_path)
-                    
-    #                 # Store the last quotation number for sequence tracking
-    #                 st.session_state.last_quotation_number = quotation_number
-                    
-    #                 # Auto-increment for next quotation
-    #                 if quotation_auto_increment:
-    #                     next_sequence = get_next_sequence_number(quotation_number)
-    #                     st.session_state.quotation_seq = next_sequence
-                    
-    #                 st.success("✅ Quotation generated successfully!")
-    #                 st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
-                    
-    #                 # Verify the sales person code in the generated quotation number
-    #                 generated_prefix, generated_sales_person, generated_quarter, generated_date, generated_year, generated_sequence = parse_quotation_number(quotation_number)
-    #                 st.info(f"📄 Quotation Number: {generated_sales_person} - Sequence {generated_sequence}")
-                    
-    #                 # Download button
-    #                 st.download_button(
-    #                     "⬇ Download Quotation PDF",
-    #                     data=pdf_bytes,
-    #                     file_name=f"Quotation_{quotation_number.replace('/', '_')}.pdf",
-    #                     mime="application/pdf",
-    #                     use_container_width=True
-    #                 )
-                    
-    #             except Exception as e:
-    #                 st.error(f"Error generating PDF: {str(e)}")
     # Clean up temporary files
     for path in ["temp_logo.jpg", "temp_stamp.jpg", "temp_logo_quote.jpg", "temp_stamp_quote.jpg"]:
         if os.path.exists(path):
@@ -1892,7 +1607,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 

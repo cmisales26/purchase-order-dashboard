@@ -1403,6 +1403,8 @@ def main():
         
         # Get the quotation number
         # Auto-generate quotation number first
+        quotation_number = get_quotation_number(sales_person)
+
         auto_generated_number = get_quotation_number()
 
         # Show it as editable input (default = auto-generated)

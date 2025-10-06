@@ -93,7 +93,7 @@ def parse_quotation_number(quotation_number):
             return prefix, sales_person, quarter, date_part, year_range, sequence
     except:
         pass
-    return "CMI", "SD", get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
+    return "CMI", sales_person(), get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
 
 def generate_quotation_number(sales_person, sequence_number):
     """Generate quotation number with current quarter and sequence"""

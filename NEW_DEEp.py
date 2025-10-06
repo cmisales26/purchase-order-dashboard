@@ -769,7 +769,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     if stamp_file and os.path.exists(stamp_file):
         try:
             stamp_width = 25
-            pdf.image(stamp_file, x=pdf.l_margin, y=pdf.get_y(), w=stamp_width)  # left-aligned
+            pdf.image(stamp_file, x=pdf.r_margin, y=pdf.get_y(), w=stamp_width)  # left-aligned
             pdf.ln(15)  # spacing below stamp
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")

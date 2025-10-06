@@ -384,13 +384,9 @@ def add_page_two_commercials(pdf, data):
         ("GSTIN", "24ANMPP4891R1ZX"),
         ("PAN No", "ANMPP4891R")
     ]
-    
-        # --- Signature Block ---
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(0, 5, "Yours Truly,", ln=True)
-    pdf.cell(0, 5, "For CM INFOTECH", ln=True)
-    pdf.ln(8)
-    
+    sigbature_block = ["Yours Ttuly",
+                       "For CM INFOTECH"]
+
     # --- Signature Block with Dynamic Sales Person ---
     sales_person_code = data.get('sales_person_code', 'SD')
     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
@@ -416,9 +412,10 @@ def add_page_two_commercials(pdf, data):
 
     terms_height = calculate_column_height(terms, col1_width)
     bank_height = calculate_column_height([f"{label}: {value}" for label, value in bank_info], col2_width)
+    sigbature_height = calculate_column_height(sigbature_block,col2_width)
     
     # Use the maximum height
-    box_height = max(terms_height, bank_height) + padding
+    box_height = max(terms_height, bank_height,sigbature_height) + padding
 
     # Draw the main box
     pdf.rect(x_start, y_start, page_width, box_height)

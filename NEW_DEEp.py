@@ -157,7 +157,7 @@ class QUOTATION_PDF(FPDF):
         self.set_text_color(0, 0, 255)  # Blue color for links
         
         # Website link
-        self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
+        # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
         
         # Email and phone on same line - FIXED
         email_text = " info@cminfotech.com"
@@ -176,6 +176,8 @@ class QUOTATION_PDF(FPDF):
         self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text}")
         self.cell(separator_width, 4, " | ", ln=0)
         self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
+
+        self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
         
         self.set_text_color(0, 0, 0)  # Reset to black
         self.set_y(-8)

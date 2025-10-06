@@ -993,6 +993,10 @@ def main():
         st.session_state.po_date = datetime.date.today().strftime("%d-%m-%Y")
     if "last_po_number" not in st.session_state:
         st.session_state.last_po_number = ""
+    if "quotation_number" not in st.session_state:
+        st.session_state.quotation_number = generate_quotation_number("SD", st.session_state.quotation_seq)
+    if "current_quote_sales_person" not in st.session_state:
+        st.session_state.current_quote_sales_person = "SD"
 
     # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
@@ -1623,7 +1627,7 @@ def main():
                 st.error("Please add at least one product to generate the quotation.")
             else:
                 quotation_data = {
-                    "quotation_number": quotation_number,
+                    "quotation_number": st.session_state.quotation_number,
                     "quotation_date": today.strftime("%d-%m-%Y"),
                     "vendor_name": vendor_name,
                     "vendor_address": vendor_address,

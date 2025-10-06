@@ -712,10 +712,10 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 
     pdf.cell(35, 5, "", border="L", ln=False)
     pdf.cell(35, 5, "", border="L", ln=False)
-    pdf.cell(28, 5, "Rate", border="L", align="C")
-    pdf.cell(28, 5, "Amount", border="LR", align="C")
-    pdf.cell(28, 5, "Rate", border="L", align="C")
-    pdf.cell(28, 5, "Amount", border="LR", ln=True, align="C")
+    pdf.cell(29, 5, "Rate", border="L", align="C")
+    pdf.cell(29, 5, "Amount", border="LR", align="C")
+    pdf.cell(29, 5, "Rate", border="L", align="C")
+    pdf.cell(29, 5, "Amount", border="LR", ln=True, align="C")
 
     pdf.set_font("Helvetica", "", 8)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])

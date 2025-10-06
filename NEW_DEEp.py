@@ -574,7 +574,9 @@ class PDF(FPDF):
         self.ln(3)
 
 def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "stamp.jpg"):
+    
     pdf = PDF()
+    pdf.set_auto_page_break(auto=False, margin=10)
     pdf.add_page()
 
     # --- Logo on top right ---
@@ -655,7 +657,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
         x_start = pdf.get_x()
         y_start = pdf.get_y()
 
-        pdf.set_font("Helvetica", "", 8)
+        # pdf.set_font("Helvetica", "", 8)
         
         # Description
         pdf.set_xy(x_start + col_widths[0], y_start)
@@ -741,8 +743,13 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(186, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
+     # --- Reserve footer space ---
+    needed_space = 70
+    if pdf.get_y() + needed_space > pdf.h - pdf.b_margin:
+        pdf.set_y(pdf.h - pdf.b_margin - needed_space)
+
     # --- Bank Details ---
-    pdf.ln(5)
+    pdf.ln(3)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(0, 5, "Company's Bank Details", ln=True)
     pdf.set_font("Helvetica", "", 8)
@@ -761,22 +768,31 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.multi_cell(0, 4, invoice_data['declaration'])
     
     # --- Signature ---
-    pdf.ln(3)
+    pdf.ln(5)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
 
     if stamp_file:
         try:
-            # Calculate position to place the stamp above the signature line
-            # The 'x' coordinate is calculated to align the stamp to the right side
-            # The 'y' coordinate is 10mm above the signature line
             stamp_width = 25
-            pdf.image(stamp_file, x=pdf.w - pdf.r_margin - stamp_width, y=pdf.get_y(), w=stamp_width)
-            pdf.ln(25) # Move down for the signature text
+            stamp_x = pdf.w - pdf.r_margin - stamp_width
+            stamp_y = pdf.get_y()
+            pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
+            pdf.ln(20)
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
     else:
-        pdf.ln(15) # maintain spacing if no stamp is uploded
+        pdf.ln(15)
+            # Calculate position to place the stamp above the signature line
+            # The 'x' coordinate is calculated to align the stamp to the right side
+            # The 'y' coordinate is 10mm above the signature line
+    #         stamp_width = 25
+    #         pdf.image(stamp_file, x=pdf.w - pdf.r_margin - stamp_width, y=pdf.get_y(), w=stamp_width)
+    #         pdf.ln(25) # Move down for the signature text
+    #     except Exception as e:
+    #         st.warning(f"Could not add stamp: {e}")
+    # else:
+    #     pdf.ln(15) # maintain spacing if no stamp is uploded
     # pdf.ln(5)
     # pdf.set_font("Helvetica", "B", 8)
     # pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
@@ -789,7 +805,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # pdf.set_y(-31)
     # pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-    pdf.set_y(-25)
+    # pdf.set_y(-25)
     # pdf.set_font("Helvetica", "I", 8)
     pdf.cell(0, 4, "Email: info@cminfotech.com Mo.+91 873 391 5721", ln=True, align="C")
     # pdf_output = io.BytesIO()
@@ -805,7 +821,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 class PO_PDF(FPDF):
     def __init__(self):
         super().__init__()
-        self.set_auto_page_break(auto=False, margin=0)
+        self.set_auto_page_break(auto=False, margin=10)
         self.set_left_margin(15)
         self.set_right_margin(15)
         self.logo_path = os.path.join(os.path.dirname(__file__),"logo_final.jpg")

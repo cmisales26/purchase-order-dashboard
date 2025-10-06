@@ -79,7 +79,7 @@ def get_next_sequence_number_po(po_number):
         pass
     return 1
 
-def parse_quotation_number(quotation_number):
+def parse_quotation_number(quotation_number,fallback_sales_person="SD"):
     """Parse quotation number to extract components"""
     try:
         parts = quotation_number.split('/')
@@ -93,7 +93,14 @@ def parse_quotation_number(quotation_number):
             return prefix, sales_person, quarter, date_part, year_range, sequence
     except:
         pass
-    return "CMI", "SD", get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
+        return (
+        "CMI",
+        fallback_sales_person,
+        get_current_quarter(),
+        datetime.datetime.now().strftime("%d-%m-%Y"),
+        f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}",
+        "001",
+    )
 
 def generate_quotation_number(sales_person, sequence_number):
     """Generate quotation number with current quarter and sequence"""
@@ -1365,28 +1372,37 @@ def main():
                                         key="quote_sales_person")
         
         # Generate quotation number based on selected sales person
-        def get_quotation_number():
-            # Check if we need to increment sequence
+        def get_quotation_number(sales_person):
+            """Generate the next quotation number for the selected sales person"""
             if st.session_state.last_quotation_number:
                 try:
-                    last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
-                    
+                    (
+                        last_prefix,
+                        last_sales_person,
+                        last_quarter,
+                        last_date,
+                        last_year_range,
+                        last_sequence,
+                    ) = parse_quotation_number(
+                        st.session_state.last_quotation_number, fallback_sales_person=sales_person
+                    )
+
                     if last_sales_person == sales_person:
-                        # Same sales person, increment sequence
+                        # Same sales person → increment sequence
                         next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
                         return generate_quotation_number(sales_person, next_sequence)
                     else:
-                        # Different sales person, start from sequence 1
+                        # Different sales person → restart sequence
                         return generate_quotation_number(sales_person, 1)
                 except:
-                    # If parsing fails, use default
-                    return generate_quotation_number(sales_person, st.session_state.quotation_seq)
+                    # If parsing fails → start fresh for selected person
+                    return generate_quotation_number(sales_person, 1)
             else:
-                # No previous quotation, start from sequence 1
-                return generate_quotation_number(sales_person, st.session_state.quotation_seq)
+                # First quotation → start fresh
+                return generate_quotation_number(sales_person, 1)
         
         # Get the quotation number
-        quotation_number = get_quotation_number()
+        quotation_number = get_quotation_number(sales_person)
         
         # Display current sales person info
         current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
@@ -1394,7 +1410,7 @@ def main():
         
         # Show quotation breakdown
         try:
-            prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(quotation_number)
+            prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(quotation_number, fallback_sales_person=sales_person)
             st.sidebar.success(f"**Quotation Number:** {current_sp} - Sequence {sequence}")
         except:
             st.sidebar.warning("Could not parse quotation number")

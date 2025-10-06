@@ -809,24 +809,30 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     
     # Clickable email and mobile
     pdf.set_text_color(0, 0, 255)  # Blue color for clickable links
-    
+    email1 = "info@cminfotech.com "
+    phone_number ="+91 873 391 5721"
+    pdf.set_text_color(0, 0, 255)
+    pdf.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
+    pdf.set_x((pdf.w - 80) / 2)
+    pdf.cell(0, 0, "", link=f"tel:{phone_number}")
     # Email
-    email_text = "Email: info@cminfotech.com"
-    email_width = pdf.get_string_width(email_text)
-    page_center = pdf.w / 2
-    email_x = page_center - (email_width / 2)
-    pdf.set_x(email_x)
-    pdf.cell(email_width, 4, email_text, ln=False, align="C", link="mailto:info@cminfotech.com")
+    # email_text = "Email: info@cminfotech.com"
+    # mobile_text = "Mo. +91 873 391 5721"
+    # email_width = pdf.get_string_width(email_text)
+    # page_center = pdf.w / 2
+    # email_x = page_center - (email_width / 2)
+    # pdf.set_x(email_x)
+    # pdf.cell(email_width, 4, email_text, ln=False, align="C", link="mailto:info@cminfotech.com")
     
-    # Separator
-    separator = "  |  "
-    separator_width = pdf.get_string_width(separator)
-    pdf.cell(separator_width, 4, separator, ln=False, align="C")
+    # # Separator
+    # separator = "  |  "
+    # separator_width = pdf.get_string_width(separator)
+    # pdf.cell(separator_width, 4, separator, ln=False, align="C")
     
-    # Mobile
-    mobile_text = "Mo. +91 873 391 5721"
-    mobile_width = pdf.get_string_width(mobile_text)
-    pdf.cell(mobile_width, 4, mobile_text, ln=True, align="C", link="tel:+918733915721")
+    # # Mobile
+    # mobile_text = "Mo. +91 873 391 5721"
+    # mobile_width = pdf.get_string_width(mobile_text)
+    # pdf.cell(mobile_width, 4, mobile_text, ln=True, align="C", link="tel:+918733915721")
     
     pdf.set_text_color(0, 0, 0)  # Reset to black color
     

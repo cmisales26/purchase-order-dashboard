@@ -1351,7 +1351,7 @@ def main():
                     mime="application/pdf"
                 )
 
-    # --- Tab 3: Quotation Generator (FIXED VERSION) ---
+    # --- Tab 3: Quotation Generator ---
     with tab3:
         st.header("📑 Adobe Software Quotation Generator")
         
@@ -1360,33 +1360,33 @@ def main():
         # Sales Person Selection
         st.sidebar.header("Quotation Settings")
         sales_person = st.sidebar.selectbox("Select Sales Person", 
-                                          options=list(SALES_PERSON_MAPPING.keys()), 
-                                          format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
-                                          key="quote_sales_person")
+                                        options=list(SALES_PERSON_MAPPING.keys()), 
+                                        format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+                                        key="quote_sales_person")
         
-        # Generate default quotation number
-        default_quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
+        # Generate quotation number based on selected sales person
+        def get_quotation_number():
+            # Check if we need to increment sequence
+            if st.session_state.last_quotation_number:
+                try:
+                    last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
+                    
+                    if last_sales_person == sales_person:
+                        # Same sales person, increment sequence
+                        next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
+                        return generate_quotation_number(sales_person, next_sequence)
+                    else:
+                        # Different sales person, start from sequence 1
+                        return generate_quotation_number(sales_person, 1)
+                except:
+                    # If parsing fails, use default
+                    return generate_quotation_number(sales_person, st.session_state.quotation_seq)
+            else:
+                # No previous quotation, start from sequence 1
+                return generate_quotation_number(sales_person, st.session_state.quotation_seq)
         
-        # Check if we need to increment sequence
-        if st.session_state.last_quotation_number:
-            try:
-                last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
-                
-                if last_sales_person == sales_person:
-                    # Same sales person, increment sequence
-                    next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
-                    default_quotation_number = generate_quotation_number(sales_person, next_sequence)
-                    st.session_state.quotation_seq = next_sequence
-                else:
-                    # Different sales person, start from sequence 1
-                    default_quotation_number = generate_quotation_number(sales_person, 1)
-                    st.session_state.quotation_seq = 1
-            except:
-                # If parsing fails, use default
-                default_quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
-        
-        # Editable quotation number
-        quotation_number = st.sidebar.text_input("Quotation Number", value=default_quotation_number, key="quote_number_input")
+        # Get the quotation number
+        quotation_number = get_quotation_number()
         
         # Display current sales person info
         current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
@@ -1395,9 +1395,12 @@ def main():
         # Show quotation breakdown
         try:
             prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(quotation_number)
-            st.sidebar.success(f"Quotation: {current_sp} - Sequence {sequence}")
+            st.sidebar.success(f"**Quotation Number:** {current_sp} - Sequence {sequence}")
         except:
             st.sidebar.warning("Could not parse quotation number")
+        
+        # Display the quotation number (read-only) so users can see it
+        st.sidebar.text_input("Quotation Number Display", value=quotation_number, key="quote_number_display", disabled=True)
         
         quotation_auto_increment = st.sidebar.checkbox("Auto-increment Quotation", value=True, key="quote_auto_increment")
         
@@ -1405,10 +1408,8 @@ def main():
             st.session_state.quotation_seq = 1
             st.session_state.last_quotation_number = ""
             st.sidebar.success("Quotation sequence reset to 1")
+            st.rerun()
         
-        # [Rest of your quotation form...]
-        # Your existing quotation form code goes here
-
         # Main form
         col1, col2 = st.columns([1, 1])
         
@@ -1426,13 +1427,13 @@ def main():
             intro_paragraphs = st.text_area("Introduction Paragraphs",
             """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization.
             
-Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.
+    Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.
             
-CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.
+    CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.
             
-Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.
+    Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.
             
-As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!""",
+    As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!""",
             key="quote_intro"
             )
         
@@ -1492,6 +1493,9 @@ As one of our privileged customers, we look forward to having you take part in o
         # Preview and Generate Section
         st.header("Preview & Generate Quotation")
         
+        # Show the current quotation number prominently
+        st.info(f"**Current Quotation Number:** {quotation_number}")
+        
         # Calculate totals
         total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
         total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.quotation_products)
@@ -1540,7 +1544,6 @@ As one of our privileged customers, we look forward to having you take part in o
                 st.warning(f"Could not process stamp: {e}")
                 stamp_path = None
         
-        # Generate Quotation button
         if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
             if not st.session_state.quotation_products:
                 st.error("Please add at least one product to generate the quotation.")
@@ -1574,7 +1577,10 @@ As one of our privileged customers, we look forward to having you take part in o
                     
                     st.success("✅ Quotation generated successfully!")
                     st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
-                    st.info("📧 All emails and phone numbers in the PDF are clickable!")
+                    
+                    # Verify the sales person code in the generated quotation number
+                    generated_prefix, generated_sales_person, generated_quarter, generated_date, generated_year, generated_sequence = parse_quotation_number(quotation_number)
+                    st.info(f"📄 Quotation Number: {generated_sales_person} - Sequence {generated_sequence}")
                     
                     # Download button
                     st.download_button(
@@ -1587,7 +1593,6 @@ As one of our privileged customers, we look forward to having you take part in o
                     
                 except Exception as e:
                     st.error(f"Error generating PDF: {str(e)}")
-
     # Clean up temporary files
     for path in ["temp_logo.jpg", "temp_stamp.jpg", "temp_logo_quote.jpg", "temp_stamp_quote.jpg"]:
         if os.path.exists(path):

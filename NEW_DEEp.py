@@ -817,6 +817,8 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
     pdf.set_x((pdf.w - 80) / 2)
     pdf.cell(0, 0, "", link=f"tel:{phone_number}")
+
+    pdf.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
     # Email
     # email_text = "Email: info@cminfotech.com"
     # mobile_text = "Mo. +91 873 391 5721"

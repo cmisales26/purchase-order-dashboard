@@ -34,11 +34,11 @@ SALES_PERSON_MAPPING = {
 def get_current_quarter():
     """Get current quarter (Q1, Q2, Q3, Q4) based on current month"""
     month = datetime.datetime.now().month
-    if month in [1, 2, 3]:
+    if month in [4, 5, 6]:
         return "Q1"
-    elif month in [4, 5, 6]:
-        return "Q2"
     elif month in [7, 8, 9]:
+        return "Q2"
+    elif month in [10, 11, 12]:
         return "Q3"
     else:
         return "Q4"

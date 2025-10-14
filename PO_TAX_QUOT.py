@@ -57,7 +57,7 @@ def parse_po_number(po_number):
             return prefix, sales_person, year, quarter, sequence
     except:
         pass
-    return "C", "CP", str(datetime.datetime.now().year), get_current_quarter(), "001"
+    return "CMI", sales_person(), str(datetime.datetime.now().year), get_current_quarter(), "001"
 
 def generate_po_number(sales_person, sequence_number):
     """Generate PO number with current quarter and sequence"""

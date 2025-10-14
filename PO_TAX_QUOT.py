@@ -1550,12 +1550,37 @@ def main():
         
         with col1:
             st.header("Recipient Details")
-            vendor_name = st.text_input("Company Name", "Creation Studio", key="quote_vendor_name")
-            vendor_address = st.text_area("Company Address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389", key="quote_vendor_address")
-            vendor_email = st.text_input("Email", "info@dreamcreationstudio.com", key="quote_vendor_email")
-            vendor_contact = st.text_input("Contact Person (Kind Attention)", "Mr. Musta", key="quote_vendor_contact")
-            vendor_mobile = st.text_input("Mobile", "+91 9876543210", key="quote_vendor_mobile")
-            
+            # vendor_name = st.text_input("Company Name", "Creation Studio", key="quote_vendor_name")
+            # vendor_address = st.text_area("Company Address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389", key="quote_vendor_address")
+            # vendor_email = st.text_input("Email", "info@dreamcreationstudio.com", key="quote_vendor_email")
+            # vendor_contact = st.text_input("Contact Person (Kind Attention)", "Mr. Musta", key="quote_vendor_contact")
+            # vendor_mobile = st.text_input("Mobile", "+91 9876543210", key="quote_vendor_mobile")
+                    # FIXED: Use session state values from Excel upload if available
+            vendor_name = st.text_input(
+                "Company Name", 
+                value=st.session_state.get("po_end_company", "Creation Studio"), 
+                key="quote_vendor_name"
+            )
+            vendor_address = st.text_area(
+                "Company Address", 
+                value=st.session_state.get("po_end_address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389"), 
+                key="quote_vendor_address"
+            )
+            vendor_email = st.text_input(
+                "Email", 
+                value=st.session_state.get("po_end_email", "info@dreamcreationstudio.com"), 
+                key="quote_vendor_email"
+            )
+            vendor_contact = st.text_input(
+                "Contact Person (Kind Attention)", 
+                value=st.session_state.get("po_end_person", "Mr. Musta"), 
+                key="quote_vendor_contact"
+            )
+            vendor_mobile = st.text_input(
+                "Mobile", 
+                value=st.session_state.get("po_end_contact", "+91 9876543210"), 
+                key="quote_vendor_mobile"
+            )
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "September 29, 2025", key="quote_price_validity")
             subject_line = st.text_input("Subject", "Proposal for Adobe Commercial Software Licenses", key="quote_subject")

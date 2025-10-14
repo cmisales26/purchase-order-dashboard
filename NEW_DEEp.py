@@ -145,18 +145,18 @@ class QUOTATION_PDF(FPDF):
                 self.image(self.logo_path, x=160, y=8, w=40)
             except:
                 # If image fails, show placeholder
-                self.set_font("Calibri", "B", 8)
+                self.set_font("Calibri", "B", 10)
                 self.set_xy(150, 8)
                 self.cell(40, 5, "[LOGO]", border=0, align="C")
             
         # Main Title (Centered)
-        self.set_font("Calibri", "B", 16)
+        self.set_font("Calibri", "B", 18)
         self.set_y(15)
         self.ln(5)
 
     def footer(self):
         self.set_y(-20)
-        self.set_font("Calibri", "U", 8)
+        self.set_font("Calibri", "U", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
         # Make footer emails and phone clickable - FIXED OVERLAP
@@ -187,7 +187,7 @@ class QUOTATION_PDF(FPDF):
         
         self.set_text_color(0, 0, 0)  # Reset to black
         self.set_y(-8)
-        self.set_font("Calibri", "I", 7)
+        self.set_font("Calibri", "I", 9)
         self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
 
 # --- Page Content Generation Helpers ---
@@ -269,7 +269,7 @@ def add_page_one_intro(pdf, data):
 
     # Email clickable
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Calibri", "U", 10)  # underline
+    pdf.set_font("Calibri", "U", 12)  # underline
     pdf.write(5, "chirag@cminfotech.com", link="mailto:chirag@cminfotech.com")
 
     # Back to normal for separator + Mobile:
@@ -279,7 +279,7 @@ def add_page_one_intro(pdf, data):
 
     # First mobile
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Calibri", "U", 10)
+    pdf.set_font("Calibri", "U", 12)
     pdf.write(5, "+91 740 511 5721 ", link="tel:+91 740 511 5721")
 
     # Separator + second mobile
@@ -288,7 +288,7 @@ def add_page_one_intro(pdf, data):
     pdf.write(5, ", ")
 
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Calibri", "U", 10)
+    pdf.set_font("Calibri", "U", 12)
     pdf.write(5, "+91 873 391 5721", link="tel:+91 873 391 5721")
 
     # Reset back to normal for anything after
@@ -302,7 +302,7 @@ def add_page_one_intro(pdf, data):
     pdf.set_font("Calibri", "", 12)
     
     # Clickable website
-    pdf.set_font("Calibri", "U", 10)
+    pdf.set_font("Calibri", "U", 12)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, link="https://www.cminfotech.com/")
     pdf.cell(0, 4, "https://www.linkedin.com/", ln=True, link="https://www.linkedin.com/")
@@ -315,7 +315,7 @@ def add_page_two_commercials(pdf, data):
     pdf.add_page()
     
     # Annexure Title - FIXED ALIGNMENT
-    pdf.set_font("Calibri", "B", 14)
+    pdf.set_font("Calibri", "B", 16)
     pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
     pdf.set_font("Calibri", "B", 12)
     pdf.cell(0, 6, "Quotation for Adobe Software", ln=True, align="C")
@@ -327,13 +327,13 @@ def add_page_two_commercials(pdf, data):
     
     # Table Header
     pdf.set_fill_color(220, 220, 220)
-    pdf.set_font("Calibri", "B", 9)
+    pdf.set_font("Calibri", "B", 11)
     for width, header in zip(col_widths, headers):
         pdf.cell(width, 7, header, border=1, align="C", fill=True)
     pdf.ln()
 
     # Table Rows
-    pdf.set_font("Calibri", "", 9)
+    pdf.set_font("Calibri", "", 11)
     grand_total = 0.0
     
     for product in data["products"]:
@@ -364,7 +364,7 @@ def add_page_two_commercials(pdf, data):
     pdf.ln(15)
 
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
-    pdf.set_font("Calibri", "", 9)
+    pdf.set_font("Calibri", "", 11)
 
     # Terms & Conditions (UPDATED TO MATCH SECOND VERSION)
     terms = [
@@ -433,7 +433,7 @@ def add_page_two_commercials(pdf, data):
     # Terms & Conditions header
     pdf.set_xy(x_start + padding, y_start + padding)
     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
-    pdf.set_font("Calibri", "", 9)
+    pdf.set_font("Calibri", "", 11)
     
     # Terms content
     terms_y = pdf.get_y()
@@ -446,7 +446,7 @@ def add_page_two_commercials(pdf, data):
     pdf.set_font("Calibri", "B", 12)
     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-    pdf.set_font("Calibri", "", 9)
+    pdf.set_font("Calibri", "", 11)
     
     # Bank details content
     bank_y = pdf.get_y()
@@ -493,7 +493,7 @@ def add_page_two_commercials(pdf, data):
     else:
         pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
     
-    pdf.set_font("Calibri", "", 9)
+    pdf.set_font("Calibri", "", 11)
     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
     pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
     
@@ -501,7 +501,7 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
     
     # Clickable email in signature
-    pdf.set_font("Calibri", "", 9)
+    pdf.set_font("Calibri", "", 11)
     pdf.set_text_color(0, 0, 0)
     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
     label = "Email: "
@@ -512,7 +512,7 @@ def add_page_two_commercials(pdf, data):
     
     # Clickable phone in signature
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Calibri", "", 9)
+    pdf.set_font("Calibri", "", 11)
     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
     label = "Mobile: "
     pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
@@ -579,7 +579,7 @@ class PDF(FPDF):
         self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
         self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
         self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
-        self.set_font("Calibri", "", 8)
+        self.set_font("Calibri", "", 10)
         self.set_left_margin(15)
         self.set_right_margin(15)
 
@@ -606,7 +606,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # pdf.ln(3)
 
     # --- Invoice Details (top-right) ---
-    pdf.set_font("Calibri", "", 8)
+    pdf.set_font("Calibri", "", 10)
     pdf.set_xy(140, 20)
     pdf.multi_cell(60, 4,
         f"Invoice No.: {invoice_data['invoice']['invoice_no']}\n"
@@ -615,12 +615,12 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 
     # --- Vendor & Buyer ---
     pdf.set_y(35)
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(95, 5, "CM Infotech", ln=False)
     pdf.set_xy(110, 35)
     pdf.cell(95, 5, "Buyer", ln=True)
 
-    pdf.set_font("Calibri", "", 8)
+    pdf.set_font("Calibri", "", 10)
     pdf.set_xy(15, 40)
     pdf.multi_cell(95, 4, invoice_data['vendor']['address'])
     y_after_vendor = pdf.get_y()
@@ -646,7 +646,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 
     # --- Invoice Specifics ---
     pdf.ln(5)
-    pdf.set_font("Calibri", "", 8)
+    pdf.set_font("Calibri", "", 10)
     pdf.cell(95, 4, f"Buyer's Order No.: {invoice_data['invoice_details']['buyers_order_no']}")
     pdf.cell(95, 4, f"Buyer's Order Date: {invoice_data['invoice_details']['buyers_order_date']}", ln=True)
     pdf.cell(95, 4, f"Dispatch Through: {invoice_data['invoice_details']['dispatched_through']}")
@@ -655,7 +655,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 
     # --- Item Table Header ---
     pdf.ln(2)
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(10, 5, "Sr. No.", border=1, align="C")
     pdf.cell(80, 5, "Description of Goods", border=1, align="C")
     pdf.cell(20, 5, "HSN/SAC", border=1, align="C")
@@ -664,7 +664,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.cell(30, 5, "Amount", border=1, ln=True, align="C")
 
     # --- Items ---
-    pdf.set_font("Calibri", "", 8)
+    pdf.set_font("Calibri", "", 10)
     col_widths = [10, 80, 20, 20, 25, 30]
     line_height = 4
 
@@ -672,7 +672,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
         x_start = pdf.get_x()
         y_start = pdf.get_y()
 
-        # pdf.set_font("Calibri", "", 8)
+        # pdf.set_font("Calibri", "", 10)
         
         # Description
         pdf.set_xy(x_start + col_widths[0], y_start)
@@ -701,7 +701,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
         pdf.set_xy(x_start, y_start + row_height)
 
     # --- Totals ---
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")   #"R" for right align
     pdf.cell(30, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
@@ -716,12 +716,12 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     
     # --- Amount in Words ---
     pdf.ln(2)
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(185, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # --- Tax Summary Table ---
     pdf.ln(2)
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(35, 5, "HSN/SAN", border=1, align="C")
     pdf.cell(35, 5, "Taxable Value", border=1, align="C")
     pdf.cell(58, 5, "Central Tax", border=1, align="C")
@@ -734,7 +734,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.cell(29, 5, "Rate", border="L", align="C")
     pdf.cell(29, 5, "Amount", border="LR", ln=True, align="C")
 
-    pdf.set_font("Calibri", "", 8)
+    pdf.set_font("Calibri", "", 10)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
     hsn_sgst = hsn_tax_value * 0.09
     hsn_cgst = hsn_tax_value * 0.09
@@ -746,7 +746,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.cell(29, 5, "9%", border=1, align="C")
     pdf.cell(29, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(35, 5, "Total", border=1, align="C")
     pdf.cell(35, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
     pdf.cell(29, 5, "", border=1, align="C")
@@ -755,7 +755,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.cell(29, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     pdf.ln(2)
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(186, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
      # --- Reserve footer space ---
@@ -765,9 +765,9 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 
     # --- Bank Details ---
     pdf.ln(3)
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(0, 5, "Company's Bank Details", ln=True)
-    pdf.set_font("Calibri", "", 8)
+    pdf.set_font("Calibri", "", 10)
     pdf.multi_cell(0, 4,
         f"Bank Name: {invoice_data['bank']['name']}\n"
         f"Branch: {invoice_data['bank']['branch']}\n"
@@ -777,14 +777,14 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 
     # --- Declaration ---
     pdf.ln(2)
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(0, 5, "Declaration:", ln=True)
-    pdf.set_font("Calibri", "", 8)
+    pdf.set_font("Calibri", "", 10)
     pdf.multi_cell(0, 4, invoice_data['declaration'])
     
     # --- Signature ---
     pdf.ln(5)
-    pdf.set_font("Calibri", "B", 8)
+    pdf.set_font("Calibri", "B", 10)
     pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
 
     if stamp_file:
@@ -809,14 +809,14 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # else:
     #     pdf.ln(15) # maintain spacing if no stamp is uploded
     # pdf.ln(5)
-    # pdf.set_font("Calibri", "B", 8)
+    # pdf.set_font("Calibri", "B", 10)
     # pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
     # pdf.ln(10)
-    pdf.set_font("Calibri", "", 8)
+    pdf.set_font("Calibri", "", 10)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
      # --- Footer with clickable email and mobile ---
     pdf.set_y(-22)
-    pdf.set_font("Calibri", "U", 8)
+    pdf.set_font("Calibri", "U", 10)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     
     # Company address
@@ -2286,7 +2286,7 @@ if __name__ == "__main__":
 #                 self.image(self.logo_path, x=160, y=8, w=40)
 #             except:
 #                 # If image fails, show placeholder
-#                 self.set_font("Calibri", "B", 8)
+#                 self.set_font("Calibri", "B", 10)
 #                 self.set_xy(150, 8)
 #                 self.cell(40, 5, "[LOGO]", border=0, align="C")
             
@@ -2472,7 +2472,7 @@ if __name__ == "__main__":
 #     pdf.ln()
 
 #     # Table Rows
-#     pdf.set_font("Calibri", "", 9)
+#     pdf.set_font("Calibri", "", 11)
 #     grand_total = 0.0
     
 #     for product in data["products"]:
@@ -2503,7 +2503,7 @@ if __name__ == "__main__":
 #     pdf.ln(15)
 
 #     # --- Enhanced Box for Terms & Conditions and Bank Details ---
-#     pdf.set_font("Calibri", "", 9)
+#     pdf.set_font("Calibri", "", 11)
 
 #     # Terms & Conditions
 #     terms = [
@@ -2568,7 +2568,7 @@ if __name__ == "__main__":
 #     # Terms & Conditions header
 #     pdf.set_xy(x_start + padding, y_start + padding)
 #     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
-#     pdf.set_font("Calibri", "", 9)
+#     pdf.set_font("Calibri", "", 11)
     
 #     # Terms content
 #     terms_y = pdf.get_y()
@@ -2581,7 +2581,7 @@ if __name__ == "__main__":
 #     pdf.set_font("Calibri", "B", 12)
 #     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
 #     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-#     pdf.set_font("Calibri", "", 9)
+#     pdf.set_font("Calibri", "", 11)
     
 #     # Bank details content
 #     bank_y = pdf.get_y()
@@ -2706,7 +2706,7 @@ if __name__ == "__main__":
 # #                 self.image(self.logo_path, x=160, y=8, w=40)
 # #             except:
 # #                 # If image fails, show placeholder
-# #                 self.set_font("Calibri", "B", 8)
+# #                 self.set_font("Calibri", "B", 10)
 # #                 self.set_xy(150, 8)
 # #                 self.cell(40, 5, "[LOGO]", border=0, align="C")
             
@@ -2892,7 +2892,7 @@ if __name__ == "__main__":
 # #     pdf.ln()
 
 # #     # Table Rows
-# #     pdf.set_font("Calibri", "", 9)
+# #     pdf.set_font("Calibri", "", 11)
 # #     grand_total = 0.0
     
 # #     for product in data["products"]:
@@ -2923,7 +2923,7 @@ if __name__ == "__main__":
 # #     pdf.ln(15)
 
 # #     # --- Enhanced Box for Terms & Conditions and Bank Details ---
-# #     pdf.set_font("Calibri", "", 9)
+# #     pdf.set_font("Calibri", "", 11)
 
 # #     # Terms & Conditions
 # #     terms = [
@@ -2988,7 +2988,7 @@ if __name__ == "__main__":
 # #     # Terms & Conditions header
 # #     pdf.set_xy(x_start + padding, y_start + padding)
 # #     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
-# #     pdf.set_font("Calibri", "", 9)
+# #     pdf.set_font("Calibri", "", 11)
     
 # #     # Terms content
 # #     terms_y = pdf.get_y()
@@ -3001,7 +3001,7 @@ if __name__ == "__main__":
 # #     pdf.set_font("Calibri", "B", 12)
 # #     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
 # #     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-# #     pdf.set_font("Calibri", "", 9)
+# #     pdf.set_font("Calibri", "", 11)
     
 # #     # Bank details content
 # #     bank_y = pdf.get_y()
@@ -3100,7 +3100,7 @@ if __name__ == "__main__":
 # class PDF(FPDF):
 #     def __init__(self):
 #         super().__init__()
-#         self.set_font("Calibri", "", 8)
+#         self.set_font("Calibri", "", 10)
 #         self.set_left_margin(15)
 #         self.set_right_margin(15)
 
@@ -3125,7 +3125,7 @@ if __name__ == "__main__":
 #     # pdf.ln(3)
 
 #     # --- Invoice Details (top-right) ---
-#     pdf.set_font("Calibri", "", 8)
+#     pdf.set_font("Calibri", "", 10)
 #     pdf.set_xy(140, 20)
 #     pdf.multi_cell(60, 4,
 #         f"Invoice No.: {invoice_data['invoice']['invoice_no']}\n"
@@ -3134,12 +3134,12 @@ if __name__ == "__main__":
 
 #     # --- Vendor & Buyer ---
 #     pdf.set_y(35)
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(95, 5, "CM Infotech", ln=False)
 #     pdf.set_xy(110, 35)
 #     pdf.cell(95, 5, "Buyer", ln=True)
 
-#     pdf.set_font("Calibri", "", 8)
+#     pdf.set_font("Calibri", "", 10)
 #     pdf.set_xy(15, 40)
 #     pdf.multi_cell(95, 4, invoice_data['vendor']['address'])
 #     y_after_vendor = pdf.get_y()
@@ -3165,7 +3165,7 @@ if __name__ == "__main__":
 
 #     # --- Invoice Specifics ---
 #     pdf.ln(5)
-#     pdf.set_font("Calibri", "", 8)
+#     pdf.set_font("Calibri", "", 10)
 #     pdf.cell(95, 4, f"Buyer's Order No.: {invoice_data['invoice_details']['buyers_order_no']}")
 #     pdf.cell(95, 4, f"Buyer's Order Date: {invoice_data['invoice_details']['buyers_order_date']}", ln=True)
 #     pdf.cell(95, 4, f"Dispatch Through: {invoice_data['invoice_details']['dispatched_through']}")
@@ -3174,7 +3174,7 @@ if __name__ == "__main__":
 
 #     # --- Item Table Header ---
 #     pdf.ln(2)
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(10, 5, "Sr. No.", border=1, align="C")
 #     pdf.cell(85, 5, "Description of Goods", border=1, align="C")
 #     pdf.cell(20, 5, "HSN/SAC", border=1, align="C")
@@ -3183,7 +3183,7 @@ if __name__ == "__main__":
 #     pdf.cell(30, 5, "Amount", border=1, ln=True, align="C")
 
 #     # --- Items ---
-#     pdf.set_font("Calibri", "", 8)
+#     pdf.set_font("Calibri", "", 10)
 #     col_widths = [10, 85, 20, 20, 25, 30]
 #     line_height = 4
 
@@ -3191,7 +3191,7 @@ if __name__ == "__main__":
 #         x_start = pdf.get_x()
 #         y_start = pdf.get_y()
 
-#         pdf.set_font("Calibri", "", 8)
+#         pdf.set_font("Calibri", "", 10)
         
 #         # Description
 #         pdf.set_xy(x_start + col_widths[0], y_start)
@@ -3220,7 +3220,7 @@ if __name__ == "__main__":
 #         pdf.set_xy(x_start, y_start + row_height)
 
 #     # --- Totals ---
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")   #"R" for right align
 #     pdf.cell(30, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
@@ -3235,12 +3235,12 @@ if __name__ == "__main__":
     
 #     # --- Amount in Words ---
 #     pdf.ln(2)
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(0, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
 #     # --- Tax Summary Table ---
 #     pdf.ln(2)
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(35, 5, "HSN/SAN", border=1, align="C")
 #     pdf.cell(35, 5, "Taxable Value", border=1, align="C")
 #     pdf.cell(60, 5, "Central Tax", border=1, align="C")
@@ -3253,7 +3253,7 @@ if __name__ == "__main__":
 #     pdf.cell(30, 5, "Rate", border="L", align="C")
 #     pdf.cell(30, 5, "Amount", border="LR", ln=True, align="C")
 
-#     pdf.set_font("Calibri", "", 8)
+#     pdf.set_font("Calibri", "", 10)
 #     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
 #     hsn_sgst = hsn_tax_value * 0.09
 #     hsn_cgst = hsn_tax_value * 0.09
@@ -3265,7 +3265,7 @@ if __name__ == "__main__":
 #     pdf.cell(30, 5, "9%", border=1, align="C")
 #     pdf.cell(30, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(35, 5, "Total", border=1, align="C")
 #     pdf.cell(35, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
 #     pdf.cell(30, 5, "", border=1, align="C")
@@ -3274,14 +3274,14 @@ if __name__ == "__main__":
 #     pdf.cell(30, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
 #     pdf.ln(2)
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(0, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
 #     # --- Bank Details ---
 #     pdf.ln(5)
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(0, 5, "Company's Bank Details", ln=True)
-#     pdf.set_font("Calibri", "", 8)
+#     pdf.set_font("Calibri", "", 10)
 #     pdf.multi_cell(0, 4,
 #         f"Bank Name: {invoice_data['bank']['name']}\n"
 #         f"Branch: {invoice_data['bank']['branch']}\n"
@@ -3291,14 +3291,14 @@ if __name__ == "__main__":
 
 #     # --- Declaration ---
 #     pdf.ln(2)
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(0, 5, "Declaration:", ln=True)
-#     pdf.set_font("Calibri", "", 8)
+#     pdf.set_font("Calibri", "", 10)
 #     pdf.multi_cell(0, 4, invoice_data['declaration'])
     
 #     # --- Signature ---
 #     pdf.ln(5)
-#     pdf.set_font("Calibri", "B", 8)
+#     pdf.set_font("Calibri", "B", 10)
 #     pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
 
 #     if stamp_file:
@@ -3314,10 +3314,10 @@ if __name__ == "__main__":
 #     else:
 #         pdf.ln(10) # maintain spacing if no stamp is uploded
 #     # pdf.ln(5)
-#     # pdf.set_font("Calibri", "B", 8)
+#     # pdf.set_font("Calibri", "B", 10)
 #     # pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
 #     pdf.ln(10)
-#     pdf.set_font("Calibri", "", 8)
+#     pdf.set_font("Calibri", "", 10)
 #     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
 #     pdf.set_y(-42)
 #     pdf.set_font("Calibri", "I", 8)

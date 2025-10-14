@@ -194,23 +194,23 @@ class QUOTATION_PDF(FPDF):
 
 def add_clickable_email(pdf, email, label="Email: "):
     """Add clickable email with label - FIXED OVERLAP"""
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     label_width = pdf.get_string_width(label)
     pdf.cell(label_width, 4, label, ln=0)
     
     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
     pdf.set_text_color(0, 0, 0)  # Reset to black
 
 def add_clickable_phone(pdf, phone, label="Mobile: "):
     """Add clickable phone number with label - FIXED OVERLAP"""
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     label_width = pdf.get_string_width(label)
     pdf.cell(label_width, 4, label, ln=0)
     
     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     # Remove spaces and + for tel link
     tel_number = phone.replace(' ', '').replace('+', '')
     pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
@@ -218,18 +218,18 @@ def add_clickable_phone(pdf, phone, label="Mobile: "):
 
 def add_page_one_intro(pdf, data):
     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     pdf.set_y(25)
     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
     pdf.ln(10)
 
     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.cell(0, 5, "To,", ln=True)
     pdf.set_font("Calibri", "B", 12)
     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     
     # Address handling
     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
@@ -244,7 +244,7 @@ def add_page_one_intro(pdf, data):
     if data.get('vendor_mobile'):
         add_clickable_phone(pdf, data['vendor_mobile'])
     
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", ln=True)
     pdf.ln(8)
 
@@ -254,13 +254,13 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # Introductory Paragraph (from user input)
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.multi_cell(0, 5, pdf.sanitize_text(data['intro_paragraph']))
     pdf.ln(5)
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.set_text_color(0, 0, 0)
 
     # Normal text
@@ -274,7 +274,7 @@ def add_page_one_intro(pdf, data):
 
     # Back to normal for separator + Mobile:
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.write(5, "  Mobile: ")
 
     # First mobile
@@ -284,7 +284,7 @@ def add_page_one_intro(pdf, data):
 
     # Separator + second mobile
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.write(5, ", ")
 
     pdf.set_text_color(0, 0, 255)
@@ -293,13 +293,13 @@ def add_page_one_intro(pdf, data):
 
     # Reset back to normal for anything after
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.ln(10)  # move cursor down for next section
     
     pdf.ln(3)
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     
     # Clickable website
     pdf.set_font("Calibri", "U", 10)
@@ -358,7 +358,7 @@ def add_page_two_commercials(pdf, data):
         pdf.ln()
 
     # Grand Total Row - FIXED ALIGNMENT
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
     pdf.ln(15)
@@ -428,7 +428,7 @@ def add_page_two_commercials(pdf, data):
     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
 
     # Add section headers
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     
     # Terms & Conditions header
     pdf.set_xy(x_start + padding, y_start + padding)
@@ -443,7 +443,7 @@ def add_page_two_commercials(pdf, data):
         terms_y = pdf.get_y()
 
     # Bank Details header
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
     pdf.set_font("Calibri", "", 9)
@@ -458,7 +458,7 @@ def add_page_two_commercials(pdf, data):
     # --- Signature Block INSIDE BANK DETAILS BOX ---
     signature_start_y = bank_y + 5
     
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     pdf.set_xy(x_start + col1_width + padding, signature_start_y)
     pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
     
@@ -468,7 +468,7 @@ def add_page_two_commercials(pdf, data):
         # --- Signature Block INSIDE BANK DETAILS BOX ---
     signature_start_y = bank_y + 5
     
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     pdf.set_xy(x_start + col1_width + padding, signature_start_y)
     pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
     
@@ -949,7 +949,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     
     # --- Vendor & Bill/Ship ---
     pdf.section_title("Vendor & Addresses")
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
     pdf.ln(7)
     # pdf.set_xy(110, pdf.get_y() - 20)
@@ -965,12 +965,12 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     col_widths = [65, 22, 30, 25, 15, 22]
     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
     pdf.set_fill_color(220, 220, 220)
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     for h, w in zip(headers, col_widths):
         pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
     pdf.ln()
 
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     line_height = 5
     for p in po_data["products"]:
         gst_amt = p["basic"] * p["gst_percent"] / 100
@@ -995,33 +995,33 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
         pdf.ln(row_height)
 
     # Grand Total Row
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
     pdf.cell(col_widths[5], 6, f"{po_data['grand_total']:.2f}", border=1, align="R")
     pdf.ln(4)
 
     # --- Amount in Words ---
     pdf.ln(5)
-    pdf.set_font("Calibri", "B", 10)
+    pdf.set_font("Calibri", "B", 12)
     pdf.cell(0, 5, "Amount in Words:", ln=True)
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.multi_cell(0, 5, pdf.sanitize_text(po_data['amount_words']))
     pdf.ln(4)
 
     # # --- Terms ---
     pdf.section_title("Terms & Conditions")
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {sanitized_payment_terms}\nDelivery: {sanitized_delivery_terms}")
     pdf.ln(2)
 
     # --- End User ---
     pdf.section_title("End User Details")
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.multi_cell(0, 4, f"{sanitized_end_company}\n{sanitized_end_address}\nContact: {sanitized_end_person} | {sanitized_end_contact}\nEmail: {sanitized_end_email}")
     pdf.ln(2)
 
     # Authorization Section
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.set_x(pdf.l_margin)
     pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
 
@@ -1030,7 +1030,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)
-    pdf.set_font("Calibri", "", 10)
+    pdf.set_font("Calibri", "", 12)
     pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
     stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
     if os.path.exists(stamp_path):
@@ -2333,23 +2333,23 @@ if __name__ == "__main__":
 
 # def add_clickable_email(pdf, email, label="Email: "):
 #     """Add clickable email with label - FIXED OVERLAP"""
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     label_width = pdf.get_string_width(label)
 #     pdf.cell(label_width, 4, label, ln=0)
     
 #     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
 #     pdf.set_text_color(0, 0, 0)  # Reset to black
 
 # def add_clickable_phone(pdf, phone, label="Mobile: "):
 #     """Add clickable phone number with label - FIXED OVERLAP"""
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     label_width = pdf.get_string_width(label)
 #     pdf.cell(label_width, 4, label, ln=0)
     
 #     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     # Remove spaces and + for tel link
 #     tel_number = phone.replace(' ', '').replace('+', '')
 #     pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
@@ -2357,18 +2357,18 @@ if __name__ == "__main__":
 
 # def add_page_one_intro(pdf, data):
 #     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     pdf.set_y(25)
 #     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
 #     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
 #     pdf.ln(10)
 
 #     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.cell(0, 5, "To,", ln=True)
 #     pdf.set_font("Calibri", "B", 12)
 #     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
     
 #     # Address handling
 #     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
@@ -2383,7 +2383,7 @@ if __name__ == "__main__":
 #     if data.get('vendor_mobile'):
 #         add_clickable_phone(pdf, data['vendor_mobile'])
     
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", ln=True)
 #     pdf.ln(8)
 
@@ -2393,13 +2393,13 @@ if __name__ == "__main__":
 #     pdf.ln(5)
 
 #     # Introductory Paragraph (from user input)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.multi_cell(0, 5, pdf.sanitize_text(data['intro_paragraph']))
 #     pdf.ln(5)
 
 #     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
 #     page_width = pdf.w - 2 * pdf.l_margin
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.set_text_color(0, 0, 0)
 
 #     # Normal text
@@ -2413,7 +2413,7 @@ if __name__ == "__main__":
 
 #     # Back to normal for separator + Mobile:
 #     pdf.set_text_color(0, 0, 0)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.write(5, "  Mobile: ")
 
 #     # First mobile
@@ -2423,7 +2423,7 @@ if __name__ == "__main__":
 
 #     # Separator + second mobile
 #     pdf.set_text_color(0, 0, 0)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.write(5, ", ")
 
 #     pdf.set_text_color(0, 0, 255)
@@ -2432,13 +2432,13 @@ if __name__ == "__main__":
 
 #     # Reset back to normal for anything after
 #     pdf.set_text_color(0, 0, 0)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.ln(10)  # move cursor down for next section
     
 #     pdf.ln(3)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
     
 #     # Clickable website
 #     pdf.set_font("Calibri", "U", 10)
@@ -2497,7 +2497,7 @@ if __name__ == "__main__":
 #         pdf.ln()
 
 #     # Grand Total Row - FIXED ALIGNMENT
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
 #     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
 #     pdf.ln(15)
@@ -2563,7 +2563,7 @@ if __name__ == "__main__":
 #     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
 
 #     # Add section headers
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
     
 #     # Terms & Conditions header
 #     pdf.set_xy(x_start + padding, y_start + padding)
@@ -2578,7 +2578,7 @@ if __name__ == "__main__":
 #         terms_y = pdf.get_y()
 
 #     # Bank Details header
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
 #     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
 #     pdf.set_font("Calibri", "", 9)
@@ -2594,7 +2594,7 @@ if __name__ == "__main__":
 #     pdf.set_xy(x_start, y_start + box_height + 10)
 
 #     # --- Signature Block ---
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     pdf.cell(0, 5, "Yours Truly,", ln=True)
 #     pdf.cell(0, 5, "For CM INFOTECH", ln=True)
 #     pdf.ln(8)
@@ -2603,7 +2603,7 @@ if __name__ == "__main__":
 #     sales_person_code = data.get('sales_person_code', 'SD')
 #     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
     
-#     # pdf.set_font("Calibri", "B", 10)
+#     # pdf.set_font("Calibri", "B", 12)
 #     # pdf.cell(0, 5, "Yours Truly,", ln=True)
 #     # pdf.cell(0, 5, "For CM INFOTECH", ln=True)
 #     # pdf.ln(8)
@@ -2617,12 +2617,12 @@ if __name__ == "__main__":
 #         except:
 #             pass
     
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.cell(0, 5, sales_person_info["name"], ln=True)
 #     pdf.cell(0, 5, "Inside Sales Executive", ln=True)
     
 #     # Clickable email in signature
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.set_text_color(0, 0, 0)
 #     label = "Email: "
 #     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
@@ -2632,7 +2632,7 @@ if __name__ == "__main__":
     
 #     # Clickable phone in signature
 #     pdf.set_text_color(0, 0, 0)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     label = "Mobile: "
 #     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
 #     pdf.set_text_color(0, 0, 255)
@@ -2753,23 +2753,23 @@ if __name__ == "__main__":
 # # # --- Quotation Page Content Generation Helpers ---
 # # def add_clickable_email(pdf, email, label="Email: "):
 # #     """Add clickable email with label - FIXED OVERLAP"""
-# #     pdf.set_font("Calibri", "B", 10)
+# #     pdf.set_font("Calibri", "B", 12)
 # #     label_width = pdf.get_string_width(label)
 # #     pdf.cell(label_width, 4, label, ln=0)
     
 # #     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
 # #     pdf.set_text_color(0, 0, 0)  # Reset to black
 
 # # def add_clickable_phone(pdf, phone, label="Mobile: "):
 # #     """Add clickable phone number with label - FIXED OVERLAP"""
-# #     pdf.set_font("Calibri", "B", 10)
+# #     pdf.set_font("Calibri", "B", 12)
 # #     label_width = pdf.get_string_width(label)
 # #     pdf.cell(label_width, 4, label, ln=0)
     
 # #     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     # Remove spaces and + for tel link
 # #     tel_number = phone.replace(' ', '').replace('+', '')
 # #     pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
@@ -2777,18 +2777,18 @@ if __name__ == "__main__":
 
 # # def add_page_one_intro(pdf, data):
 # #     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-# #     pdf.set_font("Calibri", "B", 10)
+# #     pdf.set_font("Calibri", "B", 12)
 # #     pdf.set_y(25)
 # #     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
 # #     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
 # #     pdf.ln(10)
 
 # #     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.cell(0, 5, "To,", ln=True)
 # #     pdf.set_font("Calibri", "B", 12)
 # #     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
     
 # #     # Address handling
 # #     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
@@ -2803,7 +2803,7 @@ if __name__ == "__main__":
 # #     if data.get('vendor_mobile'):
 # #         add_clickable_phone(pdf, data['vendor_mobile'])
     
-# #     pdf.set_font("Calibri", "B", 10)
+# #     pdf.set_font("Calibri", "B", 12)
 # #     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", ln=True)
 # #     pdf.ln(8)
 
@@ -2813,13 +2813,13 @@ if __name__ == "__main__":
 # #     pdf.ln(5)
 
 # #     # Introductory Paragraph (from user input)
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.multi_cell(0, 5, pdf.sanitize_text(data['intro_paragraph']))
 # #     pdf.ln(5)
 
 # #     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
 # #     page_width = pdf.w - 2 * pdf.l_margin
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.set_text_color(0, 0, 0)
 
 # #     # Normal text
@@ -2833,7 +2833,7 @@ if __name__ == "__main__":
 
 # #     # Back to normal for separator + Mobile:
 # #     pdf.set_text_color(0, 0, 0)
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.write(5, "  Mobile: ")
 
 # #     # First mobile
@@ -2843,7 +2843,7 @@ if __name__ == "__main__":
 
 # #     # Separator + second mobile
 # #     pdf.set_text_color(0, 0, 0)
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.write(5, ", ")
 
 # #     pdf.set_text_color(0, 0, 255)
@@ -2852,13 +2852,13 @@ if __name__ == "__main__":
 
 # #     # Reset back to normal for anything after
 # #     pdf.set_text_color(0, 0, 0)
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.ln(10)  # move cursor down for next section
     
 # #     pdf.ln(3)
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
     
 # #     # Clickable website
 # #     pdf.set_font("Calibri", "U", 10)
@@ -2917,7 +2917,7 @@ if __name__ == "__main__":
 # #         pdf.ln()
 
 # #     # Grand Total Row - FIXED ALIGNMENT
-# #     pdf.set_font("Calibri", "B", 10)
+# #     pdf.set_font("Calibri", "B", 12)
 # #     pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
 # #     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
 # #     pdf.ln(15)
@@ -2983,7 +2983,7 @@ if __name__ == "__main__":
 # #     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
 
 # #     # Add section headers
-# #     pdf.set_font("Calibri", "B", 10)
+# #     pdf.set_font("Calibri", "B", 12)
     
 # #     # Terms & Conditions header
 # #     pdf.set_xy(x_start + padding, y_start + padding)
@@ -2998,7 +2998,7 @@ if __name__ == "__main__":
 # #         terms_y = pdf.get_y()
 
 # #     # Bank Details header
-# #     pdf.set_font("Calibri", "B", 10)
+# #     pdf.set_font("Calibri", "B", 12)
 # #     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
 # #     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
 # #     pdf.set_font("Calibri", "", 9)
@@ -3014,7 +3014,7 @@ if __name__ == "__main__":
 # #     pdf.set_xy(x_start, y_start + box_height + 10)
 
 # #     # --- Signature Block ---
-# #     pdf.set_font("Calibri", "B", 10)
+# #     pdf.set_font("Calibri", "B", 12)
 # #     pdf.cell(0, 5, "Yours Truly,", ln=True)
 # #     pdf.cell(0, 5, "For CM INFOTECH", ln=True)
 # #     pdf.ln(8)
@@ -3031,12 +3031,12 @@ if __name__ == "__main__":
 # #         except:
 # #             pass
     
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.cell(0, 5, sales_person_info["name"], ln=True)
 # #     pdf.cell(0, 5, "Inside Sales Executive", ln=True)
     
 # #     # Clickable email in signature
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     pdf.set_text_color(0, 0, 0)
 # #     label = "Email: "
 # #     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
@@ -3045,7 +3045,7 @@ if __name__ == "__main__":
     
 # #     # Clickable phone in signature
 # #     pdf.set_text_color(0, 0, 0)
-# #     pdf.set_font("Calibri", "", 10)
+# #     pdf.set_font("Calibri", "", 12)
 # #     label = "Mobile: "
 # #     pdf.cell(pdf.get_string_width(label) + 2, 5, label, ln=0)
 # #     pdf.set_text_color(0, 0, 255)
@@ -3428,7 +3428,7 @@ if __name__ == "__main__":
     
 #     # --- Vendor & Bill/Ship ---
 #     pdf.section_title("Vendor & Addresses")
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
 #     pdf.ln(7)
 #     # pdf.set_xy(110, pdf.get_y() - 20)
@@ -3444,12 +3444,12 @@ if __name__ == "__main__":
 #     col_widths = [65, 22, 30, 25, 15, 22]
 #     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
 #     pdf.set_fill_color(220, 220, 220)
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     for h, w in zip(headers, col_widths):
 #         pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
 #     pdf.ln()
 
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     line_height = 5
 #     for p in po_data["products"]:
 #         gst_amt = p["basic"] * p["gst_percent"] / 100
@@ -3474,33 +3474,33 @@ if __name__ == "__main__":
 #         pdf.ln(row_height)
 
 #     # Grand Total Row
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
 #     pdf.cell(col_widths[5], 6, f"{po_data['grand_total']:.2f}", border=1, align="R")
 #     pdf.ln(4)
 
 #     # --- Amount in Words ---
 #     pdf.ln(5)
-#     pdf.set_font("Calibri", "B", 10)
+#     pdf.set_font("Calibri", "B", 12)
 #     pdf.cell(0, 5, "Amount in Words:", ln=True)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.multi_cell(0, 5, pdf.sanitize_text(po_data['amount_words']))
 #     pdf.ln(4)
 
 #     # # --- Terms ---
 #     pdf.section_title("Terms & Conditions")
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {sanitized_payment_terms}\nDelivery: {sanitized_delivery_terms}")
 #     pdf.ln(2)
 
 #     # --- End User ---
 #     pdf.section_title("End User Details")
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.multi_cell(0, 4, f"{sanitized_end_company}\n{sanitized_end_address}\nContact: {sanitized_end_person} | {sanitized_end_contact}\nEmail: {sanitized_end_email}")
 #     pdf.ln(2)
 
 #     # Authorization Section
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.set_x(pdf.l_margin)
 #     pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
 
@@ -3509,7 +3509,7 @@ if __name__ == "__main__":
 
 #     # --- Footer (Company Name + Stamp) that floats) ---
 #     pdf.ln(5)
-#     pdf.set_font("Calibri", "", 10)
+#     pdf.set_font("Calibri", "", 12)
 #     pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
 #     stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
 #     if os.path.exists(stamp_path):

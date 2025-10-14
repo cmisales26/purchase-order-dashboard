@@ -1069,7 +1069,7 @@ def main():
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
 
     if uploaded_excel:
-        vendors_df = pd.read_excel(uploaded_excel, sheet_name="Vendors")
+        vendors_df = pd.read_excel(uploaded_excel, sheet_name="Vendors", dtype={"Mobile": str})
         endusers_df = pd.read_excel(uploaded_excel, sheet_name="EndUsers")
 
         st.success("✅ Excel loaded successfully!")
@@ -1082,11 +1082,14 @@ def main():
         end_user_name = st.selectbox("Select End User", endusers_df["End User Company"].unique())
         end_user = endusers_df[endusers_df["End User Company"] == end_user_name].iloc[0]
 
+        # --- Clean and Convert Mobile (avoid float or NaN issues) ---
+        vendor_mobile = str(vendor.get("Mobile", "")).split(".")[0].strip()
+
         # Save to session_state (so Invoice & PO can use)
         st.session_state.po_vendor_name = vendor["Vendor Name"]
         st.session_state.po_vendor_address = vendor["Vendor Address"]
         st.session_state.po_vendor_contact = vendor["Contact Person"]
-        st.session_state.po_vendor_mobile = vendor["Mobile"]
+        st.session_state.po_vendor_mobile = vendor_mobile
         st.session_state.po_end_company = end_user["End User Company"]
         st.session_state.po_end_address = end_user["End User Address"]
         st.session_state.po_end_person = end_user["End User Contact"]

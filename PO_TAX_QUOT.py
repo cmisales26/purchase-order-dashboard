@@ -57,7 +57,7 @@ def parse_po_number(po_number):
             return prefix, sales_person, year, quarter, sequence
     except:
         pass
-    return "CMI", sales_person(), str(datetime.datetime.now().year), get_current_quarter(), "001"
+    return "CMI", "CP", str(datetime.datetime.now().year), get_current_quarter(), "001"
 
 def generate_po_number(sales_person, sequence_number):
     """Generate PO number with current quarter and sequence"""
@@ -1054,8 +1054,7 @@ def main():
     if "company_name" not in st.session_state:
         st.session_state.company_name = "CM Infotech"
     if "po_number" not in st.session_state:
-        default_po_number = generate_po_number("CP", st.session_state.po_seq)
-        st.session_state.po_number = default_po_number
+        st.session_state.po_number = generate_po_number("CP", st.session_state.po_seq)
     if "po_date" not in st.session_state:
         st.session_state.po_date = datetime.date.today().strftime("%d-%m-%Y")
     if "last_po_number" not in st.session_state:
@@ -1064,6 +1063,10 @@ def main():
         st.session_state.quotation_number = generate_quotation_number("SD", st.session_state.quotation_seq)
     if "current_quote_sales_person" not in st.session_state:
         st.session_state.current_quote_sales_person = "SD"
+    if "current_po_sales_person" not in st.session_state:  # NEW
+        st.session_state.current_po_sales_person = "CP"
+    if "current_po_quarter" not in st.session_state:  # NEW
+        st.session_state.current_po_quarter = get_current_quarter()
 
     # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
@@ -1205,47 +1208,120 @@ def main():
                     file_name=f"Invoice_{invoice_no}.pdf",
                     mime="application/pdf")
                 
-
     # --- Tab 2: Purchase Order Generator ---
     with tab2:
         st.header("Purchase Order Generator")
         
+        today = datetime.date.today()
+        current_quarter = get_current_quarter()
+        
         # PO Settings in sidebar for this tab
         st.sidebar.header("PO Settings")
         
-        # Sales Person Selection for PO
+        # Sales Person Selection for PO - JUST LIKE QUOTATION
         po_sales_person = st.sidebar.selectbox("Select Sales Person", 
-                                              options=list(SALES_PERSON_MAPPING.keys()), 
-                                              format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
-                                              key="po_sales_person")
+                                            options=list(SALES_PERSON_MAPPING.keys()), 
+                                            format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+                                            key="po_sales_person")
         
-        # Generate default PO number
-        default_po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
+        # Get current sales person info
+        current_sales_person_info = SALES_PERSON_MAPPING.get(po_sales_person, SALES_PERSON_MAPPING['CP'])
         
-        # Check if we need to increment sequence
-        if st.session_state.last_po_number:
-            last_sales_person = parse_po_number(st.session_state.last_po_number)[1]
-            if last_sales_person == po_sales_person:
-                # Same sales person, increment sequence
-                next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
-                default_po_number = generate_po_number(po_sales_person, next_sequence)
+        # Generate PO number based on selected sales person - JUST LIKE QUOTATION
+        def get_po_number():
+            # Check if we need to increment sequence
+            if st.session_state.last_po_number:
+                try:
+                    last_prefix, last_sales_person, last_year, last_quarter, last_sequence = parse_po_number(st.session_state.last_po_number)
+                    
+                    if last_sales_person == po_sales_person and last_quarter == current_quarter:
+                        # Same sales person and same quarter, increment sequence
+                        next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
+                        return generate_po_number(po_sales_person, next_sequence)
+                    else:
+                        # Different sales person or new quarter, start from sequence 1
+                        return generate_po_number(po_sales_person, 1)
+                except:
+                    # If parsing fails, use current sequence
+                    return generate_po_number(po_sales_person, st.session_state.po_seq)
+            else:
+                # No previous PO, start from current sequence
+                return generate_po_number(po_sales_person, st.session_state.po_seq)
         
-        # Editable PO number
-        po_number = st.sidebar.text_input("PO Number", value=default_po_number, key="po_number_input")
+        # Initialize or update PO number when sales person changes
+        if "current_po_sales_person" not in st.session_state:
+            st.session_state.current_po_sales_person = po_sales_person
+            st.session_state.po_number = get_po_number()
         
-        # Parse the current PO number to get sequence
-        _, _, _, _, current_sequence = parse_po_number(po_number)
+        # Update PO number if sales person changes or quarter changes
+        if (st.session_state.current_po_sales_person != po_sales_person or 
+            st.session_state.get('current_po_quarter', '') != current_quarter):
+            st.session_state.current_po_sales_person = po_sales_person
+            st.session_state.current_po_quarter = current_quarter
+            st.session_state.po_number = get_po_number()
         
         # Display current sales person info
-        current_sales_person_info = SALES_PERSON_MAPPING.get(po_sales_person, SALES_PERSON_MAPPING['CP'])
         st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
+        st.sidebar.info(f"**Current Quarter:** {current_quarter}")
         
-        po_auto_increment = st.sidebar.checkbox("Auto-increment PO Number", value=True, key="po_auto_increment")
+        # Show auto-generated breakdown
+        try:
+            prefix, current_sp, year, quarter, sequence = parse_po_number(st.session_state.po_number)
+            st.sidebar.success(f"**Auto-generated PO Number**")
+            st.sidebar.info(f"**Format:** {current_sp}/{year}/{quarter}_{sequence}")
+        except:
+            st.sidebar.warning("Could not parse PO number")
         
-        if st.sidebar.button("Reset PO Sequence"):
+        # Editable PO number WITH sales person selection
+        st.sidebar.subheader("PO Number Editor")
+        
+        # Parse current PO number for editing
+        try:
+            current_prefix, current_sp, current_year, current_q, current_seq = parse_po_number(st.session_state.po_number)
+            
+            # Create editable components
+            col1, col2, col3, col4 = st.sidebar.columns([1, 2, 2, 1])
+            
+            with col1:
+                # Show current sales person (read-only)
+                st.text_input("Sales Person", value=current_sp, key="po_sp_display", disabled=True)
+            
+            with col2:
+                new_year = st.text_input("Year", value=current_year, key="po_year_edit")
+            
+            with col3:
+                new_quarter = st.text_input("Quarter", value=current_q, key="po_quarter_edit")
+            
+            with col4:
+                new_sequence = st.number_input("Sequence", 
+                                            min_value=1, 
+                                            value=int(current_seq), 
+                                            step=1,
+                                            key="po_seq_edit")
+            
+            # Construct new PO number using the SELECTED sales person, not the edited one
+            new_po_number = f"CMI/{po_sales_person}/{new_year}/{new_quarter}_{new_sequence:03d}"
+            
+            # Update if changed
+            if new_po_number != st.session_state.po_number:
+                st.session_state.po_number = new_po_number
+                
+        except Exception as e:
+            st.sidebar.error(f"Error parsing PO number: {e}")
+            # Fallback to default
+            st.session_state.po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
+        
+        # Display final PO number
+        st.sidebar.code(st.session_state.po_number)
+        
+        po_auto_increment = st.sidebar.checkbox("Auto-increment Sequence", value=True, key="po_auto_increment")
+        
+        if st.sidebar.button("Reset to Auto-generate", use_container_width=True):
             st.session_state.po_seq = 1
             st.session_state.last_po_number = ""
-            st.sidebar.success("PO sequence reset to 1")
+            st.session_state.po_number = get_po_number()
+            st.sidebar.success("PO number reset to auto-generated")
+            st.rerun()
         
         tab_vendor, tab_products, tab_terms, tab_preview = st.tabs(["Vendor Details", "Products", "Terms", "Preview & Generate"])
         with tab_vendor:
@@ -1372,6 +1448,11 @@ def main():
         
         with tab_preview:
             st.header("Preview & Generate")
+            
+            # Show the current PO number prominently with sales person info - JUST LIKE QUOTATION
+            st.info(f"**PO Number:** {st.session_state.po_number}")
+            st.info(f"**Sales Person:** {current_sales_person_info['name']} ({po_sales_person}) - {current_sales_person_info['email']}")
+            
             total_base = sum(p["basic"] * p["qty"] for p in st.session_state.products)
             total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.products)
             grand_total = total_base + total_gst
@@ -1387,7 +1468,7 @@ def main():
             
             if st.button("Generate PO", type="primary"):
                 po_data = {
-                    "po_number": po_number,
+                    "po_number": st.session_state.po_number,
                     "po_date": st.session_state.po_date,
                     "vendor_name": vendor_name,
                     "vendor_address": vendor_address,
@@ -1418,12 +1499,16 @@ def main():
                 pdf_bytes = create_po_pdf(po_data, logo_path)
 
                 # Store the last PO number for sequence tracking
-                st.session_state.last_po_number = po_number
+                st.session_state.last_po_number = st.session_state.po_number
                 
                 # Auto-increment for next PO
                 if po_auto_increment:
-                    next_sequence = get_next_sequence_number_po(po_number)
-                    st.session_state.po_seq = next_sequence
+                    try:
+                        next_sequence = get_next_sequence_number_po(st.session_state.po_number)
+                        # Update the sequence in session state for next time
+                        st.session_state.po_seq = next_sequence
+                    except:
+                        st.session_state.po_seq += 1
 
                 st.success("Purchase Order generated!")
                 st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
@@ -1431,9 +1516,237 @@ def main():
                 st.download_button(
                     "⬇ Download Purchase Order",
                     data=pdf_bytes,
-                    file_name=f"PO_{po_number.replace('/', '_')}.pdf",
+                    file_name=f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
                     mime="application/pdf"
                 )
+    # # --- Tab 2: Purchase Order Generator ---
+    # with tab2:
+    #     st.header("Purchase Order Generator")
+        
+    #     # PO Settings in sidebar for this tab
+    #     st.sidebar.header("PO Settings")
+        
+    #     # Sales Person Selection for PO
+    #     po_sales_person = st.sidebar.selectbox("Select Sales Person", 
+    #                                           options=list(SALES_PERSON_MAPPING.keys()), 
+    #                                           format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+    #                                           key="po_sales_person")
+        
+    #     # Generate default PO number
+    #     default_po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
+        
+    #     # Check if we need to increment sequence
+    #     if st.session_state.last_po_number:
+    #         last_sales_person = parse_po_number(st.session_state.last_po_number)[1]
+    #         if last_sales_person == po_sales_person:
+    #             # Same sales person, increment sequence
+    #             next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
+    #             default_po_number = generate_po_number(po_sales_person, next_sequence)
+        
+    #     # Editable PO number
+    #     po_number = st.sidebar.text_input("PO Number", value=default_po_number, key="po_number_input")
+        
+    #     # Parse the current PO number to get sequence
+    #     _, _, _, _, current_sequence = parse_po_number(po_number)
+        
+    #     # Display current sales person info
+    #     current_sales_person_info = SALES_PERSON_MAPPING.get(po_sales_person, SALES_PERSON_MAPPING['CP'])
+    #     st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
+        
+    #     po_auto_increment = st.sidebar.checkbox("Auto-increment PO Number", value=True, key="po_auto_increment")
+        
+    #     if st.sidebar.button("Reset PO Sequence"):
+    #         st.session_state.po_seq = 1
+    #         st.session_state.last_po_number = ""
+    #         st.sidebar.success("PO sequence reset to 1")
+        
+    #     tab_vendor, tab_products, tab_terms, tab_preview = st.tabs(["Vendor Details", "Products", "Terms", "Preview & Generate"])
+    #     with tab_vendor:
+    #         col1, col2 = st.columns(2)
+    #         with col1:
+    #             vendor_name = st.text_input(
+    #                 "Vendor Name",
+    #                 value=safe_str_state("po_vendor_name", "Arkance IN Pvt. Ltd."),
+    #                 key="po_vendor_name"
+    #             )
+    #             vendor_address = st.text_area(
+    #                 "Vendor Address",
+    #                 value=safe_str_state("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1..."),
+    #                 key="po_vendor_address"
+    #             )
+    #             vendor_contact = st.text_input(
+    #                 "Contact Person",
+    #                 value=safe_str_state("po_vendor_contact", "Ms/Mr"),
+    #                 key="po_vendor_contact"
+    #             )
+    #             vendor_mobile = st.text_input(
+    #                 "Mobile",
+    #                 value=safe_str_state("po_vendor_mobile", "+91 1234567890"),
+    #                 key="po_vendor_mobile"
+    #             )
+    #             end_company = st.text_input(
+    #                 "End User Company",
+    #                 value=safe_str_state("po_end_company", "Baldridge & Associates Pvt Ltd."),
+    #                 key="po_end_company"
+    #             )
+    #             end_address = st.text_area(
+    #                 "End User Address",
+    #                 value=safe_str_state("po_end_address", "406 Sakar East, Vadodara 390009"),
+    #                 key="po_end_address"
+    #             )
+    #             end_person = st.text_input(
+    #                 "End User Contact",
+    #                 value=safe_str_state("po_end_person", "Mr. Dev"),
+    #                 key="po_end_person"
+    #             )
+    #             end_contact = st.text_input(
+    #                 "End User Phone",
+    #                 value=safe_str_state("po_end_contact", "+91 9876543210"),
+    #                 key="po_end_contact"
+    #             )
+    #             end_email = st.text_input(
+    #                 "End User Email",
+    #                 value=safe_str_state("po_end_email", "info@company.com"),
+    #                 key="po_end_email"
+    #             )
+    #         with col2:
+    #             bill_to_company = st.text_input(
+    #                 "Bill To",
+    #                 value=safe_str_state("po_bill_to_company", "CM INFOTECH"),
+    #                 key="po_bill_to_company"
+    #             )
+    #             bill_to_address = st.text_area(
+    #                 "Bill To Address",
+    #                 value=safe_str_state("po_bill_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
+    #                 key="po_bill_to_address"
+    #             )
+    #             ship_to_company = st.text_input(
+    #                 "Ship To",
+    #                 value=safe_str_state("po_ship_to_company", "CM INFOTECH"),
+    #                 key="po_ship_to_company"
+    #             )
+    #             ship_to_address = st.text_area(
+    #                 "Ship To Address",
+    #                 value=safe_str_state("po_ship_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
+    #                 key="po_ship_to_address"
+    #             )
+    #             gst_no = st.text_input(
+    #                 "GST No",
+    #                 value=safe_str_state("po_gst_no", "24ANMPP4891R1ZX"),
+    #                 key="po_gst_no"
+    #             )
+    #             pan_no = st.text_input(
+    #                 "PAN No",
+    #                 value=safe_str_state("po_pan_no", "ANMPP4891R"),
+    #                 key="po_pan_no"
+    #             )
+    #             msme_no = st.text_input(
+    #                 "MSME No",
+    #                 value=safe_str_state("po_msme_no", "UDYAM-GJ-01-0117646"),
+    #                 key="po_msme_no"
+    #             )
+
+    #     with tab_products:
+    #         st.header("Products")
+    #         selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select")
+    #         if st.button("➕ Add Selected Product", key="add_selected_po"):
+    #             if selected_product:
+    #                 details = PRODUCT_CATALOG[selected_product]
+    #                 st.session_state.products.append({
+    #                     "name": selected_product,
+    #                     "basic": details["basic"],
+    #                     "gst_percent": details["gst_percent"],
+    #                     "qty": 1.0,
+    #                 })
+    #                 st.success(f"{selected_product} added!")
+            
+    #         if st.button("➕ Add Empty Product", key="add_empty_po"):
+    #             st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+
+    #         for i, p in enumerate(st.session_state.products):
+    #             with st.expander(f"Product {i+1}: {p['name']}", expanded=i == 0):
+    #                 st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
+    #                 st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
+    #                 st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
+    #                 st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
+    #                 if st.button("Remove", key=f"po_remove_{i}"):
+    #                     st.session_state.products.pop(i)
+    #                     st.rerun()
+    #     with tab_terms:
+    #         st.header("Terms & Authorization")
+    #         col1, col2 = st.columns(2)
+    #         with col1:
+    #             payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date", key="po_payment_terms")
+    #             delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days")
+    #             delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days", key="po_delivery_terms")
+    #         with col2:
+    #             prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by")
+    #             authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by")
+        
+    #     with tab_preview:
+    #         st.header("Preview & Generate")
+    #         total_base = sum(p["basic"] * p["qty"] for p in st.session_state.products)
+    #         total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.products)
+    #         grand_total = total_base + total_gst
+    #         amount_words = num2words(grand_total, to="currency", currency="INR").title()
+    #         st.metric("Grand Total", f"₹{grand_total:,.2f}")
+
+    #         logo_file = st.file_uploader("Upload Company Logo", type=["png", "jpg", "jpeg"], key="po_logo")
+    #         logo_path = None
+    #         if logo_file:
+    #             logo_path = "logo_final.jpg"
+    #             with open(logo_path, "wb") as f:
+    #                 f.write(logo_file.getbuffer())
+            
+    #         if st.button("Generate PO", type="primary"):
+    #             po_data = {
+    #                 "po_number": po_number,
+    #                 "po_date": st.session_state.po_date,
+    #                 "vendor_name": vendor_name,
+    #                 "vendor_address": vendor_address,
+    #                 "vendor_contact": vendor_contact,
+    #                 "vendor_mobile": vendor_mobile,
+    #                 "gst_no": gst_no,
+    #                 "pan_no": pan_no,
+    #                 "msme_no": msme_no,
+    #                 "bill_to_company": bill_to_company,
+    #                 "bill_to_address": bill_to_address,
+    #                 "ship_to_company": ship_to_company,
+    #                 "ship_to_address": ship_to_address,
+    #                 "end_company": end_company,
+    #                 "end_address":end_address,
+    #                 "end_person": end_person,
+    #                 "end_contact": end_contact,
+    #                 "end_email": end_email,
+    #                 "products": st.session_state.products,
+    #                 "grand_total": grand_total,
+    #                 "amount_words": amount_words,
+    #                 "payment_terms": payment_terms,
+    #                 "delivery_terms": delivery_terms,
+    #                 "prepared_by": prepared_by,
+    #                 "authorized_by": authorized_by,
+    #                 "company_name": st.session_state.company_name
+    #             }
+
+    #             pdf_bytes = create_po_pdf(po_data, logo_path)
+
+    #             # Store the last PO number for sequence tracking
+    #             st.session_state.last_po_number = po_number
+                
+    #             # Auto-increment for next PO
+    #             if po_auto_increment:
+    #                 next_sequence = get_next_sequence_number_po(po_number)
+    #                 st.session_state.po_seq = next_sequence
+
+    #             st.success("Purchase Order generated!")
+    #             st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
+                
+    #             st.download_button(
+    #                 "⬇ Download Purchase Order",
+    #                 data=pdf_bytes,
+    #                 file_name=f"PO_{po_number.replace('/', '_')}.pdf",
+    #                 mime="application/pdf"
+    #             )
 
     # --- Tab 3: Quotation Generator (SINGLE SALES PERSON SELECTION) ---
     with tab3:

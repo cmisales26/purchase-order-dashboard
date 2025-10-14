@@ -24,10 +24,10 @@ PRODUCT_CATALOG = {
 
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
-    "SD": {"name": "Sakshi Darji", "email": "sak@cminfotech.com", "mobile": "+91 98765 43210"},
-    "CP": {"name": "Chirag Prajapati", "email": "chii@cminfotech.com", "mobile": "+91 98765 43211"},
-    "HP": {"name": "Hiral Patel", "email": "hir@cminfotech.com", "mobile": "+91 98765 43212"},
-    "KP": {"name": "Khushi Patel", "email": "khus@cminfotech.com", "mobile": "+91 98765 43213"}
+    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"},
+    "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721"},
+    "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 98765 43212"},
+    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"}
 }
 
 # --- Helper Functions for Quotation and PO ---
@@ -150,7 +150,7 @@ class QUOTATION_PDF(FPDF):
 
     def footer(self):
         self.set_y(-20)
-        self.set_font("Helvetica", "I", 8)
+        self.set_font("Helvetica", "U", 8)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
         # Make footer emails and phone clickable - FIXED OVERLAP
@@ -803,7 +803,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
      # --- Footer with clickable email and mobile ---
     pdf.set_y(-22)
-    pdf.set_font("Helvetica", "I", 8)
+    pdf.set_font("Helvetica", "U", 8)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     
     # Company address
@@ -881,7 +881,7 @@ class PO_PDF(FPDF):
 
     def footer(self):
         self.set_y(-18)
-        self.set_font("Helvetica", "I", 10)
+        self.set_font("Helvetica", "U", 10)
         self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
         self.set_text_color(0, 0, 255)
         # email1 = "cad@cmi.com"

@@ -309,7 +309,7 @@ def add_page_two_commercials(pdf, data):
     pdf.add_page()
     
     # Annexure Title - FIXED ALIGNMENT
-    quotation_title = "Quotation for Adobe Software"  # This can come from user input, database, etc.
+    quotation_title = data.get('quotation_title', 'Quotation for Adobe Software')  # Get from data
 
     pdf.set_font("Helvetica", "B", 14)
     pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
@@ -1905,7 +1905,13 @@ As one of our privileged customers, we look forward to having you take part in o
         
         with col2:
             st.header("Products & Services")
-            
+                # Add this new input field for quotation title
+            quotation_title = st.text_input(
+                "Quotation Title", 
+                "Quotation for Adobe Software", 
+                key="quote_title_input",
+                help="Enter the main title that will appear on page 2 of the quotation"
+            )
             # Product selection from catalog
             selected_product = st.selectbox("Select from Product Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="quote_product_select")
             
@@ -2028,7 +2034,8 @@ As one of our privileged customers, we look forward to having you take part in o
                     "grand_total": grand_total,
                     "subject": subject_line,
                     "intro_paragraph": intro_paragraphs,
-                    "sales_person_code": sales_person  # Use the selected sales person
+                    "sales_person_code": sales_person,  # Use the selected sales person
+                    "quotation_title": quotation_title
                 }
                 
                 try:

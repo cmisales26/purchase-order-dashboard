@@ -304,12 +304,23 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 4, "https://www.facebook.com/", ln=True, link="https://www.facebook.com/")
     pdf.cell(0, 4, "https://www.instagram.com/", ln=True, link="https://www.instagram.com/")
     pdf.set_text_color(0, 0, 0)
+    
+def add_quotation_header(pdf, annexure_text, quotation_text):
+    """Add dynamic quotation header with both annexure and title"""
+    pdf.set_font("Helvetica", "B", 14)
+    pdf.cell(0, 8, annexure_text, ln=True, align="C")
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 6, quotation_text, ln=True, align="C")
+    pdf.ln(8)
 
 def add_page_two_commercials(pdf, data):
     pdf.add_page()
     
-    # Annexure Title - FIXED ALIGNMENT
-    quotation_title = data.get('quotation_title', 'Quotation for Adobe Software')  # Get from data
+    # Use dynamic header function
+    annexure_text = data.get('annexure_text', 'Annexure I - Commercials')
+    quotation_title = data.get('quotation_title', 'Quotation for Adobe Software')
+    
+    add_quotation_header(pdf, annexure_text, quotation_title)
 
     pdf.set_font("Helvetica", "B", 14)
     pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
@@ -1905,16 +1916,28 @@ As one of our privileged customers, we look forward to having you take part in o
         
         with col2:
             st.header("Products & Services")
-                # Add this new input field for quotation title
-            quotation_title = st.text_input(
-                "Quotation Title", 
-                "Quotation for Adobe Software", 
-                key="quote_title_input",
-                help="Enter the main title that will appear on page 2 of the quotation"
-            )
+            
+            # Add input fields for both annexure and quotation title
+            col_annexure, col_title = st.columns(2)
+            
+            with col_annexure:
+                annexure_text = st.text_input(
+                    "Annexure Text", 
+                    "Annexure I - Commercials", 
+                    key="quote_annexure_input",
+                    help="Enter annexure text (e.g., Annexure I - Commercials, Annexure II - Terms)"
+                )
+            
+            with col_title:
+                quotation_title = st.text_input(
+                    "Quotation Title", 
+                    "Quotation for Adobe Software", 
+                    key="quote_title_input",
+                    help="Enter the main title that will appear below annexure"
+                )
+            
             # Product selection from catalog
             selected_product = st.selectbox("Select from Product Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="quote_product_select")
-            
             if st.button("➕ Add Selected Product", key="add_selected_quote"):
                 if selected_product:
                     details = PRODUCT_CATALOG[selected_product]
@@ -2035,6 +2058,7 @@ As one of our privileged customers, we look forward to having you take part in o
                     "subject": subject_line,
                     "intro_paragraph": intro_paragraphs,
                     "sales_person_code": sales_person,  # Use the selected sales person
+                    "annexure_text": annexure_text,  # Add this line
                     "quotation_title": quotation_title
                 }
                 

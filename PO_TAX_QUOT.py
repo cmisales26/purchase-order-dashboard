@@ -26,7 +26,7 @@ PRODUCT_CATALOG = {
 SALES_PERSON_MAPPING = {
     "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"},
     "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721"},
-    "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 98765 43212"},
+    "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721"},
     "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"}
 }
 
@@ -117,7 +117,7 @@ def get_next_sequence_number(quotation_number):
 
 # --- PDF Class for Two-Page Quotation (Matching Demo Format) ---
 class QUOTATION_PDF(FPDF):
-    def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="SD"):
+    def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="CP"):
         super().__init__()
         self.set_auto_page_break(auto=True, margin=15)
         self.set_left_margin(15)
@@ -309,11 +309,18 @@ def add_page_two_commercials(pdf, data):
     pdf.add_page()
     
     # Annexure Title - FIXED ALIGNMENT
+    quotation_title = "Quotation for Adobe Software"  # This can come from user input, database, etc.
+
     pdf.set_font("Helvetica", "B", 14)
     pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
     pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 6, "Quotation for Adobe Software", ln=True, align="C")
+    pdf.cell(0, 6, quotation_title, ln=True, align="C")
     pdf.ln(8)
+    # pdf.set_font("Helvetica", "B", 14)
+    # pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
+    # pdf.set_font("Helvetica", "B", 12)
+    # pdf.cell(0, 6, "Quotation for Adobe Software", ln=True, align="C")
+    # pdf.ln(8)
 
     # --- Products Table - FIXED COLUMN WIDTHS ---
     col_widths = [70, 25, 25, 25, 15, 25]  # Adjusted for better fit

@@ -949,7 +949,7 @@ def create_po_pdf(po_data, logo_path=None):
     pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
     
     # Add stamp if available
-    stamp_path = "stamp.jpg"  # You can modify this path
+    stamp_path = "stamp__.jpg"  # You can modify this path
     if os.path.exists(stamp_path):
         pdf.ln(2)
         pdf.image(stamp_path, x=pdf.get_x(), y=pdf.get_y(), w=30)

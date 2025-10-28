@@ -604,7 +604,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(95, 8, "CM Infotech.", ln=0)
     pdf.cell(45, 8, "Invoice No.", ln=0)
-    pdf.cell(45, 8, "Invoice Date", ln=1)
+    pdf.cell(45, 8, "Invoice Date", ln=0)
 
     pdf.set_font("Helvetica", "", 10)
     

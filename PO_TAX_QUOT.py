@@ -911,7 +911,7 @@ class PO_PDF(FPDF):
         self.set_text_color(0, 0, 255)
         # email1 = "cad@cmi.com"
         email1 = "info@cminfotech.com "
-        phone_number ="+91 873 391 5721"
+        phone_number =" +91 873 391 5721"
         self.set_text_color(0, 0, 255)
         self.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
         self.set_x((self.w - 80) / 2)

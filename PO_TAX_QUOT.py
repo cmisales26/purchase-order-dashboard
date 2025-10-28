@@ -895,10 +895,14 @@ class PO_PDF(FPDF):
             # PO info
             self.set_font("Helvetica", "", 12)
             # PO Number (right aligned)
-            self.cell(0, 8, f"PO No: {self.sanitize_text(st.session_state.po_number)}", ln=1, align='R')
-            # Date (right aligned, under PO Number)
-            self.cell(0, 8, f"Date: {self.sanitize_text(st.session_state.po_date)}", ln=0, align='R')
-            self.ln(4)
+            self.set_xy(140,20)
+            self.multi_cell(60,4,
+                            f"PO No: {self.sanitize_text(st.session_state.po_number)}\n"
+                            f"Date: {self.sanitize_text(st.session_state.po_date)}")
+            # self.cell(0, 8, f"PO No: {self.sanitize_text(st.session_state.po_number)}", ln=1, align='R')
+            # # Date (right aligned, under PO Number)
+            # self.cell(0, 8, f"Date: {self.sanitize_text(st.session_state.po_date)}", ln=0, align='R')
+            # self.ln(4)
 
     def footer(self):
         self.set_y(-18)

@@ -740,9 +740,16 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Address (Multi-cell) - You can adjust the line height (e.g., from 4.0 to 5.0) here:
     pdf.set_font("Helvetica", "", 10)
+    
+    # --- FIX 1: Capture Y before the multi_cell ---
+    y_before_buyer_address = pdf.get_y()
+    
     pdf.l_margin += 1
     pdf.multi_cell(COL_FULL - 1, LINE_HEIGHT_ADDRESS, invoice_data['buyer']['address'], border="L", align="L")
     pdf.l_margin -= 1 # Reset margin
+    
+    # --- FIX 2: Calculate the actual height of the multi_cell block ---
+    buyer_address_block_height = pdf.get_y() - y_before_buyer_address 
 
     # Email Line
     pdf.set_x(x_buyer_left)
@@ -776,15 +783,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(x_buyer_left + COL_FULL, y_buyer_left_start)
     
     # Row 1: Buyer's Order No/Date (Aligned with Name cell)
-    # Note: Use LINE_HEIGHT_NAME (4.0) here for alignment
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(COL_HALF, LINE_HEIGHT_NAME, invoice_data['invoice_details']['buyers_order_no'], border="R", ln=0)
     pdf.cell(COL_HALF, LINE_HEIGHT_NAME, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1)
     
     # Row 2: Empty space to align with the Address multi_cell
     pdf.set_x(x_buyer_left + COL_FULL)
-    # The height of this cell must match the height of the Address multi_cell block
-    pdf.cell(COL_FULL, y_before_buyer_address - pdf.get_y(), "", border="R", ln=1)
+    # Use the calculated height of the address block (buyer_address_block_height)
+    pdf.cell(COL_FULL, buyer_address_block_height, "", border="R", ln=1)
 
     # Row 3: Dispatch Doc No/Delivery Note Date Headers
     pdf.set_x(x_buyer_left + COL_FULL)
@@ -836,6 +842,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_y(y_buyer_right_end) # Keep Y at the end of the taller right side
         
     pdf.ln(8)
+    
+    
 
 
     # --- Item Table Header ---

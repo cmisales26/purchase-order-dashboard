@@ -693,7 +693,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(WIDTH_INNER_HALF, 5, "Order", border="LRB", ln=0)
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_x(x_left + WIDTH_LEFT)
-    pdf.cell(WIDTH_INNER_HALF, 5, "Other Reference(s)", border="LRB", ln=0)
+    pdf.cell(WIDTH_INNER_HALF, 5, "Other Reference(s)", border="LRB", ln=1)
 
     # 5. Row: Supplier's Ref. Header/Value (Spans 10mm vertically, aligning with Email and Mobile lines)
     pdf.set_x(x_left + WIDTH_LEFT)

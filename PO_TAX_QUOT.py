@@ -136,7 +136,7 @@ class QUOTATION_PDF(FPDF):
         # Logo placement (top right) - FIXED
         if hasattr(self, 'logo_path') and self.logo_path and os.path.exists(self.logo_path):
             try:
-                self.image(self.logo_path, x=160, y=8, w=45)
+                self.image(self.logo_path, x=160, y=8, w=50)
             except:
                 # If image fails, show placeholder
                 self.set_font("Helvetica", "B", 10)

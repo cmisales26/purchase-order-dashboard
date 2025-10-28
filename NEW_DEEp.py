@@ -613,7 +613,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Define constants for consistent column widths
     WIDTH_LEFT = 95
     WIDTH_COL = 95
-    WIDTH_RIGHT = 100
+    WIDTH_RIGHT = 95
     WIDTH_INNER_HALF = WIDTH_RIGHT / 2 
 
     pdf.set_auto_page_break(auto=False, margin=10)
@@ -692,8 +692,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_x(x_left + WIDTH_LEFT)
     pdf.cell(WIDTH_INNER_HALF, 5, "Order", border="LRB", ln=0)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.set_x(x_left + 150)
-    pdf.cell(WIDTH_INNER_HALF, 5, "Other Reference(s)", border="LRB", ln=1)
+    pdf.cell(WIDTH_INNER_HALF, 5, "Other Reference(s)", border="RB", ln=1)
 
     # 5. Row: Supplier's Ref. Header/Value (Spans 10mm vertically, aligning with Email and Mobile lines)
     pdf.set_x(x_left + WIDTH_LEFT)

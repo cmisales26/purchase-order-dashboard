@@ -761,8 +761,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # 2. Row: Buyer's Order No/Date Values
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(WIDTH_INNER_HALF, 4, "", border="R", ln=0) # Buyer's Order No. value (empty in this row)
-    pdf.cell(WIDTH_INNER_HALF, 4, "17 April 2025", border="R", ln=1)
+    pdf.cell(WIDTH_INNER_HALF, 4, invoice_data['invoice_details']['buyers_order_no'], border="R", ln=0) # Buyer's Order No. value (empty in this row)
+    pdf.cell(WIDTH_INNER_HALF, 4, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1)
     
     # 3. Row: Dispatch/Delivery Note Headers
     pdf.set_x(x_buyer_left + WIDTH_LEFT)

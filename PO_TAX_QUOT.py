@@ -150,7 +150,7 @@ class QUOTATION_PDF(FPDF):
 
     def footer(self):
         self.set_y(-20)
-        self.set_font("Helvetica", "U", 8)
+        self.set_font("Helvetica", "U", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
         # Make footer emails and phone clickable - FIXED OVERLAP
@@ -955,14 +955,14 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # --- Vendor & Bill/Ship ---
     pdf.section_title("Vendor & Addresses")
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nAttn: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
+    pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
     pdf.ln(7)
     # pdf.set_xy(110, pdf.get_y() - 20)
     pdf.multi_cell(95, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
     pdf.set_xy(120, pdf.get_y() - 20)
     pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
     # pdf.ln(2)
-    pdf.multi_cell(0, 5, f"GST: {sanitized_gst_no}\nPAN: {sanitized_pan_no}\nMSME: {sanitized_msme_no}")
+    pdf.multi_cell(0, 5, f"GST NO: {sanitized_gst_no}\nPAN NO: {sanitized_pan_no}\nMSME Registration No: {sanitized_msme_no}")
     pdf.ln(2)
 
     # --- Products Table ---
@@ -1016,22 +1016,22 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # # --- Terms ---
     pdf.section_title("Terms & Conditions")
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"Taxes: As specified above\nPayment: {sanitized_payment_terms}\nDelivery: {sanitized_delivery_terms}")
+    pdf.multi_cell(0, 4, f"Taxes    : As specified above\nPayment   : {sanitized_payment_terms}\nDelivery   : {sanitized_delivery_terms}")
     pdf.ln(2)
 
     # --- End User ---
     pdf.section_title("End User Details")
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"{sanitized_end_company}\n{sanitized_end_address}\nContact: {sanitized_end_person} | {sanitized_end_contact}\nEmail: {sanitized_end_email}")
+    pdf.multi_cell(0, 4, f"Company Name :{sanitized_end_company}\nCompany Address   :{sanitized_end_address}\nContact   : {sanitized_end_person} | {sanitized_end_contact}\nEmail   : {sanitized_end_email}")
     pdf.ln(2)
 
     # Authorization Section
-    pdf.set_font("Helvetica", "", 10)
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
+    # pdf.set_font("Helvetica", "", 10)
+    # pdf.set_x(pdf.l_margin)
+    # pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
 
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
+    # pdf.set_x(pdf.l_margin)
+    # pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
 
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)

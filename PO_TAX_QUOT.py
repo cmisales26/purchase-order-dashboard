@@ -458,7 +458,7 @@ def add_page_two_commercials(pdf, data):
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font("Helvetica", "B", 9)
     
     # Bank details content
     bank_y = pdf.get_y()

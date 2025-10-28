@@ -139,7 +139,7 @@ class QUOTATION_PDF(FPDF):
                 self.image(self.logo_path, x=160, y=8, w=40)
             except:
                 # If image fails, show placeholder
-                self.set_font("Helvetica", "B", 8)
+                self.set_font("Helvetica", "B", 10)
                 self.set_xy(150, 8)
                 self.cell(40, 5, "[LOGO]", border=0, align="C")
             
@@ -322,11 +322,11 @@ def add_page_two_commercials(pdf, data):
     
     add_quotation_header(pdf, annexure_text, quotation_title)
 
-    pdf.set_font("Helvetica", "B", 14)
-    pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 6, quotation_title, ln=True, align="C")
-    pdf.ln(8)
+    # pdf.set_font("Helvetica", "B", 14)
+    # pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
+    # pdf.set_font("Helvetica", "B", 12)
+    # pdf.cell(0, 6, quotation_title, ln=True, align="C")
+    # pdf.ln(8)
     # pdf.set_font("Helvetica", "B", 14)
     # pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
     # pdf.set_font("Helvetica", "B", 12)

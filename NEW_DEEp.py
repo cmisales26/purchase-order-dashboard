@@ -632,7 +632,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Left Column: Company Address
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(WIDTH_COL, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481", border="L", ln=0)
+    pdf.multi_cell(WIDTH_COL, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481", border="L")
     
     # Right Column: Invoice Number and Date (Must span ADDRESS_HEIGHT)
     # Jump back to the right column's Y position
@@ -721,7 +721,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_buyer_address = pdf.get_y()
     
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(WIDTH_COL, 4, invoice_data['buyer']['address'], border="L", ln=0)
+    pdf.multi_cell(WIDTH_COL, 4, invoice_data['buyer']['address'], border="L")
     
     # Right Column: Dispatch/Delivery Headers (Must span BUYER_ADDRESS_HEIGHT)
     pdf.set_xy(x_buyer_address + WIDTH_COL, y_buyer_address) 

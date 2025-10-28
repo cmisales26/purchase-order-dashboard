@@ -600,9 +600,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.add_page()
 
     # --- Header Section ---
-    # Company Name and Invoice Details - PERFECT ALIGNMENT
+    # Company Name and Invoice Details - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(100, 8, "CM Infotech.", ln=0)
+    pdf.cell(95, 8, "CM Infotech.", ln=0)
     pdf.cell(45, 8, "Invoice No.", ln=0)
     pdf.cell(45, 8, "Invoice Date", ln=1)
 
@@ -612,17 +612,17 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_start = pdf.get_y()
     
     # Company Address
-    pdf.multi_cell(100, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
+    pdf.multi_cell(90, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
     
     # GST No
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(20, 6, "GST No. :", ln=0)
+    pdf.cell(15, 6, "GST No:", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(0, 6, invoice_data['vendor']['gst'], ln=1)
     
     # MSME Registration
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(35, 6, "MSME Reg. No. :", ln=0)
+    pdf.cell(40, 6, "MSME Registration No. :", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(0, 6, invoice_data['vendor']['msme'], ln=1)
     
@@ -634,13 +634,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Mobile
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(20, 6, "Mobile No. :", ln=0)
+    pdf.cell(22, 6, "Mobile No:", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(0, 6, "8733915721", ln=1)
     
     y_left_end = pdf.get_y()
     
-    # Right Column: Invoice Details - PERFECTLY ALIGNED
+    # Right Column: Invoice Details - PROPERLY ALIGNED
     pdf.set_xy(110, y_start)
     
     # Invoice Number
@@ -649,21 +649,20 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Invoice Date
     pdf.set_x(110)
-    pdf.cell(45, 6, invoice_data['invoice']['date'], ln=1)
+    pdf.cell(45, 6, invoice_data['invoice']['date'], ln=2)
     
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(45, 6, "Mode/Terms of Payment:", ln=1)
     pdf.set_x(110)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(45, 6, "100% Advance with Purchase Order", ln=1)
+    pdf.multi_cell(80, 4, "100% Advance with Purchase Order")
     
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(45, 6, "Supplier's Ref.", ln=1)
-    pdf.set_x(110)
+    pdf.cell(35, 6, "Supplier's Ref.", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(45, 6, "Other Reference(s)", ln=1)
+    pdf.cell(35, 6, "Other Reference(s)", ln=1)
     
     y_right_end = pdf.get_y()
     
@@ -671,10 +670,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_y(max(y_left_end, y_right_end))
     pdf.ln(8)
 
-    # --- Buyer Section --- PERFECT ALIGNMENT
+    # --- Buyer Section --- FIXED ALIGNMENT
     # Buyer Header
     pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(100, 8, "Buyer", ln=0)
+    pdf.cell(95, 8, "Buyer", ln=0)
     pdf.cell(45, 8, "Buyer's Order No.", ln=0)
     pdf.cell(45, 8, "Buyer's Order Date", ln=1)
 
@@ -693,7 +692,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(0, 6, "dmistry@baseengr.com", ln=1)
     
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(15, 6, "Tel No. :", ln=0)
+    pdf.cell(18, 6, "Tel No. :", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(0, 6, "98987 91813", ln=1)
     
@@ -704,7 +703,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     y_buyer_left_end = pdf.get_y()
     
-    # Right Column: Order Details - PERFECTLY ALIGNED
+    # Right Column: Order Details - PROPERLY ALIGNED
     pdf.set_xy(110, y_buyer_start)
     
     # Buyer's Order No
@@ -748,7 +747,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Reset to max Y position
     pdf.set_y(max(y_buyer_left_end, y_buyer_right_end))
     pdf.ln(8)
-
 
     
     # --- Item Table Header ---

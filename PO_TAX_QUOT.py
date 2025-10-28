@@ -1030,9 +1030,9 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.section_title("Terms & Conditions")
     pdf.set_font("Helvetica", "", 10)
     terms_lines = [
-        f"{'Taxes':<18}: As specified above",
-        f"{'Payment':<18}: {sanitized_payment_terms}",
-        f"{'Delivery':<18}: {sanitized_delivery_terms}"
+        f"{'Taxes':<31}: As specified above",
+        f"{'Payment':<30}: {sanitized_payment_terms}",
+        f"{'Delivery':<29}: {sanitized_delivery_terms}"
     ]
     pdf.multi_cell(0, 4, "\n".join(terms_lines))
     pdf.ln(2)
@@ -1043,7 +1043,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     end_user_lines = [
         f"{'Company Name':<21}: {sanitized_end_company}",
         f"{'Company Address':<18}: {sanitized_end_address}",
-        f"{'Contact':<29}: {sanitized_end_person} | {sanitized_end_contact}",
+        f"{'Contact':<30}: {sanitized_end_person} | {sanitized_end_contact}",
         f"{'Email':<31}: {sanitized_end_email}"
     ]
     pdf.multi_cell(0, 4, "\n".join(end_user_lines))

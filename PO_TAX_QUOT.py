@@ -895,7 +895,7 @@ class PO_PDF(FPDF):
             # PO info
             self.set_font("Helvetica", "", 12)
             # PO Number (right aligned)
-            self.set_xy(140,10)
+            self.set_xy(140,25)
             self.multi_cell(60,4,
                             f"PO No: {self.sanitize_text(st.session_state.po_number)}\n"
                             f"Date: {self.sanitize_text(st.session_state.po_date)}")

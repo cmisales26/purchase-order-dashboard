@@ -1029,13 +1029,24 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # --- Terms & Conditions ---
     pdf.section_title("Terms & Conditions")
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"Taxes                                            : As specified above\nPayment           : {sanitized_payment_terms}\nDelivery          : {sanitized_delivery_terms}")
+    terms_lines = [
+        f"{'Taxes':<18}: As specified above",
+        f"{'Payment':<18}: {sanitized_payment_terms}",
+        f"{'Delivery':<18}: {sanitized_delivery_terms}"
+    ]
+    pdf.multi_cell(0, 4, "\n".join(terms_lines))
     pdf.ln(2)
 
     # --- End User ---
     pdf.section_title("End User Details")
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"Company Name     : {sanitized_end_company}\nCompany Address      : {sanitized_end_address}\nContact          : {sanitized_end_person} | {sanitized_end_contact}\nEmail             : {sanitized_end_email}")
+    end_user_lines = [
+        f"{'Company Name':<18}: {sanitized_end_company}",
+        f"{'Company Address':<18}: {sanitized_end_address}",
+        f"{'Contact':<18}: {sanitized_end_person} | {sanitized_end_contact}",
+        f"{'Email':<18}: {sanitized_end_email}"
+    ]
+    pdf.multi_cell(0, 4, "\n".join(end_user_lines))
     pdf.ln(2)
     # Authorization Section
     # pdf.set_font("Helvetica", "", 10)

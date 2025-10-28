@@ -831,7 +831,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     # Clickable email and mobile
     pdf.set_text_color(0, 0, 255)  # Blue color for clickable links
     email1 = "info@cminfotech.com "
-    phone_number ="+91 873 391 5721"
+    phone_number =" +91 873 391 5721"
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
     pdf.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")

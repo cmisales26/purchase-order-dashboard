@@ -1014,15 +1014,55 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.ln(4)
 
     # # --- Terms ---
+    # pdf.section_title("Terms & Conditions")
+    # pdf.set_font("Helvetica", "", 10)
+    # pdf.multi_cell(0, 4, f"Taxes            : As specified above\nPayment                     : {sanitized_payment_terms}\nDelivery                      : {sanitized_delivery_terms}")
+    # pdf.ln(2)
+
+    # # --- End User ---
+    # pdf.section_title("End User Details")
+    # pdf.set_font("Helvetica", "", 10)
+    # pdf.multi_cell(0, 4, f"Company Name         :{sanitized_end_company}\nCompany Address   :{sanitized_end_address}\nContact                       : {sanitized_end_person} | {sanitized_end_contact}\nEmail                           : {sanitized_end_email}")
+    # pdf.ln(2)
+
+
+    # --- Terms & Conditions ---
     pdf.section_title("Terms & Conditions")
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"Taxes                          : As specified above\nPayment                     : {sanitized_payment_terms}\nDelivery                      : {sanitized_delivery_terms}")
+
+    terms_data = [
+        ("Taxes", "As specified above"),
+        ("Payment", sanitized_payment_terms),
+        ("Delivery", sanitized_delivery_terms),
+    ]
+
+    # Find longest label length
+    max_label_len_terms = max(len(label) for label, _ in terms_data)
+
+    # Build formatted text with aligned colons
+    formatted_terms = "\n".join(
+        [f"{label.ljust(max_label_len_terms)} : {value}" for label, value in terms_data]
+    )
+    pdf.multi_cell(0, 5, formatted_terms)
     pdf.ln(2)
 
-    # --- End User ---
+    # --- End User Details ---
     pdf.section_title("End User Details")
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 4, f"Company Name         :{sanitized_end_company}\nCompany Address   :{sanitized_end_address}\nContact                       : {sanitized_end_person} | {sanitized_end_contact}\nEmail                           : {sanitized_end_email}")
+
+    end_user_data = [
+        ("Company Name", sanitized_end_company),
+        ("Company Address", sanitized_end_address),
+        ("Contact", f"{sanitized_end_person} | {sanitized_end_contact}"),
+        ("Email", sanitized_end_email),
+    ]
+
+    max_label_len_end = max(len(label) for label, _ in end_user_data)
+
+    formatted_end_user = "\n".join(
+        [f"{label.ljust(max_label_len_end)} : {value}" for label, value in end_user_data]
+    )
+    pdf.multi_cell(0, 5, formatted_end_user)
     pdf.ln(2)
 
     # Authorization Section

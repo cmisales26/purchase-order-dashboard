@@ -614,7 +614,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     WIDTH_LEFT = 95
     WIDTH_COL = 95
     WIDTH_RIGHT = 95
-    WIDTH_INNER_HALF = WIDTH_RIGHT / 2 
+    WIDTH_INNER_HALF = WIDTH_RIGHT / 1.5 
 
     pdf.set_auto_page_break(auto=False, margin=10)
     pdf.add_page()

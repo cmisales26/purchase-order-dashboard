@@ -613,7 +613,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Define constants for consistent column widths
     WIDTH_LEFT = 95
     WIDTH_COL = 95
-    WIDTH_RIGHT = 95
+    WIDTH_RIGHT = 90
     WIDTH_INNER_HALF = WIDTH_RIGHT / 2 
 
     pdf.set_auto_page_break(auto=False, margin=10)
@@ -674,11 +674,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Right Column Block: Invoice Details ---
     
     # Jump to the right column's Y position after the initial header row
-    pdf.set_xy(x_left + WIDTH_LEFT, y_left_start) 
+    pdf.set_xy(x_left + 90, y_left_start) 
     
     # 2. Row: Invoice No./Date Values (Spans 8mm vertically, aligning with 2 address lines)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(WIDTH_INNER_HALF, 4, invoice_data['invoice']['invoice_no'], border="R", ln=0)
+    pdf.cell(WIDTH_INNER_HALF, 4, invoice_data['invoice']['invoice_no'], border="RL", ln=0)
     pdf.cell(WIDTH_INNER_HALF, 4, invoice_data['invoice']['date'], border="R", ln=1)
     
     # 3. Row: Terms of Payment Header/Value (Spans 10mm vertically, aligning with GST and MSME lines)

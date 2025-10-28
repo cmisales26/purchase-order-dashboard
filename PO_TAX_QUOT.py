@@ -1030,19 +1030,15 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.section_title("Terms & Conditions")
     pdf.set_font("Helvetica", "", 10)
 
+    # Define aligned labels
     terms_data = [
         ("Taxes", "As specified above"),
         ("Payment", sanitized_payment_terms),
         ("Delivery", sanitized_delivery_terms),
     ]
 
-    # Find longest label length
-    max_label_len_terms = max(len(label) for label, _ in terms_data)
-
-    # Build formatted text with aligned colons
-    formatted_terms = "\n".join(
-        [f"{label.ljust(max_label_len_terms)} : {value}" for label, value in terms_data]
-    )
+    # Format each line so ":" align vertically
+    formatted_terms = "\n".join([f"{label.ljust(15)}: {value}" for label, value in terms_data])
     pdf.multi_cell(0, 5, formatted_terms)
     pdf.ln(2)
 
@@ -1057,11 +1053,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
         ("Email", sanitized_end_email),
     ]
 
-    max_label_len_end = max(len(label) for label, _ in end_user_data)
-
-    formatted_end_user = "\n".join(
-        [f"{label.ljust(max_label_len_end)} : {value}" for label, value in end_user_data]
-    )
+    formatted_end_user = "\n".join([f"{label.ljust(18)}: {value}" for label, value in end_user_data])
     pdf.multi_cell(0, 5, formatted_end_user)
     pdf.ln(2)
 

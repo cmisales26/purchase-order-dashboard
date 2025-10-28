@@ -898,7 +898,7 @@ class PO_PDF(FPDF):
             self.cell(0, 8, f"PO No: {self.sanitize_text(st.session_state.po_number)}", ln=1, align='R')
             # Date (right aligned, under PO Number)
             self.cell(0, 8, f"Date: {self.sanitize_text(st.session_state.po_date)}", ln=0, align='R')
-            self.ln(2)
+            self.ln(4)
 
     def footer(self):
         self.set_y(-18)

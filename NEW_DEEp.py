@@ -609,11 +609,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font("Helvetica", "", 10)
     # Company Address
     y_before_address = pdf.get_y()
-    pdf.multi_cell(100, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
+    pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
     y_after_address = pdf.get_y()
 
     # Invoice Number and Date
-    pdf.set_xy(110, y_before_address)
+    pdf.set_xy(115, y_before_address)
     pdf.cell(45, 8, invoice_data['invoice']['invoice_no'], ln=0)
     pdf.cell(45, 8, invoice_data['invoice']['date'], ln=1)
 

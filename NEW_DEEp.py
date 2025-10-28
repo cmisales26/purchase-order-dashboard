@@ -613,7 +613,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Define constants for consistent column widths
     WIDTH_LEFT = 95
     WIDTH_COL = 95
-    WIDTH_RIGHT = 90
+    WIDTH_RIGHT = 100
     WIDTH_INNER_HALF = WIDTH_RIGHT / 2 
 
     pdf.set_auto_page_break(auto=False, margin=10)

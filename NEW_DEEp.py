@@ -611,7 +611,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf = PDF()
     
     # Define constants for consistent column widths
-    WIDTH_LEFT = 93
+    WIDTH_LEFT = 95
     WIDTH_COL = 95
     WIDTH_RIGHT = 95
     WIDTH_INNER_HALF = WIDTH_RIGHT / 2 
@@ -641,7 +641,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Address Line 1-2 (Multi-cell)
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(WIDTH_LEFT, 4, invoice_data['vendor']['address'], border="L")
+    pdf.multi_cell(90, 4, invoice_data['vendor']['address'], border="L")
     y_address_end = pdf.get_y() # Expected height: 8mm (2 lines)
 
     # GST No. Line 3
@@ -795,7 +795,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
 
 
-    
+
     # --- Item Table Header ---
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)

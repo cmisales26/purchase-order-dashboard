@@ -619,7 +619,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_auto_page_break(auto=False, margin=10)
     pdf.add_page()
     
-    # --- VENDOR (CM Infotech) SECTION ---
+    # --- VENDOR (CM Infotech) SECTION (No changes here, assuming it's aligned) ---
     
     y_start_vendor = pdf.get_y()
     
@@ -688,7 +688,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if address_block_height > 0:
         RIGHT_HEIGHT_1 = address_block_height / 2
         pdf.set_font("Helvetica", "", 10)
-        pdf.cell(WIDTH_INNER_HALF, RIGHT_HEIGHT_1, invoice_data['invoice']['invoice_no'], border="RL", ln=0)
+        pdf.cell(WIDTH_INNER_HALF, RIGHT_HEIGHT_1, invoice_data['invoice']['invoice_no'], border="R", ln=0)
         pdf.cell(WIDTH_INNER_HALF, RIGHT_HEIGHT_1, invoice_data['invoice']['date'], border="R", ln=1)
     else:
         pdf.cell(WIDTH_COL, 8, "", border="R", ln=1) 
@@ -709,22 +709,19 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Row 4: Supplier's Ref (aligned with Email line)
     pdf.set_x(x_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(WIDTH_INNER_HALF, 10, "Supplier's Ref.", border="LR", ln=0)
+    pdf.cell(WIDTH_INNER_HALF, line_height, "Supplier's Ref.", border="LRT", ln=0)
     
-    # >>> MODIFICATION 1: Use value from invoice_data for Other Reference(s)
     other_ref_value = invoice_data['invoice_details'].get('other_reference', '')
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(WIDTH_INNER_HALF, line_height, other_ref_value, border="RT", ln=1)
     
-    # Row 5: Empty row (aligned with Mobile line) - This can now be used for another value if needed
+    # Row 5: Empty row (aligned with Mobile line)
     pdf.set_x(x_left + WIDTH_LEFT)
     pdf.cell(WIDTH_COL, line_height, "", border="LRB", ln=1)
     
     # --- BUYER (Baldridge) SECTION ---
     
     pdf.set_y(y_left_end + 2) # Gap between sections
-    
-    y_buyer_start = pdf.get_y()
     
     # 1. Row: Buyer Header (Left) and Order Info Headers (Right)
     pdf.set_font("Helvetica", "B", 12)
@@ -738,10 +735,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     x_buyer_left = pdf.get_x()
     y_buyer_left_start = pdf.get_y()
-    
     buyer_line_height = 5
     
-    # **1. DRAW LEFT BUYER CONTENT (and capture actual height)**
+    # **1. PRE-CALCULATE AND DRAW LEFT BUYER CONTENT (and capture total height)**
     
     # Buyer Name (1 line = 4mm)
     pdf.set_font("Helvetica", "B", 10)
@@ -749,12 +745,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Address (Multi-cell)
     pdf.set_font("Helvetica", "", 10)
+    # Store Y before address
     y_before_buyer_address = pdf.get_y()
-    pdf.multi_cell(WIDTH_LEFT, 4, invoice_data['buyer']['address'], border="L")
-    y_after_buyer_address = pdf.get_y()
-    
-    buyer_address_block_height = y_after_buyer_address - y_before_buyer_address
-    
+    # Move the margin temporary to the right for the multi_cell calculation
+    pdf.l_margin += 1
+    pdf.multi_cell(WIDTH_LEFT - 1, 4, invoice_data['buyer']['address'], border="L", align="L")
+    pdf.l_margin -= 1 # Reset margin
+
     # Email Line
     pdf.set_x(x_buyer_left)
     pdf.set_font("Helvetica", "B", 10)
@@ -780,19 +777,16 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # **2. DRAW RIGHT ORDER DETAILS (Aligned to Left)**
     
+    # Calculate the total height of the content drawn so far on the left side
+    TOTAL_LEFT_CONTENT_HEIGHT = y_buyer_left_end - y_buyer_left_start
+
     # Reset Y to the start of the buyer content block
     pdf.set_xy(x_buyer_left + WIDTH_LEFT, y_buyer_left_start)
     
-    # Row 1: Buyer's Order No/Date (Aligned with Name + Address)
-    
-    # 4mm (Name)
+    # Row 1: Buyer's Order No/Date (Fixed header style)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(WIDTH_INNER_HALF, 4, invoice_data['invoice_details']['buyers_order_no'], border="R", ln=0)
     pdf.cell(WIDTH_INNER_HALF, 4, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1)
-    
-    # buyer_address_block_height (Address)
-    pdf.set_x(x_buyer_left + WIDTH_LEFT)
-    pdf.cell(WIDTH_COL, buyer_address_block_height, "", border="R", ln=1)
     
     # Row 2: Dispatch Doc No/Delivery Note Date Headers
     pdf.set_x(x_buyer_left + WIDTH_LEFT)
@@ -800,7 +794,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Dispatch Document No.", border="LRT", ln=0)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Delivery Note Date", border="RT", ln=1)
     
-    # >>> MODIFICATION 2: Insert space for Dispatch Doc No/Delivery Note Date values
+    # Row 3: Dispatch Doc No/Delivery Note Date values (Space created here)
     pdf.set_x(x_buyer_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "", 10)
     dispatch_doc_no = invoice_data['invoice_details'].get('dispatch_doc_no', '')
@@ -808,31 +802,44 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, dispatch_doc_no, border="LR", ln=0)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, delivery_note_date, border="R", ln=1)
 
-    # Row 3 (Next row): Dispatched Through/Destination Headers (Aligned with Tel line)
+    # Row 4: Dispatched Through/Destination Headers
     pdf.set_x(x_buyer_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Dispatched Through", border="LRT", ln=0)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Destination", border="RT", ln=1)
     
-    # Row 4: Values for Dispatched Through/Destination (Aligned with GST line)
+    # Row 5: Values for Dispatched Through/Destination
     pdf.set_x(x_buyer_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, invoice_data['invoice_details']['dispatched_through'], border="LRB", ln=0)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, invoice_data['invoice_details']['destination'], border="RB", ln=1)
     
-    # Row 5: Terms of delivery (Extra row to match the image structure height)
+    # Row 6: Terms of delivery (Header)
     pdf.set_x(x_buyer_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
     
-    # Add a final closing line below the terms of delivery
-    pdf.set_x(x_buyer_left + WIDTH_LEFT)
-    pdf.cell(WIDTH_COL, 0, "", border="B", ln=1)
+    # Now, calculate the height the right side used
+    y_buyer_right_end = pdf.get_y()
+    
+    # Calculate difference and draw a final empty cell to ensure both columns have the same bottom border
+    HEIGHT_DIFFERENCE = TOTAL_LEFT_CONTENT_HEIGHT - (y_buyer_right_end - y_buyer_left_start)
+    
+    if HEIGHT_DIFFERENCE > 0.1:
+        # If the left side is taller, extend the right border
+        pdf.set_x(x_buyer_left + WIDTH_LEFT)
+        pdf.cell(WIDTH_COL, HEIGHT_DIFFERENCE, "", border="R", ln=1)
+    else:
+        # If the right side is taller or equal, just draw the final bottom line
+        pdf.set_x(x_buyer_left + WIDTH_LEFT)
+        pdf.cell(WIDTH_COL, 0, "", border="B", ln=1)
 
+    # Reset Y to the max height of the two columns (or the actual end if right was taller)
+    pdf.set_y(max(y_buyer_left_end, y_buyer_right_end) + 0.1)
+    
     pdf.ln(8)
-
 
 
 

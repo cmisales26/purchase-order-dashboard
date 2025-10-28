@@ -674,7 +674,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Right Column Block: Invoice Details ---
     
     # Jump to the right column's Y position after the initial header row
-    pdf.set_xy(x_left + 90, y_left_start) 
+    pdf.set_xy(x_left + WIDTH_LEFT, y_left_start) 
     
     # 2. Row: Invoice No./Date Values (Spans 8mm vertically, aligning with 2 address lines)
     pdf.set_font("Helvetica", "", 10)

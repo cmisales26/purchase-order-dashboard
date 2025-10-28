@@ -730,7 +730,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(WIDTH_LEFT, 4, "Baldridge & Associates Structural Engineering Pvt Ltd.", border="L", ln=1)
     
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(WIDTH_LEFT, 4, "406, Sakar East,40mt Tarsali – Danteshwar Ring Road, Vadodara - 390009", border="L")
+    pdf.multi_cell(WIDTH_LEFT, 4, "406, Sakar East,40mt Tarsali - Danteshwar Ring Road, Vadodara - 390009", border="L")
     y_buyer_address_end = pdf.get_y() # Expected height: 8mm (2 lines)
     
     # Email Line 3

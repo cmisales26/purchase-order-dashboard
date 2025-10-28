@@ -611,7 +611,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf = PDF()
     
     # Define constants for consistent column widths
-    # A4 content area is 190mm wide. We use 95mm for each column.
     WIDTH_COL = 95
     WIDTH_LEFT = 95
     WIDTH_RIGHT = 95
@@ -638,7 +637,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_left_start = pdf.get_y()
     line_height = 5
     
-    # Define content for Multi-Cell (Using a default if data is missing)
     address_text = invoice_data['vendor']['address'] if 'address' in invoice_data['vendor'] else "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481"
     
     # **1. DRAW LEFT VENDOR CONTENT (and capture actual height)**
@@ -649,7 +647,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.multi_cell(WIDTH_LEFT, 4, address_text, border="L")
     y_after_address = pdf.get_y()
     
-    # Actual height used by the multi_cell
     address_block_height = y_after_address - y_before_address
     
     # GST No. Line 3
@@ -688,15 +685,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(x_left + WIDTH_LEFT, y_left_start)
     
     # Row 1: Invoice No/Date values (Aligns with Address block)
-    # Use the calculated height of the address block divided by the number of text lines (2 in the image)
-    # Note: If the address wraps more, the RIGHT_HEIGHT_1 will be larger, maintaining alignment.
     if address_block_height > 0:
         RIGHT_HEIGHT_1 = address_block_height / 2
         pdf.set_font("Helvetica", "", 10)
         pdf.cell(WIDTH_INNER_HALF, RIGHT_HEIGHT_1, invoice_data['invoice']['invoice_no'], border="R", ln=0)
         pdf.cell(WIDTH_INNER_HALF, RIGHT_HEIGHT_1, invoice_data['invoice']['date'], border="R", ln=1)
     else:
-        # Fallback if address_block_height is zero (unlikely but safe)
         pdf.cell(WIDTH_COL, 8, "", border="R", ln=1) 
     
     # Row 2: Payment terms (aligned with GST line)
@@ -716,10 +710,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_x(x_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(WIDTH_INNER_HALF, line_height, "Supplier's Ref.", border="LRT", ln=0)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(WIDTH_INNER_HALF, line_height, "", border="RT", ln=1)
     
-    # Row 5: Empty row (aligned with Mobile line)
+    # >>> MODIFICATION 1: Use value from invoice_data for Other Reference(s)
+    other_ref_value = invoice_data['invoice_details'].get('other_reference', '')
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(WIDTH_INNER_HALF, line_height, other_ref_value, border="RT", ln=1)
+    
+    # Row 5: Empty row (aligned with Mobile line) - This can now be used for another value if needed
     pdf.set_x(x_left + WIDTH_LEFT)
     pdf.cell(WIDTH_COL, line_height, "", border="LRB", ln=1)
     
@@ -795,23 +792,29 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # buyer_address_block_height (Address)
     pdf.set_x(x_buyer_left + WIDTH_LEFT)
-    # Use the height calculated from the multi_cell for the empty cell
     pdf.cell(WIDTH_COL, buyer_address_block_height, "", border="R", ln=1)
     
-    # Row 2: Dispatch Doc No/Delivery Note Date (Aligned with Email line)
+    # Row 2: Dispatch Doc No/Delivery Note Date Headers
     pdf.set_x(x_buyer_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Dispatch Document No.", border="LRT", ln=0)
-    pdf.set_font("Helvetica", "", 10)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Delivery Note Date", border="RT", ln=1)
     
-    # Row 3: Dispatched Through/Destination (Aligned with Tel line)
+    # >>> MODIFICATION 2: Insert space for Dispatch Doc No/Delivery Note Date values
+    pdf.set_x(x_buyer_left + WIDTH_LEFT)
+    pdf.set_font("Helvetica", "", 10)
+    dispatch_doc_no = invoice_data['invoice_details'].get('dispatch_doc_no', '')
+    delivery_note_date = invoice_data['invoice_details'].get('delivery_note_date', '')
+    pdf.cell(WIDTH_INNER_HALF, buyer_line_height, dispatch_doc_no, border="LR", ln=0)
+    pdf.cell(WIDTH_INNER_HALF, buyer_line_height, delivery_note_date, border="R", ln=1)
+
+    # Row 3 (Next row): Dispatched Through/Destination Headers (Aligned with Tel line)
     pdf.set_x(x_buyer_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Dispatched Through", border="LR", ln=0)
-    pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Destination", border="R", ln=1)
+    pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Dispatched Through", border="LRT", ln=0)
+    pdf.cell(WIDTH_INNER_HALF, buyer_line_height, "Destination", border="RT", ln=1)
     
-    # Row 4: Values for above (Aligned with GST line)
+    # Row 4: Values for Dispatched Through/Destination (Aligned with GST line)
     pdf.set_x(x_buyer_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(WIDTH_INNER_HALF, buyer_line_height, invoice_data['invoice_details']['dispatched_through'], border="LRB", ln=0)

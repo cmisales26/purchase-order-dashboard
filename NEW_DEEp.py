@@ -593,19 +593,13 @@ class PDF(FPDF):
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
         self.ln(3)
 
-def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "stamp.jpg"):
+def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     
     pdf = PDF()
     pdf.set_auto_page_break(auto=False, margin=10)
     pdf.add_page()
 
-    # --- Logo on top right ---
-    if logo_file:
-        try:
-            pdf.image(logo_file, x=170, y=2.5, w=35)
-        except Exception as e:
-            st.warning(f"Could not add logo: {e}")
-        # --- Header Section ---
+    # --- Header Section ---
     # Company Name and Invoice Details
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(100, 8, "CM Infotech.", ln=0)
@@ -617,14 +611,14 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.multi_cell(100, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=0)
     # Invoice Number and Date
     pdf.set_xy(110, pdf.get_y() - 8)  # Adjust position for multi_cell height
-    pdf.cell(45, 8, "CMI/25-26/G1/010", ln=0)
-    pdf.cell(45, 8, "28 April 2025", ln=1)
+    pdf.cell(45, 8, invoice_data['invoice']['invoice_no'], ln=0)
+    pdf.cell(45, 8, invoice_data['invoice']['date'], ln=1)
 
     # GST and Payment Details
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(40, 6, "GST No. :", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(60, 6, "24ANMPP4891R12X", ln=0)
+    pdf.cell(60, 6, invoice_data['vendor']['gst'], ln=0)
 
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(50, 6, "Mode/Terms of Payment:", ln=0)
@@ -635,7 +629,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(50, 6, "MSME Registration No. :", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 6, "UDYAM-GJ-01-0117646", ln=1)
+    pdf.cell(0, 6, invoice_data['vendor']['msme'], ln=1)
 
     # Email and References
     pdf.set_font("Helvetica", "B", 10)
@@ -665,14 +659,14 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
 
     # Buyer Company Name
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(100, 6, "Baldridge & Associates Structural Engineering Pvt Ltd.", ln=0)
-    pdf.cell(45, 6, "", ln=0)  # Empty for Order No.
+    pdf.cell(100, 6, invoice_data['buyer']['name'], ln=0)
+    pdf.cell(45, 6, invoice_data['invoice_details']['buyers_order_no'], ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(45, 6, "17 April 2025", ln=1)
+    pdf.cell(45, 6, invoice_data['invoice_details']['buyers_order_date'], ln=1)
 
     # Buyer Address
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(100, 4, "406, Sakar East,40mt Tarsali – Danteshwar Ring Road, Vadodara - 390009", ln=0)
+    pdf.multi_cell(100, 4, invoice_data['buyer']['address'], ln=0)
 
     pdf.set_xy(110, pdf.get_y() - 8)
     pdf.set_font("Helvetica", "B", 10)
@@ -684,7 +678,7 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(20, 6, "Email :", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(80, 6, "dmistry@baseengr.com", ln=0)
+    pdf.cell(80, 6, "dmistry@baseengr.com", ln=0)  # You might want to make this dynamic too
 
     pdf.set_xy(110, pdf.get_y())
     pdf.cell(45, 6, "", ln=0)  # Empty for Dispatch Doc No.
@@ -694,33 +688,35 @@ def create_invoice_pdf(invoice_data,logo_file="logo_final.jpg",stamp_file = "sta
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(25, 6, "Tel No. :", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(75, 6, "98987 91813", ln=0)
+    pdf.cell(75, 6, "98987 91813", ln=0)  # You might want to make this dynamic too
 
     pdf.set_xy(110, pdf.get_y())
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(45, 6, "Dispatched Through", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(45, 6, "Destination", ln=1)
+    pdf.cell(45, 6, invoice_data['invoice_details']['destination'], ln=1)
 
     # Buyer GST
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(25, 6, "GST No. :", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(75, 6, "24AAHCB9936E12L", ln=0)
+    pdf.cell(75, 6, invoice_data['buyer']['gst'], ln=0)
 
     pdf.set_xy(110, pdf.get_y())
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(45, 6, "Terms of delivery", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(45, 6, "Vadodara", ln=1)
+    pdf.cell(45, 6, invoice_data['invoice_details']['terms_of_delivery'], ln=1)
 
     # Empty line for delivery terms value
     pdf.cell(100, 6, "", ln=0)
     pdf.set_xy(110, pdf.get_y())
     pdf.cell(45, 6, "", ln=0)
-    pdf.cell(45, 6, "Within Month", ln=1)
+    pdf.cell(45, 6, invoice_data['invoice_details']['dispatched_through'], ln=1)
 
     pdf.ln(8)
+
+    # Continue with the rest of your existing code...
     # --- Item Table Header ---
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)

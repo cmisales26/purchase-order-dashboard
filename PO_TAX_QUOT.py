@@ -1027,35 +1027,15 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
 
     # --- Terms & Conditions ---
-    def format_lines(items):
-        """Format items with consistent alignment"""
-        max_label_length = max(len(label) for label, _ in items)
-        lines = []
-        for label, value in items:
-            lines.append(f"{label:<{max_label_length}} : {value}")
-        return "\n".join(lines)
-
-    # Usage:
     pdf.section_title("Terms & Conditions")
     pdf.set_font("Helvetica", "", 10)
-    terms_items = [
-        ("Taxes", "As specified above"),
-        ("Payment", sanitized_payment_terms),
-        ("Delivery", sanitized_delivery_terms)
-    ]
-    pdf.multi_cell(0, 4, format_lines(terms_items))
+    pdf.multi_cell(0, 4, f"Taxes              : As specified above\nPayment            : {sanitized_payment_terms}\nDelivery           : {sanitized_delivery_terms}")
     pdf.ln(2)
 
     # --- End User ---
     pdf.section_title("End User Details")
     pdf.set_font("Helvetica", "", 10)
-    end_user_items = [
-        ("Company Name", sanitized_end_company),
-        ("Company Address", sanitized_end_address),
-        ("Contact", f"{sanitized_end_person} | {sanitized_end_contact}"),
-        ("Email", sanitized_end_email)
-    ]
-    pdf.multi_cell(0, 4, format_lines(end_user_items))
+    pdf.multi_cell(0, 4, f"Company Name       : {sanitized_end_company}\nCompany Address   : {sanitized_end_address}\nContact           : {sanitized_end_person} | {sanitized_end_contact}\nEmail             : {sanitized_end_email}")
     pdf.ln(2)
     # Authorization Section
     # pdf.set_font("Helvetica", "", 10)

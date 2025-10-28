@@ -1043,8 +1043,8 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     end_user_lines = [
         f"{'Company Name':<21}: {sanitized_end_company}",
         f"{'Company Address':<18}: {sanitized_end_address}",
-        f"{'Contact':<30}: {sanitized_end_person} | {sanitized_end_contact}",
-        f"{'Email':<30}: {sanitized_end_email}"
+        f"{'Contact':<29}: {sanitized_end_person} | {sanitized_end_contact}",
+        f"{'Email':<31}: {sanitized_end_email}"
     ]
     pdf.multi_cell(0, 4, "\n".join(end_user_lines))
     pdf.ln(2)

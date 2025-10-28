@@ -688,7 +688,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if address_block_height > 0:
         RIGHT_HEIGHT_1 = address_block_height / 2
         pdf.set_font("Helvetica", "", 10)
-        pdf.cell(WIDTH_INNER_HALF, RIGHT_HEIGHT_1, invoice_data['invoice']['invoice_no'], border="R", ln=0)
+        pdf.cell(WIDTH_INNER_HALF, RIGHT_HEIGHT_1, invoice_data['invoice']['invoice_no'], border="RL", ln=0)
         pdf.cell(WIDTH_INNER_HALF, RIGHT_HEIGHT_1, invoice_data['invoice']['date'], border="R", ln=1)
     else:
         pdf.cell(WIDTH_COL, 8, "", border="R", ln=1) 
@@ -709,7 +709,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Row 4: Supplier's Ref (aligned with Email line)
     pdf.set_x(x_left + WIDTH_LEFT)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(WIDTH_INNER_HALF, line_height, "Supplier's Ref.", border="LRT", ln=0)
+    pdf.cell(WIDTH_INNER_HALF, line_height, "Supplier's Ref.", border="LR", ln=0)
     
     # >>> MODIFICATION 1: Use value from invoice_data for Other Reference(s)
     other_ref_value = invoice_data['invoice_details'].get('other_reference', '')

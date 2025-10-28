@@ -629,7 +629,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(50, 6, "Mode/Terms of Payment:", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(50, 0, "100% Advance with Purchase Order", ln=1)
+    pdf.cell(0, 6, "100% Advance with Purchase Order", ln=1)
 
     # MSME Registration
     pdf.set_font("Helvetica", "B", 10)

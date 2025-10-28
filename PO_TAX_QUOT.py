@@ -307,9 +307,9 @@ def add_page_one_intro(pdf, data):
     
 def add_quotation_header(pdf, annexure_text, quotation_text):
     """Add dynamic quotation header with both annexure and title"""
-    pdf.set_font("Helvetica", "B","U", 14)
+    pdf.set_font("Helvetica", "BU", 14)
     pdf.cell(0, 8, annexure_text, ln=True, align="C")
-    pdf.set_font("Helvetica", "B","U", 12)
+    pdf.set_font("Helvetica", "BU", 12)
     pdf.cell(0, 6, quotation_text, ln=True, align="C")
     pdf.ln(8)
 

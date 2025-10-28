@@ -160,7 +160,7 @@ class QUOTATION_PDF(FPDF):
         # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
         
         # Email and phone on same line - FIXED
-        email_text = " info@cminfotech.com"
+        email_text = " info@cminfotech.com "
         phone_text = " +91 873 391 5721"
         
         # Calculate positions for proper alignment

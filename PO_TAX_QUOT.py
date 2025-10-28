@@ -1041,10 +1041,10 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.section_title("End User Details")
     pdf.set_font("Helvetica", "", 10)
     end_user_lines = [
-        f"{'Company Name':<19}: {sanitized_end_company}",
+        f"{'Company Name':<20}: {sanitized_end_company}",
         f"{'Company Address':<18}: {sanitized_end_address}",
-        f"{'Contact':<20}: {sanitized_end_person} | {sanitized_end_contact}",
-        f"{'Email':<22}: {sanitized_end_email}"
+        f"{'Contact':<25}: {sanitized_end_person} | {sanitized_end_contact}",
+        f"{'Email':<28}: {sanitized_end_email}"
     ]
     pdf.multi_cell(0, 4, "\n".join(end_user_lines))
     pdf.ln(2)

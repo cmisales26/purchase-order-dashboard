@@ -675,7 +675,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.multi_cell(100, 4, invoice_data['buyer']['address'])
     y_after_buyer_address = pdf.get_y()
 
-    pdf.set_xy(100, y_before_buyer_address)
+    pdf.set_xy(115, y_before_buyer_address)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(45, 6, "Dispatch Document No.", ln=0)
     pdf.set_font("Helvetica", "", 10)

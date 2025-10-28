@@ -640,7 +640,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Address Line 1-2 (Multi-cell)
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(WIDTH_LEFT, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481", border="L", ln=0)
+    pdf.multi_cell(WIDTH_LEFT, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481", border="L")
     y_address_end = pdf.get_y() # Expected height: 8mm (2 lines)
 
     # GST No. Line 3
@@ -729,7 +729,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(WIDTH_LEFT, 4, "Baldridge & Associates Structural Engineering Pvt Ltd.", border="L", ln=1)
     
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(WIDTH_LEFT, 4, "406, Sakar East,40mt Tarsali – Danteshwar Ring Road, Vadodara - 390009", border="L", ln=0)
+    pdf.multi_cell(WIDTH_LEFT, 4, "406, Sakar East,40mt Tarsali – Danteshwar Ring Road, Vadodara - 390009", border="L")
     y_buyer_address_end = pdf.get_y() # Expected height: 8mm (2 lines)
     
     # Email Line 3
@@ -800,6 +800,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(20, 5, "Quantity", border=1, align="C")
     pdf.cell(25, 5, "Unit Rate", border=1, align="C")
     pdf.cell(30, 5, "Amount", border=1, ln=True, align="C")
+    
 
     # --- Items ---
     pdf.set_font("Helvetica", "", 8)

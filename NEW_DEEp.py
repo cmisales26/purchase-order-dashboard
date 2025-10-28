@@ -603,7 +603,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Company Name and Invoice Details - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(115, 8, "CM Infotech.", ln=0)
-    pdf.cell(45, 8, "Invoice No.", ln=0)
+    pdf.cell(35, 8, "Invoice No.", ln=0)
     pdf.cell(45, 8, "Invoice Date", ln=1)
 
     pdf.set_font("Helvetica", "", 10)
@@ -612,7 +612,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_start = pdf.get_y()
     
     # Company Address
-    pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
+    pdf.multi_cell(90, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
     
     # GST No
     pdf.set_font("Helvetica", "B", 10)

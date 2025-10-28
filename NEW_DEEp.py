@@ -600,124 +600,153 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.add_page()
 
     # --- Header Section ---
-    # Company Name and Invoice Details
+    # Company Name and Invoice Details - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(100, 8, "CM Infotech.", ln=0)
     pdf.cell(45, 8, "Invoice No.", ln=0)
     pdf.cell(45, 8, "Invoice Date", ln=1)
 
     pdf.set_font("Helvetica", "", 10)
+    
+    # Left Column: Company Details
+    y_start = pdf.get_y()
+    
     # Company Address
-    y_before_address = pdf.get_y()
-    pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
-    y_after_address = pdf.get_y()
-
-    # Invoice Number and Date
-    pdf.set_xy(115, y_before_address)
-    pdf.cell(45, 8, invoice_data['invoice']['invoice_no'], ln=0)
-    pdf.cell(45, 8, invoice_data['invoice']['date'], ln=1)
-
-    # Reset Y position
-    pdf.set_y(max(y_after_address, pdf.get_y()))
-
-    # GST and Payment Details
+    pdf.multi_cell(100, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
+    
+    # GST No
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(40, 6, "GST No. :", ln=0)
+    pdf.cell(25, 6, "GST No. :", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(60, 6, invoice_data['vendor']['gst'], ln=0)
-
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(50, 6, "Mode/Terms of Payment:", ln=0)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 6, "100% Advance with Purchase Order", ln=1)
-
+    pdf.cell(0, 6, invoice_data['vendor']['gst'], ln=1)
+    
     # MSME Registration
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(50, 6, "MSME Registration No. :", ln=0)
+    pdf.cell(40, 6, "MSME Registration No. :", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(0, 6, invoice_data['vendor']['msme'], ln=1)
-
-    # Email and References
+    
+    # Email
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(25, 6, "E-Mail :", ln=0)
+    pdf.cell(15, 6, "E-Mail :", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(75, 6, "cm.infotech2014@gmail.com", ln=0)
-
+    pdf.cell(0, 6, "cm.infotech2014@gmail.com", ln=1)
+    
+    # Mobile
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(22, 6, "Mobile No. :", ln=0)
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(0, 6, "8733915721", ln=1)
+    
+    y_left_end = pdf.get_y()
+    
+    # Right Column: Invoice Details - PROPERLY ALIGNED
+    pdf.set_xy(110, y_start)
+    
+    # Invoice Number
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(45, 6, invoice_data['invoice']['invoice_no'], ln=1)
+    
+    # Invoice Date
+    pdf.set_x(110)
+    pdf.cell(45, 6, invoice_data['invoice']['date'], ln=1)
+    
+    pdf.set_x(110)
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(45, 6, "Mode/Terms of Payment:", ln=1)
+    pdf.set_x(110)
+    pdf.set_font("Helvetica", "", 10)
+    pdf.multi_cell(80, 4, "100% Advance with Purchase Order")
+    
+    pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(35, 6, "Supplier's Ref.", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(35, 6, "Other Reference(s)", ln=1)
+    
+    y_right_end = pdf.get_y()
+    
+    # Reset to max Y position
+    pdf.set_y(max(y_left_end, y_right_end))
+    pdf.ln(8)
 
-    # Mobile Number
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(30, 6, "Mobile No. :", ln=0)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 6, "8733915721", ln=1)
-
-    pdf.ln(4)
-
-    # --- Buyer Section ---
+    # --- Buyer Section --- FIXED ALIGNMENT
     # Buyer Header
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(100, 8, "Buyer", ln=0)
     pdf.cell(45, 8, "Buyer's Order No.", ln=0)
     pdf.cell(45, 8, "Buyer's Order Date", ln=1)
 
-    # Buyer Company Name
+    y_buyer_start = pdf.get_y()
+    
+    # Left Column: Buyer Details
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(100, 6, invoice_data['buyer']['name'], ln=0)
-    pdf.cell(45, 6, invoice_data['invoice_details']['buyers_order_no'], ln=0)
+    pdf.cell(100, 6, invoice_data['buyer']['name'], ln=1)
+    
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(45, 6, invoice_data['invoice_details']['buyers_order_date'], ln=1)
-
-    # Buyer Address - fix multi_cell positioning
-    y_before_buyer_address = pdf.get_y()
     pdf.multi_cell(100, 4, invoice_data['buyer']['address'])
-    y_after_buyer_address = pdf.get_y()
-
-    pdf.set_xy(115, y_before_buyer_address)
+    
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(45, 6, "Dispatch Document No.", ln=0)
+    pdf.cell(15, 6, "Email :", ln=0)
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(0, 6, "dmistry@baseengr.com", ln=1)
+    
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(18, 6, "Tel No. :", ln=0)
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(0, 6, "98987 91813", ln=1)
+    
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(18, 6, "GST No. :", ln=0)
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(0, 6, invoice_data['buyer']['gst'], ln=1)
+    
+    y_buyer_left_end = pdf.get_y()
+    
+    # Right Column: Order Details - PROPERLY ALIGNED
+    pdf.set_xy(110, y_buyer_start)
+    
+    # Buyer's Order No
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(45, 6, invoice_data['invoice_details']['buyers_order_no'], ln=1)
+    
+    # Buyer's Order Date
+    pdf.set_x(110)
+    pdf.cell(45, 6, invoice_data['invoice_details']['buyers_order_date'], ln=1)
+    
+    pdf.set_x(110)
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(45, 6, "Dispatch Document No.", ln=1)
+    pdf.set_x(110)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(45, 6, "Delivery Note Date", ln=1)
-
-    # Reset Y position
-    pdf.set_y(max(y_after_buyer_address, pdf.get_y()))
-
-    # Continue with the rest of your buyer section...
-    # Buyer Email
+    
+    pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(20, 6, "Email :", ln=0)
+    pdf.cell(45, 6, "Dispatched Through", ln=1)
+    pdf.set_x(110)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(80, 6, "dmistry@baseengr.com", ln=0)
-
-    pdf.cell(45, 6, "", ln=0)  # Empty for Dispatch Doc No.
-    pdf.cell(45, 6, "", ln=1)  # Empty for Delivery Note Date
-
-    # Buyer Phone
+    pdf.cell(45, 6, invoice_data['invoice_details']['dispatched_through'], ln=1)
+    
+    pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(25, 6, "Tel No. :", ln=0)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(75, 6, "98987 91813", ln=0)
-
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(45, 6, "Dispatched Through", ln=0)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(45, 6, invoice_data['invoice_details']['destination'], ln=1)
-
-    # Buyer GST
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(25, 6, "GST No. :", ln=0)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(75, 6, invoice_data['buyer']['gst'], ln=0)
-
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(45, 6, "Terms of delivery", ln=0)
+    pdf.cell(45, 6, "Terms of delivery", ln=1)
+    pdf.set_x(110)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(45, 6, invoice_data['invoice_details']['terms_of_delivery'], ln=1)
-
+    
+    pdf.set_x(110)
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(45, 6, "Destination", ln=1)
+    pdf.set_x(110)
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(45, 6, invoice_data['invoice_details']['destination'], ln=1)
+    
+    y_buyer_right_end = pdf.get_y()
+    
+    # Reset to max Y position
+    pdf.set_y(max(y_buyer_left_end, y_buyer_right_end))
     pdf.ln(8)
-
     # --- Item Table Header ---
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)

@@ -445,7 +445,7 @@ def add_page_two_commercials(pdf, data):
     # Terms & Conditions header
     pdf.set_xy(x_start + padding, y_start + padding)
     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font("Helvetica", "B", 9)
     
     # Terms content
     terms_y = pdf.get_y()

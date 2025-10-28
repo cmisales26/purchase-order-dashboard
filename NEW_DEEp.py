@@ -647,9 +647,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # 3. Row: GST No (Left) and Mode/Terms of Payment Header (Right)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(15, 6, "GST No:", border="L", ln=0)
+    pdf.cell(95, 6, "GST No:", border="L", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(WIDTH_COL - 15, 6, invoice_data['vendor']['gst'], border="R", ln=0)
+    pdf.cell(WIDTH_COL - 95, 6, invoice_data['vendor']['gst'], border="R", ln=0)
     
     # Right Column: Mode/Terms of Payment Header
     pdf.set_font("Helvetica", "B", 10)

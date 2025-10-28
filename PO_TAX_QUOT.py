@@ -1033,17 +1033,17 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # Taxes
     pdf.cell(45, 4, "Taxes")
     pdf.cell(5, 4, ":")
-    pdf.multi_cell(0, 4, f" As specified above")
+    pdf.multi_cell(0, 4, f"As specified above")
 
     # Payment
     pdf.cell(45, 4, "Payment")
     pdf.cell(5, 4, ":")
-    pdf.multi_cell(0, 4, f" {sanitized_payment_terms}")
+    pdf.multi_cell(0, 4, f"{sanitized_payment_terms}")
 
     # Delivery
     pdf.cell(45, 4, "Delivery")
     pdf.cell(5, 4, ":")
-    pdf.multi_cell(0, 4, f" {sanitized_delivery_terms}")
+    pdf.multi_cell(0, 4, f"{sanitized_delivery_terms}")
 
     pdf.ln(2)
 
@@ -1054,22 +1054,22 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # Company Name
     pdf.cell(45, 4, "Company Name")
     pdf.cell(5, 4, ":")
-    pdf.multi_cell(0, 4, f" {sanitized_end_company}")
+    pdf.multi_cell(0, 4, f"{sanitized_end_company}")
 
     # Company Address
     pdf.cell(45, 4, "Company Address")
     pdf.cell(5, 4, ":")
-    pdf.multi_cell(0, 4, f" {sanitized_end_address}")
+    pdf.multi_cell(0, 4, f"{sanitized_end_address}")
 
     # Contact
     pdf.cell(45, 4, "Contact")
     pdf.cell(5, 4, ":")
-    pdf.multi_cell(0, 4, f" {sanitized_end_person} | {sanitized_end_contact}")
+    pdf.multi_cell(0, 4, f"{sanitized_end_person} | {sanitized_end_contact}")
 
     # Email
     pdf.cell(45, 4, "Email")
     pdf.cell(5, 4, ":")
-    pdf.multi_cell(0, 4, f" {sanitized_end_email}")
+    pdf.multi_cell(0, 4, f"{sanitized_end_email}")
 
     pdf.ln(2)
     # Authorization Section

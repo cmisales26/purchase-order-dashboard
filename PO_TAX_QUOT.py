@@ -1029,24 +1029,48 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # --- Terms & Conditions ---
     pdf.section_title("Terms & Conditions")
     pdf.set_font("Helvetica", "", 10)
-    terms_lines = [
-        f"{'Taxes':<15}: As specified above",
-        f"{'Payment':<15}: {sanitized_payment_terms}",
-        f"{'Delivery':<15}: {sanitized_delivery_terms}"
-    ]
-    pdf.multi_cell(0, 4, "\n".join(terms_lines))
+
+    # Taxes
+    pdf.cell(45, 4, "Taxes")
+    pdf.cell(5, 4, ":")
+    pdf.multi_cell(0, 4, f" As specified above")
+
+    # Payment
+    pdf.cell(45, 4, "Payment")
+    pdf.cell(5, 4, ":")
+    pdf.multi_cell(0, 4, f" {sanitized_payment_terms}")
+
+    # Delivery
+    pdf.cell(45, 4, "Delivery")
+    pdf.cell(5, 4, ":")
+    pdf.multi_cell(0, 4, f" {sanitized_delivery_terms}")
+
     pdf.ln(2)
 
     # --- End User ---
     pdf.section_title("End User Details")
     pdf.set_font("Helvetica", "", 10)
-    end_user_lines = [
-        f"{'Company Name':<15}: {sanitized_end_company}",
-        f"{'Company Address':<15}: {sanitized_end_address}",
-        f"{'Contact':<15}: {sanitized_end_person} | {sanitized_end_contact}",
-        f"{'Email':<15}: {sanitized_end_email}"
-    ]
-    pdf.multi_cell(0, 4, "\n".join(end_user_lines))
+
+    # Company Name
+    pdf.cell(45, 4, "Company Name")
+    pdf.cell(5, 4, ":")
+    pdf.multi_cell(0, 4, f" {sanitized_end_company}")
+
+    # Company Address
+    pdf.cell(45, 4, "Company Address")
+    pdf.cell(5, 4, ":")
+    pdf.multi_cell(0, 4, f" {sanitized_end_address}")
+
+    # Contact
+    pdf.cell(45, 4, "Contact")
+    pdf.cell(5, 4, ":")
+    pdf.multi_cell(0, 4, f" {sanitized_end_person} | {sanitized_end_contact}")
+
+    # Email
+    pdf.cell(45, 4, "Email")
+    pdf.cell(5, 4, ":")
+    pdf.multi_cell(0, 4, f" {sanitized_end_email}")
+
     pdf.ln(2)
     # Authorization Section
     # pdf.set_font("Helvetica", "", 10)

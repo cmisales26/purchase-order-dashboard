@@ -581,262 +581,158 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
             return b""
 
 from fpdf import FPDF
-# NOTE: Assuming 'PDF' is a subclass of FPDF or FPDF itself.
 
 # --- PDF Class for Tax Invoice ---
 class PDF(FPDF):
     def __init__(self):
         super().__init__()
         self.set_font("Helvetica", "", 8)
-        # Use 10mm margins for 190mm content width
         self.set_left_margin(10)
         self.set_right_margin(9)
 
     def header(self):
         self.set_y(10)
-        # Placeholder for Logo/Company Name (as seen in image_7000da.png)
-        # Assuming the logo is roughly 30mm wide and 15mm high and aligned right.
-        # If 'logo_final.jpg' exists and is used in the final implementation, you'd add it here.
-        # pdf.image(logo_file, 160, 10, 30, 15) 
-
         self.set_font("Helvetica", "BU", 12)
-        # Center the title below the logo area
         self.set_xy(10, 25)
         self.cell(0, 5, "TAX INVOICE", 0, 1, "C")
-        self.set_y(35) # Start content below the tax invoice header
+        self.set_y(35)
 
 
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
-    
     pdf = PDF()
-    
     pdf.set_auto_page_break(auto=False, margin=10)
     pdf.add_page()
-    
-    # --- VENDOR (CM Infotech) SECTION ---
-    
-    y_start_vendor = pdf.get_y()
-    
-    # 1. Row: CM Infotech Title (Left) and Invoice Info Headers (Right)
+
+    # --- Vendor Section (CM Infotech) ---
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(95, 6, "CM Infotech.", border="LRT", ln=0)
-    
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(47.5, 6, "Invoice No.", border="RT", ln=0)
-    pdf.cell(47.5, 6, "Invoice Date", border="RT", ln=1)
-    
-    # --- Address and GST Block vs. Invoice Details Block ---
-    
+    pdf.cell(47, 6, "Invoice No.", border="RT", ln=0)
+    pdf.cell(47, 6, "Invoice Date", border="RT", ln=1)
+
     x_left = pdf.get_x()
     y_left_start = pdf.get_y()
-    line_height = 5
-    
-    address_text = invoice_data['vendor']['address'] if 'address' in invoice_data['vendor'] else "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481"
-    
-    # **1. DRAW LEFT VENDOR CONTENT (and capture actual height)**
-    
-    # Address Line 1-2 (Multi-cell)
+
     pdf.set_font("Helvetica", "", 10)
     y_before_address = pdf.get_y()
-    pdf.multi_cell(95, 4, address_text, border="L")
+    pdf.multi_cell(95, 4, invoice_data['vendor'].get('address', "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Ahmedabad - 382481"), border="L")
     y_after_address = pdf.get_y()
-    
-    address_block_height = y_after_address - y_before_address
-    
-    # GST No. Line 3
-    pdf.set_x(x_left)
+
+    # GST No
+    pdf.set_x(10)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(20, line_height, "GST No. :", border="L", ln=0)
+    pdf.cell(20, 5, "GST No. :", border="L", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(75, line_height, invoice_data['vendor']['gst'], border="R", ln=1)
-    
-    # MSME Line 4
-    pdf.set_x(x_left)
+    pdf.cell(75, 5, invoice_data['vendor']['gst'], border="R", ln=1)
+
+    # MSME
+    pdf.set_x(10)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(45, line_height, "MSME Registration No. :", border="L", ln=0)
+    pdf.cell(45, 5, "MSME Registration No. :", border="L", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(50, line_height, invoice_data['vendor']['msme'], border="R", ln=1)
-    
-    # E-Mail Line 5
-    pdf.set_x(x_left)
+    pdf.cell(50, 5, invoice_data['vendor']['msme'], border="R", ln=1)
+
+    # E-Mail
+    pdf.set_x(10)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(20, line_height, "E-Mail :", border="L", ln=0)
+    pdf.cell(20, 5, "E-Mail :", border="L", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(75, line_height, "cm.infotech2014@gmail.com", border="R", ln=1)
-    
-    # Mobile No. Line 6 (Closing border on bottom left)
-    pdf.set_x(x_left)
+    pdf.cell(75, 5, "cm.infotech2014@gmail.com", border="R", ln=1)
+
+    # Mobile
+    pdf.set_x(10)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(25, line_height, "Mobile No. :", border="LB", ln=0)
+    pdf.cell(25, 5, "Mobile No. :", border="LB", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(70, line_height, "8733915721", border="RB", ln=1)
-    
+    pdf.cell(70, 5, "8733915721", border="RB", ln=1)
+
     y_left_end = pdf.get_y()
-    
-    # **2. DRAW RIGHT VENDOR CONTENT (Aligned to Left)**
-    
-    # Reset Y to the start of the content block
-    pdf.set_xy(x_left + 95, y_left_start)
-    
-    # Row 1: Invoice No/Date values (Aligns with Address block)
-    if address_block_height > 0:
-        address_half_height = address_block_height / 2
-        pdf.set_font("Helvetica", "", 10)
-        pdf.cell(47.5, address_half_height, invoice_data['invoice']['invoice_no'], border="RL", ln=0)
-        pdf.cell(47.5, address_half_height, invoice_data['invoice']['date'], border="R", ln=1)
-    else:
-        pdf.cell(95, 8, "", border="R", ln=1) 
-    
-    # Row 2: Payment terms (aligned with GST line)
-    pdf.set_x(x_left + 95)
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(47.5, line_height, "Mode/Terms of Payment:", border="LRT", ln=0)
+
+    # --- Right Side (Invoice Details) ---
+    pdf.set_xy(105, y_left_start)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(47.5, line_height, "100% Advance with Purchase", border="RT", ln=1)
-    
-    # Row 3: Order/Other Reference (aligned with MSME line)
-    pdf.set_x(x_left + 95)
-    pdf.cell(47.5, line_height, "Order", border="LRB", ln=0)
+    pdf.cell(47, 10, invoice_data['invoice']['invoice_no'], border="R", ln=0)
+    pdf.cell(47, 10, invoice_data['invoice']['date'], border="R", ln=1)
+
+    # Mode/Terms of Payment
+    pdf.set_x(105)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(47.5, line_height, "Other Reference(s)", border="RB", ln=1)
-    
-    # Row 4: Supplier's Ref (aligned with Email line)
-    pdf.set_x(x_left + 95)
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(47.5, line_height, "Supplier's Ref.", border="LRT", ln=0)
-    
-    other_ref_value = invoice_data['invoice_details'].get('other_reference', '')
+    pdf.cell(47, 5, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(47.5, line_height, other_ref_value, border="RT", ln=1)
-    
-    # Row 5: Empty row (aligned with Mobile line)
-    pdf.set_x(x_left + 95)
-    pdf.cell(95, line_height, "", border="LRB", ln=1)
-    
-    # --- BUYER (Baldridge) SECTION ---
-    
-    pdf.set_y(y_left_end + 2) # Gap between sections
-    
-    y_buyer_start = pdf.get_y()
-    
-    # 1. Row: Buyer Header (Left) and Order Info Headers (Right)
+    pdf.cell(47, 5, invoice_data['invoice'].get('payment_terms', '100% Advance with Purchase'), border="RT", ln=1)
+
+    # Supplier Ref / Other Reference
+    pdf.set_x(105)
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(47, 5, "Supplier's Ref.", border="LRT", ln=0)
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(47, 5, invoice_data['invoice_details'].get('other_reference', ''), border="RT", ln=1)
+
+    pdf.set_x(105)
+    pdf.cell(94, 5, "", border="LRB", ln=1)
+
+    # --- Buyer Section ---
+    pdf.set_y(y_left_end + 3)
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(95, 6, "Buyer", border="LRT", ln=0)
-    
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(47.5, 6, "Buyer's Order No.", border="RT", ln=0)
-    pdf.cell(47.5, 6, "Buyer's Order Date", border="RT", ln=1)
+    pdf.cell(47, 6, "Buyer's Order No.", border="RT", ln=0)
+    pdf.cell(47, 6, "Buyer's Order Date", border="RT", ln=1)
 
-    # --- Buyer Details Block vs. Order Details Block ---
-
-    x_buyer_left = pdf.get_x()
     y_buyer_left_start = pdf.get_y()
-    
-    buyer_line_height = 5
-    
-    # **1. DRAW LEFT BUYER CONTENT (and capture actual height)**
-    
-    # Store the starting Y position for the entire left buyer block
-    y_left_buyer_block_start = pdf.get_y()
-    
-    # Buyer Name (1 line = 4mm)
+
+    # Buyer Name + Address
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(95, 4, invoice_data['buyer']['name'], border="L", ln=1)
-    
-    # Address (Multi-cell) - This will determine the variable height
+    pdf.cell(95, 5, invoice_data['buyer']['name'], border="L", ln=1)
     pdf.set_font("Helvetica", "", 10)
     pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="L")
-    
-    # Email Line
-    pdf.set_x(x_buyer_left)
+
+    # Email
+    pdf.set_x(10)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(18, buyer_line_height, "Email :", border="L", ln=0)
+    pdf.cell(18, 5, "Email :", border="L", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(77, buyer_line_height, "dmistry@baseengr.com", border="R", ln=1)
-    
-    # Tel No. Line
-    pdf.set_x(x_buyer_left)
+    pdf.cell(77, 5, "dmistry@baseengr.com", border="R", ln=1)
+
+    # Tel No
+    pdf.set_x(10)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(18, buyer_line_height, "Tel No. :", border="L", ln=0)
+    pdf.cell(18, 5, "Tel No. :", border="L", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(77, buyer_line_height, "98987 91813", border="R", ln=1)
-    
-    # GST No. Line (Closing border on bottom left)
-    pdf.set_x(x_buyer_left)
+    pdf.cell(77, 5, "98987 91813", border="R", ln=1)
+
+    # GST
+    pdf.set_x(10)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(20, buyer_line_height, "GST No. :", border="LB", ln=0)
+    pdf.cell(20, 5, "GST No. :", border="LB", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(75, buyer_line_height, invoice_data['buyer']['gst'], border="RB", ln=1)
-    
+    pdf.cell(75, 5, invoice_data['buyer']['gst'], border="RB", ln=1)
+
     y_buyer_left_end = pdf.get_y()
-    
-    # Calculate total height of left buyer block
-    total_left_buyer_height = y_buyer_left_end - y_left_buyer_block_start
-    
-    # **2. DRAW RIGHT ORDER DETAILS (Aligned to Left)**
-    
-    # Reset Y to the start of the buyer content block
-    pdf.set_xy(x_buyer_left + 95, y_buyer_left_start)
-    
-    # Row 1: Buyer's Order No/Date - FIXED HEIGHT (don't stretch with address)
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(47.5, 4, invoice_data['invoice_details']['buyers_order_no'], border="R", ln=0)
-    pdf.cell(47.5, 4, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1)
-    
-    # Calculate remaining height for the address space
-    name_height = 4  # Height of buyer name
-    remaining_height_for_address = total_left_buyer_height - name_height - (3 * buyer_line_height)  # Subtract name and 3 lines (email, tel, gst)
-    
-    # If address takes extra space, add it here (but keep Buyer's Order No/Date fixed)
-    if remaining_height_for_address > 0:
-        pdf.set_x(x_buyer_left + 95)
-        pdf.cell(95, remaining_height_for_address, "", border="R", ln=1)
-    
-    # Row 2: Dispatch Doc No/Delivery Note Date Headers
-    pdf.set_x(x_buyer_left + 95)
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(47.5, buyer_line_height, "Dispatch Document No.", border="LRT", ln=0)
-    pdf.cell(47.5, buyer_line_height, "Delivery Note Date", border="RT", ln=1)
-    
-    # Row 3: Dispatch Doc No/Delivery Note Date Values
-    pdf.set_x(x_buyer_left + 95)
-    pdf.set_font("Helvetica", "", 10)
-    dispatch_doc_no = invoice_data['invoice_details'].get('dispatch_doc_no', '')
-    delivery_note_date = invoice_data['invoice_details'].get('delivery_note_date', '')
-    pdf.cell(47.5, buyer_line_height, dispatch_doc_no, border="LR", ln=0)
-    pdf.cell(47.5, buyer_line_height, delivery_note_date, border="R", ln=1)
 
-    # Row 4: Dispatched Through/Destination Headers
-    pdf.set_x(x_buyer_left + 95)
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(47.5, buyer_line_height, "Dispatched Through", border="LRT", ln=0)
-    pdf.cell(47.5, buyer_line_height, "Destination", border="RT", ln=1)
-    
-    # Row 5: Values for Dispatched Through/Destination
-    pdf.set_x(x_buyer_left + 95)
+    # --- Right Side (Order Details) ---
+    pdf.set_xy(105, y_buyer_left_start)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(47.5, buyer_line_height, invoice_data['invoice_details']['dispatched_through'], border="LRB", ln=0)
-    pdf.cell(47.5, buyer_line_height, invoice_data['invoice_details']['destination'], border="RB", ln=1)
-    
-    # Row 6: Terms of delivery
-    pdf.set_x(x_buyer_left + 95)
+    pdf.cell(47, 5, invoice_data['invoice_details']['buyers_order_no'], border="R", ln=0)
+    pdf.cell(47, 5, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1)
+
+    pdf.set_x(105)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(47.5, buyer_line_height, "Terms of delivery", border="LRT", ln=0)
+    pdf.cell(47, 5, "Dispatched Through", border="LRT", ln=0)
+    pdf.cell(47, 5, "Destination", border="RT", ln=1)
+
+    pdf.set_x(105)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(47.5, buyer_line_height, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
-    
-    # Add a final closing line if needed to match total height
-    current_right_y = pdf.get_y()
-    expected_right_y = y_buyer_left_start + total_left_buyer_height
-    
-    if current_right_y < expected_right_y:
-        # Add empty space to match heights
-        pdf.set_x(x_buyer_left + 95)
-        height_diff = expected_right_y - current_right_y
-        pdf.cell(95, height_diff, "", border="LRB", ln=1)
+    pdf.cell(47, 5, invoice_data['invoice_details']['dispatched_through'], border="LRB", ln=0)
+    pdf.cell(47, 5, invoice_data['invoice_details']['destination'], border="RB", ln=1)
 
-    pdf.ln(8)
+    pdf.set_x(105)
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(47, 5, "Terms of delivery", border="LRT", ln=0)
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(47, 5, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
 
+    pdf.ln(10)
 
 
     # --- Item Table Header ---

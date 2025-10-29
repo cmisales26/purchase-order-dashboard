@@ -661,7 +661,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(47, 8, "Supplier's Reference:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    other_ref_value = invoice_data['invoice_details'].get('other_reference', '')
+    other_ref_value = invoice_data['Reference']['Suppliers_Reference']
     pdf.cell(47, 8, other_ref_value, border="RTB", ln=1)
 
     # Other's reference
@@ -669,7 +669,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(47, 8, "Other's Reference:", border="LRTB", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    other_ref_value = invoice_data['invoice_details'].get('other_reference', '')
+    other_ref_value = invoice_data['Reference']['Other']
     pdf.cell(47, 8, other_ref_value, border="LRTB", ln=1)
 
     # # Empty closing row
@@ -1260,6 +1260,8 @@ def main():
             st.subheader("Invoice Details")
             invoice_no = st.text_input("Invoice No", "CMI/25-26/Q1/010")
             invoice_date = st.text_input("Invoice Date", "28 April 2025")
+            Suppliers_Reference = st.text_input("Supplier's Reference", "NA")
+            Others_Reference = st.text_input("Other's Reference", "NA")
             buyers_order_no = st.text_input("Buyer's Order No.", "Online")
             buyers_order_date = st.text_input("Buyer's Order Date", "17 April 2025")
             dispatched_through = st.text_input("Dispatched Through", "Online")
@@ -1324,6 +1326,7 @@ def main():
 
                 invoice_data = {
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},
+                    "Reference": {"Suppliers_Reference":Suppliers_Reference, "Other": Others_Reference},
                     "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
                     "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
                     "invoice_details": {

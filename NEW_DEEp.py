@@ -888,7 +888,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.multi_cell(0, 4, invoice_data['declaration'])
     
     # --- Signature ---
-    pdf.ln(5)
+    pdf.ln(3)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
 

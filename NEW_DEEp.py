@@ -664,9 +664,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     other_ref_value = invoice_data['invoice_details'].get('other_reference', '')
     pdf.cell(47, 6, other_ref_value, border="RT", ln=1)
 
-    # Empty closing row
-    pdf.set_x(110)
-    pdf.cell(94, 6, "", border="LRB", ln=1)
+    # # Empty closing row
+    # pdf.set_x(110)
+    # pdf.cell(94, 6, "", border="LRB", ln=1)
 
     pdf.ln(6)
 

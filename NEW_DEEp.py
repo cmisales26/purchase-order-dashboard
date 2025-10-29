@@ -682,10 +682,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer address
     pdf.set_font("Helvetica", "", 8)
-    address_lines = pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="L", split_only=True)
-    address_height = len(address_lines) * 4
-    
-    # Draw the address
     pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="L")
     
     # Buyer contact details
@@ -716,7 +712,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Calculate space needed for address
     name_height = 5
-    contact_height = 15  # 3 lines × 5mm
+    contact_height = 15
     address_space = total_left_height - name_height - contact_height
     
     # Add space for address

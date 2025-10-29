@@ -875,11 +875,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(0, 5, "Company's Bank Details", ln=True)
     pdf.set_font("Helvetica", "", 8)
     pdf.multi_cell(0, 4,
-        f"Bank Name: {invoice_data['bank']['name']}\n"
-        f"Branch: {invoice_data['bank']['branch']}\n"
-        f"Account No.: {invoice_data['bank']['account_no']}\n"
-        f"IFS Code: {invoice_data['bank']['ifsc']}"
-    )
+            f"Bank Nmae: IDFC FIRST\n"
+            "Branch: AHMEDABAD Shyamal Branch\n"
+            "Account No: 88130420182\n"
+            "IFS Code: IDFB0040335")
+    #     f"Bank Name: {invoice_data['bank']['name']}\n"
+    #     f"Branch: {invoice_data['bank']['branch']}\n"
+    #     f"Account No.: {invoice_data['bank']['account_no']}\n"
+    #     f"IFS Code: {invoice_data['bank']['ifsc']}"
+    # )
 
     # --- Declaration ---
     pdf.ln(2)

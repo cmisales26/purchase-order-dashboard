@@ -684,7 +684,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer name and address
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(95, 5, invoice_data['buyer']['name'], border="L", ln=1)
+    pdf.cell(95, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
     pdf.set_font("Helvetica", "", 8)
     pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="L")

@@ -638,7 +638,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Right Side (Invoice Details) ---
     pdf.set_xy(110, y_left_start)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 8, invoice_data['invoice']['invoice_no'], border="R", ln=0, align="C")
+    pdf.cell(47, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="C")
     pdf.cell(47, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
 
     # Payment terms

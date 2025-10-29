@@ -398,7 +398,7 @@ def add_page_two_commercials(pdf, data):
         ("Name", "CM INFOTECH"),
         ("Account Number", "88130420182"),
         ("IFSC Code", "IDFB0040335"),
-        ("SWIFT Code","IDFBINBBMUM")
+        ("SWIFT Code","IDFBINBBMUM"),
         ("Bank Name", "TIDFC FIRST"),
         ("Branch", "AHMEDABAD - SHYAMAL BRANCH"),
         ("MSME", "UDYAM-GJ-01-0117646"),

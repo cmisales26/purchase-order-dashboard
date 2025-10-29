@@ -668,7 +668,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # pdf.set_x(110)
     # pdf.cell(94, 6, "", border="LRB", ln=1)
 
-    pdf.ln(6)
+    # pdf.ln(6)
 
     # === BUYER SECTION ===
     pdf.set_font("Helvetica", "B", 10)

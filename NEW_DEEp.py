@@ -1349,7 +1349,7 @@ def main():
                         "amount_in_words": amount_in_words,
                         "tax_in_words": tax_in_words
                     },
-                    "bank": {"name": bank_name, "branch": bank_branch, "account_no": account_no, "ifsc": ifsc},
+                    # "bank": {"name": bank_name, "branch": bank_branch, "account_no": account_no, "ifsc": ifsc},
                     "declaration": declaration
                 }
 

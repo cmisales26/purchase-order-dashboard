@@ -396,10 +396,11 @@ def add_page_two_commercials(pdf, data):
     # Bank Details (UPDATED TO MATCH SECOND VERSION)
     bank_info = [
         ("Name", "CM INFOTECH"),
-        ("Account Number", "02320102640"),
-        ("IFSC Code", "KCCB0SCR023"),
-        ("Bank Name", "THE KALUPUR COMMERCIAL CO-OPERATIVE BANK"),
-        ("Branch", "SWASTIK CHAR RASTA BRANCH (AHMEDABAD)"),
+        ("Account Number", "88130420182"),
+        ("IFSC Code", "IDFB0040335"),
+        ("SWIFT Code","IDFBINBBMUM")
+        ("Bank Name", "TIDFC FIRST"),
+        ("Branch", "AHMEDABAD - SHYAMAL BRANCH"),
         ("MSME", "UDYAM-GJ-01-0117646"),
         ("GSTIN", "24ANMPP4891R1ZX"),
         ("PAN No", "ANMPP4891R")

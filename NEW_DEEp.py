@@ -604,6 +604,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_auto_page_break(auto=False, margin=10)
     pdf.add_page()
 
+        # --- Logo on top right ---
+    if logo_file:
+        try:
+            pdf.image(logo_file, x=170, y=2.5, w=35)
+        except Exception as e:
+            st.warning(f"Could not add logo: {e}")
+
     # === HEADER (Vendor + Invoice Details) ===
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(95, 8, "CM Infotech.", border=1, ln=0)

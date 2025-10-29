@@ -604,63 +604,66 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_auto_page_break(auto=False, margin=10)
     pdf.add_page()
 
-    # === HEADER (Vendor + Invoice Details) ===
+    # === VENDOR SECTION ===
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(95, 8, "CM Infotech.", border=1, ln=0)
     pdf.cell(47, 8, "Invoice No.", border=1, ln=0, align="C")
     pdf.cell(47, 8, "Invoice Date", border=1, ln=1, align="C")
 
-    y_left_start = pdf.get_y()
+    y_start = pdf.get_y()
 
-    # --- Left Side (Vendor Details) ---
+    # --- Left Vendor Details ---
     pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="L")
+    pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481", border="L")
     
-    # Vendor details lines
-    vendor_lines = [
+    # Vendor details
+    vendor_details = [
         ("GST No.:", invoice_data['vendor']['gst']),
         ("MSME Registration No.:", invoice_data['vendor']['msme']),
         ("E-Mail:", "cm.infotech2014@gmail.com"),
         ("Mobile No.:", "8733915721"),
     ]
     
-    for i, (label, value) in enumerate(vendor_lines):
+    for i, (label, value) in enumerate(vendor_details):
         pdf.set_x(15)
         pdf.set_font("Helvetica", "B", 8)
-        label_width = pdf.get_string_width(label)
-        pdf.cell(label_width, 6, label, border="L", ln=0)
+        pdf.cell(40, 5, label, border="L", ln=0)
         pdf.set_font("Helvetica", "", 8)
-        border = "R" if i < len(vendor_lines) - 1 else "RB"
-        pdf.cell(95 - label_width, 6, value, border=border, ln=1)
+        border = "R" if i < len(vendor_details) - 1 else "RB"
+        pdf.cell(55, 5, value, border=border, ln=1)
 
     y_left_end = pdf.get_y()
 
-    # --- Right Side (Invoice Details) ---
-    pdf.set_xy(110, y_left_start)
+    # --- Right Invoice Details ---
+    pdf.set_xy(110, y_start)
+    
+    # Invoice number and date
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(47, 8, invoice_data['invoice']['invoice_no'], border="R", ln=0, align="C")
     pdf.cell(47, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
 
-    # Payment terms
+    # Payment terms - spans both columns
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 6, "Mode/Terms of Payment:", border="LRT", ln=0)
+    pdf.cell(47, 5, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 6, "100% Advance with Purchase", border="RT", ln=1)
+    pdf.cell(47, 5, "100% Advance with Purchase", border="RT", ln=1)
 
-    # Supplier's reference
+    # Supplier's reference - spans both columns
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 6, "Supplier's Ref.:", border="LRT", ln=0)
+    pdf.cell(47, 5, "Supplier's Ref.:", border="LR", ln=0)
     pdf.set_font("Helvetica", "", 8)
     other_ref_value = invoice_data['invoice_details'].get('other_reference', '')
-    pdf.cell(47, 6, other_ref_value, border="RT", ln=1)
+    pdf.cell(47, 5, other_ref_value, border="R", ln=1)
 
-    # Empty closing row
-    pdf.set_x(110)
-    pdf.cell(94, 6, "", border="LRB", ln=1)
+    # Empty row to match left side height
+    remaining_height = y_left_end - pdf.get_y()
+    if remaining_height > 0:
+        pdf.set_x(110)
+        pdf.cell(94, remaining_height, "", border="LRB", ln=1)
 
-    pdf.ln(6)
+    pdf.ln(5)
 
     # === BUYER SECTION ===
     pdf.set_font("Helvetica", "B", 10)
@@ -670,164 +673,158 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     y_buyer_start = pdf.get_y()
 
-    # --- Buyer Left Details ---
-    # Store starting position for left buyer block
+    # --- Left Buyer Details ---
     y_left_buyer_start = pdf.get_y()
     
-    # Buyer name and address
+    # Buyer name
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(95, 5, invoice_data['buyer']['name'], border="L", ln=1)
     
+    # Buyer address
     pdf.set_font("Helvetica", "", 8)
+    address_lines = pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="L", split_only=True)
+    address_height = len(address_lines) * 4
+    
+    # Draw the address
     pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="L")
     
     # Buyer contact details
-    buyer_lines = [
+    buyer_details = [
         ("Email:", "dmistry@baseengr.com"),
         ("Tel No.:", "98987 91813"),
         ("GST No.:", invoice_data['buyer']['gst']),
     ]
     
-    for i, (label, value) in enumerate(buyer_lines):
+    for i, (label, value) in enumerate(buyer_details):
         pdf.set_x(15)
         pdf.set_font("Helvetica", "B", 8)
-        label_width = pdf.get_string_width(label)
-        pdf.cell(label_width, 6, label, border="L", ln=0)
+        pdf.cell(20, 5, label, border="L", ln=0)
         pdf.set_font("Helvetica", "", 8)
-        border = "R" if i < len(buyer_lines) - 1 else "RB"
-        pdf.cell(95 - label_width, 6, value, border=border, ln=1)
+        border = "R" if i < len(buyer_details) - 1 else "RB"
+        pdf.cell(75, 5, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
-    
-    # Calculate total height of left buyer block
-    total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
+    total_left_height = y_buyer_left_end - y_left_buyer_start
 
-    # --- Buyer Right Details ---
+    # --- Right Order Details ---
     pdf.set_xy(110, y_buyer_start)
     
-    # Row 1: Buyer's Order No/Date - FIXED POSITION (doesn't stretch with address)
+    # Order number and date
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(47, 8, invoice_data['invoice_details']['buyers_order_no'], border="R", ln=0, align="C")
     pdf.cell(47, 8, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1, align="C")
 
-    # Calculate remaining height needed for address space
-    name_height = 5  # Height of buyer name
-    contact_lines_height = 18  # Height of 3 contact lines (6mm each)
-    remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
+    # Calculate space needed for address
+    name_height = 5
+    contact_height = 15  # 3 lines × 5mm
+    address_space = total_left_height - name_height - contact_height
     
-    # Add empty space for address if needed
-    if remaining_height_for_address > 0:
+    # Add space for address
+    if address_space > 0:
         pdf.set_x(110)
-        pdf.cell(94, remaining_height_for_address, "", border="R", ln=1)
+        pdf.cell(94, address_space, "", border="R", ln=1)
 
-    # Row 2: Dispatched Through
+    # Dispatched Through and Destination
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 6, "Dispatched Through", border="LRT", ln=0)
+    pdf.cell(47, 5, "Dispatched Through", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
+    pdf.cell(47, 5, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
-    # Row 3: Destination
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 6, "Destination", border="LRT", ln=0)
+    pdf.cell(47, 5, "Destination", border="LR", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
+    pdf.cell(47, 5, invoice_data['invoice_details']['destination'], border="R", ln=1)
 
-    # Row 4: Terms of delivery
+    # Terms of delivery
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 6, "Terms of delivery", border="LRT", ln=0)
+    pdf.cell(47, 5, "Terms of delivery", border="LRB", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
+    pdf.cell(47, 5, invoice_data['invoice_details']['terms_of_delivery'], border="RB", ln=1)
 
-    # Closing row
-    pdf.set_x(110)
-    pdf.cell(94, 1, "", border="LRB", ln=1)
-
-    # --- Item Table Header ---
-    pdf.ln(2)
+    # === ITEMS TABLE ===
+    pdf.ln(8)
+    
+    # Table header
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(10, 5, "Sr. No.", border=1, align="C")
-    pdf.cell(80, 5, "Description of Goods", border=1, align="C")
-    pdf.cell(20, 5, "HSN/SAC", border=1, align="C")
-    pdf.cell(20, 5, "Quantity", border=1, align="C")
-    pdf.cell(25, 5, "Unit Rate", border=1, align="C")
-    pdf.cell(30, 5, "Amount", border=1, ln=True, align="C")
-
-    # --- Items ---
-    pdf.set_font("Helvetica", "", 8)
     col_widths = [10, 80, 20, 20, 25, 30]
-    line_height = 4
+    headers = ["Sr. No.", "Description of Goods", "HSN/SAC", "Quantity", "Unit Rate", "Amount"]
+    
+    for width, header in zip(col_widths, headers):
+        pdf.cell(width, 6, header, border=1, align="C")
+    pdf.ln()
 
+    # Table rows
+    pdf.set_font("Helvetica", "", 8)
     for i, item in enumerate(invoice_data["items"], start=1):
         x_start = pdf.get_x()
         y_start = pdf.get_y()
 
-        # Description
+        # Description (multi-line)
         pdf.set_xy(x_start + col_widths[0], y_start)
-        pdf.multi_cell(col_widths[1], line_height, item['description'], border=1)
+        pdf.multi_cell(col_widths[1], 4, item['description'], border=1)
         y_after_desc = pdf.get_y()
-        
         row_height = y_after_desc - y_start
-        
-        # Other cells for the row
+
+        # Other cells
         pdf.set_xy(x_start, y_start)
-        pdf.multi_cell(col_widths[0], row_height, str(i), border=1, align="C")
+        pdf.cell(col_widths[0], row_height, str(i), border=1, align="C")
         
-        pdf.set_xy(x_start + col_widths[0] + col_widths[1], y_start)
-        pdf.multi_cell(col_widths[2], row_height, item['hsn'], border=1, align="C")
+        pdf.set_xy(x_start + sum(col_widths[:1]), y_start)
+        pdf.cell(col_widths[2], row_height, item['hsn'], border=1, align="C")
+        
+        pdf.set_xy(x_start + sum(col_widths[:2]), y_start)
+        pdf.cell(col_widths[3], row_height, str(item['quantity']), border=1, align="C")
         
         pdf.set_xy(x_start + sum(col_widths[:3]), y_start)
-        pdf.multi_cell(col_widths[3], row_height, str(item['quantity']), border=1, align="C")
-        
-        pdf.set_xy(x_start + sum(col_widths[:4]), y_start)
-        pdf.multi_cell(col_widths[4], row_height, f"{item['unit_rate']:.2f}", border=1, align="R")
+        pdf.cell(col_widths[4], row_height, f"{item['unit_rate']:.2f}", border=1, align="R")
         
         amount = item['quantity'] * item['unit_rate']
-        pdf.set_xy(x_start + sum(col_widths[:-1]), y_start)
-        pdf.multi_cell(col_widths[5], row_height, f"{amount:.2f}", border=1, align="R")
+        pdf.set_xy(x_start + sum(col_widths[:4]), y_start)
+        pdf.cell(col_widths[5], row_height, f"{amount:.2f}", border=1, align="R")
 
-        pdf.set_xy(x_start, y_start + row_height)
+        pdf.set_xy(x_start, y_after_desc)
 
-    # --- Totals ---
+    # === TOTALS ===
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")
-    pdf.cell(30, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(sum(col_widths[:5]), 6, "Basic Amount", border=1, align="L")
+    pdf.cell(30, 6, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
-    pdf.cell(sum(col_widths[:5]), 5, "SGST @ 9%", border=1, align="L")
-    pdf.cell(30, 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(sum(col_widths[:5]), 6, "SGST @ 9%", border=1, align="L")
+    pdf.cell(30, 6, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
     
-    pdf.cell(sum(col_widths[:5]), 5, "CGST @ 9%", border=1, align="L")
-    pdf.cell(30, 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(sum(col_widths[:5]), 6, "CGST @ 9%", border=1, align="L")
+    pdf.cell(30, 6, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
 
-    pdf.cell(sum(col_widths[:5]), 5, "Final Amount to be Paid", border=1, align="L")
-    pdf.cell(30, 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(sum(col_widths[:5]), 6, "Final Amount to be Paid", border=1, align="L")
+    pdf.cell(30, 6, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
     
-    # --- Amount in Words ---
-    pdf.ln(2)
+    # Amount in words
+    pdf.ln(3)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(185, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
+    pdf.cell(185, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", border=1, ln=True)
 
-    # --- Tax Summary Table ---
-    pdf.ln(2)
+    # === TAX SUMMARY ===
+    pdf.ln(3)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(35, 5, "HSN/SAN", border=1, align="C")
     pdf.cell(35, 5, "Taxable Value", border=1, align="C")
     pdf.cell(58, 5, "Central Tax", border=1, align="C")
     pdf.cell(58, 5, "State Tax", border=1, ln=True, align="C")
 
-    pdf.cell(35, 5, "", border="L", ln=False)
-    pdf.cell(35, 5, "", border="L", ln=False)
+    pdf.cell(35, 5, "", border="L")
+    pdf.cell(35, 5, "", border="L")
     pdf.cell(29, 5, "Rate", border="L", align="C")
     pdf.cell(29, 5, "Amount", border="LR", align="C")
     pdf.cell(29, 5, "Rate", border="L", align="C")
     pdf.cell(29, 5, "Amount", border="LR", ln=True, align="C")
 
     pdf.set_font("Helvetica", "", 8)
-    hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
-    hsn_sgst = hsn_tax_value * 0.09
-    hsn_cgst = hsn_tax_value * 0.09
+    hsn_tax_value = invoice_data['totals']['basic_amount']
+    hsn_sgst = invoice_data['totals']['sgst']
+    hsn_cgst = invoice_data['totals']['cgst']
     
     pdf.cell(35, 5, "997331", border=1, align="C")
     pdf.cell(35, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
@@ -844,17 +841,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(29, 5, "", border=1, align="C")
     pdf.cell(29, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
-    pdf.ln(2)
+    pdf.ln(3)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(186, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    pdf.cell(186, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", border=1, ln=True)
 
-    # --- Reserve footer space ---
+    # === FOOTER CONTENT ===
+    # Reserve space
     needed_space = 70
     if pdf.get_y() + needed_space > pdf.h - pdf.b_margin:
-        pdf.set_y(pdf.h - pdf.b_margin - needed_space)
+        pdf.add_page()
 
-    # --- Bank Details ---
-    pdf.ln(3)
+    # Bank Details
+    pdf.ln(5)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(0, 5, "Company's Bank Details", ln=True)
     pdf.set_font("Helvetica", "", 8)
@@ -865,15 +863,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         f"IFS Code: {invoice_data['bank']['ifsc']}"
     )
 
-    # --- Declaration ---
-    pdf.ln(2)
+    # Declaration
+    pdf.ln(3)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(0, 5, "Declaration:", ln=True)
     pdf.set_font("Helvetica", "", 8)
     pdf.multi_cell(0, 4, invoice_data['declaration'])
     
-    # --- Signature ---
-    pdf.ln(5)
+    # Signature
+    pdf.ln(8)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
 
@@ -892,16 +890,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
     
-    # --- Footer with clickable email and mobile ---
+    # Footer
     pdf.set_y(-28)
     pdf.set_font("Helvetica", "U", 8)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     
-    # Company address
     pdf.set_y(-22)
     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
     
-    # Clickable email and mobile
     pdf.set_text_color(0, 0, 255)
     email1 = "info@cminfotech.com "
     phone_number = " +91 873 391 5721"
@@ -913,6 +909,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
+
+
+
+
+
+
+
 
 
 # --- PDF Class ---

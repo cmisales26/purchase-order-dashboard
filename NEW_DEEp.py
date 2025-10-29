@@ -611,29 +611,27 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(47, 8, "Invoice Date", border=1, ln=1, align="C")
 
     y_left_start = pdf.get_y()
-    pdf.set_font("Helvetica", "", 10)
 
     # --- Left Side (Vendor Details) ---
-    pdf.multi_cell(
-        100, 6,
-        "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\n"
-        "Chenpur Road, Jagatpur Village, Ahmedabad - 382481",
-        border="L"
-    )
-
-    lines = [
+    pdf.set_font("Helvetica", "", 10)
+    pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="L")
+    
+    # Vendor details lines
+    vendor_lines = [
         ("GST No.:", invoice_data['vendor']['gst']),
         ("MSME Registration No.:", invoice_data['vendor']['msme']),
         ("E-Mail:", "cm.infotech2014@gmail.com"),
         ("Mobile No.:", "8733915721"),
     ]
-    for i, (label, value) in enumerate(lines):
+    
+    for i, (label, value) in enumerate(vendor_lines):
         pdf.set_x(15)
         pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(35, 6, label, border="L", ln=0)
+        label_width = pdf.get_string_width(label)
+        pdf.cell(label_width, 6, label, border="L", ln=0)
         pdf.set_font("Helvetica", "", 10)
-        border = "R" if i < len(lines) - 1 else "RB"
-        pdf.cell(60, 6, value, border=border, ln=1)
+        border = "R" if i < len(vendor_lines) - 1 else "RB"
+        pdf.cell(95 - label_width, 6, value, border=border, ln=1)
 
     y_left_end = pdf.get_y()
 
@@ -643,20 +641,24 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(47, 8, invoice_data['invoice']['invoice_no'], border="R", ln=0, align="C")
     pdf.cell(47, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
 
+    # Payment terms
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(47, 6, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(47, 6, invoice_data['invoice'].get('payment_terms', '100% Advance with Purchase'), border="RT", ln=1)
+    pdf.cell(47, 6, "100% Advance with Purchase", border="RT", ln=1)
 
+    # Supplier's reference
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(47, 6, "Supplier's Ref.:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(47, 6, invoice_data['invoice_details'].get('other_reference', ''), border="RT", ln=1)
+    other_ref_value = invoice_data['invoice_details'].get('other_reference', '')
+    pdf.cell(47, 6, other_ref_value, border="RT", ln=1)
 
+    # Empty closing row
     pdf.set_x(110)
-    pdf.cell(94, 1, "", border="LRB", ln=1)
+    pdf.cell(94, 6, "", border="LRB", ln=1)
 
     pdf.ln(6)
 
@@ -669,56 +671,79 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_buyer_start = pdf.get_y()
 
     # --- Buyer Left Details ---
+    # Store starting position for left buyer block
+    y_left_buyer_start = pdf.get_y()
+    
+    # Buyer name and address
     pdf.set_font("Helvetica", "B", 10)
-    pdf.multi_cell(95, 5, invoice_data['buyer']['name'], border="L")
+    pdf.cell(95, 5, invoice_data['buyer']['name'], border="L", ln=1)
+    
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(95, 5, invoice_data['buyer']['address'], border="L")
-
+    pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="L")
+    
+    # Buyer contact details
     buyer_lines = [
         ("Email:", "dmistry@baseengr.com"),
         ("Tel No.:", "98987 91813"),
         ("GST No.:", invoice_data['buyer']['gst']),
     ]
+    
     for i, (label, value) in enumerate(buyer_lines):
         pdf.set_x(15)
         pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(25, 6, label, border="L", ln=0)
+        label_width = pdf.get_string_width(label)
+        pdf.cell(label_width, 6, label, border="L", ln=0)
         pdf.set_font("Helvetica", "", 10)
         border = "R" if i < len(buyer_lines) - 1 else "RB"
-        pdf.cell(70, 6, value, border=border, ln=1)
+        pdf.cell(95 - label_width, 6, value, border=border, ln=1)
 
-    y_buyer_end = pdf.get_y()
+    y_buyer_left_end = pdf.get_y()
+    
+    # Calculate total height of left buyer block
+    total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
 
     # --- Buyer Right Details ---
     pdf.set_xy(110, y_buyer_start)
+    
+    # Row 1: Buyer's Order No/Date - FIXED POSITION (doesn't stretch with address)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(47, 8, invoice_data['invoice_details']['buyers_order_no'], border="R", ln=0, align="C")
     pdf.cell(47, 8, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1, align="C")
 
+    # Calculate remaining height needed for address space
+    name_height = 5  # Height of buyer name
+    contact_lines_height = 18  # Height of 3 contact lines (6mm each)
+    remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
+    
+    # Add empty space for address if needed
+    if remaining_height_for_address > 0:
+        pdf.set_x(110)
+        pdf.cell(94, remaining_height_for_address, "", border="R", ln=1)
+
+    # Row 2: Dispatched Through
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(47, 6, "Dispatched Through", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(47, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
+    # Row 3: Destination
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(47, 6, "Destination", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(47, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
 
+    # Row 4: Terms of delivery
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(47, 6, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(47, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
 
+    # Closing row
     pdf.set_x(110)
     pdf.cell(94, 1, "", border="LRB", ln=1)
-
-
-
-
 
     # --- Item Table Header ---
     pdf.ln(2)
@@ -729,7 +754,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(20, 5, "Quantity", border=1, align="C")
     pdf.cell(25, 5, "Unit Rate", border=1, align="C")
     pdf.cell(30, 5, "Amount", border=1, ln=True, align="C")
-    
 
     # --- Items ---
     pdf.set_font("Helvetica", "", 8)
@@ -740,13 +764,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         x_start = pdf.get_x()
         y_start = pdf.get_y()
 
-        # pdf.set_font("Helvetica", "", 8)
-        
         # Description
         pdf.set_xy(x_start + col_widths[0], y_start)
         pdf.multi_cell(col_widths[1], line_height, item['description'], border=1)
         y_after_desc = pdf.get_y()
-
+        
         row_height = y_after_desc - y_start
         
         # Other cells for the row
@@ -770,16 +792,16 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Totals ---
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")   #"R" for right align
+    pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")
     pdf.cell(30, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
-    pdf.cell(sum(col_widths[:5]), 5, "SGST @ 9%", border=1, align="L")   #"R" for right align
+    pdf.cell(sum(col_widths[:5]), 5, "SGST @ 9%", border=1, align="L")
     pdf.cell(30, 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
     
-    pdf.cell(sum(col_widths[:5]), 5, "CGST @ 9%", border=1, align="L")   #"R" for right align
+    pdf.cell(sum(col_widths[:5]), 5, "CGST @ 9%", border=1, align="L")
     pdf.cell(30, 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
 
-    pdf.cell(sum(col_widths[:5]), 5, "Final Amount to be Paid", border=1, align="L")   #"R" for right align
+    pdf.cell(sum(col_widths[:5]), 5, "Final Amount to be Paid", border=1, align="L")
     pdf.cell(30, 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
     
     # --- Amount in Words ---
@@ -826,7 +848,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(186, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
-     # --- Reserve footer space ---
+    # --- Reserve footer space ---
     needed_space = 70
     if pdf.get_y() + needed_space > pdf.h - pdf.b_margin:
         pdf.set_y(pdf.h - pdf.b_margin - needed_space)
@@ -866,23 +888,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             st.warning(f"Could not add stamp: {e}")
     else:
         pdf.ln(15)
-            # Calculate position to place the stamp above the signature line
-            # The 'x' coordinate is calculated to align the stamp to the right side
-            # The 'y' coordinate is 10mm above the signature line
-    #         stamp_width = 25
-    #         pdf.image(stamp_file, x=pdf.w - pdf.r_margin - stamp_width, y=pdf.get_y(), w=stamp_width)
-    #         pdf.ln(25) # Move down for the signature text
-    #     except Exception as e:
-    #         st.warning(f"Could not add stamp: {e}")
-    # else:
-    #     pdf.ln(15) # maintain spacing if no stamp is uploded
-    # pdf.ln(5)
-    # pdf.set_font("Helvetica", "B", 8)
-    # pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
-    # pdf.ln(10)
+        
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
-     # --- Footer with clickable email and mobile ---
+    
+    # --- Footer with clickable email and mobile ---
     pdf.set_y(-28)
     pdf.set_font("Helvetica", "U", 8)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
@@ -892,37 +902,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
     
     # Clickable email and mobile
-    pdf.set_text_color(0, 0, 255)  # Blue color for clickable links
-    email1 = "info@cminfotech.com "
-    phone_number =" +91 873 391 5721"
     pdf.set_text_color(0, 0, 255)
+    email1 = "info@cminfotech.com "
+    phone_number = " +91 873 391 5721"
     pdf.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
     pdf.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
     pdf.set_x((pdf.w - 80) / 2)
     pdf.cell(0, 0, "", link=f"tel:{phone_number}")
+    pdf.set_text_color(0, 0, 0)
 
-    # pdf.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
-    # Email
-    # email_text = "Email: info@cminfotech.com"
-    # mobile_text = "Mo. +91 873 391 5721"
-    # email_width = pdf.get_string_width(email_text)
-    # page_center = pdf.w / 2
-    # email_x = page_center - (email_width / 2)
-    # pdf.set_x(email_x)
-    # pdf.cell(email_width, 4, email_text, ln=False, align="C", link="mailto:info@cminfotech.com")
-    
-    # # Separator
-    # separator = "  |  "
-    # separator_width = pdf.get_string_width(separator)
-    # pdf.cell(separator_width, 4, separator, ln=False, align="C")
-    
-    # # Mobile
-    # mobile_text = "Mo. +91 873 391 5721"
-    # mobile_width = pdf.get_string_width(mobile_text)
-    # pdf.cell(mobile_width, 4, mobile_text, ln=True, align="C", link="tel:+918733915721")
-    
-    pdf.set_text_color(0, 0, 0)  # Reset to black color
-    
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
 

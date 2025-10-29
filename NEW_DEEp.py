@@ -653,7 +653,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Supplier’s Ref row
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(47, 6, "Supplier’s Ref.:", border="LRT", ln=0)
+    pdf.cell(47, 6, "Supplier's Ref.:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(47, 6, invoice_data['invoice_details'].get('other_reference', ''), border="RT", ln=1)
 

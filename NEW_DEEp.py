@@ -772,7 +772,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Items ---
     pdf.set_font("Helvetica", "", 8)
-    col_widths = [10, 80, 20, 20, 25, 30]
+    col_widths = [10, 80, 20, 20, 25, 34]
     line_height = 4
 
     for i, item in enumerate(invoice_data["items"], start=1):

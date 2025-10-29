@@ -1304,11 +1304,11 @@ def main():
                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
                     items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
 
-            st.subheader("Bank Details")
-            bank_name = st.text_input("Bank Name", "XYZ bank")
-            bank_branch = st.text_input("Branch", "AHMED")
-            account_no = st.text_input("Account No.", "881304")
-            ifsc = st.text_input("IFS Code", "IDFB004")
+            # st.subheader("Bank Details")
+            # bank_name = st.text_input("Bank Name", "XYZ bank")
+            # bank_branch = st.text_input("Branch", "AHMED")
+            # account_no = st.text_input("Account No.", "881304")
+            # ifsc = st.text_input("IFS Code", "IDFB004")
 
             st.subheader("Declaration")
             declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")

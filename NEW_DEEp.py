@@ -612,7 +612,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left Column (Company Details)
     pdf.multi_cell(
-        100, 5,
+        95, 6,
         "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\n"
         "Chenpur Road, Jagatpur Village, Ahmedabad - 382481",
         border="L"

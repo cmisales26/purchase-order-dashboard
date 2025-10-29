@@ -908,12 +908,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
     
     # --- Footer with clickable email and mobile ---
-    pdf.set_y(-25)
+    pdf.set_y(-24)
     pdf.set_font("Helvetica", "U", 8)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     
     # Company address
-    pdf.set_y(-19)
+    pdf.set_y(-18)
     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
     
     # Clickable email and mobile

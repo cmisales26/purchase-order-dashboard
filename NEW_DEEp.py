@@ -807,8 +807,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Totals ---
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(sum(col_widths[:6]), 5, "Basic Amount", border=1, align="L")
-    pdf.cell(30, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")
+    pdf.cell(34, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
     pdf.cell(sum(col_widths[:5]), 5, "SGST @ 9%", border=1, align="L")
     pdf.cell(30, 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")

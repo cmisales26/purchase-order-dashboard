@@ -722,8 +722,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Row 1: Buyer's Order No/Date - FIXED POSITION (doesn't stretch with address)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="C")
-    pdf.cell(47, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="C")
+    pdf.cell(47, 6, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="C")
+    pdf.cell(47, 6, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="C")
 
     # Calculate remaining height needed for address space
     name_height = 5  # Height of buyer name

@@ -1358,8 +1358,9 @@ def main():
                 st.download_button(
                     "⬇ Download Invoice PDF",
                     data=pdf_file,
-                    file_name=f"Invoice_{invoice_no}.pdf",
-                    mime="application/pdf")
+                    file_name=f"Invoice_{invoice_no.replace('/', '_')}.pdf",
+                    mime="application/pdf",
+                    key="invoice_download_button")
                 
     # --- Tab 2: Purchase Order Generator ---
     with tab2:

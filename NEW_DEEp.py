@@ -607,8 +607,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # === HEADER (Vendor + Invoice Details) ===
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(94, 8, "CM Infotech.", border=1, ln=0)
-    pdf.cell(44, 8, "Invoice No.", border=1, ln=0, align="C")
-    pdf.cell(44, 8, "Invoice Date", border=1, ln=1, align="C")
+    pdf.cell(45, 8, "Invoice No.", border=1, ln=0, align="C")
+    pdf.cell(45, 8, "Invoice Date", border=1, ln=1, align="C")
 
     y_left_start = pdf.get_y()
 
@@ -638,23 +638,23 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Right Side (Invoice Details) ---
     pdf.set_xy(110, y_left_start)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(44, 8, invoice_data['invoice']['invoice_no'], border="R", ln=0, align="C")
-    pdf.cell(44, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
+    pdf.cell(45, 8, invoice_data['invoice']['invoice_no'], border="R", ln=0, align="C")
+    pdf.cell(45, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
 
     # Payment terms
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(44, 6, "Mode/Terms of Payment:", border="LRT", ln=0)
+    pdf.cell(45, 6, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(44, 6, "100% Advance with Purchase", border="RT", ln=1)
+    pdf.cell(45, 6, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(44, 6, "Supplier's Ref.:", border="LRT", ln=0)
+    pdf.cell(45, 6, "Supplier's Ref.:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
     other_ref_value = invoice_data['invoice_details'].get('other_reference', '')
-    pdf.cell(44, 6, other_ref_value, border="RT", ln=1)
+    pdf.cell(45, 6, other_ref_value, border="RT", ln=1)
 
     # Empty closing row
     pdf.set_x(110)

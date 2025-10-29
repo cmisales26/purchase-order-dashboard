@@ -822,22 +822,22 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Amount in Words ---
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(185, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
+    pdf.cell(189, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # --- Tax Summary Table ---
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(35, 5, "HSN/SAN", border=1, align="C")
     pdf.cell(35, 5, "Taxable Value", border=1, align="C")
-    pdf.cell(58, 5, "Central Tax", border=1, align="C")
-    pdf.cell(58, 5, "State Tax", border=1, ln=True, align="C")
+    pdf.cell(60, 5, "Central Tax", border=1, align="C")
+    pdf.cell(60, 5, "State Tax", border=1, ln=True, align="C")
 
     pdf.cell(35, 5, "", border="L", ln=False)
     pdf.cell(35, 5, "", border="L", ln=False)
-    pdf.cell(29, 5, "Rate", border="L", align="C")
-    pdf.cell(29, 5, "Amount", border="LR", align="C")
-    pdf.cell(29, 5, "Rate", border="L", align="C")
-    pdf.cell(29, 5, "Amount", border="LR", ln=True, align="C")
+    pdf.cell(30, 5, "Rate", border="L", align="C")
+    pdf.cell(30, 5, "Amount", border="LR", align="C")
+    pdf.cell(30, 5, "Rate", border="L", align="C")
+    pdf.cell(30, 5, "Amount", border="LR", ln=True, align="C")
 
     pdf.set_font("Helvetica", "", 8)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
@@ -846,22 +846,22 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     pdf.cell(35, 5, "997331", border=1, align="C")
     pdf.cell(35, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(29, 5, "9%", border=1, align="C")
-    pdf.cell(29, 5, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(29, 5, "9%", border=1, align="C")
-    pdf.cell(29, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(30, 5, "9%", border=1, align="C")
+    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(30, 5, "9%", border=1, align="C")
+    pdf.cell(30, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(35, 5, "Total", border=1, align="C")
     pdf.cell(35, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(29, 5, "", border=1, align="C")
-    pdf.cell(29, 5, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(29, 5, "", border=1, align="C")
-    pdf.cell(29, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(30, 5, "", border=1, align="C")
+    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(30, 5, "", border=1, align="C")
+    pdf.cell(30, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(186, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    pdf.cell(190, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # --- Reserve footer space ---
     needed_space = 70

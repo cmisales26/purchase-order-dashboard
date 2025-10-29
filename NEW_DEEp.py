@@ -644,9 +644,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Payment terms
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 6, "Mode/Terms of Payment:", border="LRT", ln=0)
+    pdf.cell(47, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 6, "100% Advance with Purchase", border="RT", ln=1)
+    pdf.cell(47, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(110)

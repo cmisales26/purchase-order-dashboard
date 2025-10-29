@@ -239,7 +239,7 @@ def add_page_one_intro(pdf, data):
         add_clickable_phone(pdf, data['vendor_mobile'])
     
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", ln=True)
+    pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
     pdf.ln(8)
 
     # Subject Line (from user input)

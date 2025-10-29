@@ -612,22 +612,22 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left Column (Company Details)
     pdf.multi_cell(
-        95, 5,
+        100, 5,
         "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\n"
         "Chenpur Road, Jagatpur Village, Ahmedabad - 382481",
         border="L"
     )
-    pdf.cell(30, 6, "GST No.:", border="L", ln=0)
-    pdf.cell(65, 6, invoice_data['vendor']['gst'], border="R", ln=1)
+    pdf.cell(30, 6, "GST No:", border="L", ln=0)
+    pdf.cell(80, 6, invoice_data['vendor']['gst'], border="R", ln=1)
 
     pdf.cell(45, 6, "MSME Registration No.:", border="L", ln=0)
     pdf.cell(50, 6, invoice_data['vendor']['msme'], border="R", ln=1)
 
     pdf.cell(25, 6, "E-Mail:", border="L", ln=0)
-    pdf.cell(70, 6, "cm.infotech2014@gmail.com", border="R", ln=1)
+    pdf.cell(80, 6, "cm.infotech2014@gmail.com", border="R", ln=1)
 
     pdf.cell(25, 6, "Mobile No.:", border="L", ln=0)
-    pdf.cell(70, 6, "8733915721", border="R", ln=1)
+    pdf.cell(80, 6, "8733915721", border="R", ln=1)
 
     # Close bottom border
     pdf.cell(95, 1, "", border="LBR", ln=0)

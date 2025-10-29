@@ -1213,52 +1213,78 @@ def main():
         st.session_state.quotation_number = generate_quotation_number("SD", st.session_state.quotation_seq)
     if "current_quote_sales_person" not in st.session_state:
         st.session_state.current_quote_sales_person = "SD"
-    if "current_po_sales_person" not in st.session_state:  # NEW
+    if "current_po_sales_person" not in st.session_state:
         st.session_state.current_po_sales_person = "CP"
-    if "current_po_quarter" not in st.session_state:  # NEW
+    if "current_po_quarter" not in st.session_state:
         st.session_state.current_po_quarter = get_current_quarter()
+
+    # Create tabs for different document types FIRST
+    tab1, tab2, tab3 = st.tabs(["Tax Invoice Generator", "Purchase Order Generator", "Quotation Generator"])
 
     # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
 
+    # Initialize session state for vendor/end user data
+    if 'vendors_df' not in st.session_state:
+        st.session_state.vendors_df = None
+    if 'endusers_df' not in st.session_state:
+        st.session_state.endusers_df = None
+
     if uploaded_excel:
-        vendors_df = pd.read_excel(uploaded_excel, sheet_name="Vendors", dtype={"Mobile": str})
-        endusers_df = pd.read_excel(uploaded_excel, sheet_name="EndUsers")
-
-        st.success("✅ Excel loaded successfully!")
-
-        # --- Select Vendor ---
-        vendor_name = st.selectbox("Select Vendor", vendors_df["Vendor Name"].unique())
-        vendor = vendors_df[vendors_df["Vendor Name"] == vendor_name].iloc[0]
-
-        # --- Select End User ---
-        end_user_name = st.selectbox("Select End User", endusers_df["End User Company"].unique())
-        end_user = endusers_df[endusers_df["End User Company"] == end_user_name].iloc[0]
-
-        # --- Clean and Convert Mobile (avoid float or NaN issues) ---
-        vendor_mobile = str(vendor.get("Mobile", "")).split(".")[0].strip()
-
-        # Save to session_state (so Invoice & PO can use)
-        st.session_state.po_vendor_name = vendor["Vendor Name"]
-        st.session_state.po_vendor_address = vendor["Vendor Address"]
-        st.session_state.po_vendor_contact = vendor["Contact Person"]
-        st.session_state.po_vendor_mobile = vendor_mobile
-        st.session_state.po_end_company = end_user["End User Company"]
-        st.session_state.po_end_address = end_user["End User Address"]
-        st.session_state.po_end_person = end_user["End User Contact"]
-        st.session_state.po_end_contact = end_user["End User Phone"]
-        st.session_state.po_end_email = end_user["End User Email"]
-        st.session_state.po_end_gst_no = end_user["GST NO"]
-
-        st.info("Vendor & End User details auto-filled from Excel ✅")
-    
-
-    # Create tabs for different document types
-    tab1, tab2, tab3 = st.tabs(["Tax Invoice Generator", "Purchase Order Generator", "Quotation Generator"])
+        try:
+            st.session_state.vendors_df = pd.read_excel(uploaded_excel, sheet_name="Vendors", dtype={"Mobile": str})
+            st.session_state.endusers_df = pd.read_excel(uploaded_excel, sheet_name="EndUsers")
+            st.success("✅ Excel loaded successfully!")
+        except Exception as e:
+            st.error(f"Error loading Excel: {e}")
 
     # --- Tab 1: Tax Invoice Generator ---
     with tab1:
         st.header("Tax Invoice Generator")
+        
+        # Vendor and End User selection for INVOICE tab
+        if st.session_state.vendors_df is not None and st.session_state.endusers_df is not None:
+            col_select1, col_select2 = st.columns(2)
+            with col_select1:
+                # Select Vendor for Invoice
+                vendor_name_invoice = st.selectbox(
+                    "Select Vendor for Invoice", 
+                    st.session_state.vendors_df["Vendor Name"].unique(),
+                    key="invoice_vendor_select"
+                )
+                vendor_invoice = st.session_state.vendors_df[st.session_state.vendors_df["Vendor Name"] == vendor_name_invoice].iloc[0]
+                
+            with col_select2:
+                # Select End User for Invoice
+                end_user_name_invoice = st.selectbox(
+                    "Select End User for Invoice", 
+                    st.session_state.endusers_df["End User Company"].unique(),
+                    key="invoice_enduser_select"
+                )
+                end_user_invoice = st.session_state.endusers_df[st.session_state.endusers_df["End User Company"] == end_user_name_invoice].iloc[0]
+            
+            # Clean and Convert Mobile
+            vendor_mobile_invoice = str(vendor_invoice.get("Mobile", "")).split(".")[0].strip()
+            
+            st.info("✅ Vendor & End User details loaded for Invoice")
+        else:
+            st.info("📂 Please upload an Excel file with Vendor and End User data above")
+            # Set default values if no Excel uploaded
+            vendor_invoice = type('obj', (object,), {
+                'Vendor Name': 'Arkance IN Pvt. Ltd.',
+                'Vendor Address': 'Unit 801-802, 8th Floor, Tower 1...',
+                'Contact Person': 'Ms/Mr',
+                'Mobile': '+91 1234567890'
+            })
+            end_user_invoice = type('obj', (object,), {
+                'End User Company': 'Baldridge & Associates Pvt Ltd.',
+                'End User Address': '406 Sakar East, Vadodara 390009',
+                'End User Contact': 'Mr. Dev',
+                'End User Phone': '+91 9876543210',
+                'End User Email': 'info@company.com',
+                'GST NO': '24AAHCB9'
+            })
+
         col1, col2 = st.columns([1,1])
         with col1:
             st.subheader("Invoice Details")
@@ -1281,37 +1307,33 @@ def main():
             st.subheader("Buyer Details")
             buyer_name = st.text_input(
                 "Buyer Name",
-                value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
+                value=getattr(end_user_invoice, 'End User Company', "Baldridge Pvt Ltd."),
+                key="invoice_buyer_name"
             )
             buyer_address = st.text_area(
                 "Buyer Address",
-                value=st.session_state.get("po_end_address","406, Sakar East,...")
+                value=getattr(end_user_invoice, 'End User Address', "406, Sakar East,..."),
+                key="invoice_buyer_address"
             )
             buyer_gst = st.text_input(
                 "Buyer GST No.",
-                value=st.session_state.get("po_end_gst_no","24AAHCB9")
+                value=getattr(end_user_invoice, 'GST NO', "24AAHCB9"),
+                key="invoice_buyer_gst"
             )
 
-            
             st.subheader("Products")
             items = []
-            num_items = st.number_input("Number of Products", 1, 10, 1)
+            num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
             for i in range(num_items):
-                with st.expander(f"Product {i+1}"):
-                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026")
-                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331")
-                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00)
-                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
+                with st.expander(f"Product {i+1}", key=f"invoice_product_{i}"):
+                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
+                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
+                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
+                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00, key=f"invoice_rate_{i}")
                     items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
 
-            # st.subheader("Bank Details")
-            # bank_name = st.text_input("Bank Name", "XYZ bank")
-            # bank_branch = st.text_input("Branch", "AHMED")
-            # account_no = st.text_input("Account No.", "881304")
-            # ifsc = st.text_input("IFS Code", "IDFB004")
-
             st.subheader("Declaration")
-            declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
+            declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE", key="invoice_declaration")
             
             st.subheader("Company Logo & Stamp")
             logo_file = st.file_uploader("Upload your company logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_logo")
@@ -1319,7 +1341,7 @@ def main():
 
         with col2:
             st.subheader("Invoice Preview & Download")
-            if st.button("Generate Invoice"):
+            if st.button("Generate Invoice", key="generate_invoice_btn"):
                 basic_amount = sum(item['quantity'] * item['unit_rate'] for item in items)
                 sgst = basic_amount * 0.09
                 cgst = basic_amount * 0.09
@@ -1349,7 +1371,6 @@ def main():
                         "amount_in_words": amount_in_words,
                         "tax_in_words": tax_in_words
                     },
-                    # "bank": {"name": bank_name, "branch": bank_branch, "account_no": account_no, "ifsc": ifsc},
                     "declaration": declaration
                 }
 
@@ -1360,11 +1381,55 @@ def main():
                     data=pdf_file,
                     file_name=f"Invoice_{invoice_no.replace('/', '_')}.pdf",
                     mime="application/pdf",
-                    key="invoice_download_button")
-                
+                    key="invoice_download_unique"
+                )
+
     # --- Tab 2: Purchase Order Generator ---
     with tab2:
         st.header("Purchase Order Generator")
+        
+        # Vendor and End User selection for PO tab
+        if st.session_state.vendors_df is not None and st.session_state.endusers_df is not None:
+            col_select1, col_select2 = st.columns(2)
+            with col_select1:
+                # Select Vendor for PO
+                vendor_name_po = st.selectbox(
+                    "Select Vendor for PO", 
+                    st.session_state.vendors_df["Vendor Name"].unique(),
+                    key="po_vendor_select"
+                )
+                vendor_po = st.session_state.vendors_df[st.session_state.vendors_df["Vendor Name"] == vendor_name_po].iloc[0]
+                
+            with col_select2:
+                # Select End User for PO
+                end_user_name_po = st.selectbox(
+                    "Select End User for PO", 
+                    st.session_state.endusers_df["End User Company"].unique(),
+                    key="po_enduser_select"
+                )
+                end_user_po = st.session_state.endusers_df[st.session_state.endusers_df["End User Company"] == end_user_name_po].iloc[0]
+            
+            # Clean and Convert Mobile
+            vendor_mobile_po = str(vendor_po.get("Mobile", "")).split(".")[0].strip()
+            
+            st.info("✅ Vendor & End User details loaded for Purchase Order")
+        else:
+            st.info("📂 Please upload an Excel file with Vendor and End User data above")
+            # Set default values if no Excel uploaded
+            vendor_po = type('obj', (object,), {
+                'Vendor Name': 'Arkance IN Pvt. Ltd.',
+                'Vendor Address': 'Unit 801-802, 8th Floor, Tower 1...',
+                'Contact Person': 'Ms/Mr',
+                'Mobile': '+91 1234567890'
+            })
+            end_user_po = type('obj', (object,), {
+                'End User Company': 'Baldridge & Associates Pvt Ltd.',
+                'End User Address': '406 Sakar East, Vadodara 390009',
+                'End User Contact': 'Mr. Dev',
+                'End User Phone': '+91 9876543210',
+                'End User Email': 'info@company.com',
+                'GST NO': '24AAHCB9'
+            })
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
@@ -1485,47 +1550,47 @@ def main():
             with col1:
                 vendor_name = st.text_input(
                     "Vendor Name",
-                    value=safe_str_state("po_vendor_name", "Arkance IN Pvt. Ltd."),
+                    value=getattr(vendor_po, 'Vendor Name', safe_str_state("po_vendor_name", "Arkance IN Pvt. Ltd.")),
                     key="po_vendor_name_input"
                 )
                 vendor_address = st.text_area(
                     "Vendor Address",
-                    value=safe_str_state("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1..."),
+                    value=getattr(vendor_po, 'Vendor Address', safe_str_state("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1...")),
                     key="po_vendor_address_input"
                 )
                 vendor_contact = st.text_input(
                     "Contact Person",
-                    value=safe_str_state("po_vendor_contact", "Ms/Mr"),
+                    value=getattr(vendor_po, 'Contact Person', safe_str_state("po_vendor_contact", "Ms/Mr")),
                     key="po_vendor_contact_input"
                 )
                 vendor_mobile = st.text_input(
                     "Mobile",
-                    value=safe_str_state("po_vendor_mobile", "+91 1234567890"),
+                    value=getattr(vendor_po, 'Mobile', safe_str_state("po_vendor_mobile", "+91 1234567890")),
                     key="po_vendor_mobile_input"
                 )
                 end_company = st.text_input(
                     "End User Company",
-                    value=safe_str_state("po_end_company", "Baldridge & Associates Pvt Ltd."),
+                    value=getattr(end_user_po, 'End User Company', safe_str_state("po_end_company", "Baldridge & Associates Pvt Ltd.")),
                     key="po_end_company_input"
                 )
                 end_address = st.text_area(
                     "End User Address",
-                    value=safe_str_state("po_end_address", "406 Sakar East, Vadodara 390009"),
+                    value=getattr(end_user_po, 'End User Address', safe_str_state("po_end_address", "406 Sakar East, Vadodara 390009")),
                     key="po_end_address_input"
                 )
                 end_person = st.text_input(
                     "End User Contact",
-                    value=safe_str_state("po_end_person", "Mr. Dev"),
+                    value=getattr(end_user_po, 'End User Contact', safe_str_state("po_end_person", "Mr. Dev")),
                     key="po_end_person_input"
                 )
                 end_contact = st.text_input(
                     "End User Phone",
-                    value=safe_str_state("po_end_contact", "+91 9876543210"),
+                    value=getattr(end_user_po, 'End User Phone', safe_str_state("po_end_contact", "+91 9876543210")),
                     key="po_end_contact_input"
                 )
                 end_email = st.text_input(
                     "End User Email",
-                    value=safe_str_state("po_end_email", "info@company.com"),
+                    value=getattr(end_user_po, 'End User Email', safe_str_state("po_end_email", "info@company.com")),
                     key="po_end_email_input"
                 )
             with col2:
@@ -1644,7 +1709,7 @@ def main():
                     "ship_to_company": ship_to_company,
                     "ship_to_address": ship_to_address,
                     "end_company": end_company,
-                    "end_address":end_address,
+                    "end_address": end_address,
                     "end_person": end_person,
                     "end_contact": end_contact,
                     "end_email": end_email,
@@ -1679,7 +1744,8 @@ def main():
                     "⬇ Download Purchase Order",
                     data=pdf_bytes,
                     file_name=f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
-                    mime="application/pdf"
+                    mime="application/pdf",
+                    key="po_download_unique"
                 )
 
     # --- Tab 3: Quotation Generator (SINGLE SALES PERSON SELECTION) ---
@@ -1994,7 +2060,8 @@ As one of our privileged customers, we look forward to having you take part in o
                         data=pdf_bytes,
                         file_name=f"Quotation_{st.session_state.quotation_number.replace('/', '_')}.pdf",
                         mime="application/pdf",
-                        use_container_width=True
+                        use_container_width=True,
+                        key="quote_download_unique"
                     )
                     
                 except Exception as e:

@@ -248,7 +248,7 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # --- Simple and Reliable Paragraph Formatting ---
-    def write_paragraph_with_formatting(pdf, text):
+    def write_paragraph_with_formatting(pdf, text, software_name=None):
         """Write paragraph with specific terms in BOLD and UNDERLINE"""
         
         # Terms that should be BOLD
@@ -263,15 +263,9 @@ def add_page_one_intro(pdf, data):
             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
         ]
         
-        # Extract software name for bold
-        if "requirement for" in text.lower():
-            start_idx = text.lower().find("requirement for") + len("requirement for")
-            remaining = text[start_idx:].split('.')[0].split('!')[0].split('?')[0].strip()
-            words = remaining.split()[:2]
-            if words:
-                software_name = ' '.join(words).strip(' ,.!?;:')
-                if software_name:
-                    bold_terms.append(software_name)
+        # Add software name to bold terms if provided
+        if software_name and software_name not in bold_terms:
+            bold_terms.append(software_name)
         
         # Process the text
         lines = text.split('\n')
@@ -319,7 +313,7 @@ def add_page_one_intro(pdf, data):
                     if style == "bold":
                         pdf.set_font("Helvetica", "B", 10)
                     else:  # underline
-                        pdf.set_font("Helvetica", "BU", 10)
+                        pdf.set_font("Helvetica", "U", 10)
                     pdf.write(5, formatted_text)
                     
                     current_pos = end
@@ -333,13 +327,24 @@ def add_page_one_intro(pdf, data):
         
         pdf.ln(3)
 
+    # --- Extract software name once from the first paragraph ---
+    intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
+    software_name = None
+    
+    # Extract software name from first paragraph
+    if intro_text and "requirement for" in intro_text.lower():
+        start_idx = intro_text.lower().find("requirement for") + len("requirement for")
+        remaining = intro_text[start_idx:].split('.')[0].split('!')[0].split('?')[0].strip()
+        words = remaining.split()[:2]
+        if words:
+            software_name = ' '.join(words).strip(' ,.!?;:')
+
     # --- Write all paragraphs with formatting ---
     company_name = pdf.sanitize_text(data.get("vendor_name", "CM INFOTECH"))
     
     # Write the user's custom intro paragraph
-    intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
     if intro_text:
-        write_paragraph_with_formatting(pdf, intro_text)
+        write_paragraph_with_formatting(pdf, intro_text, software_name)
 
     # Fixed company introduction paragraphs
     fixed_paragraphs = [
@@ -353,7 +358,7 @@ def add_page_one_intro(pdf, data):
     ]
 
     for paragraph in fixed_paragraphs:
-        write_paragraph_with_formatting(pdf, paragraph)
+        write_paragraph_with_formatting(pdf, paragraph, software_name)
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin
@@ -399,6 +404,7 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 4, "https://www.instagram.com/", ln=True, link="https://www.instagram.com/")
     pdf.set_text_color(0, 0, 0)
     
+        
 def add_quotation_header(pdf, annexure_text, quotation_text):
     """Add dynamic quotation header with both annexure and title"""
     pdf.set_font("Helvetica", "BU", 14)

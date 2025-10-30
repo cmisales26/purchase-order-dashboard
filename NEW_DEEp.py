@@ -460,7 +460,7 @@ def add_page_two_commercials(pdf, data):
     pdf.ln(15)
 
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font("Helvetica", "", 9)
 
     # Terms & Conditions with ALL terms in bold
     terms = [
@@ -529,7 +529,7 @@ def add_page_two_commercials(pdf, data):
     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
 
     # Add section headers
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font("Helvetica", "B", 12)
 
     # Terms & Conditions header
     pdf.set_xy(x_start + padding, y_start + padding)
@@ -541,21 +541,21 @@ def add_page_two_commercials(pdf, data):
         pdf.set_xy(x_start + padding, terms_y)
         
         if i < 6:  # First 6 terms - ALL BOLD
-            pdf.set_font("Helvetica", "B", 9)
+            pdf.set_font("Helvetica", "B", 10)
             pdf.multi_cell(col1_width - 2*padding, line_height, label)
             
         elif value:  # Terms 7-11 with mixed formatting (label + bold value)
             # Write the regular font part
-            pdf.set_font("Helvetica", "", 9)
+            pdf.set_font("Helvetica", "", 10)
             pdf.cell(pdf.get_string_width(label), line_height, label, ln=0)
             
             # Write the bold part
-            pdf.set_font("Helvetica", "B", 9)
+            pdf.set_font("Helvetica", "B", 10)
             remaining_width = col1_width - 2*padding - pdf.get_string_width(label)
             pdf.multi_cell(remaining_width, line_height, value)
             
             # Reset to regular font
-            pdf.set_font("Helvetica", "", 9)
+            pdf.set_font("Helvetica", "", 10)
         else:
             # Regular terms without special formatting
             pdf.multi_cell(col1_width - 2*padding, line_height, label)
@@ -563,10 +563,10 @@ def add_page_two_commercials(pdf, data):
         terms_y = pdf.get_y()
 
     # Bank Details header - INSIDE THE BOX
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font("Helvetica", "B", 12)
     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-    pdf.set_font("Helvetica", "", 9)  # Set to regular for labels
+    pdf.set_font("Helvetica", "", 12)  # Set to regular for labels
 
     # Bank details content - INSIDE THE BOX
     bank_y = pdf.get_y()
@@ -574,11 +574,11 @@ def add_page_two_commercials(pdf, data):
         pdf.set_xy(x_start + col1_width + padding, bank_y)
         
         # Write label in regular font
-        pdf.set_font("Helvetica", "", 9)
+        pdf.set_font("Helvetica", "", 10)
         pdf.cell(pdf.get_string_width(f"{label}: "), line_height, f"{label}: ", ln=0)
         
         # Write value in BOLD font
-        pdf.set_font("Helvetica", "B", 9)
+        pdf.set_font("Helvetica", "B", 10)
         remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{label}: ")
         pdf.multi_cell(remaining_width, line_height, value)
         

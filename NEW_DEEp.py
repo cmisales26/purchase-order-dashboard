@@ -378,27 +378,27 @@ def add_page_two_commercials(pdf, data):
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
     pdf.set_font("Helvetica", "", 9)
 
-    # Terms & Conditions (UPDATED TO MATCH SECOND VERSION)
+    # Terms & Conditions with mixed formatting
     terms = [
-        "1. Above charges are Inclusive of GST.",
-        "2. Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.",
-        "3. TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.",
-        "4. ELD licenses are paper licenses that do not contain media.",
-        "5. An Internet connection is required to access cloud services.",
-        "6. Training will be charged at extra cost depending on no. of participants.",
-        "7. Price Validity: 10 days from Quotation date",
-        "8. Payment: 100% Advance along with purchase order.",
-        "9. Delivery period: 1-2 Weeks from the date of Purchase Order",
-        '10. Cheque to be issued on name of: "CM INFOTECH"',
-        "11. Order to be placed on: CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481"
+        ("1. Above charges are Inclusive of GST.", ""),
+        ("2. Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.", ""),
+        ("3. TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.", ""),
+        ("4. ELD licenses are paper licenses that do not contain media.", ""),
+        ("5. An Internet connection is required to access cloud services.", ""),
+        ("6. Training will be charged at extra cost depending on no. of participants.", ""),
+        ("7. Price Validity: ", "10 days from Quotation date"),
+        ("8. Payment: ", "100% Advance along with purchase order"),
+        ("9. Delivery period: ", "1-2 Weeks from the date of Purchase Order"),
+        ("10. Cheque to be issued on name of: ", '"CM INFOTECH"'),
+        ("11. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481")
     ]
 
-    # Bank Details (UPDATED TO MATCH SECOND VERSION)
+    # Bank Details
     bank_info = [
         ("Name", "CM INFOTECH"),
         ("Account Number", "88130420182"),
         ("IFSC Code", "IDFB0040335"),
-        ("SWIFT Code","IDFBINBBMUM"),
+        ("SWIFT Code", "IDFBINBBMUM"),
         ("Bank Name", "IDFC FIRST"),
         ("Branch", "AHMEDABAD - SHYAMAL BRANCH"),
         ("MSME", "UDYAM-GJ-01-0117646"),
@@ -419,15 +419,19 @@ def add_page_two_commercials(pdf, data):
     # Calculate required height for both columns
     def calculate_column_height(items, col_width):
         height = 0
-        for item in items:
-            lines = pdf.multi_cell(col_width - 2*padding, line_height, item, split_only=True)
+        for label, value in items:
+            if value:  # If there's a value part
+                text = f"{label}{value}"
+            else:
+                text = label
+            lines = pdf.multi_cell(col_width - 2*padding, line_height, text, split_only=True)
             height += len(lines) * line_height + section_spacing
         return height + 3*padding  # Add padding
 
     terms_height = calculate_column_height(terms, col1_width)
 
     # Calculate bank details height including signature section
-    bank_items_height = calculate_column_height([f"{label}: {value}" for label, value in bank_info], col2_width)
+    bank_items_height = calculate_column_height(bank_info, col2_width)
     signature_height = 35  # Estimated height for signature section
     bank_height = bank_items_height + signature_height + padding
 
@@ -448,71 +452,104 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
     pdf.set_font("Helvetica", "", 9)  # Set to regular font for terms content
 
-    # Terms content
+    # Terms content - INSIDE THE BOX
     terms_y = pdf.get_y()
-    for i, term in enumerate(terms):
+    for label, value in terms:
         pdf.set_xy(x_start + padding, terms_y)
         
-        # Apply bold formatting to specific parts
-        if "Price Validity:" in term:
-            # Split the term into label and value for bold formatting
-            parts = term.split("Price Validity:")
-            pdf.cell(col1_width - 2*padding, line_height, parts[0] + "Price Validity:", ln=0)
-            pdf.set_font("Helvetica", "B", 9)
-            remaining_width = col1_width - 2*padding - pdf.get_string_width(parts[0] + "Price Validity:")
-            pdf.multi_cell(remaining_width, line_height, parts[1])
+        if value:  # Terms with mixed formatting (label + bold value)
+            # Write the regular font part
             pdf.set_font("Helvetica", "", 9)
-        
-        elif "Payment:" in term:
-            parts = term.split("Payment:")
-            pdf.cell(col1_width - 2*padding, line_height, parts[0] + "Payment:", ln=0)
+            pdf.cell(pdf.get_string_width(label), line_height, label, ln=0)
+            
+            # Write the bold part
             pdf.set_font("Helvetica", "B", 9)
-            remaining_width = col1_width - 2*padding - pdf.get_string_width(parts[0] + "Payment:")
-            pdf.multi_cell(remaining_width, line_height, parts[1])
+            remaining_width = col1_width - 2*padding - pdf.get_string_width(label)
+            pdf.multi_cell(remaining_width, line_height, value)
+            
+            # Reset to regular font
             pdf.set_font("Helvetica", "", 9)
-        
-        elif "Delivery period:" in term:
-            parts = term.split("Delivery period:")
-            pdf.cell(col1_width - 2*padding, line_height, parts[0] + "Delivery period:", ln=0)
-            pdf.set_font("Helvetica", "B", 9)
-            remaining_width = col1_width - 2*padding - pdf.get_string_width(parts[0] + "Delivery period:")
-            pdf.multi_cell(remaining_width, line_height, parts[1])
-            pdf.set_font("Helvetica", "", 9)
-        
-        elif "Cheque to be issued" in term:
-            parts = term.split(":")
-            pdf.cell(col1_width - 2*padding, line_height, parts[0] + ":", ln=0)
-            pdf.set_font("Helvetica", "B", 9)
-            remaining_width = col1_width - 2*padding - pdf.get_string_width(parts[0] + ":")
-            pdf.multi_cell(remaining_width, line_height, parts[1])
-            pdf.set_font("Helvetica", "", 9)
-        
-        elif "Order to be placed" in term:
-            parts = term.split(":")
-            pdf.cell(col1_width - 2*padding, line_height, parts[0] + ":", ln=0)
-            pdf.set_font("Helvetica", "B", 9)
-            remaining_width = col1_width - 2*padding - pdf.get_string_width(parts[0] + ":")
-            pdf.multi_cell(remaining_width, line_height, parts[1])
-            pdf.set_font("Helvetica", "", 9)
-        
         else:
             # Regular terms without special formatting
-            pdf.multi_cell(col1_width - 2*padding, line_height, term)
+            pdf.multi_cell(col1_width - 2*padding, line_height, label)
         
         terms_y = pdf.get_y()
 
-    # Bank Details header
+    # Bank Details header - INSIDE THE BOX
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
     pdf.set_font("Helvetica", "B", 9)
 
-    # Bank details content
+    # Bank details content - INSIDE THE BOX
     bank_y = pdf.get_y()
     for label, value in bank_info:
         pdf.set_xy(x_start + col1_width + padding, bank_y)
-        pdf.multi_cell(col2_width - 2*padding, line_height, f"{label}: {value}")
+        pdf.set_font("Helvetica", "B", 9)
+        pdf.cell(pdf.get_string_width(f"{label}: "), line_height, f"{label}: ", ln=0)
+        pdf.set_font("Helvetica", "", 9)
+        remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{label}: ")
+        pdf.multi_cell(remaining_width, line_height, value)
         bank_y = pdf.get_y()
+
+    # --- Signature Block INSIDE BANK DETAILS BOX ---
+    signature_start_y = bank_y + 5
+
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_xy(x_start + col1_width + padding, signature_start_y)
+    pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
+
+    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
+
+    # --- Signature Block with Dynamic Sales Person ---
+    sales_person_code = data.get('sales_person_code', 'SD')
+    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+
+    # Add stamp between "For CM INFOTECH" and sales person name
+    if data.get('stamp_path') and os.path.exists(data['stamp_path']):
+        try:
+            # Position stamp centered between "For CM INFOTECH" and sales person name
+            stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
+            stamp_x = x_start + col1_width + padding + (col2_width - 2*padding - 20) / 2  # Center the stamp
+            pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
+            # Move cursor down after stamp
+            pdf.set_y(stamp_y + 25)  # Space for stamp + some padding
+        except:
+            pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
+    else:
+        pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
+
+    pdf.set_font("Helvetica", "", 9)
+    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
+
+    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
+
+    # Clickable email in signature
+    pdf.set_font("Helvetica", "", 9)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    label = "Email: "
+    pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+    pdf.set_text_color(0, 0, 255)
+    pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
+            ln=True, link=f"mailto:{sales_person_info['email']}")
+
+    # Clickable phone in signature
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Helvetica", "", 9)
+    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    label = "Mobile: "
+    pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+    pdf.set_text_color(0, 0, 255)
+    pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
+            ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+    pdf.set_text_color(0, 0, 0)
+
+    # Move cursor below the box
+    pdf.set_xy(x_start, y_start + box_height + 10)
     
     # --- Signature Block INSIDE BANK DETAILS BOX ---
     signature_start_y = bank_y + 5

@@ -279,7 +279,7 @@ def write_formatted_paragraph(pdf, text):
             
             # Space between paragraphs
             if para_idx < len(paragraphs) - 1:
-                pdf.ln(12)  # Good space between paragraphs
+                pdf.ln(40)  # Good space between paragraphs
 
 def write_line_with_markers(pdf, line):
     """Write a line parsing **bold** and __underline__ markers"""
@@ -298,7 +298,7 @@ def write_line_with_markers(pdf, line):
         elif part.startswith('__') and part.endswith('__'):
             # Underlined text  
             text = part[2:-2]
-            pdf.set_font("Helvetica", "U", 10)
+            pdf.set_font("Helvetica", "BU", 10)
             pdf.write(5, text)
             pdf.set_font("Helvetica", "", 10)
         else:

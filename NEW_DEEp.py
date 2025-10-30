@@ -2039,6 +2039,7 @@ def main():
                     "grand_total": grand_total,
                     "subject": subject_line,
                     "intro_paragraph": intro_paragraphs_1,
+                    "product_name": selected_product if selected_product else "Software",
                     "sales_person_code": sales_person,  
                     "annexure_text": annexure_text,  
                     "quotation_title": quotation_title

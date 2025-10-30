@@ -188,12 +188,12 @@ class QUOTATION_PDF(FPDF):
 
 def add_clickable_email(pdf, email, label="Email: "):
     """Add clickable email with label - FIXED OVERLAP"""
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font("Helvetica", "B", 12)
     label_width = pdf.get_string_width(label)
     pdf.cell(label_width, 4, label, ln=0)
     
     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 12)
     pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
     pdf.set_text_color(0, 0, 0)  # Reset to black
 
@@ -346,7 +346,7 @@ def add_page_one_intro(pdf, data):
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 12)
     pdf.set_text_color(0, 0, 0)
 
     # Normal text
@@ -355,31 +355,31 @@ def add_page_one_intro(pdf, data):
 
     # Email clickable
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 10)  # underline
+    pdf.set_font("Helvetica", "U", 12)  # underline
     pdf.write(5, "chirag@cminfotech.com", link="mailto:chirag@cminfotech.com")
 
     # Back to normal for separator + Mobile:
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 12)
     pdf.write(5, "  Mobile: ")
 
     # Only one mobile number
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 10)
+    pdf.set_font("Helvetica", "U", 12)
     pdf.write(5, "+91 873 391 5721", link="tel:+91 873 391 5721")
 
     # Reset back to normal for anything after
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 12)
     pdf.ln(10)  # move cursor down for next section
     
     pdf.ln(3)
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 12)
     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 12)
     
     # Clickable website
-    pdf.set_font("Helvetica", "U", 10)
+    pdf.set_font("Helvetica", "U", 12)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, link="https://www.cminfotech.com/")
     pdf.cell(0, 4, "https://www.linkedin.com/", ln=True, link="https://www.linkedin.com/")

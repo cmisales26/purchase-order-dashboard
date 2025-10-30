@@ -523,10 +523,10 @@ def add_page_two_commercials(pdf, data):
     for label, value in bank_info:
         pdf.set_xy(x_start + col1_width + padding, bank_y)
         pdf.set_font("Helvetica", "B", 9)
-        pdf.cell(pdf.get_string_width(f"{label}: "), line_height, f"{label}: ", ln=0)
+        pdf.cell(pdf.get_string_width(f"{value}: "), line_height, f"{value}: ", ln=0)
         pdf.set_font("Helvetica", "", 9)
-        remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{label}: ")
-        pdf.multi_cell(remaining_width, line_height, value)
+        remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{value}: ")
+        pdf.multi_cell(remaining_width, line_height, label)
         bank_y = pdf.get_y()
 
     

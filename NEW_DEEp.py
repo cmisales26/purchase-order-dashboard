@@ -254,9 +254,9 @@ def add_page_one_intro(pdf, data):
             software_name, software_name.split()[0],
             "Quotation", "Autodesk", "GstarCAD", "Grabert", "RuleBuddy",
             "CMS Intellicad", "ZWCAD", "Etabs", "Trimble", "Bentley",
-            "Solidworks", "Solid Edge", "Bluebeam", "Adobe", "Microsoft",
-            "Corel", "Chaos", "Nitro", "Tally Quick Heal","CMS Intellicad","Solid Edge",
-            "Tally Quick Heal"
+            "Solidworks", "Solid Edge", "Bluebeam", "Adobe Software", "Microsoft",
+            "Corel", "Chaos", "Nitro", "Tally Quick Heal","CMS Intellicad",
+            "Tally Quick Heal","Solid Edge","Adobe"
         ]
         pdf.set_font("Helvetica", "", font_size)
         line_height = 5.5

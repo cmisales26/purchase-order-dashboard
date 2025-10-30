@@ -322,6 +322,17 @@ def add_page_two_commercials(pdf, data):
     
     add_quotation_header(pdf, annexure_text, quotation_title)
 
+    # pdf.set_font("Helvetica", "B", 14)
+    # pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
+    # pdf.set_font("Helvetica", "B", 12)
+    # pdf.cell(0, 6, quotation_title, ln=True, align="C")
+    # pdf.ln(8)
+    # pdf.set_font("Helvetica", "B", 14)
+    # pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
+    # pdf.set_font("Helvetica", "B", 12)
+    # pdf.cell(0, 6, "Quotation for Adobe Software", ln=True, align="C")
+    # pdf.ln(8)
+
     # --- Products Table - FIXED COLUMN WIDTHS ---
     col_widths = [70, 25, 25, 25, 15, 25]  # Adjusted for better fit
     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
@@ -364,19 +375,12 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
     pdf.ln(15)
 
-    # --- Define layout variables HERE before using them ---
-    page_width = pdf.w - 2 * pdf.l_margin
-    x_start = pdf.l_margin
-    col1_width = page_width * 0.6  # 60% for Terms
-    padding = 4
-    line_height = 4.5
-
     pdf.set_font("Helvetica", "B", 9)
 
     # Terms & Conditions with partial bold formatting
     terms_y = pdf.get_y()
 
-    # Regular terms (1-6) - No bold
+    # Regular terms (1-6)
     terms = [
         "Above charges are Inclusive of GST.",
         "Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.",
@@ -388,21 +392,17 @@ def add_page_two_commercials(pdf, data):
 
     for i, term in enumerate(terms):
         pdf.set_xy(x_start + padding, terms_y)
-        pdf.set_font("Helvetica", "", 9)  # Regular font for these terms
         pdf.multi_cell(col1_width - 2*padding, line_height, f"{i+1}. {term}")
         terms_y = pdf.get_y()
 
     # Special terms with partial bold (7-11)
-    # Term 7: Price Validity
     pdf.set_xy(x_start + padding, terms_y)
-    pdf.set_font("Helvetica", "", 9)
     pdf.multi_cell(col1_width - 2*padding, line_height, "7. Price Validity: ")
     pdf.set_x(x_start + padding + pdf.get_string_width("7. Price Validity: "))
     pdf.set_font("Helvetica", "B", 9)
     pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width("7. Price Validity: "), line_height, "10 days from Quotation date")
     terms_y = pdf.get_y()
 
-    # Term 8: Payment
     pdf.set_xy(x_start + padding, terms_y)
     pdf.set_font("Helvetica", "", 9)
     pdf.multi_cell(col1_width - 2*padding, line_height, "8. Payment: ")
@@ -411,7 +411,6 @@ def add_page_two_commercials(pdf, data):
     pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width("8. Payment: "), line_height, "100% Advance along with purchase order")
     terms_y = pdf.get_y()
 
-    # Term 9: Delivery period
     pdf.set_xy(x_start + padding, terms_y)
     pdf.set_font("Helvetica", "", 9)
     pdf.multi_cell(col1_width - 2*padding, line_height, "9. Delivery period: ")
@@ -420,7 +419,6 @@ def add_page_two_commercials(pdf, data):
     pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width("9. Delivery period: "), line_height, "License will be delivered electronically within 2-3 working days after payment confirmation. Includes 12 months of technical support and software updates from OEM.")
     terms_y = pdf.get_y()
 
-    # Term 10: Dispatched Through
     pdf.set_xy(x_start + padding, terms_y)
     pdf.set_font("Helvetica", "", 9)
     pdf.multi_cell(col1_width - 2*padding, line_height, "10. Dispatched Through: ")
@@ -429,7 +427,6 @@ def add_page_two_commercials(pdf, data):
     pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width("10. Dispatched Through: "), line_height, "Online")
     terms_y = pdf.get_y()
 
-    # Term 11: Cheque to be issued
     pdf.set_xy(x_start + padding, terms_y)
     pdf.set_font("Helvetica", "", 9)
     pdf.multi_cell(col1_width - 2*padding, line_height, '11. Cheque to be issued on name of: ')
@@ -514,6 +511,16 @@ def add_page_two_commercials(pdf, data):
         bank_y = pdf.get_y()
     
     # --- Signature Block INSIDE BANK DETAILS BOX ---
+    signature_start_y = bank_y + 5
+    
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_xy(x_start + col1_width + padding, signature_start_y)
+    pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
+    
+    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
+    
+        # --- Signature Block INSIDE BANK DETAILS BOX ---
     signature_start_y = bank_y + 5
     
     pdf.set_font("Helvetica", "B", 10)

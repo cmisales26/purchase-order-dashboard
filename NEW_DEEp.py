@@ -319,7 +319,7 @@ def add_page_one_intro(pdf, data):
                     if style == "bold":
                         pdf.set_font("Helvetica", "B", 10)
                     else:  # underline
-                        pdf.set_font("Helvetica", "U", 10)
+                        pdf.set_font("Helvetica", "BU", 10)
                     pdf.write(5, formatted_text)
                     
                     current_pos = end
@@ -366,7 +366,7 @@ def add_page_one_intro(pdf, data):
 
     # Email clickable
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "UB", 10)  # underline
+    pdf.set_font("Helvetica", "U", 10)  # underline
     pdf.write(5, "chirag@cminfotech.com", link="mailto:chirag@cminfotech.com")
 
     # Back to normal for separator + Mobile:

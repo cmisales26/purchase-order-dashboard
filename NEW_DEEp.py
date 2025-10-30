@@ -516,17 +516,22 @@ def add_page_two_commercials(pdf, data):
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-    pdf.set_font("Helvetica", "B", 9)
+    pdf.set_font("Helvetica", "", 9)  # Set to regular for labels
 
     # Bank details content - INSIDE THE BOX
     bank_y = pdf.get_y()
     for label, value in bank_info:
         pdf.set_xy(x_start + col1_width + padding, bank_y)
-        pdf.set_font("Helvetica", "B", 9)
-        pdf.cell(pdf.get_string_width(f"{value}: "), line_height, f"{value}: ", ln=0)
+        
+        # Write label in regular font
         pdf.set_font("Helvetica", "", 9)
-        remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{value}: ")
-        pdf.multi_cell(remaining_width, line_height, label)
+        pdf.cell(pdf.get_string_width(f"{label}: "), line_height, f"{label}: ", ln=0)
+        
+        # Write value in BOLD font
+        pdf.set_font("Helvetica", "B", 9)
+        remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{label}: ")
+        pdf.multi_cell(remaining_width, line_height, value)
+        
         bank_y = pdf.get_y()
 
     

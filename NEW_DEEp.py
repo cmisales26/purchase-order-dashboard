@@ -464,35 +464,35 @@ def add_page_two_commercials(pdf, data):
         if "Price Validity:" in term:
             # Split the term into label and value for bold formatting
             parts = term.split("Price Validity:")
-            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + "Price Validity:", ln=0)
+            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + "Price Validity:")
             pdf.set_font("Helvetica", "B", 9)
             pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width(parts[0] + "Price Validity:"), line_height, parts[1])
             pdf.set_font("Helvetica", "", 9)
         
         elif "Payment:" in term:
             parts = term.split("Payment:")
-            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + "Payment:", ln=0)
+            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + "Payment:")
             pdf.set_font("Helvetica", "B", 9)
             pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width(parts[0] + "Payment:"), line_height, parts[1])
             pdf.set_font("Helvetica", "", 9)
         
         elif "Delivery period:" in term:
             parts = term.split("Delivery period:")
-            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + "Delivery period:", ln=0)
+            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + "Delivery period:")
             pdf.set_font("Helvetica", "B", 9)
             pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width(parts[0] + "Delivery period:"), line_height, parts[1])
             pdf.set_font("Helvetica", "", 9)
         
         elif "Cheque to be issued" in term:
             parts = term.split(":")
-            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + ":", ln=0)
+            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + ":")
             pdf.set_font("Helvetica", "B", 9)
             pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width(parts[0] + ":"), line_height, parts[1])
             pdf.set_font("Helvetica", "", 9)
         
         elif "Order to be placed" in term:
             parts = term.split(":")
-            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + ":", ln=0)
+            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + ":")
             pdf.set_font("Helvetica", "B", 9)
             pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width(parts[0] + ":"), line_height, parts[1])
             pdf.set_font("Helvetica", "", 9)

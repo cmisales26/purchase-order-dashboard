@@ -301,22 +301,22 @@ def add_page_one_intro(pdf, data):
                 for start, end, style in format_positions:
                     # Write text before formatting
                     if start > current_pos:
-                        pdf.set_font("Helvetica", "", 10)
+                        pdf.set_font("Helvetica", "", 12)
                         pdf.write(5, line[current_pos:start])
                     
                     # Write formatted text
                     formatted_text = line[start:end]
                     if style == "bold":
-                        pdf.set_font("Helvetica", "B", 10)
+                        pdf.set_font("Helvetica", "B", 12)
                     else:  # underline
-                        pdf.set_font("Helvetica", "BU", 10)
+                        pdf.set_font("Helvetica", "BU", 12)
                     pdf.write(5, formatted_text)
                     
                     current_pos = end
                 
                 # Write remaining text
                 if current_pos < len(line):
-                    pdf.set_font("Helvetica", "", 10)
+                    pdf.set_font("Helvetica", "", 12)
                     pdf.write(5, line[current_pos:])
                 
                 pdf.ln(5)

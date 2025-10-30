@@ -248,42 +248,46 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # --- Formatted Introductory Paragraph (Normal + Bold/Underline details) ---
-    def add_styled_paragraph(pdf, text, company_name="CMI (CM INFOTECH)", software_name="Adobe Software", font_size=10):
+    # --- Formatted Introductory Paragraph (Normal + Bold/Underline details) ---
+    def add_styled_paragraph(pdf, text, company_name, software_name, font_size=10):
+        # Words that should appear bold & underlined
         highlight_words = [
             company_name, company_name.replace(" ", ""),
             software_name, software_name.split()[0],
             "Quotation", "Autodesk", "GstarCAD", "Grabert", "RuleBuddy",
             "CMS Intellicad", "ZWCAD", "Etabs", "Trimble", "Bentley",
-            "Solidworks", "Solid_Edge", "Bluebeam", "Adobe Software", "Microsoft",
-            "Corel", "Chaos", "Nitro", "Tally Quick Heal","CMS Intellicad",
-            "Tally Quick Heal","Solid Edge","Adobe"
+            "Solidworks", "Solid Edge", "Bluebeam", "Adobe", "Microsoft",
+            "Corel", "Chaos", "Nitro", "Tally", "Quick Heal"
         ]
+
         pdf.set_font("Helvetica", "", font_size)
         line_height = 5.5
+
         for para in text.split("\n"):
             if not para.strip():
                 pdf.ln(3)
                 continue
+
             words = para.split(" ")
             for word in words:
                 clean = word.strip(",.()\"")
                 match = next((hw for hw in highlight_words if hw.lower() in clean.lower()), None)
                 if match:
-                    pdf.set_font("Helvetica", "BU", font_size)  # Bold + Underline for keywords
+                    pdf.set_font("Helvetica", "BU", font_size)  # Bold + Underline
                     pdf.write(line_height, word + " ")
                     pdf.set_font("Helvetica", "", font_size)
                 else:
                     pdf.write(line_height, word + " ")
             pdf.ln(line_height)
 
-    # Call styled paragraph function here
-    add_styled_paragraph(
-        pdf,
-        pdf.sanitize_text(data['intro_paragraph']),
-        company_name="CM INFOTECH",
-        software_name="ZWCAD Software"
-    )
+    # --- Call with dynamic user inputs ---
+    company_name = pdf.sanitize_text(data.get("vendor_name", "CM INFOTECH"))
+    software_name = pdf.sanitize_text(data.get("product_name", "ZWCAD Software"))
+    intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
+
+    add_styled_paragraph(pdf, intro_text, company_name, software_name)
     pdf.ln(5)
+
 
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP

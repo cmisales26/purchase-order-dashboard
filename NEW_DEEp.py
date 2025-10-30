@@ -210,124 +210,6 @@ def add_clickable_phone(pdf, phone, label="Mobile: "):
     pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
     pdf.set_text_color(0, 0, 0)  # Reset to black
 
-def write_formatted_paragraph(pdf, text):
-    """Simple formatting - only specific predefined terms get special formatting"""
-    
-    # Define exactly what gets formatted
-    formatting_rules = {
-        # Bold terms
-        "Quotation": "bold",
-        "CM Infotech's proposal": "bold", 
-        "CMI (CM INFOTECH)": "bold",
-        
-        # Underlined terms (software partnership)
-        "Autodesk": "underline",
-        "GstarCAD": "underline",
-        "Grabert": "underline", 
-        "RuleBuddy": "underline",
-        "CMS Intellicad": "underline",
-        "ZWCAD": "underline",
-        "Etabs": "underline",
-        "Trimble": "underline",
-        "Bentley": "underline",
-        "Solidworks": "underline",
-        "Solid Edge": "underline",
-        "Bluebeam": "underline",
-        "Adobe": "underline", 
-        "Microsoft": "underline",
-        "Corel": "underline",
-        "Chaos": "underline",
-        "Nitro": "underline",
-        "Tally Quick Heal": "underline"
-    }
-    
-    # Extract software name for bold
-    first_line = text.split('\n')[0] if '\n' in text else text
-    software_name = None
-    if "requirement for" in first_line.lower():
-        start_idx = first_line.lower().find("requirement for") + len("requirement for")
-        remaining = first_line[start_idx:].split('.')[0].split('!')[0].split('?')[0].strip()
-        words = remaining.split()[:2]  # Take max 2 words
-        if words:
-            software_name = ' '.join(words).strip(' ,.!?;:')
-            if software_name:
-                formatting_rules[software_name] = "bold"
-    
-    # Process text paragraph by paragraph
-    paragraphs = text.split('\n\n')
-    
-    for para_idx, paragraph in enumerate(paragraphs):
-        if paragraph.strip():
-            current_text = paragraph
-            
-            # Apply formatting by replacing terms
-            for term, style in formatting_rules.items():
-                if term in current_text:
-                    if style == "bold":
-                        replacement = f"**{term}**"
-                    else:  # underline
-                        replacement = f"__{term}__"
-                    current_text = current_text.replace(term, replacement)
-            
-            # Parse and write with formatting
-            lines = current_text.split('\n')
-            for line_idx, line in enumerate(lines):
-                if line.strip():
-                    write_line_with_markers(pdf, line)
-                    if line_idx < len(lines) - 1:
-                        pdf.ln(4)
-            
-            # Space between paragraphs
-            if para_idx < len(paragraphs) - 1:
-                pdf.ln(40)  # Good space between paragraphs
-
-def write_line_with_markers(pdf, line):
-    """Write a line parsing **bold** and __underline__ markers"""
-    import re
-    
-    # Split by formatting markers
-    parts = re.split(r'(\*\*.*?\*\*|__.*?__)', line)
-    
-    for part in parts:
-        if part.startswith('**') and part.endswith('**'):
-            # Bold text
-            text = part[2:-2]
-            pdf.set_font("Helvetica", "B", 10)
-            pdf.write(5, text)
-            pdf.set_font("Helvetica", "", 10)
-        elif part.startswith('__') and part.endswith('__'):
-            # Underlined text  
-            text = part[2:-2]
-            pdf.set_font("Helvetica", "BU", 10)
-            pdf.write(5, text)
-            pdf.set_font("Helvetica", "", 10)
-        else:
-            # Regular text
-            pdf.set_font("Helvetica", "", 10)
-            pdf.write(5, part)    
-    # return None
-
-def detect_software_names(text):
-    """Detect common software names in the text"""
-    software_names = []
-    
-    # Common software name patterns (capitalized words, often with specific terms)
-    words = text.split()
-    for i, word in enumerate(words):
-        # Look for capitalized words that might be software names
-        if (word.istitle() or word.isupper()) and len(word) > 2:
-            # Check if it's followed by common software terms
-            if i + 1 < len(words):
-                next_word = words[i + 1].lower()
-                if next_word in ['software', 'license', 'subscription', 'cloud', 'app', 'application', 'suite', 'package']:
-                    software_names.append(f"{word} {words[i + 1]}")
-                elif word.lower() not in ['the', 'and', 'for', 'with', 'your', 'our']:
-                    software_names.append(word)
-    
-    return software_names
-
-
-
 def add_page_one_intro(pdf, data):
     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "B", 10)
@@ -365,10 +247,43 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
 
-    # Introductory Paragraph (from user input) with automatic software detection and bold formatting
-    pdf.set_font("Helvetica", "", 10)
-    write_formatted_paragraph(pdf, data['intro_paragraph'])
+    # --- Formatted Introductory Paragraph (Normal + Bold/Underline details) ---
+    def add_styled_paragraph(pdf, text, company_name="CM INFOTECH", software_name="ZWCAD Software", font_size=10):
+        highlight_words = [
+            company_name, company_name.replace(" ", ""),
+            software_name, software_name.split()[0],
+            "Quotation", "Autodesk", "GstarCAD", "Grabert", "RuleBuddy",
+            "CMS Intellicad", "ZWCAD", "Etabs", "Trimble", "Bentley",
+            "Solidworks", "Solid Edge", "Bluebeam", "Adobe", "Microsoft",
+            "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+        ]
+        pdf.set_font("Helvetica", "", font_size)
+        line_height = 5.5
+        for para in text.split("\n"):
+            if not para.strip():
+                pdf.ln(3)
+                continue
+            words = para.split(" ")
+            for word in words:
+                clean = word.strip(",.()\"")
+                match = next((hw for hw in highlight_words if hw.lower() in clean.lower()), None)
+                if match:
+                    pdf.set_font("Helvetica", "BU", font_size)  # Bold + Underline for keywords
+                    pdf.write(line_height, word + " ")
+                    pdf.set_font("Helvetica", "", font_size)
+                else:
+                    pdf.write(line_height, word + " ")
+            pdf.ln(line_height)
+
+    # Call styled paragraph function here
+    add_styled_paragraph(
+        pdf,
+        pdf.sanitize_text(data['intro_paragraph']),
+        company_name="CM INFOTECH",
+        software_name="ZWCAD Software"
+    )
     pdf.ln(5)
+
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin
@@ -393,8 +308,6 @@ def add_page_one_intro(pdf, data):
     pdf.set_text_color(0, 0, 255)
     pdf.set_font("Helvetica", "U", 10)
     pdf.write(5, "+91 873 391 5721 ", link="tel:+91 873 391 5721")
-
-
 
     # Reset back to normal for anything after
     pdf.set_text_color(0, 0, 0)
@@ -606,64 +519,6 @@ def add_page_two_commercials(pdf, data):
         pdf.multi_cell(remaining_width, line_height, value)
         bank_y = pdf.get_y()
 
-    # # --- Signature Block INSIDE BANK DETAILS BOX ---
-    # signature_start_y = bank_y + 5
-
-    # pdf.set_font("Helvetica", "B", 10)
-    # pdf.set_xy(x_start + col1_width + padding, signature_start_y)
-    # pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
-
-    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    # pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
-
-    # # --- Signature Block with Dynamic Sales Person ---
-    # sales_person_code = data.get('sales_person_code', 'SD')
-    # sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-
-    # # Add stamp between "For CM INFOTECH" and sales person name
-    # if data.get('stamp_path') and os.path.exists(data['stamp_path']):
-    #     try:
-    #         # Position stamp centered between "For CM INFOTECH" and sales person name
-    #         stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
-    #         stamp_x = x_start + col1_width + padding + (col2_width - 2*padding - 20) / 2  # Center the stamp
-    #         pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
-    #         # Move cursor down after stamp
-    #         pdf.set_y(stamp_y + 25)  # Space for stamp + some padding
-    #     except:
-    #         pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
-    # else:
-    #     pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
-
-    # pdf.set_font("Helvetica", "", 9)
-    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    # pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
-
-    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    # pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
-
-    # # Clickable email in signature
-    # pdf.set_font("Helvetica", "", 9)
-    # pdf.set_text_color(0, 0, 0)
-    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    # label = "Email: "
-    # pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    # pdf.set_text_color(0, 0, 255)
-    # pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
-    #         ln=True, link=f"mailto:{sales_person_info['email']}")
-
-    # # Clickable phone in signature
-    # pdf.set_text_color(0, 0, 0)
-    # pdf.set_font("Helvetica", "", 9)
-    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    # label = "Mobile: "
-    # pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    # pdf.set_text_color(0, 0, 255)
-    # pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
-    #         ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-    # pdf.set_text_color(0, 0, 0)
-
-    # # Move cursor below the box
-    # pdf.set_xy(x_start, y_start + box_height + 10)
     
     # --- Signature Block INSIDE BANK DETAILS BOX ---
     signature_start_y = bank_y + 5

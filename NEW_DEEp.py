@@ -309,7 +309,7 @@ def add_page_one_intro(pdf, data):
                     if style == "bold":
                         pdf.set_font("Helvetica", "B", 10)
                     else:  # underline
-                        pdf.set_font("Helvetica", "U", 10)
+                        pdf.set_font("Helvetica", "BU", 10)
                     pdf.write(5, formatted_text)
                     
                     current_pos = end
@@ -387,8 +387,8 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 4, "https://www.facebook.com/", ln=True, link="https://www.facebook.com/")
     pdf.cell(0, 4, "https://www.instagram.com/", ln=True, link="https://www.instagram.com/")
     pdf.set_text_color(0, 0, 0)
-    
-        
+
+
 def add_quotation_header(pdf, annexure_text, quotation_text):
     """Add dynamic quotation header with both annexure and title"""
     pdf.set_font("Helvetica", "BU", 14)

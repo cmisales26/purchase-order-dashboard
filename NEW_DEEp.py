@@ -247,7 +247,6 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
 
-    # --- Formatted Introductory Paragraph (Normal + Bold/Underline details) ---
     # --- Perfect Intro Paragraph Formatting (Bold + Underline like sample image) ---
     def add_styled_paragraph(pdf, text, company_name, software_name, font_size=10):
         highlight_words = [
@@ -290,10 +289,25 @@ def add_page_one_intro(pdf, data):
     software_name = pdf.sanitize_text(data.get("product_name", "ZWCAD Software"))
     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
 
-    add_styled_paragraph(pdf, intro_text, company_name, software_name)
-    pdf.ln(5)
+    # Write the user's custom intro paragraph
+    if intro_text:
+        add_styled_paragraph(pdf, intro_text, company_name, software_name)
+        pdf.ln(8)
 
+    # --- Fixed company introduction paragraphs ---
+    fixed_paragraphs = [
+        "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
+        
+        "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
+        
+        "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
+        
+        "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
+    ]
 
+    for paragraph in fixed_paragraphs:
+        add_styled_paragraph(pdf, paragraph, company_name, software_name)
+        pdf.ln(5)
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin
@@ -314,10 +328,10 @@ def add_page_one_intro(pdf, data):
     pdf.set_font("Helvetica", "", 10)
     pdf.write(5, "  Mobile: ")
 
-    # First mobile
+    # Only one mobile number
     pdf.set_text_color(0, 0, 255)
     pdf.set_font("Helvetica", "U", 10)
-    pdf.write(5, "+91 873 391 5721 ", link="tel:+91 873 391 5721")
+    pdf.write(5, "+91 873 391 5721", link="tel:+91 873 391 5721")
 
     # Reset back to normal for anything after
     pdf.set_text_color(0, 0, 0)
@@ -1876,7 +1890,7 @@ def main():
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "September 29, 2025", key="quote_price_validity")
             subject_line = st.text_input("Subject", "Proposal for Adobe Commercial Software Licenses", key="quote_subject")
-            intro_paragraphs = st.text_area("Introduction Paragraph",
+            intro_paragraphs_1 = st.text_area("Introduction Paragraph",
             """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization.""",
             key="quote_intro"
             )
@@ -2024,7 +2038,7 @@ def main():
                     "price_validity": price_validity,
                     "grand_total": grand_total,
                     "subject": subject_line,
-                    "intro_paragraph": intro_paragraphs,
+                    "intro_paragraph": intro_paragraphs_1,
                     "sales_person_code": sales_person,  
                     "annexure_text": annexure_text,  
                     "quotation_title": quotation_title

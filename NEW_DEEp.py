@@ -460,7 +460,7 @@ def add_page_two_commercials(pdf, data):
     pdf.ln(15)
 
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font("Helvetica", "", 12)
 
     # Terms & Conditions with ALL terms in bold
     terms = [

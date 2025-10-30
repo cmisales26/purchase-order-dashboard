@@ -216,7 +216,7 @@ def add_page_one_intro(pdf, data):
     pdf.set_y(25)
     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
-    pdf.ln(10)
+    pdf.ln(8)
 
     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "", 10)

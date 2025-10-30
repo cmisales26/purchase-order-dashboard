@@ -554,74 +554,74 @@ def add_page_two_commercials(pdf, data):
     # Move cursor below the box
     pdf.set_xy(x_start, y_start + box_height + 10)
     
-    # --- Signature Block INSIDE BANK DETAILS BOX ---
-    signature_start_y = bank_y + 5
+    # # --- Signature Block INSIDE BANK DETAILS BOX ---
+    # signature_start_y = bank_y + 5
     
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.set_xy(x_start + col1_width + padding, signature_start_y)
-    pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
+    # pdf.set_font("Helvetica", "B", 10)
+    # pdf.set_xy(x_start + col1_width + padding, signature_start_y)
+    # pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
     
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
+    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    # pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
     
-        # --- Signature Block INSIDE BANK DETAILS BOX ---
-    signature_start_y = bank_y + 5
+    #     # --- Signature Block INSIDE BANK DETAILS BOX ---
+    # signature_start_y = bank_y + 5
     
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.set_xy(x_start + col1_width + padding, signature_start_y)
-    pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
+    # pdf.set_font("Helvetica", "B", 10)
+    # pdf.set_xy(x_start + col1_width + padding, signature_start_y)
+    # pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
     
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
+    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    # pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
     
-    # --- Signature Block with Dynamic Sales Person ---
-    sales_person_code = data.get('sales_person_code', 'SD')
-    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+    # # --- Signature Block with Dynamic Sales Person ---
+    # sales_person_code = data.get('sales_person_code', 'SD')
+    # sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
     
-    # Add stamp between "For CM INFOTECH" and sales person name
-    if data.get('stamp_path') and os.path.exists(data['stamp_path']):
-        try:
-            # Position stamp centered between "For CM INFOTECH" and sales person name
-            stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
-            stamp_x = x_start + col1_width + padding# + (col2_width - 2*padding - 20) / 2  # Center the stamp
-            pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
-            # Move cursor down after stamp
-            pdf.set_y(stamp_y + 25)  # Space for stamp + some padding
-        except:
-            pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
-    else:
-        pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
+    # # Add stamp between "For CM INFOTECH" and sales person name
+    # if data.get('stamp_path') and os.path.exists(data['stamp_path']):
+    #     try:
+    #         # Position stamp centered between "For CM INFOTECH" and sales person name
+    #         stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
+    #         stamp_x = x_start + col1_width + padding# + (col2_width - 2*padding - 20) / 2  # Center the stamp
+    #         pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
+    #         # Move cursor down after stamp
+    #         pdf.set_y(stamp_y + 25)  # Space for stamp + some padding
+    #     except:
+    #         pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
+    # else:
+    #     pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
     
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
+    # pdf.set_font("Helvetica", "", 9)
+    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    # pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
     
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
+    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    # pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
     
-    # Clickable email in signature
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    label = "Email: "
-    pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
-             ln=True, link=f"mailto:{sales_person_info['email']}")
+    # # Clickable email in signature
+    # pdf.set_font("Helvetica", "", 9)
+    # pdf.set_text_color(0, 0, 0)
+    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    # label = "Email: "
+    # pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+    # pdf.set_text_color(0, 0, 255)
+    # pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
+    #          ln=True, link=f"mailto:{sales_person_info['email']}")
     
-    # Clickable phone in signature
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    label = "Mobile: "
-    pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
-             ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-    pdf.set_text_color(0, 0, 0)         
+    # # Clickable phone in signature
+    # pdf.set_text_color(0, 0, 0)
+    # pdf.set_font("Helvetica", "", 9)
+    # pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+    # label = "Mobile: "
+    # pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+    # pdf.set_text_color(0, 0, 255)
+    # pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
+    #          ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+    # pdf.set_text_color(0, 0, 0)         
 
-    # Move cursor below the box
-    pdf.set_xy(x_start, y_start + box_height + 10)
+    # # Move cursor below the box
+    # pdf.set_xy(x_start, y_start + box_height + 10)
 
 def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
     """Orchestrates the creation of the two-page PDF."""

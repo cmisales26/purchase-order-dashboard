@@ -309,7 +309,7 @@ def add_page_one_intro(pdf, data):
                     if style == "bold":
                         pdf.set_font("Helvetica", "B", 10)
                     else:  # underline
-                        pdf.set_font("Helvetica", "B", 10)
+                        pdf.set_font("Helvetica", "BU", 10)
                     pdf.write(5, formatted_text)
                     
                     current_pos = end

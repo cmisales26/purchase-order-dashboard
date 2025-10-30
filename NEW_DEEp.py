@@ -276,14 +276,6 @@ def add_page_one_intro(pdf, data):
     pdf.set_font("Helvetica", "U", 10)
     pdf.write(5, "+91 873 391 5721 ", link="tel:+91 873 391 5721")
 
-    # # Separator + second mobile
-    # pdf.set_text_color(0, 0, 0)
-    # pdf.set_font("Helvetica", "", 10)
-    # pdf.write(5, ", ")
-
-    # pdf.set_text_color(0, 0, 255)
-    # pdf.set_font("Helvetica", "U", 10)
-    # pdf.write(5, "+91 740 511 5721", link="tel:+91 740 511 5721")
 
     # Reset back to normal for anything after
     pdf.set_text_color(0, 0, 0)

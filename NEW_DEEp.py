@@ -210,6 +210,149 @@ def add_clickable_phone(pdf, phone, label="Mobile: "):
     pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
     pdf.set_text_color(0, 0, 0)  # Reset to black
 
+def write_formatted_paragraph(pdf, text):
+    """Write paragraph with precise bold formatting for specific terms and detected software names"""
+    
+    # EXACT phrases that should always be bold (case insensitive)
+    exact_bold_phrases = [
+        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
+        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", "ZWCAD", 
+        "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", "Bluebeam", 
+        "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+    ]
+    
+    # Extract software name from the first line automatically
+    software_name = extract_software_name(text)
+    if software_name and software_name not in exact_bold_phrases:
+        exact_bold_phrases.append(software_name)
+    
+    # Also detect common software patterns in the entire text
+    additional_software = detect_software_names(text)
+    for software in additional_software:
+        if software not in exact_bold_phrases:
+            exact_bold_phrases.append(software)
+    
+    # Convert to lowercase for case-insensitive matching
+    bold_phrases_lower = [phrase.lower() for phrase in exact_bold_phrases]
+    
+    # Split text into lines to preserve paragraph structure
+    lines = text.split('\n')
+    
+    for line_idx, line in enumerate(lines):
+        if line.strip():  # Skip empty lines
+            words = line.split()
+            i = 0
+            
+            while i < len(words):
+                matched = False
+                # Check for exact phrase matches (longer phrases first)
+                for length in range(5, 0, -1):  # Check 5-word to 1-word phrases
+                    if i + length <= len(words):
+                        # Try the exact phrase as written
+                        exact_phrase = ' '.join(words[i:i+length])
+                        exact_phrase_lower = exact_phrase.lower()
+                        
+                        # Check if this exact phrase should be bold
+                        for bold_phrase_lower in bold_phrases_lower:
+                            if exact_phrase_lower == bold_phrase_lower:
+                                # Found exact match - make it bold
+                                pdf.set_font("Helvetica", "B", 10)
+                                pdf.write(5, exact_phrase)
+                                pdf.set_font("Helvetica", "", 10)
+                                
+                                # Add space after if not at end
+                                if i + length < len(words):
+                                    pdf.write(5, " ")
+                                
+                                i += length
+                                matched = True
+                                break
+                        
+                        if matched:
+                            break
+                
+                if not matched:
+                    # Write regular word
+                    pdf.set_font("Helvetica", "", 10)
+                    pdf.write(5, words[i])
+                    if i < len(words) - 1:
+                        pdf.write(5, " ")
+                    i += 1
+            
+            # Add newline after each line (except the last one)
+            if line_idx < len(lines) - 1:
+                pdf.ln(5)
+    
+    pdf.ln(10)
+
+def extract_software_name(text):
+    """Extract software name from the first line of the text"""
+    if not text:
+        return None
+    
+    first_line = text.split('\n')[0]
+    
+    # Common patterns to detect software names
+    patterns = [
+        "requirement for",
+        "reference to your requirement for", 
+        "regarding",
+        "for your",
+        "about your"
+    ]
+    
+    for pattern in patterns:
+        if pattern in first_line.lower():
+            # Find the position after the pattern
+            start_idx = first_line.lower().find(pattern) + len(pattern)
+            # Extract the text after the pattern
+            remaining_text = first_line[start_idx:].strip()
+            
+            # Clean up - remove punctuation and take first few words
+            words = remaining_text.split()
+            if words:
+                # Take 1-3 words as software name (most software names are 1-3 words)
+                software_words = []
+                for word in words[:3]:  # Check first 3 words
+                    # Stop if we hit common sentence endings
+                    if word.lower() in ['it', 'we', 'this', 'that', 'which', 'who']:
+                        break
+                    # Stop if word ends with common punctuation
+                    if word.endswith(('.', '!', '?', ',')):
+                        software_words.append(word[:-1])
+                        break
+                    software_words.append(word)
+                
+                if software_words:
+                    software_name = ' '.join(software_words).strip()
+                    # Clean up any trailing punctuation
+                    software_name = software_name.rstrip('.,!?;:')
+                    if software_name and len(software_name) > 2:  # Avoid very short names
+                        return software_name
+    
+    return None
+
+def detect_software_names(text):
+    """Detect common software names in the text"""
+    software_names = []
+    
+    # Common software name patterns (capitalized words, often with specific terms)
+    words = text.split()
+    for i, word in enumerate(words):
+        # Look for capitalized words that might be software names
+        if (word.istitle() or word.isupper()) and len(word) > 2:
+            # Check if it's followed by common software terms
+            if i + 1 < len(words):
+                next_word = words[i + 1].lower()
+                if next_word in ['software', 'license', 'subscription', 'cloud', 'app', 'application', 'suite', 'package']:
+                    software_names.append(f"{word} {words[i + 1]}")
+                elif word.lower() not in ['the', 'and', 'for', 'with', 'your', 'our']:
+                    software_names.append(word)
+    
+    return software_names
+
+
+
 def add_page_one_intro(pdf, data):
     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "B", 10)
@@ -247,9 +390,9 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
 
-    # Introductory Paragraph (from user input)
+    # Introductory Paragraph (from user input) with automatic software detection and bold formatting
     pdf.set_font("Helvetica", "", 10)
-    pdf.multi_cell(0, 5, pdf.sanitize_text(data['intro_paragraph']))
+    write_formatted_paragraph(pdf, data['intro_paragraph'])
     pdf.ln(5)
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
@@ -275,6 +418,7 @@ def add_page_one_intro(pdf, data):
     pdf.set_text_color(0, 0, 255)
     pdf.set_font("Helvetica", "U", 10)
     pdf.write(5, "+91 873 391 5721 ", link="tel:+91 873 391 5721")
+
 
 
     # Reset back to normal for anything after

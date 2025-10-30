@@ -215,7 +215,11 @@ def write_formatted_paragraph(pdf, text):
     
     # EXACT phrases that should always be bold (case insensitive)
     exact_bold_phrases = [
-        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
+        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)"
+    ]
+    
+    # Phrases that should be underlined (software partnership list)
+    underlined_phrases = [
         "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", "ZWCAD", 
         "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", "Bluebeam", 
         "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
@@ -234,6 +238,7 @@ def write_formatted_paragraph(pdf, text):
     
     # Convert to lowercase for case-insensitive matching
     bold_phrases_lower = [phrase.lower() for phrase in exact_bold_phrases]
+    underlined_phrases_lower = [phrase.lower() for phrase in underlined_phrases]
     
     # Split text into lines to preserve paragraph structure
     lines = text.split('\n')
@@ -268,6 +273,23 @@ def write_formatted_paragraph(pdf, text):
                                 matched = True
                                 break
                         
+                        # Check if this exact phrase should be underlined
+                        if not matched:
+                            for underlined_phrase_lower in underlined_phrases_lower:
+                                if exact_phrase_lower == underlined_phrase_lower:
+                                    # Found exact match - make it underlined
+                                    pdf.set_font("Helvetica", "U", 10)
+                                    pdf.write(5, exact_phrase)
+                                    pdf.set_font("Helvetica", "", 10)
+                                    
+                                    # Add space after if not at end
+                                    if i + length < len(words):
+                                        pdf.write(5, " ")
+                                    
+                                    i += length
+                                    matched = True
+                                    break
+                        
                         if matched:
                             break
                 
@@ -279,9 +301,11 @@ def write_formatted_paragraph(pdf, text):
                         pdf.write(5, " ")
                     i += 1
             
-            # Add newline after each line (except the last one)
+            # Add space between paragraphs (more space after each line/paragraph)
             if line_idx < len(lines) - 1:
-                pdf.ln(5)
+                pdf.ln(8)  # Increased from 5 to 8 for more space between paragraphs
+            else:
+                pdf.ln(5)  # Normal line height for within paragraphs
     
     pdf.ln(10)
 
@@ -330,6 +354,26 @@ def extract_software_name(text):
                     if software_name and len(software_name) > 2:  # Avoid very short names
                         return software_name
     
+    return None
+
+def detect_software_names(text):
+    """Detect common software names in the text"""
+    software_names = []
+    
+    # Common software name patterns (capitalized words, often with specific terms)
+    words = text.split()
+    for i, word in enumerate(words):
+        # Look for capitalized words that might be software names
+        if (word.istitle() or word.isupper()) and len(word) > 2:
+            # Check if it's followed by common software terms
+            if i + 1 < len(words):
+                next_word = words[i + 1].lower()
+                if next_word in ['software', 'license', 'subscription', 'cloud', 'app', 'application', 'suite', 'package']:
+                    software_names.append(f"{word} {words[i + 1]}")
+                elif word.lower() not in ['the', 'and', 'for', 'with', 'your', 'our']:
+                    software_names.append(word)
+    
+    return software_names    
     return None
 
 def detect_software_names(text):

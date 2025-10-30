@@ -248,13 +248,13 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # --- Formatted Introductory Paragraph (Normal + Bold/Underline details) ---
-    def add_styled_paragraph(pdf, text, company_name="CM INFOTECH", software_name="ZWCAD Software", font_size=10):
+    def add_styled_paragraph(pdf, text, company_name="CMI (CM INFOTECH)", software_name="ZWCAD Software", font_size=10):
         highlight_words = [
             company_name, company_name.replace(" ", ""),
             software_name, software_name.split()[0],
             "Quotation", "Autodesk", "GstarCAD", "Grabert", "RuleBuddy",
             "CMS Intellicad", "ZWCAD", "Etabs", "Trimble", "Bentley",
-            "Solidworks", "Solid Edge", "Bluebeam", "Adobe", "Microsoft",
+            "Solidworks", "Solid Edge", "Bluebeam", "Adobe", "Microsoft","CMS Intellicad","Solid Edge","Tally Quick Heal",
             "Corel", "Chaos", "Nitro", "Tally Quick Heal"
         ]
         pdf.set_font("Helvetica", "", font_size)

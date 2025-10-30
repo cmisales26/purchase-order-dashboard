@@ -248,7 +248,7 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # --- Simple and Reliable Paragraph Formatting ---
-    def write_paragraph_with_formatting(pdf, text, software_name=None):
+    def write_paragraph_with_formatting(pdf, text):
         """Write paragraph with specific terms in BOLD and UNDERLINE"""
         
         # Terms that should be BOLD
@@ -262,10 +262,6 @@ def add_page_one_intro(pdf, data):
             "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
         ]
-        
-        # Add software name to bold terms if provided
-        if software_name and software_name not in bold_terms:
-            bold_terms.append(software_name)
         
         # Process the text
         lines = text.split('\n')
@@ -327,24 +323,12 @@ def add_page_one_intro(pdf, data):
         
         pdf.ln(3)
 
-    # --- Extract software name once from the first paragraph ---
-    intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
-    software_name = None
-    
-    # Extract software name from first paragraph
-    if intro_text and "requirement for" in intro_text.lower():
-        start_idx = intro_text.lower().find("requirement for") + len("requirement for")
-        remaining = intro_text[start_idx:].split('.')[0].split('!')[0].split('?')[0].strip()
-        words = remaining.split()[:2]
-        if words:
-            software_name = ' '.join(words).strip(' ,.!?;:')
-
     # --- Write all paragraphs with formatting ---
-    company_name = pdf.sanitize_text(data.get("vendor_name", "CM INFOTECH"))
     
     # Write the user's custom intro paragraph
+    intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
     if intro_text:
-        write_paragraph_with_formatting(pdf, intro_text, software_name)
+        write_paragraph_with_formatting(pdf, intro_text)
 
     # Fixed company introduction paragraphs
     fixed_paragraphs = [
@@ -358,7 +342,7 @@ def add_page_one_intro(pdf, data):
     ]
 
     for paragraph in fixed_paragraphs:
-        write_paragraph_with_formatting(pdf, paragraph, software_name)
+        write_paragraph_with_formatting(pdf, paragraph)
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin

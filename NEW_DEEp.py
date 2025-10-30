@@ -376,22 +376,28 @@ def add_page_two_commercials(pdf, data):
     pdf.ln(15)
 
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
-    pdf.set_font("Helvetica", "B", 9)
+    pdf.set_font("Helvetica", "", 9)
 
     # Terms & Conditions (UPDATED TO MATCH SECOND VERSION)
     terms = [
-        "Above charges are Inclusive of GST.",
-        "Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.",
-        "TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.",
-        "ELD licenses are paper licenses that do not contain media.",
-        "An Internet connection is required to access cloud services.",
-        "Training will be charged at extra cost depending on no. of participants.",
-        "Price Validity: 10 days from Quotation date",
-        "Payment: 100% Advance along with purchase order.",
-        "Delivery period: 1-2 Weeks from the date of Purchase Order",
-        'Cheque to be issued on name of: "CM INFOTECH"',
-        "Order to be placed on: CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481"
+        ("Above charges are Inclusive of GST."),
+        ("Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable."),
+        ("TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012."),
+        ("ELD licenses are paper licenses that do not contain media."),
+        ("An Internet connection is required to access cloud services."),
+        ("Training will be charged at extra cost depending on no. of participants."),
+        ("Price Validity: 10 days from Quotation date"),
+        ("Payment: 100% Advance along with purchase order."),
+        ("Delivery period: 1-2 Weeks from the date of Purchase Order"),
+        ('Cheque to be issued on name of: "CM INFOTECH"'),
+        ("Order to be placed on: CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481")
     ]
+
+    for label, detail in terms:
+        pdf.set_font("Helvetica", "B", 9)
+        pdf.cell(0, 5, label + "100% Advance along with purchase order", ln=0)
+        pdf.set_font("Helvetica", "", 9)
+        pdf.multi_cell(0, 5, detail)
 
     # Bank Details (UPDATED TO MATCH SECOND VERSION)
     bank_info = [

@@ -378,7 +378,7 @@ def add_page_two_commercials(pdf, data):
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
     pdf.set_font("Helvetica", "", 9)
 
-    # Terms & Conditions with mixed formatting
+    # Terms & Conditions with ALL terms in bold
     terms = [
         ("1. Above charges are Inclusive of GST.", ""),
         ("2. Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.", ""),
@@ -450,14 +450,17 @@ def add_page_two_commercials(pdf, data):
     # Terms & Conditions header
     pdf.set_xy(x_start + padding, y_start + padding)
     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
-    pdf.set_font("Helvetica", "", 9)  # Set to regular font for terms content
 
     # Terms content - INSIDE THE BOX
     terms_y = pdf.get_y()
-    for label, value in terms:
+    for i, (label, value) in enumerate(terms):
         pdf.set_xy(x_start + padding, terms_y)
         
-        if value:  # Terms with mixed formatting (label + bold value)
+        if i < 6:  # First 6 terms - ALL BOLD
+            pdf.set_font("Helvetica", "B", 9)
+            pdf.multi_cell(col1_width - 2*padding, line_height, label)
+            
+        elif value:  # Terms 7-11 with mixed formatting (label + bold value)
             # Write the regular font part
             pdf.set_font("Helvetica", "", 9)
             pdf.cell(pdf.get_string_width(label), line_height, label, ln=0)

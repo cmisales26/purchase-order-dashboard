@@ -254,7 +254,7 @@ def add_page_one_intro(pdf, data):
             software_name, software_name.split()[0],
             "Quotation", "Autodesk", "GstarCAD", "Grabert", "RuleBuddy",
             "CMS Intellicad", "ZWCAD", "Etabs", "Trimble", "Bentley",
-            "Solidworks", "Solid Edge", "Bluebeam", "Adobe Software", "Microsoft",
+            "Solidworks", "Solid_Edge", "Bluebeam", "Adobe Software", "Microsoft",
             "Corel", "Chaos", "Nitro", "Tally Quick Heal","CMS Intellicad",
             "Tally Quick Heal","Solid Edge","Adobe"
         ]

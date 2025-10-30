@@ -375,12 +375,10 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
     pdf.ln(15)
 
+    # --- Enhanced Box for Terms & Conditions and Bank Details ---
     pdf.set_font("Helvetica", "B", 9)
 
-    # Terms & Conditions with partial bold formatting
-    terms_y = pdf.get_y()
-
-    # Regular terms (1-6)
+    # Terms & Conditions (UPDATED TO MATCH SECOND VERSION)
     terms = [
         "Above charges are Inclusive of GST.",
         "Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.",
@@ -388,52 +386,12 @@ def add_page_two_commercials(pdf, data):
         "ELD licenses are paper licenses that do not contain media.",
         "An Internet connection is required to access cloud services.",
         "Training will be charged at extra cost depending on no. of participants.",
+        "Price Validity: 10 days from Quotation date",
+        "Payment: 100% Advance along with purchase order.",
+        "Delivery period: 1-2 Weeks from the date of Purchase Order",
+        'Cheque to be issued on name of: "CM INFOTECH"',
+        "Order to be placed on: CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481"
     ]
-
-    for i, term in enumerate(terms):
-        pdf.set_xy(x_start + padding, terms_y)
-        pdf.multi_cell(col1_width - 2*padding, line_height, f"{i+1}. {term}")
-        terms_y = pdf.get_y()
-
-    # Special terms with partial bold (7-11)
-    pdf.set_xy(x_start + padding, terms_y)
-    pdf.multi_cell(col1_width - 2*padding, line_height, "7. Price Validity: ")
-    pdf.set_x(x_start + padding + pdf.get_string_width("7. Price Validity: "))
-    pdf.set_font("Helvetica", "B", 9)
-    pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width("7. Price Validity: "), line_height, "10 days from Quotation date")
-    terms_y = pdf.get_y()
-
-    pdf.set_xy(x_start + padding, terms_y)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.multi_cell(col1_width - 2*padding, line_height, "8. Payment: ")
-    pdf.set_x(x_start + padding + pdf.get_string_width("8. Payment: "))
-    pdf.set_font("Helvetica", "B", 9)
-    pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width("8. Payment: "), line_height, "100% Advance along with purchase order")
-    terms_y = pdf.get_y()
-
-    pdf.set_xy(x_start + padding, terms_y)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.multi_cell(col1_width - 2*padding, line_height, "9. Delivery period: ")
-    pdf.set_x(x_start + padding + pdf.get_string_width("9. Delivery period: "))
-    pdf.set_font("Helvetica", "B", 9)
-    pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width("9. Delivery period: "), line_height, "License will be delivered electronically within 2-3 working days after payment confirmation. Includes 12 months of technical support and software updates from OEM.")
-    terms_y = pdf.get_y()
-
-    pdf.set_xy(x_start + padding, terms_y)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.multi_cell(col1_width - 2*padding, line_height, "10. Dispatched Through: ")
-    pdf.set_x(x_start + padding + pdf.get_string_width("10. Dispatched Through: "))
-    pdf.set_font("Helvetica", "B", 9)
-    pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width("10. Dispatched Through: "), line_height, "Online")
-    terms_y = pdf.get_y()
-
-    pdf.set_xy(x_start + padding, terms_y)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.multi_cell(col1_width - 2*padding, line_height, '11. Cheque to be issued on name of: ')
-    pdf.set_x(x_start + padding + pdf.get_string_width('11. Cheque to be issued on name of: '))
-    pdf.set_font("Helvetica", "B", 9)
-    pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width('11. Cheque to be issued on name of: '), line_height, '"CM INFOTECH"')
-    terms_y = pdf.get_y()
 
     # Bank Details (UPDATED TO MATCH SECOND VERSION)
     bank_info = [

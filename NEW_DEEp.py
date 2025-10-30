@@ -447,7 +447,7 @@ def add_page_two_commercials(pdf, data):
     for label, detail in terms:
         pdf.set_xy(x_start + padding, terms_y)
         pdf.set_font("Helvetica", "B", 9)
-        pdf.cell(0, line_height, f"• {label} ", ln=0)
+        pdf.cell(0, line_height, f"{label} ", ln=0)
         pdf.set_font("Helvetica", "", 9)
         pdf.multi_cell(col1_width - 2*padding, line_height, detail)
         terms_y = pdf.get_y()

@@ -248,9 +248,8 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # --- Formatted Introductory Paragraph (Normal + Bold/Underline details) ---
-    # --- Formatted Introductory Paragraph (Normal + Bold/Underline details) ---
+    # --- Perfect Intro Paragraph Formatting (Bold + Underline like sample image) ---
     def add_styled_paragraph(pdf, text, company_name, software_name, font_size=10):
-        # Words that should appear bold & underlined
         highlight_words = [
             company_name, company_name.replace(" ", ""),
             software_name, software_name.split()[0],
@@ -261,26 +260,32 @@ def add_page_one_intro(pdf, data):
         ]
 
         pdf.set_font("Helvetica", "", font_size)
-        line_height = 5.5
+        line_height = 5.8
 
         for para in text.split("\n"):
             if not para.strip():
-                pdf.ln(3)
+                pdf.ln(4)
                 continue
 
             words = para.split(" ")
-            for word in words:
-                clean = word.strip(",.()\"")
-                match = next((hw for hw in highlight_words if hw.lower() in clean.lower()), None)
-                if match:
-                    pdf.set_font("Helvetica", "BU", font_size)  # Bold + Underline
-                    pdf.write(line_height, word + " ")
-                    pdf.set_font("Helvetica", "", font_size)
-                else:
-                    pdf.write(line_height, word + " ")
-            pdf.ln(line_height)
+            for i, word in enumerate(words):
+                clean = word.strip(",.()\":;")
+                match = next((hw for hw in highlight_words if hw.lower() == clean.lower()), None)
 
-    # --- Call with dynamic user inputs ---
+                if match:
+                    pdf.set_font("Helvetica", "BU", font_size)
+                    pdf.write(line_height, clean)
+                    pdf.set_font("Helvetica", "", font_size)
+                    if len(word) > len(clean):  # print trailing punctuation
+                        pdf.write(line_height, word[len(clean):])
+                else:
+                    pdf.write(line_height, word)
+
+                if i < len(words) - 1:
+                    pdf.write(line_height, " ")
+            pdf.ln(line_height + 1)
+
+    # --- Use with dynamic Streamlit inputs ---
     company_name = pdf.sanitize_text(data.get("vendor_name", "CM INFOTECH"))
     software_name = pdf.sanitize_text(data.get("product_name", "ZWCAD Software"))
     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))

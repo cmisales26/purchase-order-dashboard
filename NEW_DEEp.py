@@ -240,7 +240,7 @@ def add_page_one_intro(pdf, data):
     
     pdf.set_font("Helvetica", "BU", 10)
     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
-    pdf.ln(8)
+    pdf.ln(5)
 
     # Subject Line (from user input)
     pdf.set_font("Helvetica", "BU", 12)

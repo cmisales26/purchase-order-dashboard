@@ -199,12 +199,12 @@ def add_clickable_email(pdf, email, label="Email: "):
 
 def add_clickable_phone(pdf, phone, label="Mobile: "):
     """Add clickable phone number with label - FIXED OVERLAP"""
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font("Helvetica", "B", 12)
     label_width = pdf.get_string_width(label)
     pdf.cell(label_width, 4, label, ln=0)
     
     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 12)
     # Remove spaces and + for tel link
     tel_number = phone.replace(' ', '').replace('+', '')
     pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
@@ -219,11 +219,11 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 12)
     pdf.cell(0, 5, "To,", ln=True)
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 12)
     
     # Address handling
     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
@@ -238,7 +238,7 @@ def add_page_one_intro(pdf, data):
     if data.get('vendor_mobile'):
         add_clickable_phone(pdf, data['vendor_mobile'])
     
-    pdf.set_font("Helvetica", "BU", 10)
+    pdf.set_font("Helvetica", "BU", 12)
     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
     pdf.ln(5)
 

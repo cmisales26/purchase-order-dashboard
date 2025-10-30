@@ -485,7 +485,7 @@ def add_page_two_commercials(pdf, data):
         
         elif "Cheque to be issued" in term:
             parts = term.split(":")
-            pdf.multi_cell(col1_width - 2*padding, line_height, parts[0] + ":")
+            pdf.cell(col1_width - 2*padding, line_height, parts[0] + ":",ln=0)
             pdf.set_font("Helvetica", "B", 9)
             pdf.multi_cell(col1_width - 2*padding - pdf.get_string_width(parts[0] + ":"), line_height, parts[1])
             pdf.set_font("Helvetica", "", 9)

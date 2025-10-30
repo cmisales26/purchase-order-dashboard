@@ -247,54 +247,101 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
 
-    # --- Perfect Intro Paragraph Formatting (Bold + Underline like sample image) ---
-    def add_styled_paragraph(pdf, text, company_name, software_name, font_size=10):
-        highlight_words = [
-            company_name, company_name.replace(" ", ""),
-            software_name, software_name.split()[0],
-            "Quotation", "Autodesk", "GstarCAD", "Grabert", "RuleBuddy",
-            "CMS Intellicad", "ZWCAD", "Etabs", "Trimble", "Bentley",
-            "Solidworks", "Solid Edge", "Bluebeam", "Adobe", "Microsoft",
-            "Corel", "Chaos", "Nitro", "Tally", "Quick Heal"
+    # --- Simple and Reliable Paragraph Formatting ---
+    def write_paragraph_with_formatting(pdf, text):
+        """Write paragraph with specific terms in BOLD and UNDERLINE"""
+        
+        # Terms that should be BOLD
+        bold_terms = [
+            "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)"
         ]
+        
+        # Terms that should be UNDERLINED (software partnership list)
+        underlined_terms = [
+            "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
+            "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
+            "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+        ]
+        
+        # Extract software name for bold
+        if "requirement for" in text.lower():
+            start_idx = text.lower().find("requirement for") + len("requirement for")
+            remaining = text[start_idx:].split('.')[0].split('!')[0].split('?')[0].strip()
+            words = remaining.split()[:2]
+            if words:
+                software_name = ' '.join(words).strip(' ,.!?;:')
+                if software_name:
+                    bold_terms.append(software_name)
+        
+        # Process the text
+        lines = text.split('\n')
+        
+        for line_idx, line in enumerate(lines):
+            if line.strip():
+                current_pos = 0
+                
+                # Find all formatting positions
+                format_positions = []
+                
+                # Find bold terms
+                for term in bold_terms:
+                    start = 0
+                    while True:
+                        pos = line.lower().find(term.lower(), start)
+                        if pos == -1:
+                            break
+                        format_positions.append((pos, pos + len(term), "bold"))
+                        start = pos + 1
+                
+                # Find underlined terms
+                for term in underlined_terms:
+                    start = 0
+                    while True:
+                        pos = line.lower().find(term.lower(), start)
+                        if pos == -1:
+                            break
+                        format_positions.append((pos, pos + len(term), "underline"))
+                        start = pos + 1
+                
+                # Sort by position
+                format_positions.sort()
+                
+                # Write the line with formatting
+                current_pos = 0
+                for start, end, style in format_positions:
+                    # Write text before formatting
+                    if start > current_pos:
+                        pdf.set_font("Helvetica", "", 10)
+                        pdf.write(5, line[current_pos:start])
+                    
+                    # Write formatted text
+                    formatted_text = line[start:end]
+                    if style == "bold":
+                        pdf.set_font("Helvetica", "B", 10)
+                    else:  # underline
+                        pdf.set_font("Helvetica", "U", 10)
+                    pdf.write(5, formatted_text)
+                    
+                    current_pos = end
+                
+                # Write remaining text
+                if current_pos < len(line):
+                    pdf.set_font("Helvetica", "", 10)
+                    pdf.write(5, line[current_pos:])
+                
+                pdf.ln(5)
+        
+        pdf.ln(3)
 
-        pdf.set_font("Helvetica", "", font_size)
-        line_height = 5.8
-
-        for para in text.split("\n"):
-            if not para.strip():
-                pdf.ln(4)
-                continue
-
-            words = para.split(" ")
-            for i, word in enumerate(words):
-                clean = word.strip(",.()\":;")
-                match = next((hw for hw in highlight_words if hw.lower() == clean.lower()), None)
-
-                if match:
-                    pdf.set_font("Helvetica", "BU", font_size)
-                    pdf.write(line_height, clean)
-                    pdf.set_font("Helvetica", "", font_size)
-                    if len(word) > len(clean):  # print trailing punctuation
-                        pdf.write(line_height, word[len(clean):])
-                else:
-                    pdf.write(line_height, word)
-
-                if i < len(words) - 1:
-                    pdf.write(line_height, " ")
-            pdf.ln(line_height + 1)
-
-    # --- Use with dynamic Streamlit inputs ---
+    # --- Write all paragraphs with formatting ---
     company_name = pdf.sanitize_text(data.get("vendor_name", "CM INFOTECH"))
-    software_name = pdf.sanitize_text(data.get("product_name", "ZWCAD Software"))
-    intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
-
+    
     # Write the user's custom intro paragraph
+    intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
     if intro_text:
-        add_styled_paragraph(pdf, intro_text, company_name, software_name)
-        pdf.ln(8)
+        write_paragraph_with_formatting(pdf, intro_text)
 
-    # --- Fixed company introduction paragraphs ---
+    # Fixed company introduction paragraphs
     fixed_paragraphs = [
         "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
         
@@ -306,8 +353,7 @@ def add_page_one_intro(pdf, data):
     ]
 
     for paragraph in fixed_paragraphs:
-        add_styled_paragraph(pdf, paragraph, company_name, software_name)
-        pdf.ln(5)
+        write_paragraph_with_formatting(pdf, paragraph)
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin
@@ -2039,7 +2085,7 @@ def main():
                     "grand_total": grand_total,
                     "subject": subject_line,
                     "intro_paragraph": intro_paragraphs_1,
-                    "product_name": selected_product if selected_product else "Software",
+                    "product_name": selected_product if selected_product else "Software",   
                     "sales_person_code": sales_person,  
                     "annexure_text": annexure_text,  
                     "quotation_title": quotation_title

@@ -1166,7 +1166,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     sanitized_end_company = pdf.sanitize_text(po_data['end_company'])
     sanitized_end_address = pdf.sanitize_text(po_data['end_address'])
     sanitized_end_person = pdf.sanitize_text(po_data['end_person'])
-    sanitized_end_contact = pdf.sanitize_text(po_data['end_contact'])
+    sanitized_end_contact = pdf.sanitize_text(po_data['end_mobile'])
     sanitized_end_email = pdf.sanitize_text(po_data['end_email'])
     sanitized_payment_terms = pdf.sanitize_text(po_data['payment_terms'])
     sanitized_delivery_terms = pdf.sanitize_text(po_data['delivery_terms'])
@@ -1666,7 +1666,7 @@ def main():
                     value=st.session_state.get("po_end_person", "Mr. Dev"),
                     key="po_end_person"
                 )
-                end_contact = st.text_input(
+                end_mobile = st.text_input(
                     "End Mobile",
                     value=str(st.session_state.get("po_end_contact", "1234567891") or "").strip(),
                     key="po_end_contact_input"
@@ -1794,7 +1794,7 @@ def main():
                     "end_company": end_company,
                     "end_address":end_address,
                     "end_person": end_person,
-                    "end_contact": end_contact,
+                    "end_mobile": end_mobile,
                     "end_email": end_email,
                     "products": st.session_state.products,
                     "grand_total": grand_total,

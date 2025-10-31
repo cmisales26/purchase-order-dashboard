@@ -1374,7 +1374,7 @@ def main():
 
         # --- Clean and Convert Mobile (avoid float or NaN issues) ---
         vendor_mobile = str(vendor.get("Mobile", "")).split(".")[0].strip()
-        End_user_mobile = str(end_user.get("Mobile", "")).split(".")[0].strip
+        End_user_mobile = str(end_user.get("Mobile", "")).split(".")[0].strip()
 
         # Save to session_state (so Invoice & PO can use)
         st.session_state.po_vendor_name = vendor["Vendor Name"]

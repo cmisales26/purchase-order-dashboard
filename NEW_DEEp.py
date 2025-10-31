@@ -1663,7 +1663,7 @@ def main():
                 end_email = st.text_input(
                     "End User Email",
                     value=st.session_state.get("po_end_email", "info@company.com"),
-                    key="po_end_email_input"
+                    key="po_end_email"
                 )
             with col2:
                 bill_to_company = st.text_input(

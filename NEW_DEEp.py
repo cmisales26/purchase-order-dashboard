@@ -777,7 +777,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.cell(label_width, 6, label, border="LB", ln=0)
         pdf.set_font("Helvetica", "", 8)
         border = "RB" if i < len(vendor_lines) - 1 else "RB"
-        pdf.cell(95 - label_width, 6, value, border=border, ln=1)
+        pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
     y_left_end = pdf.get_y()
 
@@ -800,7 +800,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(44, 8, "Supplier's Reference:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
     other_ref_value = invoice_data['Reference']['Suppliers_Reference']
-    pdf.cell(47, 8, other_ref_value, border="RTB", ln=1)
+    pdf.cell(47, 8, other_ref_value, border="LRTB", ln=1)
 
     # Other's reference
     pdf.set_x(107)

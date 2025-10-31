@@ -1383,7 +1383,7 @@ def main():
         st.session_state.po_end_company = end_user["End User Company"]
         st.session_state.po_end_address = end_user["End User Address"]
         st.session_state.po_end_person = end_user["End User Contact"]
-        st.session_state.po_end_contact = end_user["End User Phone"]
+        st.session_state.po_end_contact_input = end_user["End User Phone"]
         st.session_state.po_end_email = end_user["End User Email"]
         st.session_state.po_end_gst_no = end_user["GST NO"]
 
@@ -1657,8 +1657,8 @@ def main():
                 )
                 end_contact = st.text_input(
                     "End User Phone",
-                    value=str(st.session_state.get("po_end_contact", "+91 9876543210")),
-                    key="po_end_contact"
+                    value=str(st.session_state.get("po_end_contact_input", "+91 9876543210")),
+                    key="po_end_contact_input"
                 )
                 end_email = st.text_input(
                     "End User Email",

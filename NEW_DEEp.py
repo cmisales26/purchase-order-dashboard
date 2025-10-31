@@ -10,6 +10,27 @@ import textwrap
 
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {
+    "GstarCAD STDANDARD 2026 Perpetual": {"basic": 34777.0, "gst_percent": 18.0},
+    "GstarCAD STDANDARD 2026 One year upgrade": {"basic": 18303.0, "gst_percent": 18.0},
+    "GstarCAD STDANDARD 2026 Two year upgrade": {"basic": 18303.0, "gst_percent": 18.0},
+    "GstarCAD STDANDARD 2026 Three + year upgrade": {"basic": 22696.0, "gst_percent": 18.0},
+    "GstarCAD PROFESSIONAL 2026 Perpetual": {"basic": 46125.0, "gst_percent": 18.0},
+    "GstarCAD PROFESSIONAL 2026 One year upgrade": {"basic": 25625.0, "gst_percent": 18.0},
+    "GstarCAD PROFESSIONAL 2026 Two year upgrade": {"basic": 25625.0, "gst_percent": 18.0},
+    "GstarCAD PROFESSIONAL 2026 Three + year upgrade": {"basic": 30018.0, "gst_percent": 18.0},
+    "GstarCAD PLUS 2026 Perpetual": {"basic": 57107.0, "gst_percent": 18.0},
+    "GstarCAD PLUS 2026 One year upgrade": {"basic": 29286.0, "gst_percent": 18.0},
+    "GstarCAD PLUS 2026 Two year upgrade": {"basic": 32946.0, "gst_percent": 18.0},
+    "GstarCAD PLUS 2026 Three + year upgrade": {"basic": 41000.0, "gst_percent": 18.0},
+    "GstarCAD MECHANICAL 2025 Perpetual": {"basic": 92250.0, "gst_percent": 18.0},
+    "GstarCAD MECHANICAL 2025 One year upgrade": {"basic": 73214.0, "gst_percent": 18.0},
+    "GstarCAD MECHANICAL 2025 Two year upgrade": {"basic": 87857.0, "gst_percent": 18.0},
+    "GstarCAD MECHANICAL 2025 Three + year upgrade": {"basic": 105428.0, "gst_percent": 18.0},
+    "GstarCAD ARCHITECTURE 2021 Perpetual": {"basic": 92250.0, "gst_percent": 18.0},
+    "GstarCAD ARCHITECTURE 2021 One year upgrade": {"basic": 73214.0, "gst_percent": 18.0},
+    "GstarCAD ARCHITECTURE 2021 Two year upgrade": {"basic": 87857.0, "gst_percent": 18.0},
+    "GstarCAD ARCHITECTURE 2021 Three + year upgrade": {"basic": 105428.0, "gst_percent": 18.0},
+    
     "Creative cloud pro plus for Teams": {"basic": 114560.0, "gst_percent": 18.0},
     "Creative cloud Pro for Teams": {"basic": 104560.0, "gst_percent": 18.0},
     "Adobe Creative Cloud All Apps": {"basic": 95000.0, "gst_percent": 18.0},

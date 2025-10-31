@@ -1166,7 +1166,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     sanitized_end_company = pdf.sanitize_text(po_data['end_company'])
     sanitized_end_address = pdf.sanitize_text(po_data['end_address'])
     sanitized_end_person = pdf.sanitize_text(po_data['end_person'])
-    sanitized_end_contact = pdf.sanitize_text(po_data['end_mobile'])
+    sanitized_end_mobile = pdf.sanitize_text(po_data['end_mobile'])
     sanitized_end_email = pdf.sanitize_text(po_data['end_email'])
     sanitized_payment_terms = pdf.sanitize_text(po_data['payment_terms'])
     sanitized_delivery_terms = pdf.sanitize_text(po_data['delivery_terms'])
@@ -1286,7 +1286,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # Contact
     pdf.cell(45, 4, "Contact")
     pdf.cell(5, 4, ":")
-    pdf.multi_cell(0, 4, f"{sanitized_end_person} | {sanitized_end_contact}")
+    pdf.multi_cell(0, 4, f"{sanitized_end_person} | {sanitized_end_mobile}")
 
     # Email
     pdf.cell(45, 4, "Email")
@@ -1394,7 +1394,7 @@ def main():
         st.session_state.po_end_company = end_user["End User Company"]
         st.session_state.po_end_address = end_user["End User Address"]
         st.session_state.po_end_person = end_user["End User Contact"]
-        st.session_state.po_end_contact = End_user_mobile
+        st.session_state.po_end_mobile = End_user_mobile
         st.session_state.po_end_email = end_user["End User Email"]
         st.session_state.po_end_gst_no = end_user["GST NO"]
 
@@ -1668,8 +1668,8 @@ def main():
                 )
                 end_mobile = st.text_input(
                     "End Mobile",
-                    value=str(st.session_state.get("po_end_contact", "1234567891") or "").strip(),
-                    key="po_end_contact_input"
+                    value=str(st.session_state.get("po_end_mobile", "1234567891") or "").strip(),
+                    key="po_end_mobile_input"
                 )
                 end_email = st.text_input(
                     "End User Email",

@@ -201,9 +201,9 @@ class QUOTATION_PDF(FPDF):
         self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
         
         self.set_text_color(0, 0, 0)  # Reset to black
-        self.set_y(-8)
-        self.set_font("Helvetica", "I", 7)
-        self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
+        # self.set_y(-8)
+        # self.set_font("Helvetica", "I", 7)
+        # self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
 
 # --- Page Content Generation Helpers ---
 

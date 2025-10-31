@@ -1373,8 +1373,18 @@ def main():
         end_user = endusers_df[endusers_df["End User Company"] == end_user_name].iloc[0]
 
         # --- Clean and Convert Mobile (avoid float or NaN issues) ---
-        vendor_mobile = str(vendor.get("Mobile", "")).split(".")[0].strip()
-        End_user_mobile = str(end_user.get("Mobile", "")).split(".")[0].strip()
+        def safe_strip(value):
+            """Safely convert any value to string and strip whitespace."""
+            try:
+                if pd.isna(value):
+                    return ""
+                return str(value).split(".")[0].strip()
+            except Exception:
+                return ""
+
+        vendor_mobile = safe_strip(vendor.get("Mobile", ""))
+        End_user_mobile = safe_strip(end_user.get("Mobile", ""))
+
 
         # Save to session_state (so Invoice & PO can use)
         st.session_state.po_vendor_name = vendor["Vendor Name"]
@@ -1384,7 +1394,6 @@ def main():
         st.session_state.po_end_company = end_user["End User Company"]
         st.session_state.po_end_address = end_user["End User Address"]
         st.session_state.po_end_person = end_user["End User Contact"]
-        # st.session_state.po_end_contact = end_user["End User Phone"]
         st.session_state.po_end_contact = End_user_mobile
         st.session_state.po_end_email = end_user["End User Email"]
         st.session_state.po_end_gst_no = end_user["GST NO"]

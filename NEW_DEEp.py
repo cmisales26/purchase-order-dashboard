@@ -1658,12 +1658,12 @@ def main():
                 end_contact = st.text_input(
                     "End User Phone",
                     value=st.session_state.get("po_end_contact", "+91 9876543210"),
-                    key="po_end_contact"
+                    key="po_end_contact_input"
                 )
                 end_email = st.text_input(
                     "End User Email",
                     value=st.session_state.get("po_end_email", "info@company.com"),
-                    key="po_end_email"
+                    key="po_end_email_input"
                 )
             with col2:
                 bill_to_company = st.text_input(

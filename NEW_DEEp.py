@@ -950,18 +950,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(32, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
     pdf.cell(sum(col_widths[:5]), 5, "SGST @ 9%", border=1, align="L")
-    pdf.cell(34, 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(32, 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
     
     pdf.cell(sum(col_widths[:5]), 5, "CGST @ 9%", border=1, align="L")
-    pdf.cell(34, 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(32, 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
 
     pdf.cell(sum(col_widths[:5]), 5, "Final Amount to be Paid", border=1, align="L")
-    pdf.cell(34, 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(32, 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
     
     # --- Amount in Words ---
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(189, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
+    pdf.cell(185, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # --- Tax Summary Table ---
     pdf.ln(2)

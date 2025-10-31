@@ -1322,36 +1322,6 @@ def safe_str_state(key, default=""):
         st.session_state[key] = str(default)
     return st.session_state[key] 
 
-# --- Function to handle Excel data loading ---
-def load_excel_data(uploaded_file):
-    """Load vendor and end user data from Excel file"""
-    try:
-        vendors_df = pd.read_excel(uploaded_file, sheet_name="Vendors", dtype={"Mobile": str})
-        endusers_df = pd.read_excel(uploaded_file, sheet_name="EndUsers")
-        return vendors_df, endusers_df
-    except Exception as e:
-        st.error(f"Error loading Excel file: {e}")
-        return None, None
-
-# --- Function to update session state with selected vendor and end user ---
-def update_selected_data(vendor_name, vendor_df, end_user_name, end_user_df):
-    """Update session state with selected vendor and end user data"""
-    if vendor_name and vendor_df is not None:
-        vendor = vendor_df[vendor_df["Vendor Name"] == vendor_name].iloc[0]
-        st.session_state.po_vendor_name = vendor["Vendor Name"]
-        st.session_state.po_vendor_address = vendor["Vendor Address"]
-        st.session_state.po_vendor_contact = vendor["Contact Person"]
-        st.session_state.po_vendor_mobile = str(vendor.get("Mobile", "")).split(".")[0].strip()
-    
-    if end_user_name and end_user_df is not None:
-        end_user = end_user_df[end_user_df["End User Company"] == end_user_name].iloc[0]
-        st.session_state.po_end_company = end_user["End User Company"]
-        st.session_state.po_end_address = end_user["End User Address"]
-        st.session_state.po_end_person = end_user["End User Contact"]
-        st.session_state.po_end_contact = end_user["End User Phone"]
-        st.session_state.po_end_email = end_user["End User Email"]
-        st.session_state.po_end_gst_no = end_user["GST NO"]
-
 # --- The main function with FIXED Quotation Tab ---
 def main():
     st.set_page_config(page_title="Document Generator", page_icon="📑", layout="wide")
@@ -1384,46 +1354,41 @@ def main():
         st.session_state.current_po_sales_person = "CP"
     if "current_po_quarter" not in st.session_state:  # NEW
         st.session_state.current_po_quarter = get_current_quarter()
-    
-    # Initialize vendor and end user session state
-    if "po_vendor_name" not in st.session_state:
-        st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
-    if "po_vendor_address" not in st.session_state:
-        st.session_state.po_vendor_address = "Unit 801-802, 8th Floor, Tower 1..."
-    if "po_vendor_contact" not in st.session_state:
-        st.session_state.po_vendor_contact = "Ms/Mr"
-    if "po_vendor_mobile" not in st.session_state:
-        st.session_state.po_vendor_mobile = "+91 1234567890"
-    if "po_end_company" not in st.session_state:
-        st.session_state.po_end_company = "Baldridge & Associates Pvt Ltd."
-    if "po_end_address" not in st.session_state:
-        st.session_state.po_end_address = "406 Sakar East, Vadodara 390009"
-    if "po_end_person" not in st.session_state:
-        st.session_state.po_end_person = "Mr. Dev"
-    if "po_end_contact" not in st.session_state:
-        st.session_state.po_end_contact = "+91 9876543210"
-    if "po_end_email" not in st.session_state:
-        st.session_state.po_end_email = "info@company.com"
-    if "po_end_gst_no" not in st.session_state:
-        st.session_state.po_end_gst_no = "24AAHCB9"
 
-    # --- Excel Upload Section ---
-    st.sidebar.header("📂 Excel Data Source")
-    uploaded_excel = st.sidebar.file_uploader("Upload Vendor & End User Excel", type=["xlsx"], key="excel_uploader")
-    
-    vendors_df = None
-    endusers_df = None
-    vendor_names = []
-    end_user_names = []
-    
+    # --- Upload Excel and Load Vendor/End User ---
+    uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
+
     if uploaded_excel:
-        vendors_df, endusers_df = load_excel_data(uploaded_excel)
-        if vendors_df is not None and endusers_df is not None:
-            vendor_names = vendors_df["Vendor Name"].unique().tolist()
-            end_user_names = endusers_df["End User Company"].unique().tolist()
-            st.sidebar.success("✅ Excel loaded successfully!")
-        else:
-            st.sidebar.error("❌ Failed to load Excel file")
+        vendors_df = pd.read_excel(uploaded_excel, sheet_name="Vendors", dtype={"Mobile": str})
+        endusers_df = pd.read_excel(uploaded_excel, sheet_name="EndUsers")
+
+        st.success("✅ Excel loaded successfully!")
+
+        # --- Select Vendor ---
+        vendor_name = st.selectbox("Select Vendor", vendors_df["Vendor Name"].unique())
+        vendor = vendors_df[vendors_df["Vendor Name"] == vendor_name].iloc[0]
+
+        # --- Select End User ---
+        end_user_name = st.selectbox("Select End User", endusers_df["End User Company"].unique())
+        end_user = endusers_df[endusers_df["End User Company"] == end_user_name].iloc[0]
+
+        # --- Clean and Convert Mobile (avoid float or NaN issues) ---
+        vendor_mobile = str(vendor.get("Mobile", "")).split(".")[0].strip()
+
+        # Save to session_state (so Invoice & PO can use)
+        st.session_state.po_vendor_name = vendor["Vendor Name"]
+        st.session_state.po_vendor_address = vendor["Vendor Address"]
+        st.session_state.po_vendor_contact = vendor["Contact Person"]
+        st.session_state.po_vendor_mobile = vendor_mobile
+        st.session_state.po_end_company = end_user["End User Company"]
+        st.session_state.po_end_address = end_user["End User Address"]
+        st.session_state.po_end_person = end_user["End User Contact"]
+        st.session_state.po_end_contact = end_user["End User Phone"]
+        st.session_state.po_end_email = end_user["End User Email"]
+        st.session_state.po_end_gst_no = end_user["GST NO"]
+
+        st.info("Vendor & End User details auto-filled from Excel ✅")
+    
 
     # Create tabs for different document types
     tab1, tab2, tab3 = st.tabs(["Tax Invoice Generator", "Purchase Order Generator", "Quotation Generator"])
@@ -1431,22 +1396,6 @@ def main():
     # --- Tab 1: Tax Invoice Generator ---
     with tab1:
         st.header("Tax Invoice Generator")
-        
-        # Excel Selection for Invoice Tab
-        if uploaded_excel and vendors_df is not None and endusers_df is not None:
-            st.subheader("Select from Excel Data")
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                selected_vendor_invoice = st.selectbox("Select Vendor", vendor_names, key="invoice_vendor_select")
-            
-            with col2:
-                selected_end_user_invoice = st.selectbox("Select End User", end_user_names, key="invoice_end_user_select")
-            
-            if st.button("Apply Selected Data to Invoice", key="apply_invoice_data"):
-                update_selected_data(selected_vendor_invoice, vendors_df, selected_end_user_invoice, endusers_df)
-                st.success("✅ Vendor and End User data applied to invoice!")
-        
         col1, col2 = st.columns([1,1])
         with col1:
             st.subheader("Invoice Details")
@@ -1492,6 +1441,12 @@ def main():
                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
                     items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
 
+            # st.subheader("Bank Details")
+            # bank_name = st.text_input("Bank Name", "XYZ bank")
+            # bank_branch = st.text_input("Branch", "AHMED")
+            # account_no = st.text_input("Account No.", "881304")
+            # ifsc = st.text_input("IFS Code", "IDFB004")
+
             st.subheader("Declaration")
             declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
             
@@ -1531,6 +1486,7 @@ def main():
                         "amount_in_words": amount_in_words,
                         "tax_in_words": tax_in_words
                     },
+                    # "bank": {"name": bank_name, "branch": bank_branch, "account_no": account_no, "ifsc": ifsc},
                     "declaration": declaration
                 }
 
@@ -1544,50 +1500,16 @@ def main():
                     key="invoice_download_button")
                 
     # --- Tab 2: Purchase Order Generator ---
-    # --- Tab 2: Purchase Order Generator ---
     with tab2:
         st.header("Purchase Order Generator")
         
-        # Excel Selection for PO Tab
-        if uploaded_excel and vendors_df is not None and endusers_df is not None:
-            st.subheader("Select from Excel Data")
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                selected_vendor_po = st.selectbox("Select Vendor", vendor_names, key="po_vendor_select")
-                if selected_vendor_po:
-                    vendor = vendors_df[vendors_df["Vendor Name"] == selected_vendor_po].iloc[0]
-            
-            with col2:
-                selected_end_user_po = st.selectbox("Select End User", end_user_names, key="po_end_user_select")
-                if selected_end_user_po:
-                    end_user = endusers_df[endusers_df["End User Company"] == selected_end_user_po].iloc[0]
-            
-            # Auto-populate when selection changes
-            if selected_vendor_po:
-                st.session_state.po_vendor_name = vendor["Vendor Name"]
-                st.session_state.po_vendor_address = vendor["Vendor Address"]
-                st.session_state.po_vendor_contact = vendor["Contact Person"]
-                st.session_state.po_vendor_mobile = str(vendor.get("Mobile", "")).split(".")[0].strip()
-            
-            if selected_end_user_po:
-                st.session_state.po_end_company = end_user["End User Company"]
-                st.session_state.po_end_address = end_user["End User Address"]
-                st.session_state.po_end_person = end_user["End User Contact"]
-                st.session_state.po_end_contact = end_user["End User Phone"]
-                st.session_state.po_end_email = end_user["End User Email"]
-                st.session_state.po_end_gst_no = end_user["GST NO"]
-            
-            st.success("✅ Vendor and End User data auto-populated from selection!")
-        
-        # Rest of the PO tab code remains the same...
         today = datetime.date.today()
         current_quarter = get_current_quarter()
         
         # PO Settings in sidebar for this tab
         st.sidebar.header("PO Settings")
         
-        # Sales Person Selection for PO
+        # Sales Person Selection for PO - JUST LIKE QUOTATION
         po_sales_person = st.sidebar.selectbox("Select Sales Person", 
                                             options=list(SALES_PERSON_MAPPING.keys()), 
                                             format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
@@ -1700,47 +1622,47 @@ def main():
             with col1:
                 vendor_name = st.text_input(
                     "Vendor Name",
-                    value=safe_str_state("po_vendor_name", "Arkance IN Pvt. Ltd."),
+                    value=st.session_state.get("po_vendor_name", "Arkance IN Pvt. Ltd."),
                     key="po_vendor_name_input"
                 )
                 vendor_address = st.text_area(
                     "Vendor Address",
-                    value=safe_str_state("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1..."),
+                    value=st.session_state.get("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1..."),
                     key="po_vendor_address_input"
                 )
                 vendor_contact = st.text_input(
                     "Contact Person",
-                    value=safe_str_state("po_vendor_contact", "Ms/Mr"),
+                    value=st.session_state.get("po_vendor_contact", "Ms/Mr"),
                     key="po_vendor_contact_input"
                 )
                 vendor_mobile = st.text_input(
                     "Mobile",
-                    value=safe_str_state("po_vendor_mobile", "+91 1234567890"),
+                    value=st.session_state.get("po_vendor_mobile", "+91 1234567890"),
                     key="po_vendor_mobile_input"
                 )
                 end_company = st.text_input(
                     "End User Company",
-                    value=safe_str_state("po_end_company", "Baldridge & Associates Pvt Ltd."),
+                    value=st.session_state.get("po_end_company", "Baldridge & Associates Pvt Ltd."),
                     key="po_end_company_input"
                 )
                 end_address = st.text_area(
                     "End User Address",
-                    value=safe_str_state("po_end_address", "406 Sakar East, Vadodara 390009"),
+                    value=st.session_state.get("po_end_address", "406 Sakar East, Vadodara 390009"),
                     key="po_end_address_input"
                 )
                 end_person = st.text_input(
                     "End User Contact",
-                    value=safe_str_state("po_end_person", "Mr. Dev"),
+                    value=st.session_state.get("po_end_person", "Mr. Dev"),
                     key="po_end_person_input"
                 )
                 end_contact = st.text_input(
                     "End User Phone",
-                    value=safe_str_state("po_end_contact", "+91 9876543210"),
+                    value=st.session_state.get("po_end_contact", "+91 9876543210"),
                     key="po_end_contact_input"
                 )
                 end_email = st.text_input(
                     "End User Email",
-                    value=safe_str_state("po_end_email", "info@company.com"),
+                    value=st.session_state.get("po_end_email", "info@company.com"),
                     key="po_end_email_input"
                 )
             with col2:
@@ -1901,21 +1823,6 @@ def main():
     with tab3:
         st.header("📑 Adobe Software Quotation Generator")
         
-        # Excel Selection for Quotation Tab
-        if uploaded_excel and vendors_df is not None and endusers_df is not None:
-            st.subheader("Select from Excel Data")
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                selected_vendor_quote = st.selectbox("Select Vendor", vendor_names, key="quote_vendor_select")
-            
-            with col2:
-                selected_end_user_quote = st.selectbox("Select End User", end_user_names, key="quote_end_user_select")
-            
-            if st.button("Apply Selected Data to Quotation", key="apply_quote_data"):
-                update_selected_data(selected_vendor_quote, vendors_df, selected_end_user_quote, endusers_df)
-                st.success("✅ Vendor and End User data applied to quotation!")
-        
         today = datetime.date.today()
         current_quarter = get_current_quarter()
         
@@ -2030,11 +1937,11 @@ def main():
         
         with col1:
             st.header("Recipient Details")
-            vendor_name = st.text_input("Company Name", st.session_state.get("po_end_company", "Creation Studio"), key="quote_vendor_name")
-            vendor_address = st.text_area("Company Address", st.session_state.get("po_end_address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389"), key="quote_vendor_address")
-            vendor_email = st.text_input("Email", st.session_state.get("po_end_email", "info@dreamcreationstudio.com"), key="quote_vendor_email")
-            vendor_contact = st.text_input("Contact Person (Kind Attention)", st.session_state.get("po_end_person", "Mr. Musta"), key="quote_vendor_contact")
-            vendor_mobile = st.text_input("Mobile", st.session_state.get("po_end_contact", "+91 9876543210"), key="quote_vendor_mobile")
+            vendor_name = st.text_input("Company Name", "Creation Studio", key="quote_vendor_name")
+            vendor_address = st.text_area("Company Address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389", key="quote_vendor_address")
+            vendor_email = st.text_input("Email", "info@dreamcreationstudio.com", key="quote_vendor_email")
+            vendor_contact = st.text_input("Contact Person (Kind Attention)", "Mr. Musta", key="quote_vendor_contact")
+            vendor_mobile = st.text_input("Mobile", "+91 9876543210", key="quote_vendor_mobile")
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "September 29, 2025", key="quote_price_validity")

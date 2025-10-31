@@ -782,20 +782,20 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_left_end = pdf.get_y()
 
     # --- Right Side (Invoice Details) ---
-    pdf.set_xy(110, y_left_start)
+    pdf.set_xy(107, y_left_start)
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(44, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="C")
     pdf.cell(44, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
 
     # Payment terms
-    pdf.set_x(110)
+    pdf.set_x(107)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(44, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
     pdf.cell(44, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
-    pdf.set_x(110)
+    pdf.set_x(107)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(44, 8, "Supplier's Reference:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)

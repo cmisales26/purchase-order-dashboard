@@ -969,7 +969,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(33, 5, "HSN/SAN", border=1, align="C")
     pdf.cell(33, 5, "Taxable Value", border=1, align="C")
     pdf.cell(58, 5, "Central Tax", border=1, align="C")
-    pdf.cell(58, 5, "State Tax", border=1, ln=True, align="C")
+    pdf.cell(57, 5, "State Tax", border=1, ln=True, align="C")
 
     pdf.cell(35, 5, "", border="L", ln=False)
     pdf.cell(35, 5, "", border="L", ln=False)

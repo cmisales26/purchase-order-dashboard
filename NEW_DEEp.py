@@ -1623,7 +1623,7 @@ def main():
                 vendor_name = st.text_input(
                     "Vendor Name",
                     value=st.session_state.get("po_vendor_name", "Arkance IN Pvt. Ltd."),
-                    key="po_vendor_name_input"
+                    key="po_vendor_name"
                 )
                 vendor_address = st.text_area(
                     "Vendor Address",

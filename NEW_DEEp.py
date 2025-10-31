@@ -805,7 +805,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Other's reference
     pdf.set_x(107)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(44, 8, "Other's Reference:", border="LRTB", ln=0)
+    pdf.cell(44, 8, "Other's Reference:", border="RTB", ln=0)
     pdf.set_font("Helvetica", "", 8)
     other_ref_value = invoice_data['Reference']['Other']
     pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)

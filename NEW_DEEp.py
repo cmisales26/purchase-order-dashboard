@@ -872,7 +872,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Add empty space for address if needed
     if remaining_height_for_address > 0:
         pdf.set_x(107)
-        pdf.cell(92, remaining_height_for_address, "", border="", ln=1)
+        pdf.cell(92, remaining_height_for_address, "", border="R", ln=1)
 
     # Row 2: Dispatched Through
     pdf.set_x(107)
@@ -897,7 +897,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Closing row
     pdf.set_x(107)
-    pdf.cell(92, 1, "", border="LRB", ln=1)
+    pdf.cell(92, 1, "", border="LB", ln=1)
 
     # --- Item Table Header ---
     pdf.ln(2)

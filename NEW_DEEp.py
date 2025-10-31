@@ -800,7 +800,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(44, 8, "Supplier's Reference:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
     other_ref_value = invoice_data['Reference']['Suppliers_Reference']
-    pdf.cell(47, 8, other_ref_value, border="LRTB", ln=1)
+    pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 
     # Other's reference
     pdf.set_x(107)
@@ -830,10 +830,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer name and address
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(95, 5, invoice_data['buyer']['name'], border="LR", ln=1)
+    pdf.cell(92, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
     pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="LRB")
+    pdf.multi_cell(92, 4, invoice_data['buyer']['address'], border="LRB")
     
     # Buyer contact details
     buyer_lines = [
@@ -849,7 +849,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.cell(label_width, 6, label, border="LBT", ln=0)
         pdf.set_font("Helvetica", "", 8)
         border = "RB" if i < len(buyer_lines) - 1 else "RB"
-        pdf.cell(95 - label_width, 6, value, border=border, ln=1)
+        pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
     
@@ -857,12 +857,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
 
     # --- Buyer Right Details ---
-    pdf.set_xy(110, y_buyer_start)
+    pdf.set_xy(107, y_buyer_start)
     
     # Row 1: Buyer's Order No/Date - FIXED POSITION (doesn't stretch with address)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="C")
-    pdf.cell(47, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="C")
+    pdf.cell(44, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="C")
+    pdf.cell(44, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="C")
 
     # Calculate remaining height needed for address space
     name_height = 5  # Height of buyer name
@@ -871,33 +871,33 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Add empty space for address if needed
     if remaining_height_for_address > 0:
-        pdf.set_x(110)
-        pdf.cell(94, remaining_height_for_address, "", border="R", ln=1)
+        pdf.set_x(107)
+        pdf.cell(92, remaining_height_for_address, "", border="R", ln=1)
 
     # Row 2: Dispatched Through
-    pdf.set_x(110)
+    pdf.set_x(107)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 6, "Dispatched Through", border="LRT", ln=0)
+    pdf.cell(44, 6, "Dispatched Through", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
+    pdf.cell(44, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
     # Row 3: Destination
-    pdf.set_x(110)
+    pdf.set_x(107)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 6, "Destination", border="LRT", ln=0)
+    pdf.cell(44, 6, "Destination", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
+    pdf.cell(44, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
 
     # Row 4: Terms of delivery
-    pdf.set_x(110)
+    pdf.set_x(107)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 6, "Terms of delivery", border="LRT", ln=0)
+    pdf.cell(44, 6, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
+    pdf.cell(44, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
 
     # Closing row
-    pdf.set_x(110)
-    pdf.cell(94, 1, "", border="LRB", ln=1)
+    pdf.set_x(107)
+    pdf.cell(92, 1, "", border="LRB", ln=1)
 
     # --- Item Table Header ---
     pdf.ln(2)

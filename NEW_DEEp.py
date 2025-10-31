@@ -966,10 +966,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Tax Summary Table ---
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(32, 5, "HSN/SAN", border=1, align="C")
-    pdf.cell(32, 5, "Taxable Value", border=1, align="C")
-    pdf.cell(60, 5, "Central Tax", border=1, align="C")
-    pdf.cell(60, 5, "State Tax", border=1, ln=True, align="C")
+    pdf.cell(33, 5, "HSN/SAN", border=1, align="C")
+    pdf.cell(33, 5, "Taxable Value", border=1, align="C")
+    pdf.cell(59, 5, "Central Tax", border=1, align="C")
+    pdf.cell(59, 5, "State Tax", border=1, ln=True, align="C")
 
     pdf.cell(35, 5, "", border="L", ln=False)
     pdf.cell(35, 5, "", border="L", ln=False)

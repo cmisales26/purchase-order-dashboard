@@ -760,7 +760,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Left Side (Vendor Details) ---
     pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="LB")
+    pdf.multi_cell(92, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="LB")
     
     # Vendor details lines
     vendor_lines = [
@@ -784,20 +784,20 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Right Side (Invoice Details) ---
     pdf.set_xy(110, y_left_start)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="C")
-    pdf.cell(47, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
+    pdf.cell(44, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="C")
+    pdf.cell(44, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
 
     # Payment terms
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
+    pdf.cell(44, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
-    pdf.cell(47, 8, "100% Advance with Purchase", border="RT", ln=1)
+    pdf.cell(44, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 8, "Supplier's Reference:", border="LRT", ln=0)
+    pdf.cell(44, 8, "Supplier's Reference:", border="LRT", ln=0)
     pdf.set_font("Helvetica", "", 8)
     other_ref_value = invoice_data['Reference']['Suppliers_Reference']
     pdf.cell(47, 8, other_ref_value, border="RTB", ln=1)
@@ -805,10 +805,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Other's reference
     pdf.set_x(110)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(47, 8, "Other's Reference:", border="LRTB", ln=0)
+    pdf.cell(44, 8, "Other's Reference:", border="LRTB", ln=0)
     pdf.set_font("Helvetica", "", 8)
     other_ref_value = invoice_data['Reference']['Other']
-    pdf.cell(47, 8, other_ref_value, border="LRTB", ln=1)
+    pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 
     # # Empty closing row
     # pdf.set_x(110)
@@ -818,9 +818,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === BUYER SECTION ===
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(95, 8, "Buyer", border=1, ln=0)
-    pdf.cell(47, 8, "Buyer's Order No.", border=1, ln=0, align="C")
-    pdf.cell(47, 8, "Buyer's Order Date", border=1, ln=1, align="C")
+    pdf.cell(92, 8, "Buyer", border=1, ln=0)
+    pdf.cell(44, 8, "Buyer's Order No.", border=1, ln=0, align="C")
+    pdf.cell(44, 8, "Buyer's Order Date", border=1, ln=1, align="C")
 
     y_buyer_start = pdf.get_y()
 

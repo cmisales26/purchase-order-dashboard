@@ -730,6 +730,7 @@ class PDF(FPDF):
         self.set_font("Helvetica", "", 8)
         self.set_left_margin(15)
         self.set_right_margin(15)
+        self.website_url = "https://cminfotech.com/"
 
     def header(self):
         self.set_font("Helvetica", "B", 12)

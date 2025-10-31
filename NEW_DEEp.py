@@ -752,9 +752,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === HEADER (Vendor + Invoice Details) ===
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(95, 8, "CM Infotech.", border=1, ln=0)
-    pdf.cell(47, 8, "Invoice No.", border=1, ln=0, align="C")
-    pdf.cell(47, 8, "Invoice Date", border=1, ln=1, align="C")
+    pdf.cell(90, 8, "CM Infotech.", border=1, ln=0)
+    pdf.cell(42, 8, "Invoice No.", border=1, ln=0, align="C")
+    pdf.cell(42, 8, "Invoice Date", border=1, ln=1, align="C")
 
     y_left_start = pdf.get_y()
 

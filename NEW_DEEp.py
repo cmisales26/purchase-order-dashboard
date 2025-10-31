@@ -169,7 +169,7 @@ class QUOTATION_PDF(FPDF):
         self.ln(5)
 
     def footer(self):
-        self.set_y(-20)
+        self.set_y(-25)
         self.set_font("Helvetica", "", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         

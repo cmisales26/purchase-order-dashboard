@@ -1544,6 +1544,7 @@ def main():
                     key="invoice_download_button")
                 
     # --- Tab 2: Purchase Order Generator ---
+    # --- Tab 2: Purchase Order Generator ---
     with tab2:
         st.header("Purchase Order Generator")
         
@@ -1554,21 +1555,39 @@ def main():
             
             with col1:
                 selected_vendor_po = st.selectbox("Select Vendor", vendor_names, key="po_vendor_select")
+                if selected_vendor_po:
+                    vendor = vendors_df[vendors_df["Vendor Name"] == selected_vendor_po].iloc[0]
             
             with col2:
                 selected_end_user_po = st.selectbox("Select End User", end_user_names, key="po_end_user_select")
+                if selected_end_user_po:
+                    end_user = endusers_df[endusers_df["End User Company"] == selected_end_user_po].iloc[0]
             
-            if st.button("Apply Selected Data to PO", key="apply_po_data"):
-                update_selected_data(selected_vendor_po, vendors_df, selected_end_user_po, endusers_df)
-                st.success("✅ Vendor and End User data applied to PO!")
+            # Auto-populate when selection changes
+            if selected_vendor_po:
+                st.session_state.po_vendor_name = vendor["Vendor Name"]
+                st.session_state.po_vendor_address = vendor["Vendor Address"]
+                st.session_state.po_vendor_contact = vendor["Contact Person"]
+                st.session_state.po_vendor_mobile = str(vendor.get("Mobile", "")).split(".")[0].strip()
+            
+            if selected_end_user_po:
+                st.session_state.po_end_company = end_user["End User Company"]
+                st.session_state.po_end_address = end_user["End User Address"]
+                st.session_state.po_end_person = end_user["End User Contact"]
+                st.session_state.po_end_contact = end_user["End User Phone"]
+                st.session_state.po_end_email = end_user["End User Email"]
+                st.session_state.po_end_gst_no = end_user["GST NO"]
+            
+            st.success("✅ Vendor and End User data auto-populated from selection!")
         
+        # Rest of the PO tab code remains the same...
         today = datetime.date.today()
         current_quarter = get_current_quarter()
         
         # PO Settings in sidebar for this tab
         st.sidebar.header("PO Settings")
         
-        # Sales Person Selection for PO - JUST LIKE QUOTATION
+        # Sales Person Selection for PO
         po_sales_person = st.sidebar.selectbox("Select Sales Person", 
                                             options=list(SALES_PERSON_MAPPING.keys()), 
                                             format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",

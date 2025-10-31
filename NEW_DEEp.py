@@ -1383,7 +1383,7 @@ def main():
                 return ""
 
         vendor_mobile = safe_strip(vendor.get("Mobile", ""))
-        End_user_mobile = safe_strip(end_user.get("Mobile", ""))
+        End_user_mobile = safe_strip(end_user.get("End User Phone", ""))
 
 
         # Save to session_state (so Invoice & PO can use)

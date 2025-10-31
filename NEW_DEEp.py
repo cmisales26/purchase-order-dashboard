@@ -1383,7 +1383,7 @@ def main():
                 return ""
 
         vendor_mobile = safe_strip(vendor.get("Mobile", ""))
-        End_user_mobile = safe_strip(end_user.get("End User Phone", ""))
+        End_user_mobile = safe_strip(end_user.get("End Mobile", ""))
 
 
         # Save to session_state (so Invoice & PO can use)
@@ -1667,8 +1667,8 @@ def main():
                     key="po_end_person"
                 )
                 end_contact = st.text_input(
-                    "End User Phone",
-                    value=str(st.session_state.get("po_end_contact", "") or "").strip(),
+                    "End Mobile",
+                    value=str(st.session_state.get("po_end_contact", "1234567891") or "").strip(),
                     key="po_end_contact_input"
                 )
                 end_email = st.text_input(

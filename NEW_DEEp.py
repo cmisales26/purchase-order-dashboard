@@ -1669,7 +1669,7 @@ def main():
                 end_mobile = st.text_input(
                     "End Mobile",
                     value=str(st.session_state.get("po_end_mobile", "1234567891") or "").strip(),
-                    key="po_end_mobile_input"
+                    key="po_end_mobile"
                 )
                 end_email = st.text_input(
                     "End User Email",

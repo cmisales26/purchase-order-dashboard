@@ -1060,6 +1060,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
     
     # Clickable email and mobile
+    pdf.set_font("Helvetica", "U", 8)
     pdf.set_text_color(0, 0, 255)
     email1 = "info@cminfotech.com "
     phone_number = " +91 873 391 5721"

@@ -903,7 +903,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(10, 5, "Sr. No.", border=1, align="C")
-    pdf.cell(80, 5, "Description of Goods", border=1, align="C")
+    pdf.cell(78, 5, "Description of Goods", border=1, align="C")
     pdf.cell(20, 5, "HSN/SAC", border=1, align="C")
     pdf.cell(20, 5, "Quantity", border=1, align="C")
     pdf.cell(24, 5, "Unit Rate", border=1, align="C")

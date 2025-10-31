@@ -30,6 +30,14 @@ PRODUCT_CATALOG = {
     "GstarCAD ARCHITECTURE 2021 One year upgrade": {"basic": 73214.0, "gst_percent": 18.0},
     "GstarCAD ARCHITECTURE 2021 Two year upgrade": {"basic": 87857.0, "gst_percent": 18.0},
     "GstarCAD ARCHITECTURE 2021 Three + year upgrade": {"basic": 105428.0, "gst_percent": 18.0},
+    "Archline.XP LT 2025 Perpetual": {"basic": 30450.0, "gst_percent": 18.0},
+    "Archline.XP LT Yearly Subscription": {"basic": 26617.0, "gst_percent": 18.0},
+    "Archline.XP Interior 2025 Perpetual": {"basic": 94500.0, "gst_percent": 18.0},
+    "Archline.XP Interior Yearly Subscription": {"basic": 70875.0, "gst_percent": 18.0},
+    "Archline.XP Professional 2025 Perpetual": {"basic": 126000.0, "gst_percent": 18.0},
+    "Archline.XP Professional Yearly Subscription": {"basic": 94500.0, "gst_percent": 18.0},
+    "Archline.XP MEP Module for LT 2025": {"basic": 30450.0, "gst_percent": 18.0},
+    "Archline.XP MEP Module Yearly Subscription": {"basic": 21000.0, "gst_percent": 18.0},
     "Creative cloud pro plus for Teams": {"basic": 114560.0, "gst_percent": 18.0},
     "Creative cloud Pro for Teams": {"basic": 104560.0, "gst_percent": 18.0},
     "Adobe Creative Cloud All Apps": {"basic": 95000.0, "gst_percent": 18.0},
@@ -730,7 +738,6 @@ class PDF(FPDF):
         self.set_font("Helvetica", "", 8)
         self.set_left_margin(15)
         self.set_right_margin(15)
-        self.website_url = "https://cminfotech.com/"
 
     def header(self):
         self.set_font("Helvetica", "B", 12)
@@ -1074,13 +1081,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
-
-
-
-
-
-
-
 
 
 # --- PDF Class ---

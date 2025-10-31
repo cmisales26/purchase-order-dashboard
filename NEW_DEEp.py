@@ -1674,7 +1674,7 @@ def main():
                 end_email = st.text_input(
                     "End User Email",
                     value=st.session_state.get("po_end_email", "info@company.com"),
-                    key="po_end_email"
+                    key="po_end_email_input"
                 )
             with col2:
                 bill_to_company = st.text_input(

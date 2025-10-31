@@ -1123,9 +1123,10 @@ class PO_PDF(FPDF):
 
     def footer(self):
         self.set_y(-18)
-        self.set_font("Helvetica", "U", 10)
+        self.set_font("Helvetica", "", 10)
         self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
         self.set_text_color(0, 0, 255)
+        self.set_font("Helvetica", "U", 10)
         # email1 = "cad@cmi.com"
         email1 = "info@cminfotech.com "
         phone_number =" +91 873 391 5721"

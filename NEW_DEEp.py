@@ -983,24 +983,24 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     hsn_sgst = hsn_tax_value * 0.09
     hsn_cgst = hsn_tax_value * 0.09
     
-    pdf.cell(35, 5, "997331", border=1, align="C")
-    pdf.cell(35, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(30, 5, "9%", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(30, 5, "9%", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(33, 5, "997331", border=1, align="C")
+    pdf.cell(33, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(29, 5, "9%", border=1, align="C")
+    pdf.cell(29, 5, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(29, 5, "9%", border=1, align="C")
+    pdf.cell(28, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(35, 5, "Total", border=1, align="C")
-    pdf.cell(35, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(30, 5, "", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(30, 5, "", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(33, 5, "Total", border=1, align="C")
+    pdf.cell(33, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(29, 5, "", border=1, align="C")
+    pdf.cell(29, 5, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(29, 5, "", border=1, align="C")
+    pdf.cell(28, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(190, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    pdf.cell(181, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # --- Reserve footer space ---
     needed_space = 70

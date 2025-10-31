@@ -911,7 +911,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Items ---
     pdf.set_font("Helvetica", "", 8)
-    col_widths = [10, 75, 20, 20, 24, 32]
+    col_widths = [10, 75, 20, 20, 24, 31]
     line_height = 4
 
     for i, item in enumerate(invoice_data["items"], start=1):
@@ -947,21 +947,21 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Totals ---
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")
-    pdf.cell(32, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(31, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
     pdf.cell(sum(col_widths[:5]), 5, "SGST @ 9%", border=1, align="L")
-    pdf.cell(32, 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(31, 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
     
     pdf.cell(sum(col_widths[:5]), 5, "CGST @ 9%", border=1, align="L")
-    pdf.cell(32, 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(31, 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
 
     pdf.cell(sum(col_widths[:5]), 5, "Final Amount to be Paid", border=1, align="L")
-    pdf.cell(32, 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(31, 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
     
     # --- Amount in Words ---
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(181, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
+    pdf.cell(180, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # --- Tax Summary Table ---
     pdf.ln(2)
@@ -969,14 +969,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(33, 5, "HSN/SAN", border=1, align="C")
     pdf.cell(33, 5, "Taxable Value", border=1, align="C")
     pdf.cell(58, 5, "Central Tax", border=1, align="C")
-    pdf.cell(57, 5, "State Tax", border=1, ln=True, align="C")
+    pdf.cell(56, 5, "State Tax", border=1, ln=True, align="C")
 
     pdf.cell(33, 5, "", border="L", ln=False)
     pdf.cell(33, 5, "", border="L", ln=False)
     pdf.cell(29, 5, "Rate", border="L", align="C")
     pdf.cell(29, 5, "Amount", border="LR", align="C")
     pdf.cell(29, 5, "Rate", border="L", align="C")
-    pdf.cell(28, 5, "Amount", border="LR", ln=True, align="C")
+    pdf.cell(27, 5, "Amount", border="LR", ln=True, align="C")
 
     pdf.set_font("Helvetica", "", 8)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
@@ -988,7 +988,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(29, 5, "9%", border=1, align="C")
     pdf.cell(29, 5, f"{hsn_sgst:.2f}", border=1, align="C")
     pdf.cell(29, 5, "9%", border=1, align="C")
-    pdf.cell(28, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(27, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(33, 5, "Total", border=1, align="C")
@@ -996,11 +996,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(29, 5, "", border=1, align="C")
     pdf.cell(29, 5, f"{hsn_sgst:.2f}", border=1, align="C")
     pdf.cell(29, 5, "", border=1, align="C")
-    pdf.cell(28, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(27, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     pdf.ln(2)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(181, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    pdf.cell(180, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # --- Reserve footer space ---
     needed_space = 70

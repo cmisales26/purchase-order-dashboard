@@ -1628,42 +1628,42 @@ def main():
                 vendor_address = st.text_area(
                     "Vendor Address",
                     value=st.session_state.get("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1..."),
-                    key="po_vendor_address_input"
+                    key="po_vendor_address"
                 )
                 vendor_contact = st.text_input(
                     "Contact Person",
                     value=st.session_state.get("po_vendor_contact", "Ms/Mr"),
-                    key="po_vendor_contact_input"
+                    key="po_vendor_contact"
                 )
                 vendor_mobile = st.text_input(
                     "Mobile",
                     value=st.session_state.get("po_vendor_mobile", "+91 1234567890"),
-                    key="po_vendor_mobile_input"
+                    key="po_vendor_mobile"
                 )
                 end_company = st.text_input(
                     "End User Company",
                     value=st.session_state.get("po_end_company", "Baldridge & Associates Pvt Ltd."),
-                    key="po_end_company_input"
+                    key="po_end_company"
                 )
                 end_address = st.text_area(
                     "End User Address",
                     value=st.session_state.get("po_end_address", "406 Sakar East, Vadodara 390009"),
-                    key="po_end_address_input"
+                    key="po_end_address"
                 )
                 end_person = st.text_input(
                     "End User Contact",
                     value=st.session_state.get("po_end_person", "Mr. Dev"),
-                    key="po_end_person_input"
+                    key="po_end_person"
                 )
                 end_contact = st.text_input(
                     "End User Phone",
                     value=st.session_state.get("po_end_contact", "+91 9876543210"),
-                    key="po_end_contact_input"
+                    key="po_end_contact"
                 )
                 end_email = st.text_input(
                     "End User Email",
                     value=st.session_state.get("po_end_email", "info@company.com"),
-                    key="po_end_email_input"
+                    key="po_end_email"
                 )
             with col2:
                 bill_to_company = st.text_input(

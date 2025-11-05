@@ -1119,15 +1119,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # pdf.multi_cell(0, 4, invoice_data['declaration'])
     # --- Bank Details & Declaration (Side by Side) ---
     # pdf.ln(5)
-# --- Bank Details & Declaration (Side by Side with Border) ---
-    # pdf.ln(5)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(95, 5, "Company's Bank Details", border=1, align="C")  # left header
-    pdf.cell(95, 5, "Declaration", border=1, align="C", ln=1)       # right header
+    pdf.cell(95, 5, "Company's Bank Details", ln=0)  # left side
+    pdf.cell(95, 5, "Declaration:", ln=1)             # right side
 
     pdf.set_font("Helvetica", "", 8)
 
-    # --- Left column (bank) ---
+    # Left column (bank)
     bank_text = (
         "Bank Name : IDFC FIRST\n"
         "Branch        : AHMEDABAD Shyamal Branch\n"
@@ -1135,32 +1133,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         "IFS Code    : IDFB0040335"
     )
 
-    # --- Right column (declaration) ---
-    decl_text = invoice_data["declaration"]
-
-    # Save Y position before writing
+    # Save current Y position
     y_before = pdf.get_y()
     x_left = pdf.get_x()
 
-    # --- Left bordered cell ---
-    pdf.multi_cell(95, 5, bank_text, border=1)
-    height_used = pdf.get_y() - y_before
-
-    # --- Move to right column (same starting height) ---
+    # Left cell (Bank)
+    pdf.multi_cell(92, 4, bank_text, border=0)
+    # Go back up for right cell
     pdf.set_xy(x_left + 95, y_before)
-    pdf.multi_cell(95, 5, decl_text, border=1)
-
-    # --- Adjust height if declaration text is taller ---
-    right_height = pdf.get_y() - y_before
-    if right_height > height_used:
-        # Extend left box to match right column height
-        pdf.set_xy(x_left, y_before + height_used)
-        pdf.cell(95, right_height - height_used, "", border="LRB")
-    elif height_used > right_height:
-        # Extend right box to match left column height
-        pdf.set_xy(x_left + 95, y_before + right_height)
-        pdf.cell(95, height_used - right_height, "", border="LRB")
-
+    pdf.multi_cell(92, 4, invoice_data['declaration'], border=0)
 
     # --- Signature ---
     pdf.ln(1)

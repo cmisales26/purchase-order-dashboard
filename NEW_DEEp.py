@@ -59,6 +59,42 @@ PRODUCT_CATALOG = {
     "Siemens NX": {"basic": 65000.0, "gst_percent": 18.0},
 }
 
+# Vendor Database - You can expand this with more vendors
+VENDOR_DATABASE = {
+    "Arkance IN Pvt. Ltd.": {
+        "address": "Unit 801-802, 8th Floor, Tower 1, Equinox Business Park, LBS Marg, Kurla West, Mumbai - 400070",
+        "contact": "Ms/Mr",
+        "mobile": "+91 1234567890",
+        "gst_no": "27AAACA7149L1Z2",
+        "pan_no": "AAACA7149L",
+        "msme_no": "UDYAM-MH-01-1234567"
+    },
+    "CM Infotech": {
+        "address": "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481",
+        "contact": "Chirag Prajapati",
+        "mobile": "+91 87339 15721",
+        "gst_no": "24ANMPP4891R1ZX",
+        "pan_no": "ANMPP4891R",
+        "msme_no": "UDYAM-GJ-01-0117646"
+    },
+    "Adobe Systems India": {
+        "address": "Building No. 4, Mindspace, Serene Properties IT SEZ, Madhapur, Hyderabad - 500081",
+        "contact": "Regional Manager",
+        "mobile": "+91 4045678901",
+        "gst_no": "36AABCA1234L1Z5",
+        "pan_no": "AABCA1234L",
+        "msme_no": "UDYAM-TS-01-7654321"
+    },
+    "Autodesk India": {
+        "address": "RMZ Ecoworld, 5th Floor, Block B, Devarabeesanahalli, Bangalore - 560103",
+        "contact": "Sales Manager",
+        "mobile": "+91 8067890123",
+        "gst_no": "29AABCA5678L1Z9",
+        "pan_no": "AABCA5678L",
+        "msme_no": "UDYAM-KA-01-9876543"
+    }
+}
+
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
     "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"},
@@ -66,6 +102,23 @@ SALES_PERSON_MAPPING = {
     "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721"},
     "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"}
 }
+
+# --- Helper Functions for Vendor Management ---
+def get_vendor_dropdown_options():
+    """Get vendor names for dropdown"""
+    return ["Select Vendor"] + list(VENDOR_DATABASE.keys())
+
+def update_vendor_fields(selected_vendor):
+    """Update session state with vendor details when vendor is selected"""
+    if selected_vendor and selected_vendor != "Select Vendor":
+        vendor_data = VENDOR_DATABASE.get(selected_vendor, {})
+        st.session_state.po_vendor_name = selected_vendor
+        st.session_state.po_vendor_address = vendor_data.get("address", "")
+        st.session_state.po_vendor_contact = vendor_data.get("contact", "")
+        st.session_state.po_vendor_mobile = vendor_data.get("mobile", "")
+        st.session_state.po_gst_no = vendor_data.get("gst_no", "")
+        st.session_state.po_pan_no = vendor_data.get("pan_no", "")
+        st.session_state.po_msme_no = vendor_data.get("msme_no", "")
 
 # --- Helper Functions for Quotation and PO ---
 def get_current_quarter():
@@ -130,7 +183,7 @@ def parse_quotation_number(quotation_number):
             return prefix, sales_person, quarter, date_part, year_range, sequence
     except:
         pass
-    return "CMI", sales_person(), get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
+    return "CMI", "SD", get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
 
 def generate_quotation_number(sales_person, sequence_number):
     """Generate quotation number with current quarter and sequence"""
@@ -1369,6 +1422,22 @@ def main():
     if "current_po_quarter" not in st.session_state:  # NEW
         st.session_state.current_po_quarter = get_current_quarter()
 
+    # Initialize vendor session states
+    if "po_vendor_name" not in st.session_state:
+        st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
+    if "po_vendor_address" not in st.session_state:
+        st.session_state.po_vendor_address = "Unit 801-802, 8th Floor, Tower 1..."
+    if "po_vendor_contact" not in st.session_state:
+        st.session_state.po_vendor_contact = "Ms/Mr"
+    if "po_vendor_mobile" not in st.session_state:
+        st.session_state.po_vendor_mobile = "+91 1234567890"
+    if "po_gst_no" not in st.session_state:
+        st.session_state.po_gst_no = "24ANMPP4891R1ZX"
+    if "po_pan_no" not in st.session_state:
+        st.session_state.po_pan_no = "ANMPP4891R"
+    if "po_msme_no" not in st.session_state:
+        st.session_state.po_msme_no = "UDYAM-GJ-01-0117646"
+
     # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
 
@@ -1645,6 +1714,20 @@ def main():
         with tab_vendor:
             col1, col2 = st.columns(2)
             with col1:
+                st.subheader("Vendor Selection")
+                
+                # Vendor Dropdown
+                selected_vendor = st.selectbox(
+                    "Select Vendor", 
+                    options=get_vendor_dropdown_options(),
+                    key="vendor_dropdown_po"
+                )
+                
+                # Update vendor fields when dropdown selection changes
+                if selected_vendor and selected_vendor != "Select Vendor":
+                    update_vendor_fields(selected_vendor)
+                
+                st.subheader("Vendor Details")
                 vendor_name = st.text_input(
                     "Vendor Name",
                     value=st.session_state.get("po_vendor_name", "Arkance IN Pvt. Ltd."),
@@ -1665,6 +1748,8 @@ def main():
                     value=st.session_state.get("po_vendor_mobile", "+91 1234567890"),
                     key="po_vendor_mobile"
                 )
+                
+                st.subheader("End User Details")
                 end_company = st.text_input(
                     "End User Company",
                     value=st.session_state.get("po_end_company", "Baldridge & Associates Pvt Ltd."),
@@ -1691,6 +1776,7 @@ def main():
                     key="po_end_email"
                 )
             with col2:
+                st.subheader("Company & Tax Details")
                 bill_to_company = st.text_input(
                     "Bill To",
                     value=safe_str_state("po_bill_to_company", "CM INFOTECH"),
@@ -1713,17 +1799,17 @@ def main():
                 )
                 gst_no = st.text_input(
                     "GST No",
-                    value=safe_str_state("po_gst_no", "24ANMPP4891R1ZX"),
+                    value=st.session_state.get("po_gst_no", "24ANMPP4891R1ZX"),
                     key="po_gst_no_input"
                 )
                 pan_no = st.text_input(
                     "PAN No",
-                    value=safe_str_state("po_pan_no", "ANMPP4891R"),
+                    value=st.session_state.get("po_pan_no", "ANMPP4891R"),
                     key="po_pan_no_input"
                 )
                 msme_no = st.text_input(
                     "MSME No",
-                    value=safe_str_state("po_msme_no", "UDYAM-GJ-01-0117646"),
+                    value=st.session_state.get("po_msme_no", "UDYAM-GJ-01-0117646"),
                     key="po_msme_no_input"
                 )
 
@@ -1962,11 +2048,35 @@ def main():
         
         with col1:
             st.header("Recipient Details")
-            vendor_name = st.text_input("Company Name", "Creation Studio", key="quote_vendor_name")
-            vendor_address = st.text_area("Company Address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389", key="quote_vendor_address")
+            
+            # Vendor Dropdown for Quotation
+            selected_vendor_quote = st.selectbox(
+                "Select Company", 
+                options=get_vendor_dropdown_options(),
+                key="vendor_dropdown_quote"
+            )
+            
+            # Update vendor fields when dropdown selection changes for quotation
+            if selected_vendor_quote and selected_vendor_quote != "Select Vendor":
+                vendor_data = VENDOR_DATABASE.get(selected_vendor_quote, {})
+                st.session_state.quote_vendor_name = selected_vendor_quote
+                st.session_state.quote_vendor_address = vendor_data.get("address", "")
+                st.session_state.quote_vendor_contact = vendor_data.get("contact", "")
+                st.session_state.quote_vendor_mobile = vendor_data.get("mobile", "")
+            
+            vendor_name = st.text_input("Company Name", 
+                                      value=st.session_state.get("quote_vendor_name", "Creation Studio"), 
+                                      key="quote_vendor_name")
+            vendor_address = st.text_area("Company Address", 
+                                        value=st.session_state.get("quote_vendor_address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389"), 
+                                        key="quote_vendor_address")
             vendor_email = st.text_input("Email", "info@dreamcreationstudio.com", key="quote_vendor_email")
-            vendor_contact = st.text_input("Contact Person (Kind Attention)", "Mr. Musta", key="quote_vendor_contact")
-            vendor_mobile = st.text_input("Mobile", "+91 9876543210", key="quote_vendor_mobile")
+            vendor_contact = st.text_input("Contact Person (Kind Attention)", 
+                                         value=st.session_state.get("quote_vendor_contact", "Mr. Musta"), 
+                                         key="quote_vendor_contact")
+            vendor_mobile = st.text_input("Mobile", 
+                                        value=st.session_state.get("quote_vendor_mobile", "+91 9876543210"), 
+                                        key="quote_vendor_mobile")
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "September 29, 2025", key="quote_price_validity")

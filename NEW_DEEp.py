@@ -1120,7 +1120,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Bank Details & Declaration (Side by Side) ---
     # pdf.ln(5)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(92, 5, "Company's Bank Details", ln=0)  # left side
+    pdf.cell(90, 5, "Company's Bank Details", ln=0)  # left side
     pdf.cell(90, 5, "Declaration:", ln=1)             # right side
 
     pdf.set_font("Helvetica", "", 8)
@@ -1141,7 +1141,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.multi_cell(92, 4, bank_text, border=0)
     # Go back up for right cell
     pdf.set_xy(x_left + 90, y_before)
-    pdf.multi_cell(92, 4, invoice_data['declaration'], border=0)
+    pdf.multi_cell(90, 4, invoice_data['declaration'], border=0)
 
     # --- Signature ---
     pdf.ln(1)

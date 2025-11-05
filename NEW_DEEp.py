@@ -828,7 +828,7 @@ class PDF(FPDF):
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()
-    pdf.set_auto_page_break(auto=False, margin=10)
+    pdf.set_auto_page_break(auto=True, margin=10)
     pdf.add_page()
 
         # --- Logo on top right ---

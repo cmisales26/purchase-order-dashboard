@@ -47,6 +47,8 @@ PRODUCT_CATALOG = {
     "Archline.XP MEP Module for LT 2025": {"basic": 30450.0, "gst_percent": 18.0},
     "Archline.XP MEP Module Yearly Subscription": {"basic": 21000.0, "gst_percent": 18.0},
 
+    "Autodesk BIM Collaborate Pro - Single User Commercial Annual Subscription Renewal":{"basic":00.0,"gst_percent": 18.0},
+
     "Creative cloud pro plus for Teams": {"basic": 114560.0, "gst_percent": 18.0},
     "Creative cloud Pro for Teams": {"basic": 104560.0, "gst_percent": 18.0},
     "Adobe Creative Cloud All Apps": {"basic": 95000.0, "gst_percent": 18.0},
@@ -1525,31 +1527,31 @@ def main():
             vendor_gst = st.text_input("Seller GST No.", "24ANMPP4891R1ZX")
             vendor_msme = st.text_input("Seller MSME Registration No.", "UDYAM-GJ-01-0117646")
 
-            st.subheader("Buyer Details")
-            buyer_name = st.text_input(
-                "Buyer Name",
-                value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
-            )
-            buyer_address = st.text_area(
-                "Buyer Address",
-                value=st.session_state.get("po_end_address","406, Sakar East,...")
-            )
-            buyer_gst = st.text_input(
-                "Buyer GST No.",
-                value=st.session_state.get("po_end_gst_no","24AAHCB9")
-            )
+            # st.subheader("Buyer Details")
+            # buyer_name = st.text_input(
+            #     "Buyer Name",
+            #     value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
+            # )
+            # buyer_address = st.text_area(
+            #     "Buyer Address",
+            #     value=st.session_state.get("po_end_address","406, Sakar East,...")
+            # )
+            # buyer_gst = st.text_input(
+            #     "Buyer GST No.",
+            #     value=st.session_state.get("po_end_gst_no","24AAHCB9")
+            # )
 
             
-            st.subheader("Products")
-            items = []
-            num_items = st.number_input("Number of Products", 1, 10, 1)
-            for i in range(num_items):
-                with st.expander(f"Product {i+1}"):
-                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026")
-                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331")
-                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00)
-                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
-                    items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
+            # st.subheader("Products")
+            # items = []
+            # num_items = st.number_input("Number of Products", 1, 10, 1)
+            # for i in range(num_items):
+            #     with st.expander(f"Product {i+1}"):
+            #         desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026")
+            #         hsn = st.text_input(f"HSN/SAC {i+1}", "997331")
+            #         qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00)
+            #         rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
+            #         items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
 
             # st.subheader("Bank Details")
             # bank_name = st.text_input("Bank Name", "XYZ bank")
@@ -1565,6 +1567,32 @@ def main():
             stamp_file = st.file_uploader("Upload your company stamp (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_stamp")
 
         with col2:
+            st.subheader("Buyer Details")
+            buyer_name = st.text_input(
+                "Buyer Name",
+                value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
+            )
+            buyer_address = st.text_area(
+                "Buyer Address",
+                value=st.session_state.get("po_end_address","406, Sakar East,...")
+            )
+            buyer_gst = st.text_input(
+                "Buyer GST No.",
+                value=st.session_state.get("po_end_gst_no","24AAHCB9")
+            )
+
+            st.subheader("Products")
+            items = []
+            num_items = st.number_input("Number of Products", 1, 10, 1)
+            for i in range(num_items):
+                with st.expander(f"Product {i+1}"):
+                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026")
+                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331")
+                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00)
+                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
+                    items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
+
+
             st.subheader("Invoice Preview & Download")
             if st.button("Generate Invoice"):
                 basic_amount = sum(item['quantity'] * item['unit_rate'] for item in items)

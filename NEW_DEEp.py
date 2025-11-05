@@ -1559,12 +1559,12 @@ def main():
             # account_no = st.text_input("Account No.", "881304")
             # ifsc = st.text_input("IFS Code", "IDFB004")
 
-            st.subheader("Declaration")
-            declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
+            # st.subheader("Declaration")
+            # declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
             
-            st.subheader("Company Logo & Stamp")
-            logo_file = st.file_uploader("Upload your company logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_logo")
-            stamp_file = st.file_uploader("Upload your company stamp (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_stamp")
+            # st.subheader("Company Logo & Stamp")
+            # logo_file = st.file_uploader("Upload your company logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_logo")
+            # stamp_file = st.file_uploader("Upload your company stamp (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_stamp")
 
         with col2:
             st.subheader("Buyer Details")
@@ -1592,7 +1592,14 @@ def main():
                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
                     items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
 
+            st.subheader("Declaration")
+            declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
+            
+            st.subheader("Company Logo & Stamp")
+            logo_file = st.file_uploader("Upload your company logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_logo")
+            stamp_file = st.file_uploader("Upload your company stamp (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_stamp")
 
+            
             st.subheader("Invoice Preview & Download")
             if st.button("Generate Invoice"):
                 basic_amount = sum(item['quantity'] * item['unit_rate'] for item in items)

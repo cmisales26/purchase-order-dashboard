@@ -1527,6 +1527,45 @@ def main():
             vendor_gst = st.text_input("Seller GST No.", "24ANMPP4891R1ZX")
             vendor_msme = st.text_input("Seller MSME Registration No.", "UDYAM-GJ-01-0117646")
 
+            # st.subheader("Buyer Details")
+            # buyer_name = st.text_input(
+            #     "Buyer Name",
+            #     value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
+            # )
+            # buyer_address = st.text_area(
+            #     "Buyer Address",
+            #     value=st.session_state.get("po_end_address","406, Sakar East,...")
+            # )
+            # buyer_gst = st.text_input(
+            #     "Buyer GST No.",
+            #     value=st.session_state.get("po_end_gst_no","24AAHCB9")
+            # )
+
+            
+            # st.subheader("Products")
+            # items = []
+            # num_items = st.number_input("Number of Products", 1, 10, 1)
+            # for i in range(num_items):
+            #     with st.expander(f"Product {i+1}"):
+            #         desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026")
+            #         hsn = st.text_input(f"HSN/SAC {i+1}", "997331")
+            #         qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00)
+            #         rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
+            #         items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
+
+            # st.subheader("Bank Details")
+            # bank_name = st.text_input("Bank Name", "XYZ bank")
+            # bank_branch = st.text_input("Branch", "AHMED")
+            # account_no = st.text_input("Account No.", "881304")
+            # ifsc = st.text_input("IFS Code", "IDFB004")
+
+            # st.subheader("Declaration")
+            # declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
+            
+            # st.subheader("Company Logo & Stamp")
+            # logo_file = st.file_uploader("Upload your company logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_logo")
+            # stamp_file = st.file_uploader("Upload your company stamp (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_stamp")
+
         with col2:
             st.subheader("Buyer Details")
             buyer_name = st.text_input(
@@ -1542,137 +1581,16 @@ def main():
                 value=st.session_state.get("po_end_gst_no","24AAHCB9")
             )
 
-            # Initialize invoice items in session state
-            if "invoice_items" not in st.session_state:
-                st.session_state.invoice_items = []
-
             st.subheader("Products")
-            
-            # Product selection from catalog
-            selected_invoice_product = st.selectbox("Select from Product Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="invoice_product_select")
-            
-            # Product form for manual entry (editable even when product is selected)
-            col_name, col_basic = st.columns([2, 1])
-            with col_name:
-                invoice_product_name = st.text_input("Product Name", 
-                                                value=selected_invoice_product if selected_invoice_product else "", 
-                                                key="invoice_product_name_input",
-                                                help="Select from dropdown OR type manually")
-            
-            with col_basic:
-                invoice_product_basic = st.number_input("Unit Rate (₹)", 
-                                                    min_value=0.0, 
-                                                    value=PRODUCT_CATALOG[selected_invoice_product]["basic"] if selected_invoice_product and selected_invoice_product in PRODUCT_CATALOG else 0.0, 
-                                                    format="%.2f", 
-                                                    key="invoice_product_basic_input")
-            
-            col_hsn, col_qty = st.columns(2)
-            with col_hsn:
-                invoice_product_hsn = st.text_input("HSN/SAC", 
-                                                value="997331", 
-                                                key="invoice_product_hsn_input")
-            
-            with col_qty:
-                invoice_product_qty = st.number_input("Quantity", 
-                                                    min_value=1.0, 
-                                                    value=1.0, 
-                                                    format="%.0f", 
-                                                    key="invoice_product_qty_input")
-            
-            # Add product button
-            col_add, col_clear = st.columns(2)
-            with col_add:
-                if st.button("➕ Add Product to List", key="invoice_add_product_btn"):
-                    if invoice_product_name.strip():  # Check if product name is not empty
-                        # Check if this product already exists in the list
-                        existing_product_index = None
-                        for i, p in enumerate(st.session_state.invoice_items):
-                            if p["description"] == invoice_product_name:
-                                existing_product_index = i
-                                break
-                        
-                        if existing_product_index is not None:
-                            # Update existing product
-                            st.session_state.invoice_items[existing_product_index] = {
-                                "description": invoice_product_name,
-                                "hsn": invoice_product_hsn,
-                                "quantity": invoice_product_qty,
-                                "unit_rate": invoice_product_basic,
-                            }
-                            st.success(f"✓ Updated '{invoice_product_name}' in the list!")
-                        else:
-                            # Add new product
-                            st.session_state.invoice_items.append({
-                                "description": invoice_product_name,
-                                "hsn": invoice_product_hsn,
-                                "quantity": invoice_product_qty,
-                                "unit_rate": invoice_product_basic,
-                            })
-                            st.success(f"✓ Added '{invoice_product_name}' to the list!")
-                        
-                        # Optional: Clear the form after adding
-                        # st.rerun()
-                    else:
-                        st.error("Please enter a product name")
-            
-            with col_clear:
-                if st.button("🗑️ Clear Form", key="invoice_clear_form_btn"):
-                    st.session_state.invoice_product_select = ""
-                    st.rerun()
-            
-            # Display current products with edit capability
-            st.subheader("Current Products in Invoice")
-            if not st.session_state.invoice_items:
-                st.info("No products added yet. Use the form above to add products.")
-            else:
-                for i, product in enumerate(st.session_state.invoice_items):
-                    with st.expander(f"Product {i+1}: {product['description']} - ₹{product['unit_rate']:,.2f} x {product['quantity']:.0f}", expanded=False):
-                        col_edit1, col_edit2 = st.columns([3, 1])
-                        
-                        with col_edit1:
-                            # Make product details editable
-                            st.session_state.invoice_items[i]["description"] = st.text_input(
-                                "Product Description", 
-                                value=product["description"], 
-                                key=f"invoice_edit_desc_{i}"
-                            )
-                            
-                            col_edit_sub1, col_edit_sub2, col_edit_sub3 = st.columns(3)
-                            with col_edit_sub1:
-                                st.session_state.invoice_items[i]["unit_rate"] = st.number_input(
-                                    "Unit Rate", 
-                                    value=product["unit_rate"], 
-                                    format="%.2f", 
-                                    key=f"invoice_edit_rate_{i}"
-                                )
-                            
-                            with col_edit_sub2:
-                                st.session_state.invoice_items[i]["hsn"] = st.text_input(
-                                    "HSN/SAC", 
-                                    value=product["hsn"], 
-                                    key=f"invoice_edit_hsn_{i}"
-                                )
-                            
-                            with col_edit_sub3:
-                                st.session_state.invoice_items[i]["quantity"] = st.number_input(
-                                    "Quantity", 
-                                    value=product["quantity"], 
-                                    format="%.0f", 
-                                    key=f"invoice_edit_qty_{i}"
-                                )
-                        
-                        with col_edit2:
-                            st.write("")  # Spacer
-                            st.write("")  # Spacer
-                            if st.button("🗑️ Remove", key=f"invoice_remove_{i}"):
-                                st.session_state.invoice_items.pop(i)
-                                st.success("Product removed!")
-                                st.rerun()
-                
-                # Show summary
-                total_items = len(st.session_state.invoice_items)
-                total_qty = sum(p["quantity"] for p in st.session_state.invoice_items)
-                st.info(f"**Summary:** {total_items} product(s), {total_qty} total quantity")
+            items = []
+            num_items = st.number_input("Number of Products", 1, 10, 1)
+            for i in range(num_items):
+                with st.expander(f"Product {i+1}"):
+                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026")
+                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331")
+                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00)
+                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
+                    items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
 
             st.subheader("Declaration")
             declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
@@ -1684,51 +1602,48 @@ def main():
             
             st.subheader("Invoice Preview & Download")
             if st.button("Generate Invoice"):
-                if not st.session_state.invoice_items:
-                    st.error("Please add at least one product to generate the invoice.")
-                else:
-                    basic_amount = sum(item['quantity'] * item['unit_rate'] for item in st.session_state.invoice_items)
-                    sgst = basic_amount * 0.09
-                    cgst = basic_amount * 0.09
-                    final_amount = basic_amount + sgst + cgst
-                    
-                    amount_in_words = num2words(final_amount, to="cardinal").title() + " Only/-"
-                    tax_in_words = num2words(sgst + cgst, to="cardinal").title()+" Only/-"
+                basic_amount = sum(item['quantity'] * item['unit_rate'] for item in items)
+                sgst = basic_amount * 0.09
+                cgst = basic_amount * 0.09
+                final_amount = basic_amount + sgst + cgst
+                
+                amount_in_words = num2words(final_amount, to="cardinal").title() + " Only/-"
+                tax_in_words = num2words(sgst + cgst, to="cardinal").title()+"Only/-"
 
-                    invoice_data = {
-                        "invoice": {"invoice_no": invoice_no, "date": invoice_date},
-                        "Reference": {"Suppliers_Reference":Suppliers_Reference, "Other": Others_Reference},
-                        "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
-                        "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
-                        "invoice_details": {
-                            "buyers_order_no": buyers_order_no,
-                            "buyers_order_date": buyers_order_date,
-                            "dispatched_through": dispatched_through,
-                            "terms_of_delivery": terms_of_delivery,
-                            "destination": destination
-                        },
-                        "items": st.session_state.invoice_items,
-                        "totals": {
-                            "basic_amount": basic_amount,
-                            "sgst": sgst,
-                            "cgst": cgst,
-                            "final_amount": final_amount,
-                            "amount_in_words": amount_in_words,
-                            "tax_in_words": tax_in_words
-                        },
-                        "declaration": declaration
-                    }
+                invoice_data = {
+                    "invoice": {"invoice_no": invoice_no, "date": invoice_date},
+                    "Reference": {"Suppliers_Reference":Suppliers_Reference, "Other": Others_Reference},
+                    "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
+                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
+                    "invoice_details": {
+                        "buyers_order_no": buyers_order_no,
+                        "buyers_order_date": buyers_order_date,
+                        "dispatched_through": dispatched_through,
+                        "terms_of_delivery": terms_of_delivery,
+                        "destination": destination
+                    },
+                    "items": items,
+                    "totals": {
+                        "basic_amount": basic_amount,
+                        "sgst": sgst,
+                        "cgst": cgst,
+                        "final_amount": final_amount,
+                        "amount_in_words": amount_in_words,
+                        "tax_in_words": tax_in_words
+                    },
+                    # "bank": {"name": bank_name, "branch": bank_branch, "account_no": account_no, "ifsc": ifsc},
+                    "declaration": declaration
+                }
 
-                    pdf_file = create_invoice_pdf(invoice_data)
+                pdf_file = create_invoice_pdf(invoice_data)
 
-                    st.download_button(
-                        "⬇ Download Invoice PDF",
-                        data=pdf_file,
-                        file_name=f"Invoice_{invoice_no.replace('/', '_')}.pdf",
-                        mime="application/pdf",
-                        key="invoice_download_button")
-                    
-                                    
+                st.download_button(
+                    "⬇ Download Invoice PDF",
+                    data=pdf_file,
+                    file_name=f"Invoice_{invoice_no.replace('/', '_')}.pdf",
+                    mime="application/pdf",
+                    key="invoice_download_button")
+                
     # --- Tab 2: Purchase Order Generator ---
     with tab2:
         st.header("Purchase Order Generator")

@@ -828,7 +828,7 @@ class PDF(FPDF):
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()
-    pdf.set_auto_page_break(auto=True, margin=10)
+    pdf.set_auto_page_break(auto=False, margin=10)
     pdf.add_page()
 
         # --- Logo on top right ---
@@ -1095,29 +1095,54 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if pdf.get_y() + needed_space > pdf.h - pdf.b_margin:
         pdf.set_y(pdf.h - pdf.b_margin - needed_space)
 
-    # --- Bank Details ---
-    pdf.ln(3)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, "Company's Bank Details", ln=True)
-    pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(0, 4,
-            f"Bank Nmae : IDFC FIRST\n"
-            "Branch        : AHMEDABAD Shyamal Branch\n"
-            "Account No : 88130420182\n"
-            "IFS Code    : IDFB0040335")
-    #     f"Bank Name: {invoice_data['bank']['name']}\n"
-    #     f"Branch: {invoice_data['bank']['branch']}\n"
-    #     f"Account No.: {invoice_data['bank']['account_no']}\n"
-    #     f"IFS Code: {invoice_data['bank']['ifsc']}"
-    # )
+    # # --- Bank Details ---
+    # pdf.ln(3)
+    # pdf.set_font("Helvetica", "B", 8)
+    # pdf.cell(0, 5, "Company's Bank Details", ln=True)
+    # pdf.set_font("Helvetica", "", 8)
+    # pdf.multi_cell(0, 4,
+    #         f"Bank Nmae : IDFC FIRST\n"
+    #         "Branch        : AHMEDABAD Shyamal Branch\n"
+    #         "Account No : 88130420182\n"
+    #         "IFS Code    : IDFB0040335")
+    # #     f"Bank Name: {invoice_data['bank']['name']}\n"
+    # #     f"Branch: {invoice_data['bank']['branch']}\n"
+    # #     f"Account No.: {invoice_data['bank']['account_no']}\n"
+    # #     f"IFS Code: {invoice_data['bank']['ifsc']}"
+    # # )
 
-    # --- Declaration ---
-    pdf.ln(2)
+    # # --- Declaration ---
+    # pdf.ln(2)
+    # pdf.set_font("Helvetica", "B", 8)
+    # pdf.cell(0, 5, "Declaration:", ln=True)
+    # pdf.set_font("Helvetica", "", 8)
+    # pdf.multi_cell(0, 4, invoice_data['declaration'])
+    # --- Bank Details & Declaration (Side by Side) ---
+    pdf.ln(5)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, "Declaration:", ln=True)
+    pdf.cell(95, 5, "Company's Bank Details", ln=0)  # left side
+    pdf.cell(95, 5, "Declaration:", ln=1)             # right side
+
     pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(0, 4, invoice_data['declaration'])
-    
+
+    # Left column (bank)
+    bank_text = (
+        "Bank Name : IDFC FIRST\n"
+        "Branch        : AHMEDABAD Shyamal Branch\n"
+        "Account No : 88130420182\n"
+        "IFS Code    : IDFB0040335"
+    )
+
+    # Save current Y position
+    y_before = pdf.get_y()
+    x_left = pdf.get_x()
+
+    # Left cell (Bank)
+    pdf.multi_cell(95, 4, bank_text, border=0)
+    # Go back up for right cell
+    pdf.set_xy(x_left + 95, y_before)
+    pdf.multi_cell(95, 4, invoice_data['declaration'], border=0)
+
     # --- Signature ---
     pdf.ln(1)
     pdf.set_font("Helvetica", "B", 8)

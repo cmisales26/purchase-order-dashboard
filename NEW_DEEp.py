@@ -1140,7 +1140,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Left cell (Bank)
     pdf.multi_cell(92, 4, bank_text, border=0)
     # Go back up for right cell
-    pdf.set_xy(x_left + 95, y_before)
+    pdf.set_xy(x_left + 92, y_before)
     pdf.multi_cell(92, 4, invoice_data['declaration'], border=0)
 
     # --- Signature ---

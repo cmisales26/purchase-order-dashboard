@@ -14,30 +14,41 @@ PRODUCT_CATALOG = {
     "GstarCAD STDANDARD 2026 One year upgrade": {"basic": 18303.0, "gst_percent": 18.0},
     "GstarCAD STDANDARD 2026 Two year upgrade": {"basic": 18303.0, "gst_percent": 18.0},
     "GstarCAD STDANDARD 2026 Three + year upgrade": {"basic": 22696.0, "gst_percent": 18.0},
+
     "GstarCAD PROFESSIONAL 2026 Perpetual": {"basic": 46125.0, "gst_percent": 18.0},
     "GstarCAD PROFESSIONAL 2026 One year upgrade": {"basic": 25625.0, "gst_percent": 18.0},
     "GstarCAD PROFESSIONAL 2026 Two year upgrade": {"basic": 25625.0, "gst_percent": 18.0},
     "GstarCAD PROFESSIONAL 2026 Three + year upgrade": {"basic": 30018.0, "gst_percent": 18.0},
+
     "GstarCAD PLUS 2026 Perpetual": {"basic": 57107.0, "gst_percent": 18.0},
     "GstarCAD PLUS 2026 One year upgrade": {"basic": 29286.0, "gst_percent": 18.0},
     "GstarCAD PLUS 2026 Two year upgrade": {"basic": 32946.0, "gst_percent": 18.0},
     "GstarCAD PLUS 2026 Three + year upgrade": {"basic": 41000.0, "gst_percent": 18.0},
+
     "GstarCAD MECHANICAL 2025 Perpetual": {"basic": 92250.0, "gst_percent": 18.0},
     "GstarCAD MECHANICAL 2025 One year upgrade": {"basic": 73214.0, "gst_percent": 18.0},
     "GstarCAD MECHANICAL 2025 Two year upgrade": {"basic": 87857.0, "gst_percent": 18.0},
     "GstarCAD MECHANICAL 2025 Three + year upgrade": {"basic": 105428.0, "gst_percent": 18.0},
+
     "GstarCAD ARCHITECTURE 2021 Perpetual": {"basic": 92250.0, "gst_percent": 18.0},
     "GstarCAD ARCHITECTURE 2021 One year upgrade": {"basic": 73214.0, "gst_percent": 18.0},
     "GstarCAD ARCHITECTURE 2021 Two year upgrade": {"basic": 87857.0, "gst_percent": 18.0},
     "GstarCAD ARCHITECTURE 2021 Three + year upgrade": {"basic": 105428.0, "gst_percent": 18.0},
+
     "Archline.XP LT 2025 Perpetual": {"basic": 30450.0, "gst_percent": 18.0},
     "Archline.XP LT Yearly Subscription": {"basic": 26617.0, "gst_percent": 18.0},
+
     "Archline.XP Interior 2025 Perpetual": {"basic": 94500.0, "gst_percent": 18.0},
     "Archline.XP Interior Yearly Subscription": {"basic": 70875.0, "gst_percent": 18.0},
+
     "Archline.XP Professional 2025 Perpetual": {"basic": 126000.0, "gst_percent": 18.0},
     "Archline.XP Professional Yearly Subscription": {"basic": 94500.0, "gst_percent": 18.0},
+
     "Archline.XP MEP Module for LT 2025": {"basic": 30450.0, "gst_percent": 18.0},
     "Archline.XP MEP Module Yearly Subscription": {"basic": 21000.0, "gst_percent": 18.0},
+
+    "Autodesk BIM Collaborate Pro - Single User Commercial Annual Subscription Renewal":{"basic":00.0,"gst_percent": 18.0},
+
     "Creative cloud pro plus for Teams": {"basic": 114560.0, "gst_percent": 18.0},
     "Creative cloud Pro for Teams": {"basic": 104560.0, "gst_percent": 18.0},
     "Adobe Creative Cloud All Apps": {"basic": 95000.0, "gst_percent": 18.0},
@@ -50,6 +61,58 @@ PRODUCT_CATALOG = {
     "Siemens NX": {"basic": 65000.0, "gst_percent": 18.0},
 }
 
+# Vendor Database - You can expand this with more vendors
+VENDOR_DATABASE = {
+    "Arkance IN Pvt. Ltd.": {
+        "address": "One International Centre,,Unit-801-802, 8th Floor, Tower-1,Senapati Bapat Marg Dadar West, Prabhadevi,Lower Parel,Mumbai - 400013,State : Maharashtra",
+        "contact": "Ms/Mr",
+        "mobile": "+91 9243493616",
+        "gst_no": "27AAACA7149L1Z2",
+        "pan_no": "AAACA7149L",
+        "msme_no": "UDYAM-MH-01-1234567"
+    },
+    "DIVTECH IT SOLUTION PVT. LTD.": {
+        "address": "Nr.kum kum party plot, TP 13, Chhani Jakatnaka, Vadodara -390024",
+        "contact": "Ms/Mr",
+        "mobile": "+91 9313158878",
+        "gst_no": "24ANMPP4891R1ZX",
+        "pan_no": "ANMPP4891R",
+        "msme_no": "UDYAM-GJ-01-0117646"
+    },
+    "ITCG Solutions Pvt. Ltd.": {
+        "address": "301, Earth The Landmark,Opp. Satsang Party Plot,Sun Pharma Road,Baroda,Gujarat,390012,India",
+        "contact": "Ms/Mr",
+        "mobile": "+91 4045678901",
+        "gst_no": "36AABCA1234L1Z5",
+        "pan_no": "AABCA1234L",
+        "msme_no": "UDYAM-TS-01-7654321"
+    },
+    "Genesis Infoserve Pvt. Ltd.": {
+        "address": "A-204/205, Eversun CHSL., DLH Junction,Sahakar Nagar, J. P. Road, Andheri (W),Mumbai - 400 053",
+        "contact": "Ms/Mr",
+        "mobile": "022 62845600 / 022 26734433",
+        "gst_no": "29AABCA5678L1Z9",
+        "pan_no": "AABCA5678L",
+        "msme_no": "UDYAM-KA-01-9876543"
+    },
+        "MicroGenesis CADSoft Pvt.Ltd.": {
+        "address": "2nd Floor, 202,, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai,, Thane, Maharashtra - 400601",
+        "contact": "Ms/Mr",
+        "mobile": "022 - 62233873",
+        "gst_no": "29AABCA5678L1Z9",
+        "pan_no": "AABCA5678L",
+        "msme_no": "UDYAM-KA-01-9876543"
+    },
+        "ACCELTY TECHSOLUTIONS LLP": {
+        "address": "603, Sai Plaza,Next To Sakinaka Telephone Exchange Andheri - Kurla Road,Mumbai - 400072",
+        "contact": "Ms/Mr",
+        "mobile": "+91 4045678901",
+        "gst_no": "29AABCA5678L1Z9",
+        "pan_no": "AABCA5678L",
+        "msme_no": "UDYAM-KA-01-9876543"
+    }
+}
+
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
     "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"},
@@ -57,6 +120,23 @@ SALES_PERSON_MAPPING = {
     "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721"},
     "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"}
 }
+
+# --- Helper Functions for Vendor Management ---
+def get_vendor_dropdown_options():
+    """Get vendor names for dropdown"""
+    return ["Select Vendor"] + list(VENDOR_DATABASE.keys())
+
+def update_vendor_fields(selected_vendor):
+    """Update session state with vendor details when vendor is selected"""
+    if selected_vendor and selected_vendor != "Select Vendor":
+        vendor_data = VENDOR_DATABASE.get(selected_vendor, {})
+        st.session_state.po_vendor_name = selected_vendor
+        st.session_state.po_vendor_address = vendor_data.get("address", "")
+        st.session_state.po_vendor_contact = vendor_data.get("contact", "")
+        st.session_state.po_vendor_mobile = vendor_data.get("mobile", "")
+        st.session_state.po_gst_no = vendor_data.get("gst_no", "")
+        st.session_state.po_pan_no = vendor_data.get("pan_no", "")
+        st.session_state.po_msme_no = vendor_data.get("msme_no", "")
 
 # --- Helper Functions for Quotation and PO ---
 def get_current_quarter():
@@ -121,7 +201,7 @@ def parse_quotation_number(quotation_number):
             return prefix, sales_person, quarter, date_part, year_range, sequence
     except:
         pass
-    return "CMI", sales_person(), get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
+    return "CMI", "SD", get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
 
 def generate_quotation_number(sales_person, sequence_number):
     """Generate quotation number with current quarter and sequence"""
@@ -822,7 +902,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # pdf.set_x(110)
     # pdf.cell(94, 6, "", border="LRB", ln=1)
 
-    pdf.ln(6)
+    # pdf.ln(6)
 
     # === BUYER SECTION ===
     pdf.set_font("Helvetica", "B", 10)
@@ -1015,29 +1095,54 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if pdf.get_y() + needed_space > pdf.h - pdf.b_margin:
         pdf.set_y(pdf.h - pdf.b_margin - needed_space)
 
-    # --- Bank Details ---
-    pdf.ln(3)
-    pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, "Company's Bank Details", ln=True)
-    pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(0, 4,
-            f"Bank Nmae : IDFC FIRST\n"
-            "Branch        : AHMEDABAD Shyamal Branch\n"
-            "Account No : 88130420182\n"
-            "IFS Code    : IDFB0040335")
-    #     f"Bank Name: {invoice_data['bank']['name']}\n"
-    #     f"Branch: {invoice_data['bank']['branch']}\n"
-    #     f"Account No.: {invoice_data['bank']['account_no']}\n"
-    #     f"IFS Code: {invoice_data['bank']['ifsc']}"
-    # )
+    # # --- Bank Details ---
+    # pdf.ln(3)
+    # pdf.set_font("Helvetica", "B", 8)
+    # pdf.cell(0, 5, "Company's Bank Details", ln=True)
+    # pdf.set_font("Helvetica", "", 8)
+    # pdf.multi_cell(0, 4,
+    #         f"Bank Nmae : IDFC FIRST\n"
+    #         "Branch        : AHMEDABAD Shyamal Branch\n"
+    #         "Account No : 88130420182\n"
+    #         "IFS Code    : IDFB0040335")
+    # #     f"Bank Name: {invoice_data['bank']['name']}\n"
+    # #     f"Branch: {invoice_data['bank']['branch']}\n"
+    # #     f"Account No.: {invoice_data['bank']['account_no']}\n"
+    # #     f"IFS Code: {invoice_data['bank']['ifsc']}"
+    # # )
 
-    # --- Declaration ---
-    pdf.ln(2)
+    # # --- Declaration ---
+    # pdf.ln(2)
+    # pdf.set_font("Helvetica", "B", 8)
+    # pdf.cell(0, 5, "Declaration:", ln=True)
+    # pdf.set_font("Helvetica", "", 8)
+    # pdf.multi_cell(0, 4, invoice_data['declaration'])
+    # --- Bank Details & Declaration (Side by Side) ---
+    # pdf.ln(5)
     pdf.set_font("Helvetica", "B", 8)
-    pdf.cell(0, 5, "Declaration:", ln=True)
+    pdf.cell(90, 5, "Company's Bank Details", ln=0)  # left side
+    pdf.cell(90, 5, "Declaration:", ln=1)             # right side
+
     pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(0, 4, invoice_data['declaration'])
-    
+
+    # Left column (bank)
+    bank_text = (
+        "Bank Name : IDFC FIRST\n"
+        "Branch        : AHMEDABAD Shyamal Branch\n"
+        "Account No : 88130420182\n"
+        "IFS Code    : IDFB0040335"
+    )
+
+    # Save current Y position
+    y_before = pdf.get_y()
+    x_left = pdf.get_x()
+
+    # Left cell (Bank)
+    pdf.multi_cell(92, 4, bank_text, border=0)
+    # Go back up for right cell
+    pdf.set_xy(x_left + 90, y_before)
+    pdf.multi_cell(90, 4, invoice_data['declaration'], border=0)
+
     # --- Signature ---
     pdf.ln(1)
     pdf.set_font("Helvetica", "B", 8)
@@ -1360,6 +1465,22 @@ def main():
     if "current_po_quarter" not in st.session_state:  # NEW
         st.session_state.current_po_quarter = get_current_quarter()
 
+    # Initialize vendor session states
+    if "po_vendor_name" not in st.session_state:
+        st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
+    if "po_vendor_address" not in st.session_state:
+        st.session_state.po_vendor_address = "Unit 801-802, 8th Floor, Tower 1..."
+    if "po_vendor_contact" not in st.session_state:
+        st.session_state.po_vendor_contact = "Ms/Mr"
+    if "po_vendor_mobile" not in st.session_state:
+        st.session_state.po_vendor_mobile = "+91 1234567890"
+    if "po_gst_no" not in st.session_state:
+        st.session_state.po_gst_no = "24ANMPP4891R1ZX"
+    if "po_pan_no" not in st.session_state:
+        st.session_state.po_pan_no = "ANMPP4891R"
+    if "po_msme_no" not in st.session_state:
+        st.session_state.po_msme_no = "UDYAM-GJ-01-0117646"
+
     # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
 
@@ -1431,6 +1552,46 @@ def main():
             vendor_gst = st.text_input("Seller GST No.", "24ANMPP4891R1ZX")
             vendor_msme = st.text_input("Seller MSME Registration No.", "UDYAM-GJ-01-0117646")
 
+            # st.subheader("Buyer Details")
+            # buyer_name = st.text_input(
+            #     "Buyer Name",
+            #     value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
+            # )
+            # buyer_address = st.text_area(
+            #     "Buyer Address",
+            #     value=st.session_state.get("po_end_address","406, Sakar East,...")
+            # )
+            # buyer_gst = st.text_input(
+            #     "Buyer GST No.",
+            #     value=st.session_state.get("po_end_gst_no","24AAHCB9")
+            # )
+
+            
+            # st.subheader("Products")
+            # items = []
+            # num_items = st.number_input("Number of Products", 1, 10, 1)
+            # for i in range(num_items):
+            #     with st.expander(f"Product {i+1}"):
+            #         desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026")
+            #         hsn = st.text_input(f"HSN/SAC {i+1}", "997331")
+            #         qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00)
+            #         rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
+            #         items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
+
+            # st.subheader("Bank Details")
+            # bank_name = st.text_input("Bank Name", "XYZ bank")
+            # bank_branch = st.text_input("Branch", "AHMED")
+            # account_no = st.text_input("Account No.", "881304")
+            # ifsc = st.text_input("IFS Code", "IDFB004")
+
+            # st.subheader("Declaration")
+            # declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
+            
+            # st.subheader("Company Logo & Stamp")
+            # logo_file = st.file_uploader("Upload your company logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_logo")
+            # stamp_file = st.file_uploader("Upload your company stamp (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_stamp")
+
+        with col2:
             st.subheader("Buyer Details")
             buyer_name = st.text_input(
                 "Buyer Name",
@@ -1445,7 +1606,6 @@ def main():
                 value=st.session_state.get("po_end_gst_no","24AAHCB9")
             )
 
-            
             st.subheader("Products")
             items = []
             num_items = st.number_input("Number of Products", 1, 10, 1)
@@ -1457,20 +1617,14 @@ def main():
                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
                     items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
 
-            # st.subheader("Bank Details")
-            # bank_name = st.text_input("Bank Name", "XYZ bank")
-            # bank_branch = st.text_input("Branch", "AHMED")
-            # account_no = st.text_input("Account No.", "881304")
-            # ifsc = st.text_input("IFS Code", "IDFB004")
-
             st.subheader("Declaration")
-            declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
+            declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
             
             st.subheader("Company Logo & Stamp")
             logo_file = st.file_uploader("Upload your company logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_logo")
             stamp_file = st.file_uploader("Upload your company stamp (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_stamp")
 
-        with col2:
+            
             st.subheader("Invoice Preview & Download")
             if st.button("Generate Invoice"):
                 basic_amount = sum(item['quantity'] * item['unit_rate'] for item in items)
@@ -1636,6 +1790,20 @@ def main():
         with tab_vendor:
             col1, col2 = st.columns(2)
             with col1:
+                st.subheader("Vendor Selection")
+                
+                # Vendor Dropdown
+                selected_vendor = st.selectbox(
+                    "Select Vendor", 
+                    options=get_vendor_dropdown_options(),
+                    key="vendor_dropdown_po"
+                )
+                
+                # Update vendor fields when dropdown selection changes
+                if selected_vendor and selected_vendor != "Select Vendor":
+                    update_vendor_fields(selected_vendor)
+                
+                st.subheader("Vendor Details")
                 vendor_name = st.text_input(
                     "Vendor Name",
                     value=st.session_state.get("po_vendor_name", "Arkance IN Pvt. Ltd."),
@@ -1656,6 +1824,8 @@ def main():
                     value=st.session_state.get("po_vendor_mobile", "+91 1234567890"),
                     key="po_vendor_mobile"
                 )
+                
+                st.subheader("End User Details")
                 end_company = st.text_input(
                     "End User Company",
                     value=st.session_state.get("po_end_company", "Baldridge & Associates Pvt Ltd."),
@@ -1682,6 +1852,7 @@ def main():
                     key="po_end_email"
                 )
             with col2:
+                st.subheader("Company & Tax Details")
                 bill_to_company = st.text_input(
                     "Bill To",
                     value=safe_str_state("po_bill_to_company", "CM INFOTECH"),
@@ -1704,17 +1875,17 @@ def main():
                 )
                 gst_no = st.text_input(
                     "GST No",
-                    value=safe_str_state("po_gst_no", "24ANMPP4891R1ZX"),
+                    value=st.session_state.get("po_gst_no", "24ANMPP4891R1ZX"),
                     key="po_gst_no_input"
                 )
                 pan_no = st.text_input(
                     "PAN No",
-                    value=safe_str_state("po_pan_no", "ANMPP4891R"),
+                    value=st.session_state.get("po_pan_no", "ANMPP4891R"),
                     key="po_pan_no_input"
                 )
                 msme_no = st.text_input(
                     "MSME No",
-                    value=safe_str_state("po_msme_no", "UDYAM-GJ-01-0117646"),
+                    value=st.session_state.get("po_msme_no", "UDYAM-GJ-01-0117646"),
                     key="po_msme_no_input"
                 )
 
@@ -1953,11 +2124,35 @@ def main():
         
         with col1:
             st.header("Recipient Details")
-            vendor_name = st.text_input("Company Name", "Creation Studio", key="quote_vendor_name")
-            vendor_address = st.text_area("Company Address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389", key="quote_vendor_address")
+            
+            # Vendor Dropdown for Quotation
+            selected_vendor_quote = st.selectbox(
+                "Select Company", 
+                options=get_vendor_dropdown_options(),
+                key="vendor_dropdown_quote"
+            )
+            
+            # Update vendor fields when dropdown selection changes for quotation
+            if selected_vendor_quote and selected_vendor_quote != "Select Vendor":
+                vendor_data = VENDOR_DATABASE.get(selected_vendor_quote, {})
+                st.session_state.quote_vendor_name = selected_vendor_quote
+                st.session_state.quote_vendor_address = vendor_data.get("address", "")
+                st.session_state.quote_vendor_contact = vendor_data.get("contact", "")
+                st.session_state.quote_vendor_mobile = vendor_data.get("mobile", "")
+            
+            vendor_name = st.text_input("Company Name", 
+                                      value=st.session_state.get("quote_vendor_name", "Creation Studio"), 
+                                      key="quote_vendor_name")
+            vendor_address = st.text_area("Company Address", 
+                                        value=st.session_state.get("quote_vendor_address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389"), 
+                                        key="quote_vendor_address")
             vendor_email = st.text_input("Email", "info@dreamcreationstudio.com", key="quote_vendor_email")
-            vendor_contact = st.text_input("Contact Person (Kind Attention)", "Mr. Musta", key="quote_vendor_contact")
-            vendor_mobile = st.text_input("Mobile", "+91 9876543210", key="quote_vendor_mobile")
+            vendor_contact = st.text_input("Contact Person (Kind Attention)", 
+                                         value=st.session_state.get("quote_vendor_contact", "Mr. Musta"), 
+                                         key="quote_vendor_contact")
+            vendor_mobile = st.text_input("Mobile", 
+                                        value=st.session_state.get("quote_vendor_mobile", "+91 9876543210"), 
+                                        key="quote_vendor_mobile")
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "September 29, 2025", key="quote_price_validity")

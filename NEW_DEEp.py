@@ -1121,7 +1121,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # pdf.ln(5)
     pdf.set_font("Helvetica", "B", 8)
     pdf.cell(92, 5, "Company's Bank Details", ln=0)  # left side
-    pdf.cell(92, 5, "Declaration:", ln=1)             # right side
+    pdf.cell(90, 5, "Declaration:", ln=1)             # right side
 
     pdf.set_font("Helvetica", "", 8)
 

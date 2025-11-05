@@ -62,33 +62,49 @@ PRODUCT_CATALOG = {
 # Vendor Database - You can expand this with more vendors
 VENDOR_DATABASE = {
     "Arkance IN Pvt. Ltd.": {
-        "address": "Unit 801-802, 8th Floor, Tower 1, Equinox Business Park, LBS Marg, Kurla West, Mumbai - 400070",
+        "address": "One International Centre,,Unit-801-802, 8th Floor, Tower-1,Senapati Bapat Marg Dadar West, Prabhadevi,Lower Parel,Mumbai - 400013,State : Maharashtra",
         "contact": "Ms/Mr",
-        "mobile": "+91 1234567890",
+        "mobile": "+91 9243493616",
         "gst_no": "27AAACA7149L1Z2",
         "pan_no": "AAACA7149L",
         "msme_no": "UDYAM-MH-01-1234567"
     },
-    "CM Infotech": {
-        "address": "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481",
-        "contact": "Chirag Prajapati",
-        "mobile": "+91 87339 15721",
+    "DIVTECH IT SOLUTION PVT. LTD.": {
+        "address": "Nr.kum kum party plot, TP 13, Chhani Jakatnaka, Vadodara -390024",
+        "contact": "Ms/Mr",
+        "mobile": "+91 9313158878",
         "gst_no": "24ANMPP4891R1ZX",
         "pan_no": "ANMPP4891R",
         "msme_no": "UDYAM-GJ-01-0117646"
     },
-    "Adobe Systems India": {
-        "address": "Building No. 4, Mindspace, Serene Properties IT SEZ, Madhapur, Hyderabad - 500081",
-        "contact": "Regional Manager",
+    "ITCG Solutions Pvt. Ltd.": {
+        "address": "301, Earth The Landmark,Opp. Satsang Party Plot,Sun Pharma Road,Baroda,Gujarat,390012,India",
+        "contact": "Ms/Mr",
         "mobile": "+91 4045678901",
         "gst_no": "36AABCA1234L1Z5",
         "pan_no": "AABCA1234L",
         "msme_no": "UDYAM-TS-01-7654321"
     },
-    "Autodesk India": {
-        "address": "RMZ Ecoworld, 5th Floor, Block B, Devarabeesanahalli, Bangalore - 560103",
-        "contact": "Sales Manager",
-        "mobile": "+91 8067890123",
+    "Genesis Infoserve Pvt. Ltd.": {
+        "address": "A-204/205, Eversun CHSL., DLH Junction,Sahakar Nagar, J. P. Road, Andheri (W),Mumbai - 400 053",
+        "contact": "Ms/Mr",
+        "mobile": "022 62845600 / 022 26734433",
+        "gst_no": "29AABCA5678L1Z9",
+        "pan_no": "AABCA5678L",
+        "msme_no": "UDYAM-KA-01-9876543"
+    },
+        "MicroGenesis CADSoft Pvt.Ltd.": {
+        "address": "2nd Floor, 202,, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai,, Thane, Maharashtra - 400601",
+        "contact": "Ms/Mr",
+        "mobile": "022 - 62233873",
+        "gst_no": "29AABCA5678L1Z9",
+        "pan_no": "AABCA5678L",
+        "msme_no": "UDYAM-KA-01-9876543"
+    },
+        "ACCELTY TECHSOLUTIONS LLP": {
+        "address": "603, Sai Plaza,Next To Sakinaka Telephone Exchange Andheri - Kurla Road,Mumbai - 400072",
+        "contact": "Ms/Mr",
+        "mobile": "+91 4045678901",
         "gst_no": "29AABCA5678L1Z9",
         "pan_no": "AABCA5678L",
         "msme_no": "UDYAM-KA-01-9876543"

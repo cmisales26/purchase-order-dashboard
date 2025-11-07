@@ -458,29 +458,39 @@ def add_page_one_intro(pdf, data):
     pdf.set_font("Helvetica", "", 12)
     pdf.set_text_color(0, 0, 0)
 
+
+    # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
+    page_width = pdf.w - 2 * pdf.l_margin
+    pdf.set_font("Helvetica", "", 12)
+    pdf.set_text_color(0, 0, 0)
+
     # Normal text
     pdf.write(5, "Please revert back to us, if you need any clarification / information "
                 "at the below mentioned address or email at ")
 
-    # Email clickable
+    # Get sales person info dynamically
+    sales_person_code = data.get('sales_person_code', 'SD')
+    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+    
+    # Email clickable - DYNAMIC from sales person
     pdf.set_text_color(0, 0, 255)
     pdf.set_font("Helvetica", "U", 12)  # underline
-    pdf.write(5, "chirag@cminfotech.com", link="mailto:chirag@cminfotech.com")
+    pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
 
     # Back to normal for separator + Mobile:
     pdf.set_text_color(0, 0, 0)
     pdf.set_font("Helvetica", "", 12)
     pdf.write(5, "  Mobile: ")
 
-    # Only one mobile number
+    # Mobile clickable - DYNAMIC from sales person
     pdf.set_text_color(0, 0, 255)
     pdf.set_font("Helvetica", "U", 12)
-    pdf.write(5, "+91 873 391 5721", link="tel:+91 873 391 5721")
+    pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
 
     # Reset back to normal for anything after
     pdf.set_text_color(0, 0, 0)
     pdf.set_font("Helvetica", "", 12)
-    pdf.ln(10)  # move cursor down for next section
+    pdf.ln(10)
     
     pdf.ln(3)
     pdf.set_font("Helvetica", "", 12)
@@ -515,19 +525,8 @@ def add_page_two_commercials(pdf, data):
     
     add_quotation_header(pdf, annexure_text, quotation_title)
 
-    # pdf.set_font("Helvetica", "B", 14)
-    # pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
-    # pdf.set_font("Helvetica", "B", 12)
-    # pdf.cell(0, 6, quotation_title, ln=True, align="C")
-    # pdf.ln(8)
-    # pdf.set_font("Helvetica", "B", 14)
-    # pdf.cell(0, 8, "Annexure I - Commercials", ln=True, align="C")
-    # pdf.set_font("Helvetica", "B", 12)
-    # pdf.cell(0, 6, "Quotation for Adobe Software", ln=True, align="C")
-    # pdf.ln(8)
-
-    # --- Products Table - FIXED COLUMN WIDTHS ---
-    col_widths = [70, 25, 25, 25, 15, 25]  # Adjusted for better fit
+    # --- Products Table - FIXED COLUMN WIDTHS (Wider Description) ---
+    col_widths = [100, 25, 25, 25, 15, 25]  # Increased Description from 70 to 100
     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
     
     # Table Header
@@ -549,18 +548,45 @@ def add_page_two_commercials(pdf, data):
         total = per_unit_price * qty
         grand_total += total
         
-        # Description (wrap long text)
-        desc = product["name"]
-        if len(desc) > 35:
-            desc = desc[:32] + "..."
+        # Get current position
+        start_y = pdf.get_y()
         
-        pdf.cell(col_widths[0], 6, pdf.sanitize_text(desc), border=1)
-        pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
-        pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
-        pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
-        pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
-        pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
-        pdf.ln()
+        # Description cell (with proper text wrapping)
+        desc = product["name"]
+        pdf.set_font("Helvetica", "", 9)
+        
+        # Calculate how many lines the description will take
+        desc_lines = pdf.multi_cell(col_widths[0], 6, desc, border=0, split_only=True)
+        desc_height = len(desc_lines) * 6
+        
+        # Set position for description
+        pdf.set_xy(pdf.l_margin, start_y)
+        
+        # Draw description cell with proper height
+        if len(desc_lines) > 1:
+            # Multi-line description
+            pdf.multi_cell(col_widths[0], 6, desc, border=1)
+            current_y = pdf.get_y()
+            
+            # Set positions for other cells
+            pdf.set_xy(pdf.l_margin + col_widths[0], start_y)
+            pdf.cell(col_widths[1], desc_height, f"{basic_price:,.2f}", border=1, align="R")
+            pdf.cell(col_widths[2], desc_height, f"{gst_amount:,.2f}", border=1, align="R")
+            pdf.cell(col_widths[3], desc_height, f"{per_unit_price:,.2f}", border=1, align="R")
+            pdf.cell(col_widths[4], desc_height, f"{qty:.0f}", border=1, align="C")
+            pdf.cell(col_widths[5], desc_height, f"{total:,.2f}", border=1, align="R")
+            
+            # Move to next row
+            pdf.set_y(current_y)
+        else:
+            # Single line description
+            pdf.cell(col_widths[0], 6, desc, border=1)
+            pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
+            pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
+            pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
+            pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
+            pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
+            pdf.ln()
 
     # Grand Total Row - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "B", 10)
@@ -704,16 +730,6 @@ def add_page_two_commercials(pdf, data):
     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
     pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
     
-        # --- Signature Block INSIDE BANK DETAILS BOX ---
-    signature_start_y = bank_y + 5
-    
-    pdf.set_font("Helvetica", "B", 10)
-    pdf.set_xy(x_start + col1_width + padding, signature_start_y)
-    pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
-    
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
-    
     # --- Signature Block with Dynamic Sales Person ---
     sales_person_code = data.get('sales_person_code', 'SD')
     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
@@ -763,6 +779,7 @@ def add_page_two_commercials(pdf, data):
     # Move cursor below the box
     pdf.set_xy(x_start, y_start + box_height + 10)
 
+    
 def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
     """Orchestrates the creation of the two-page PDF."""
     sales_person_code = quotation_data.get('sales_person_code', 'SD')

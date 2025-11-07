@@ -853,7 +853,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         # --- Logo on top right ---
     if logo_file:
         try:
-            pdf.image(logo_file, x=170, y=2.5, w=35)
+            pdf.image(logo_file, x=160, y=2.5, w=35)
         except Exception as e:
             st.warning(f"Could not add logo: {e}")
 

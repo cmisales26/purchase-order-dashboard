@@ -526,7 +526,7 @@ def add_page_two_commercials(pdf, data):
     add_quotation_header(pdf, annexure_text, quotation_title)
 
     # --- Products Table - FIXED COLUMN WIDTHS (Wider Description) ---
-    col_widths = [100, 25, 25, 25, 15, 25]  # Increased Description from 70 to 100
+    col_widths = [70, 25, 25, 25, 15, 25]  # Increased Description from 70 to 100
     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
     
     # Table Header

@@ -1556,7 +1556,7 @@ def main():
         with col1:
             st.subheader("Invoice Details")
             invoice_no = st.text_input("Invoice No", "CMI/25-26/Q1/010")
-            invoice_date = st.text_input("Buyer's Order Date", datetime.date.today().strftime("%d %B %Y"))
+            invoice_date = st.text_input("Invoice Date", datetime.date.today().strftime("%d %B %Y"))
             # st.info(f"📅 Invoice Date: {invoice_date}")
             Suppliers_Reference = st.text_input("Supplier's Reference", "NA")
             Others_Reference = st.text_input("Other's Reference", "NA")

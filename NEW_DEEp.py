@@ -772,6 +772,7 @@ def add_page_two_commercials(pdf, data):
     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
     label = "Mobile: "
     pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+    pdf.set_font("Helvetica", "U", 9)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
              ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")

@@ -118,7 +118,8 @@ SALES_PERSON_MAPPING = {
     "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"},
     "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721"},
     "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721"},
-    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"}
+    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"},
+    "HP": {"name": "Harsh Prajapati","email": "harsh.prajpati2904@gamil.com","mobile": "9099845282"}
 }
 
 # --- Helper Functions for Vendor Management ---

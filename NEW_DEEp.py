@@ -756,7 +756,7 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
     
     # Clickable email in signature
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font("Helvetica", "U", 9)
     pdf.set_text_color(0, 0, 0)
     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
     label = "Email: "

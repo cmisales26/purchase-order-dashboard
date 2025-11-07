@@ -1656,7 +1656,7 @@ def main():
                 tax_in_words = num2words(sgst + cgst, to="cardinal").title()+"Only/-"
 
                 invoice_data = {
-                    "invoice": {"invoice_no": invoice_no, "date": invoice_date},
+                    "invoice": {"invoice_no": invoice_no, "date": datetime.date.today().strftime("%d %B %Y")},
                     "Reference": {"Suppliers_Reference":Suppliers_Reference, "Other": Others_Reference},
                     "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
                     "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},

@@ -379,7 +379,9 @@ def add_page_one_intro(pdf, data):
     # Clickable Email - FIXED
     if data.get('vendor_email'):
         add_clickable_email(pdf, data['vendor_email'])
-    
+
+    pdf.ln(1)
+
     # Clickable Mobile - FIXED
     if data.get('vendor_mobile'):
         add_clickable_phone(pdf, data['vendor_mobile'])
@@ -394,8 +396,9 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # --- Simple and Reliable Paragraph Formatting ---
+        # --- Advanced Justified Paragraph Formatting ---
     def write_paragraph_with_formatting(pdf, text):
-        """Write paragraph with specific terms in BOLD and UNDERLINE"""
+        """Write paragraph with formatting and proper justification"""
         
         # Terms that should be BOLD
         bold_terms = [
@@ -409,66 +412,79 @@ def add_page_one_intro(pdf, data):
             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
         ]
         
-        # Process the text
-        lines = text.split('\n')
+        # Process the text line by line
+        paragraphs = text.split('\n')
         
-        for line_idx, line in enumerate(lines):
-            if line.strip():
-                current_pos = 0
+        for paragraph in paragraphs:
+            if paragraph.strip():
+                # Split paragraph into lines that fit the page width using multi_cell in split_only mode
+                lines = pdf.multi_cell(0, 5, paragraph, split_only=True, align='J')
                 
-                # Find all formatting positions
-                format_positions = []
-                
-                # Find bold terms
-                for term in bold_terms:
-                    start = 0
-                    while True:
-                        pos = line.lower().find(term.lower(), start)
-                        if pos == -1:
-                            break
-                        format_positions.append((pos, pos + len(term), "bold"))
-                        start = pos + 1
-                
-                # Find underlined terms
-                for term in underlined_terms:
-                    start = 0
-                    while True:
-                        pos = line.lower().find(term.lower(), start)
-                        if pos == -1:
-                            break
-                        format_positions.append((pos, pos + len(term), "underline"))
-                        start = pos + 1
-                
-                # Sort by position
-                format_positions.sort()
-                
-                # Write the line with formatting
-                current_pos = 0
-                for start, end, style in format_positions:
-                    # Write text before formatting
-                    if start > current_pos:
-                        pdf.set_font("Helvetica", "", 12)
-                        pdf.write(5, line[current_pos:start])
+                for line in lines:
+                    # Check each line for formatting terms
+                    current_pos = 0
+                    format_positions = []
                     
-                    # Write formatted text
-                    formatted_text = line[start:end]
-                    if style == "bold":
-                        pdf.set_font("Helvetica", "B", 12)
-                    else:  # underline
-                        pdf.set_font("Helvetica", "BU", 12)
-                    pdf.write(5, formatted_text)
+                    # Find formatting positions in this line
+                    for term in bold_terms:
+                        start = 0
+                        while True:
+                            pos = line.lower().find(term.lower(), start)
+                            if pos == -1:
+                                break
+                            format_positions.append((pos, pos + len(term), "bold"))
+                            start = pos + 1
                     
-                    current_pos = end
-                
-                # Write remaining text
-                if current_pos < len(line):
-                    pdf.set_font("Helvetica", "", 12)
-                    pdf.write(5, line[current_pos:])
-                
-                pdf.ln(5)
+                    for term in underlined_terms:
+                        start = 0
+                        while True:
+                            pos = line.lower().find(term.lower(), start)
+                            if pos == -1:
+                                break
+                            format_positions.append((pos, pos + len(term), "underline"))
+                            start = pos + 1
+                    
+                    # Sort by position
+                    format_positions.sort()
+                    
+                    if not format_positions:
+                        # No formatting needed, write the line justified
+                        pdf.multi_cell(0, 5, line, align='J')
+                    else:
+                        # For lines with formatting, we need to handle manually
+                        # Get current X position to maintain alignment
+                        current_x = pdf.get_x()
+                        current_y = pdf.get_y()
+                        
+                        current_pos = 0
+                        for start, end, style in format_positions:
+                            # Write text before formatting
+                            if start > current_pos:
+                                pdf.set_font("Helvetica", "", 12)
+                                text_before = line[current_pos:start]
+                                pdf.write(5, text_before)
+                            
+                            # Write formatted text
+                            formatted_text = line[start:end]
+                            if style == "bold":
+                                pdf.set_font("Helvetica", "B", 12)
+                            else:  # underline
+                                pdf.set_font("Helvetica", "BU", 12)
+                            pdf.write(5, formatted_text)
+                            
+                            current_pos = end
+                        
+                        # Write remaining text
+                        if current_pos < len(line):
+                            pdf.set_font("Helvetica", "", 12)
+                            pdf.write(5, line[current_pos:])
+                        
+                        # Move to next line
+                        pdf.ln(5)
         
         pdf.ln(3)
 
+        
     # --- Write all paragraphs with formatting ---
     
     # Write the user's custom intro paragraph
@@ -1530,7 +1546,7 @@ def main():
         st.session_state.last_invoice_number = ""
     if "current_invoice_quarter" not in st.session_state:
         st.session_state.current_invoice_quarter = get_current_quarter()
-
+        
     # Initialize vendor session states
     if "po_vendor_name" not in st.session_state:
         st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
@@ -2325,7 +2341,7 @@ def main():
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "September 29, 2025", key="quote_price_validity")
-            subject_line = st.text_input("Subject", "Proposal for Adobe Commercial Software Licenses", key="quote_subject")
+            subject_line = st.text_input("Subject", "Proposal for Adobe Commercial Software License", key="quote_subject")
             intro_paragraphs_1 = st.text_area("Introduction Paragraph",
             """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization.""",
             key="quote_intro"

@@ -762,7 +762,7 @@ def add_page_two_commercials(pdf, data):
     
     # --- Signature Block INSIDE BANK DETAILS BOX ---
     signature_start_y = bank_y + 5
-    
+    pdf.ln(5)
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_xy(x_start + col1_width + padding, signature_start_y)
     pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)

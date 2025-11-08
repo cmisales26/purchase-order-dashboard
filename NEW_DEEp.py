@@ -396,105 +396,79 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # --- Simple and Reliable Paragraph Formatting ---
-        # --- Enhanced Justified Paragraph Formatting ---
+        # --- Hybrid Full Justification with Formatting ---
     def write_paragraph_with_formatting(pdf, text):
-        """Write paragraph with formatting and proper justification"""
+        """Write paragraph with full justification and smart formatting"""
         
-        # Terms that should be BOLD
-        bold_terms = [
-            "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)"
-        ]
+        # Terms that should have special formatting
+        special_terms = {
+            "Quotation": "bold",
+            "CM Infotech's proposal": "bold", 
+            "CMI (CM INFOTECH)": "bold",
+            "Autodesk": "underline",
+            "GstarCAD": "underline",
+            "Grabert": "underline",
+            "RuleBuddy": "underline",
+            "CMS Intellicad": "underline",
+            "ZWCAD": "underline",
+            "Etabs": "underline",
+            "Trimble": "underline",
+            "Bentley": "underline",
+            "Solidworks": "underline",
+            "Solid Edge": "underline",
+            "Bluebeam": "underline",
+            "Adobe": "underline",
+            "Microsoft": "underline",
+            "Corel": "underline",
+            "Chaos": "underline",
+            "Nitro": "underline",
+            "Tally Quick Heal": "underline"
+        }
         
-        # Terms that should be UNDERLINED (software partnership list)
-        underlined_terms = [
-            "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
-            "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
-            "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-        ]
-        
-        # Process the text line by line
+        # Process the text
         paragraphs = text.split('\n')
         
         for paragraph in paragraphs:
             if paragraph.strip():
-                # First, let multi_cell split the paragraph into justified lines
-                justified_lines = pdf.multi_cell(0, 5, paragraph, split_only=True, align='J')
+                # For most text, use FPDF's perfect justification
+                # Only handle formatting for very specific cases
+                has_complex_formatting = False
                 
-                for justified_line in justified_lines:
-                    # Check if this line has any formatting requirements
-                    has_formatting = False
-                    
-                    # Check for bold terms
-                    for term in bold_terms:
-                        if term.lower() in justified_line.lower():
-                            has_formatting = True
+                # Check if this paragraph has multiple formatting needs
+                formatting_count = 0
+                for term, style in special_terms.items():
+                    if term.lower() in paragraph.lower():
+                        formatting_count += 1
+                        if formatting_count > 2:  # If more than 2 formatting terms, use simple approach
+                            has_complex_formatting = True
                             break
-                    
-                    # Check for underlined terms
-                    if not has_formatting:
-                        for term in underlined_terms:
-                            if term.lower() in justified_line.lower():
-                                has_formatting = True
-                                break
-                    
-                    if not has_formatting:
-                        # No formatting needed, write the justified line directly
-                        pdf.multi_cell(0, 5, justified_line, align='J')
-                    else:
-                        # Line has formatting - we need to handle it carefully
-                        current_pos = 0
-                        format_positions = []
-                        
-                        # Find all formatting positions in this specific line
-                        for term in bold_terms:
-                            start = 0
-                            while True:
-                                pos = justified_line.lower().find(term.lower(), start)
-                                if pos == -1:
-                                    break
-                                format_positions.append((pos, pos + len(term), "bold"))
-                                start = pos + 1
-                        
-                        for term in underlined_terms:
-                            start = 0
-                            while True:
-                                pos = justified_line.lower().find(term.lower(), start)
-                                if pos == -1:
-                                    break
-                                format_positions.append((pos, pos + len(term), "underline"))
-                                start = pos + 1
-                        
-                        # Sort by position
-                        format_positions.sort()
-                        
-                        # Write the line with formatting
-                        current_pos = 0
-                        for start, end, style in format_positions:
-                            # Write text before formatting
-                            if start > current_pos:
-                                pdf.set_font("Helvetica", "", 12)
-                                text_before = justified_line[current_pos:start]
-                                pdf.write(5, text_before)
-                            
-                            # Write formatted text
-                            formatted_text = justified_line[start:end]
-                            if style == "bold":
-                                pdf.set_font("Helvetica", "B", 12)
-                            else:  # underline
-                                pdf.set_font("Helvetica", "BU", 12)
-                            pdf.write(5, formatted_text)
-                            
-                            current_pos = end
-                        
-                        # Write remaining text
-                        if current_pos < len(justified_line):
-                            pdf.set_font("Helvetica", "", 12)
-                            pdf.write(5, justified_line[current_pos:])
-                        
-                        # Move to next line
-                        pdf.ln(5)
                 
-                # Add small space between paragraphs
+                if has_complex_formatting:
+                    # Use simple full justification without complex formatting
+                    pdf.set_font("Helvetica", "", 12)
+                    pdf.multi_cell(0, 5, paragraph, align='J')
+                else:
+                    # Try to maintain some formatting with justification
+                    lines = pdf.multi_cell(0, 5, paragraph, split_only=True, align='J')
+                    
+                    for line in lines:
+                        # Simple formatting check - if line contains special terms, apply basic formatting
+                        pdf.set_font("Helvetica", "", 12)
+                        
+                        # Apply basic formatting
+                        formatted_line = line
+                        for term, style in special_terms.items():
+                            if term.lower() in line.lower():
+                                if style == "bold":
+                                    pdf.set_font("Helvetica", "B", 12)
+                                else:
+                                    pdf.set_font("Helvetica", "BU", 12)
+                                break
+                        
+                        # Write the justified line
+                        pdf.multi_cell(0, 5, formatted_line, align='J')
+                
+                # Add space between paragraphs
                 pdf.ln(2)
                 
     # --- Write all paragraphs with formatting ---

@@ -223,6 +223,42 @@ def get_next_sequence_number(quotation_number):
     except:
         pass
     return 1
+# --- Helper Functions for Invoice ---
+def parse_invoice_number(invoice_number):
+    """Parse invoice number to extract components"""
+    try:
+        parts = invoice_number.split('/')
+        if len(parts) >= 4:
+            prefix = parts[0]  # CMI
+            year_range = parts[1]  # 25-26
+            quarter = parts[2]  # Q3
+            sequence = parts[3]  # 01, 02, etc.
+            return prefix, year_range, quarter, sequence
+    except:
+        pass
+    return "CMI", f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}", get_current_quarter(), "01"
+
+
+def generate_invoice_number(sequence_number):
+    """Generate invoice number with current quarter and sequence"""
+    current_date = datetime.datetime.now()
+    quarter = get_current_quarter()
+    year_range = f"{str(current_date.year)[2:]}-{str(current_date.year + 1)[2:]}"
+    sequence = f"{sequence_number:02d}"
+    
+    return f"CMI/{year_range}/{quarter}/{sequence}"
+
+def get_next_sequence_number_invoice(invoice_number):
+    """Extract and increment sequence number from invoice number"""
+    try:
+        parts = invoice_number.split('/')
+        if len(parts) >= 4:
+            sequence = parts[3]
+            return int(sequence) + 1
+    except:
+        pass
+    return 1
+
 
 # --- PDF Class for Two-Page Quotation (Matching Demo Format) ---
 class QUOTATION_PDF(FPDF):
@@ -1485,6 +1521,16 @@ def main():
     if "current_po_quarter" not in st.session_state:  # NEW
         st.session_state.current_po_quarter = get_current_quarter()
 
+        # NEW: Invoice session state
+    if "invoice_seq" not in st.session_state:
+        st.session_state.invoice_seq = 1
+    if "invoice_number" not in st.session_state:
+        st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
+    if "last_invoice_number" not in st.session_state:
+        st.session_state.last_invoice_number = ""
+    if "current_invoice_quarter" not in st.session_state:
+        st.session_state.current_invoice_quarter = get_current_quarter()
+
     # Initialize vendor session states
     if "po_vendor_name" not in st.session_state:
         st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
@@ -1550,18 +1596,114 @@ def main():
     # Create tabs for different document types
     tab1, tab2, tab3 = st.tabs(["Tax Invoice Generator", "Purchase Order Generator", "Quotation Generator"])
 
-    # --- Tab 1: Tax Invoice Generator ---
+        # --- Tab 1: Tax Invoice Generator ---
     with tab1:
         st.header("Tax Invoice Generator")
+        
+        today = datetime.date.today()
+        current_quarter = get_current_quarter()
+        
+        # Invoice Settings in sidebar for this tab
+        st.sidebar.header("Invoice Settings")
+        
+        # Generate invoice number based on current quarter
+        def get_invoice_number():
+            # Check if we need to increment sequence
+            if st.session_state.last_invoice_number:
+                try:
+                    last_prefix, last_year_range, last_quarter, last_sequence = parse_invoice_number(st.session_state.last_invoice_number)
+                    
+                    if last_quarter == current_quarter:
+                        # Same quarter, increment sequence
+                        next_sequence = get_next_sequence_number_invoice(st.session_state.last_invoice_number)
+                        return generate_invoice_number(next_sequence)
+                    else:
+                        # New quarter, start from sequence 1
+                        return generate_invoice_number(1)
+                except:
+                    # If parsing fails, use current sequence
+                    return generate_invoice_number(st.session_state.invoice_seq)
+            else:
+                # No previous invoice, start from current sequence
+                return generate_invoice_number(st.session_state.invoice_seq)
+        
+        # Initialize or update invoice number when quarter changes
+        if "current_invoice_quarter" not in st.session_state:
+            st.session_state.current_invoice_quarter = current_quarter
+            st.session_state.invoice_number = get_invoice_number()
+        
+        # Update invoice number if quarter changes
+        if st.session_state.get('current_invoice_quarter', '') != current_quarter:
+            st.session_state.current_invoice_quarter = current_quarter
+            st.session_state.invoice_number = get_invoice_number()
+        
+        # Display current quarter info
+        st.sidebar.info(f"**Current Quarter:** {current_quarter}")
+        
+        # Show auto-generated breakdown
+        try:
+            prefix, year_range, quarter, sequence = parse_invoice_number(st.session_state.invoice_number)
+            st.sidebar.success(f"**Auto-generated Invoice Number**")
+            st.sidebar.info(f"**Format:** {year_range}/{quarter}/{sequence}")
+        except:
+            st.sidebar.warning("Could not parse invoice number")
+        
+        # Editable invoice number
+        st.sidebar.subheader("Invoice Number Editor")
+        
+        # Parse current invoice number for editing
+        try:
+            current_prefix, current_year_range, current_q, current_seq = parse_invoice_number(st.session_state.invoice_number)
+            
+            # Create editable components
+            col1, col2, col3 = st.sidebar.columns([2, 2, 1])
+            
+            with col1:
+                new_year_range = st.text_input("Year Range", value=current_year_range, key="invoice_year_edit")
+            
+            with col2:
+                new_quarter = st.text_input("Quarter", value=current_q, key="invoice_quarter_edit")
+            
+            with col3:
+                new_sequence = st.number_input("Sequence", 
+                                            min_value=1, 
+                                            value=int(current_seq), 
+                                            step=1,
+                                            key="invoice_seq_edit")
+            
+            # Construct new invoice number
+            new_invoice_number = f"CMI/{new_year_range}/{new_quarter}/{new_sequence:02d}"
+            
+            # Update if changed
+            if new_invoice_number != st.session_state.invoice_number:
+                st.session_state.invoice_number = new_invoice_number
+                
+        except Exception as e:
+            st.sidebar.error(f"Error parsing invoice number: {e}")
+            # Fallback to default
+            st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
+        
+        # Display final invoice number
+        st.sidebar.code(st.session_state.invoice_number)
+        
+        invoice_auto_increment = st.sidebar.checkbox("Auto-increment Sequence", value=True, key="invoice_auto_increment")
+        
+        if st.sidebar.button("Reset to Auto-generate", use_container_width=True, key="invoice_reset_auto_generate"):
+            st.session_state.invoice_seq = 1
+            st.session_state.last_invoice_number = ""
+            st.session_state.invoice_number = get_invoice_number()
+            st.sidebar.success("Invoice number reset to auto-generated")
+            st.rerun()
+
         col1, col2 = st.columns([1,1])
         with col1:
             st.subheader("Invoice Details")
-            invoice_no = st.text_input("Invoice No", "CMI/25-26/Q1/010")
-            invoice_date = st.text_input("Invoice Date", datetime.date.today().strftime("%d %B %Y"))
+            invoice_no = st.text_input("Invoice No", st.session_state.invoice_number, key="invoice_number_input")
+            invoice_date = st.text_input("Invoice Date", datetime.date.today().strftime("%d-%m-%Y"))
             Suppliers_Reference = st.text_input("Supplier's Reference", "NA")
             Others_Reference = st.text_input("Other's Reference", "NA")
             buyers_order_no = st.text_input("Buyer's Order No.", "Online")
-            buyers_order_date = st.text_input("Buyer's Order Date", datetime.date.today().strftime("%d %B %Y"))
+            buyers_order_date = st.text_input("Buyer's Order Date", datetime.date.today().strftime("%d-%m-%Y"))
             dispatched_through = st.text_input("Dispatched Through", "Online")
             terms_of_delivery = st.text_input("Terms of delivery", "Within Month")
             destination = st.text_input("Destination", "Vadodara")
@@ -1571,45 +1713,6 @@ def main():
             vendor_address = st.text_area("Seller Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
             vendor_gst = st.text_input("Seller GST No.", "24ANMPP4891R1ZX")
             vendor_msme = st.text_input("Seller MSME Registration No.", "UDYAM-GJ-01-0117646")
-
-            # st.subheader("Buyer Details")
-            # buyer_name = st.text_input(
-            #     "Buyer Name",
-            #     value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
-            # )
-            # buyer_address = st.text_area(
-            #     "Buyer Address",
-            #     value=st.session_state.get("po_end_address","406, Sakar East,...")
-            # )
-            # buyer_gst = st.text_input(
-            #     "Buyer GST No.",
-            #     value=st.session_state.get("po_end_gst_no","24AAHCB9")
-            # )
-
-            
-            # st.subheader("Products")
-            # items = []
-            # num_items = st.number_input("Number of Products", 1, 10, 1)
-            # for i in range(num_items):
-            #     with st.expander(f"Product {i+1}"):
-            #         desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026")
-            #         hsn = st.text_input(f"HSN/SAC {i+1}", "997331")
-            #         qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00)
-            #         rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
-            #         items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
-
-            # st.subheader("Bank Details")
-            # bank_name = st.text_input("Bank Name", "XYZ bank")
-            # bank_branch = st.text_input("Branch", "AHMED")
-            # account_no = st.text_input("Account No.", "881304")
-            # ifsc = st.text_input("IFS Code", "IDFB004")
-
-            # st.subheader("Declaration")
-            # declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN\nDEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF\nNOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED\nFROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
-            
-            # st.subheader("Company Logo & Stamp")
-            # logo_file = st.file_uploader("Upload your company logo (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_logo")
-            # stamp_file = st.file_uploader("Upload your company stamp (PNG, JPG)", type=["png", "jpg", "jpeg"], key="invoice_stamp")
 
         with col2:
             st.subheader("Buyer Details")
@@ -1628,14 +1731,14 @@ def main():
 
             st.subheader("Products")
             items = []
-            num_items = st.number_input("Number of Products", 1, 10, 1)
+            num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
             for i in range(num_items):
                 with st.expander(f"Product {i+1}"):
-                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026")
-                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331")
-                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00)
-                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00)
-                    items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate":rate})
+                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
+                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
+                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
+                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00, key=f"invoice_rate_{i}")
+                    items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
 
             st.subheader("Declaration")
             declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
@@ -1646,14 +1749,14 @@ def main():
 
             
             st.subheader("Invoice Preview & Download")
-            if st.button("Generate Invoice"):
+            if st.button("Generate Invoice", key="generate_invoice_button"):
                 basic_amount = sum(item['quantity'] * item['unit_rate'] for item in items)
                 sgst = basic_amount * 0.09
                 cgst = basic_amount * 0.09
                 final_amount = basic_amount + sgst + cgst
                 
                 amount_in_words = num2words(final_amount, to="cardinal").title() + " Only/-"
-                tax_in_words = num2words(sgst + cgst, to="cardinal").title()+"Only/-"
+                tax_in_words = num2words(sgst + cgst, to="cardinal").title()+" Only/-"
 
                 invoice_data = {
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},
@@ -1676,12 +1779,51 @@ def main():
                         "amount_in_words": amount_in_words,
                         "tax_in_words": tax_in_words
                     },
-                    # "bank": {"name": bank_name, "branch": bank_branch, "account_no": account_no, "ifsc": ifsc},
                     "declaration": declaration
                 }
 
-                pdf_file = create_invoice_pdf(invoice_data)
+                # Handle logo and stamp files
+                logo_path = None
+                stamp_path = None
+                
+                if logo_file:
+                    logo_path = "temp_invoice_logo.jpg"
+                    try:
+                        image_bytes = io.BytesIO(logo_file.getbuffer())
+                        img = Image.open(image_bytes)
+                        if img.mode != 'RGB':
+                            img = img.convert('RGB')
+                        img.save(logo_path, format="JPEG", quality=95)
+                    except Exception as e:
+                        st.warning(f"Could not process logo: {e}")
+                
+                if stamp_file:
+                    stamp_path = "temp_invoice_stamp.jpg"
+                    try:
+                        image_bytes = io.BytesIO(stamp_file.getbuffer())
+                        img = Image.open(image_bytes)
+                        if img.mode != 'RGB':
+                            img = img.convert('RGB')
+                        img.save(stamp_path, format="JPEG", quality=95)
+                    except Exception as e:
+                        st.warning(f"Could not process stamp: {e}")
 
+                pdf_file = create_invoice_pdf(invoice_data, logo_path, stamp_path)
+
+                # Store the last invoice number for sequence tracking
+                st.session_state.last_invoice_number = invoice_no
+                
+                # Auto-increment for next invoice
+                if invoice_auto_increment:
+                    try:
+                        next_sequence = get_next_sequence_number_invoice(invoice_no)
+                        # Update the sequence in session state for next time
+                        st.session_state.invoice_seq = next_sequence
+                    except:
+                        st.session_state.invoice_seq += 1
+
+                st.success("Invoice generated successfully!")
+                
                 st.download_button(
                     "⬇ Download Invoice PDF",
                     data=pdf_file,
@@ -1689,6 +1831,13 @@ def main():
                     mime="application/pdf",
                     key="invoice_download_button")
                 
+                # Clean up temporary files
+                for path in ["temp_invoice_logo.jpg", "temp_invoice_stamp.jpg"]:
+                    if os.path.exists(path):
+                        try:
+                            os.remove(path)
+                        except:
+                            pass                
     # --- Tab 2: Purchase Order Generator ---
     with tab2:
         st.header("Purchase Order Generator")

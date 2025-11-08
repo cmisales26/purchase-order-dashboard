@@ -1530,7 +1530,7 @@ def main():
         st.session_state.last_invoice_number = ""
     if "current_invoice_quarter" not in st.session_state:
         st.session_state.current_invoice_quarter = get_current_quarter()
-
+        
     # Initialize vendor session states
     if "po_vendor_name" not in st.session_state:
         st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."

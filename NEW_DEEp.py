@@ -479,7 +479,7 @@ def add_page_one_intro(pdf, data):
 
     # Fixed company introduction paragraphs
     fixed_paragraphs = [
-        "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate  and long-term operational advantages.",
+        "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
         
         "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
         
@@ -2328,7 +2328,8 @@ def main():
             price_validity = st.text_input("Price Validity", "September 29, 2025", key="quote_price_validity")
             subject_line = st.text_input("Subject", "Proposal for Adobe Commercial Software License", key="quote_subject")
             intro_paragraphs_1 = st.text_area("Introduction Paragraph",
-            """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization.""",
+            """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered 
+            by you and are invited to fulfill the requirements of your organization. """,
             key="quote_intro"
             )
 

@@ -359,7 +359,7 @@ def add_clickable_phone(pdf, phone, label="Mobile: "):
 def add_page_one_intro(pdf, data):
     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "B", 12)
-    pdf.set_y(20)
+    pdf.set_y(30)
     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
     pdf.ln(5)

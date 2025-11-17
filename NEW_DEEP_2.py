@@ -646,15 +646,15 @@ def add_page_one_intro(pdf, data):
     pdf.set_text_color(0, 0, 0)
 
 
-   # Clickable website
-    pdf.set_font("Helvetica", "U", 12)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, align="R", link="https://www.cminfotech.com/")
-    pdf.cell(0, 4, "https://www.linkedin.com/", ln=True,align="R", link="https://www.linkedin.com/")
-    pdf.cell(0, 4, "https://wa.me/8733915721", ln=True, align="R",link="https://wa.me/918733915721")
-    pdf.cell(0, 4, "https://www.facebook.com/", ln=True,align="R", link="https://www.facebook.com/")
-    pdf.cell(0, 4, "https://www.instagram.com/", ln=True, align="R",link="https://www.instagram.com/")
-    pdf.set_text_color(0, 0, 0)
+#    # Clickable website
+#     pdf.set_font("Helvetica", "U", 12)
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, align="R", link="https://www.cminfotech.com/")
+#     pdf.cell(0, 4, "https://www.linkedin.com/", ln=True,align="R", link="https://www.linkedin.com/")
+#     pdf.cell(0, 4, "https://wa.me/8733915721", ln=True, align="R",link="https://wa.me/918733915721")
+#     pdf.cell(0, 4, "https://www.facebook.com/", ln=True,align="R", link="https://www.facebook.com/")
+#     pdf.cell(0, 4, "https://www.instagram.com/", ln=True, align="R",link="https://www.instagram.com/")
+#     pdf.set_text_color(0, 0, 0)
 
 
 def add_quotation_header(pdf, annexure_text, quotation_text):

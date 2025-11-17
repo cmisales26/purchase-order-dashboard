@@ -625,7 +625,7 @@ def add_page_one_intro(pdf, data):
     links = [
         "https://www.cminfotech.com/",
         "https://www.linkedin.com/", 
-        "https://wa.me/8733915721",
+        "https://wa.me/918733915721",
         "https://www.facebook.com/",
         "https://www.instagram.com/"
     ]

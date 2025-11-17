@@ -396,236 +396,44 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
     
 
-# # --- FORMATTED AND JUSTIFIED Paragraph Function ---
-# def write_formatted_justified_paragraph(pdf, text):
-#     """Write paragraphs with both formatting (bold/underline) AND full justification"""
+# --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---
+def write_justified_paragraph_with_formatting(pdf, text):
+    """Write paragraphs with full justification using multi_cell"""
     
-#     # Available width
-#     available_width = pdf.w - 2 * pdf.l_margin
+    # Set normal font first
+    pdf.set_font("Helvetica", "", 12)
+    pdf.set_text_color(0, 0, 0)
     
-#     # Terms that should be BOLD
-#     bold_terms = [
-#         "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
-#     ]
+    # For paragraphs that need mixed formatting, we'll use a hybrid approach
+    paragraphs = text.split('\n')
     
-#     # Terms that should be UNDERLINED (software partnership list)
-#     underlined_terms = [
-#         "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
-#         "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
-#         "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-#     ]
-    
-#     def get_word_formatting(word):
-#         """Determine formatting for a single word"""
-#         word_clean = word.strip('.,!?;:()"\'')
-        
-#         # Check for bold terms
-#         for bold_term in bold_terms:
-#             if bold_term.lower() in word_clean.lower():
-#                 return "bold"
-        
-#         # Check for underlined terms  
-#         for underlined_term in underlined_terms:
-#             if underlined_term.lower() in word_clean.lower():
-#                 return "underline"
-        
-#         return "normal"
-    
-#     # Process the text paragraph by paragraph
-#     paragraphs = text.split('\n')
-    
-#     for paragraph in paragraphs:
-#         paragraph = paragraph.strip()
-#         if not paragraph:
-#             pdf.ln(3)
-#             continue
+    for paragraph in paragraphs:
+        paragraph = paragraph.strip()
+        if not paragraph:
+            pdf.ln(3)
+            continue
             
-#         # For paragraphs with formatting terms, use multi_cell with HTML-like approach
-#         # Check if paragraph contains formatting terms
-#         has_formatting = any(term.lower() in paragraph.lower() for term in bold_terms + underlined_terms)
+        # Check if this paragraph contains formatting terms
+        bold_terms = ["Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CMI"]
+        underlined_terms = [
+            "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
+            "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
+            "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+        ]
         
-#         if has_formatting:
-#             # Use the simple formatting approach for paragraphs with special terms
-#             write_simple_formatted_paragraph(pdf, paragraph)
-#         else:
-#             # Use multi_cell for clean justified text without special formatting
-#             pdf.multi_cell(0, 5, paragraph, align='J')
-#             pdf.ln(2)
-
-# # --- SIMPLE FORMATTING (for paragraphs with special terms) ---
-# def write_simple_formatted_paragraph(pdf, text):
-#     """Simple formatting for paragraphs with special terms - uses left alignment"""
-    
-#     # Terms that should be BOLD
-#     bold_terms = [
-#         "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
-#     ]
-    
-#     # Terms that should be UNDERLINED (software partnership list)
-#     underlined_terms = [
-#         "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
-#         "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
-#         "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-#     ]
-    
-#     # Process line by line
-#     lines = text.split('\n')
-    
-#     for line in lines:
-#         if line.strip():
-#             current_pos = 0
-#             format_positions = []
-            
-#             # Find bold terms
-#             for term in bold_terms:
-#                 start = 0
-#                 while True:
-#                     pos = line.lower().find(term.lower(), start)
-#                     if pos == -1:
-#                         break
-#                     format_positions.append((pos, pos + len(term), "bold"))
-#                     start = pos + 1
-            
-#             # Find underlined terms
-#             for term in underlined_terms:
-#                 start = 0
-#                 while True:
-#                     pos = line.lower().find(term.lower(), start)
-#                     if pos == -1:
-#                         break
-#                     format_positions.append((pos, pos + len(term), "underline"))
-#                     start = pos + 1
-            
-#             # Sort by position
-#             format_positions.sort()
-            
-#             # Write the line with formatting
-#             current_pos = 0
-#             for start, end, style in format_positions:
-#                 # Write text before formatting
-#                 if start > current_pos:
-#                     pdf.set_font("Helvetica", "", 12)
-#                     pdf.write(5, line[current_pos:start])
-                
-#                 # Write formatted text
-#                 formatted_text = line[start:end]
-#                 if style == "bold":
-#                     pdf.set_font("Helvetica", "B", 12)
-#                 else:  # underline
-#                     pdf.set_font("Helvetica", "BU", 12)
-#                 pdf.write(5, formatted_text)
-                
-#                 current_pos = end
-            
-#             # Write remaining text
-#             if current_pos < len(line):
-#                 pdf.set_font("Helvetica", "", 12)
-#                 pdf.write(5, line[current_pos:])
-            
-#             pdf.ln(5)
+        has_formatting = any(term in paragraph for term in bold_terms + underlined_terms)
         
-#         pdf.ln(2)
-
-# # --- UPDATED add_page_one_intro function ---
-# def add_page_one_intro(pdf, data):
-#     # Reference Number & Date (Top Right)
-#     pdf.set_font("Helvetica", "B", 12)
-#     pdf.set_y(25)
-#     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
-#     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
-#     pdf.ln(5)
-
-#     # Recipient Details
-#     pdf.set_font("Helvetica", "", 12)
-#     pdf.cell(0, 5, "To,", ln=True)
-#     pdf.set_font("Helvetica", "B", 12)
-#     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-#     pdf.set_font("Helvetica", "", 12)
-    
-#     # Address handling
-#     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
-    
-#     pdf.ln(3)
-    
-#     # Clickable Email
-#     if data.get('vendor_email'):
-#         add_clickable_email(pdf, data['vendor_email'])
+        if has_formatting:
+            # Use the original method for paragraphs with formatting
+            write_simple_formatted_paragraph(pdf, paragraph)
+        else:
+            # Use multi_cell for clean justified text
+            pdf.multi_cell(0, 5, paragraph, align='J')
         
-#     pdf.ln(1)
-#     # Clickable Mobile
-#     if data.get('vendor_mobile'):
-#         add_clickable_phone(pdf, data['vendor_mobile'])
-    
-#     pdf.set_font("Helvetica", "BU", 12)
-#     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", align="C", ln=True)
-#     pdf.ln(5)
+        pdf.ln(3)
 
-#     # Subject Line
-#     pdf.set_font("Helvetica", "BU", 12)
-#     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
-#     pdf.ln(8)  # Increased spacing
-
-#     # Write the user's custom intro paragraph WITH FORMATTING AND JUSTIFICATION
-#     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
-#     if intro_text:
-#         write_formatted_justified_paragraph(pdf, intro_text)
-
-#     # Fixed company introduction paragraphs - USE THE NEW FUNCTION
-#     fixed_paragraphs = [
-#         "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
-        
-#         "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
-        
-#         "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
-        
-#         "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
-#     ]
-
-#     for paragraph in fixed_paragraphs:
-#         write_formatted_justified_paragraph(pdf, paragraph)
-#         pdf.ln(2)  # Add space between paragraphs
-
-#     # Contact Information - MAKE SURE WE HAVE ENOUGH SPACE
-#     # Check if we need a new page
-#     if pdf.get_y() > 220:  # If we're too low on the page
-#         pdf.add_page()
-    
-#     pdf.set_font("Helvetica", "", 12)
-#     pdf.set_text_color(0, 0, 0)
-
-#     # Normal text - make sure it's complete
-#     contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
-#     pdf.write(5, contact_text)
-
-#     # Get sales person info dynamically
-#     sales_person_code = data.get('sales_person_code', 'SD')
-#     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-    
-#     # Email clickable - DYNAMIC from sales person
-#     pdf.set_text_color(0, 0, 255)
-#     pdf.set_font("Helvetica", "U", 12)
-#     pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
-
-#     # Back to normal for separator + Mobile:
-#     pdf.set_text_color(0, 0, 0)
-#     pdf.set_font("Helvetica", "", 12)
-#     pdf.write(5, "  Mobile: ")
-
-#     # Mobile clickable - DYNAMIC from sales person
-#     pdf.set_text_color(0, 0, 255)
-#     pdf.set_font("Helvetica", "U", 12)
-#     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-
-#     pdf.ln(10)  # Add space after contact info
-    
-#     # Continue with the rest of your contact information...
-#     pdf.set_font("Helvetica", "", 12)
-#     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-        
-
-# --- SIMPLE FORMATTED PARAGRAPH FUNCTION ---
 def write_simple_formatted_paragraph(pdf, text):
-    """Simple method for paragraphs with mixed formatting (bold/underline)"""
+    """Simple method for paragraphs with mixed formatting"""
     
     # Terms that should be BOLD
     bold_terms = [
@@ -697,37 +505,20 @@ def write_simple_formatted_paragraph(pdf, text):
         
         pdf.ln(2)
 
-# --- SMART PARAGRAPH FUNCTION ---
-def write_smart_paragraph(pdf, text):
-    """Smart paragraph writer - uses formatting when needed, justification when possible"""
-    
-    # Terms that should be formatted
-    formatting_terms = [
-        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI",
-        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
-        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
-        "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-    ]
+# --- EVEN SIMPLER APPROACH: Use multi_cell for everything ---
+def write_simple_justified_paragraph(pdf, text):
+    """Ultra-simple justified paragraphs using multi_cell"""
+    pdf.set_font("Helvetica", "", 12)
+    pdf.set_text_color(0, 0, 0)
     
     paragraphs = text.split('\n')
     
     for paragraph in paragraphs:
         paragraph = paragraph.strip()
-        if not paragraph:
-            pdf.ln(3)
-            continue
-            
-        # Check if paragraph contains formatting terms
-        has_formatting = any(term.lower() in paragraph.lower() for term in formatting_terms)
-        
-        if has_formatting:
-            # Use formatting (left-aligned)
-            write_simple_formatted_paragraph(pdf, paragraph)
-        else:
-            # Use justification
-            pdf.set_font("Helvetica", "", 12)
+        if paragraph:
+            # Use multi_cell with justification
             pdf.multi_cell(0, 5, paragraph, align='J')
-            pdf.ln(2)
+            pdf.ln(3)
 
 # --- UPDATED add_page_one_intro function ---
 def add_page_one_intro(pdf, data):
@@ -766,14 +557,14 @@ def add_page_one_intro(pdf, data):
     # Subject Line
     pdf.set_font("Helvetica", "BU", 12)
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
-    pdf.ln(8)
+    pdf.ln(8)  # Increased spacing
 
     # Write the user's custom intro paragraph
     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
     if intro_text:
-        write_smart_paragraph(pdf, intro_text)
+        write_simple_justified_paragraph(pdf, intro_text)
 
-    # Fixed company introduction paragraphs
+    # Fixed company introduction paragraphs - USE THE SIMPLE VERSION
     fixed_paragraphs = [
         "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
         
@@ -785,17 +576,18 @@ def add_page_one_intro(pdf, data):
     ]
 
     for paragraph in fixed_paragraphs:
-        write_smart_paragraph(pdf, paragraph)
-        pdf.ln(2)
+        write_simple_justified_paragraph(pdf, paragraph)
+        pdf.ln(2)  # Add space between paragraphs
 
-    # Contact Information
-    if pdf.get_y() > 220:
+    # Contact Information - MAKE SURE WE HAVE ENOUGH SPACE
+    # Check if we need a new page
+    if pdf.get_y() > 220:  # If we're too low on the page
         pdf.add_page()
     
     pdf.set_font("Helvetica", "", 12)
     pdf.set_text_color(0, 0, 0)
 
-    # Contact text
+    # Normal text - make sure it's complete
     contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
     pdf.write(5, contact_text)
 
@@ -803,29 +595,33 @@ def add_page_one_intro(pdf, data):
     sales_person_code = data.get('sales_person_code', 'SD')
     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
     
-    # Email clickable
+    # Email clickable - DYNAMIC from sales person
     pdf.set_text_color(0, 0, 255)
     pdf.set_font("Helvetica", "U", 12)
     pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
 
-    # Mobile
+    # Back to normal for separator + Mobile:
     pdf.set_text_color(0, 0, 0)
     pdf.set_font("Helvetica", "", 12)
     pdf.write(5, "  Mobile: ")
+
+    # Mobile clickable - DYNAMIC from sales person
     pdf.set_text_color(0, 0, 255)
     pdf.set_font("Helvetica", "U", 12)
     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
 
-    pdf.ln(10)
+    pdf.ln(10)  # Add space after contact info
     
-    # Rest of contact information...
+    # Continue with the rest of your contact information...
     pdf.set_font("Helvetica", "", 12)
     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
+    pdf.set_font("Helvetica", "", 12)
     
-    # Clickable website links
+    # Clickable website - RIGHT ALIGNED
     pdf.set_font("Helvetica", "U", 12)
     pdf.set_text_color(0, 0, 255)
 
+    # Calculate the width needed for the longest link
     links = [
         "https://www.cminfotech.com/",
         "https://www.linkedin.com/", 
@@ -834,10 +630,15 @@ def add_page_one_intro(pdf, data):
         "https://www.instagram.com/"
     ]
 
+    # Get the maximum width
     max_link_width = max(pdf.get_string_width(link) for link in links)
+
+    # Set right margin position
     right_margin = pdf.w - pdf.r_margin
 
+    # Print each link aligned to the right
     for link in links:
+        # Calculate x position to right-align
         x_position = right_margin - max_link_width
         pdf.set_x(x_position)
         pdf.cell(max_link_width, 4, link, ln=True, link=link)

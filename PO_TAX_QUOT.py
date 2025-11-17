@@ -301,7 +301,7 @@ class QUOTATION_PDF(FPDF):
 
     def footer(self):
         self.set_y(-18)
-        self.set_font("Calibri", "", 10)
+        self.set_font("calibri", "", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
         # Make footer emails and phone clickable - FIXED OVERLAP

@@ -646,7 +646,7 @@ def add_page_one_intro(pdf, data):
     pdf.set_text_color(0, 0, 0)
 
 
-    Clickable website
+   # Clickable website
     pdf.set_font("Helvetica", "U", 12)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, align="R", link="https://www.cminfotech.com/")

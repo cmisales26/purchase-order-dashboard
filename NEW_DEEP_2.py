@@ -262,8 +262,8 @@ def get_next_sequence_number_invoice(invoice_number):
 
 
 # --- PDF Class for Two-Page Quotation (Matching Demo Format) ---
-class QUOTATION_PDF(FPDF,HTMLMixin):
-    def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="CP"):
+class QUOTATION_PDF(FPDF, HTMLMixin):
+    def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="SD", logo_path=None):
         super().__init__()
         self.set_auto_page_break(auto=True, margin=15)
         self.set_left_margin(15)
@@ -271,412 +271,353 @@ class QUOTATION_PDF(FPDF,HTMLMixin):
         self.quotation_number = quotation_number
         self.quotation_date = quotation_date
         self.sales_person_code = sales_person_code
-        
+        self.logo_path = logo_path
+
+    # --- Utility ---
     def sanitize_text(self, text):
+        if text is None:
+            return ""
         try:
             return text.encode('latin-1', 'ignore').decode('latin-1')
-        except:
-            return text
+        except Exception:
+            return str(text)
 
+    # --- Header / Footer ---
     def header(self):
-        # Logo placement (top right) - FIXED
+        # Optional logo on top-right
         if hasattr(self, 'logo_path') and self.logo_path and os.path.exists(self.logo_path):
             try:
-                self.image(self.logo_path, x=155, y=8, w=50)
-            except:
-                # If image fails, show placeholder
+                self.image(self.logo_path, x=self.w - 15 - 50, y=8, w=50)
+            except Exception:
+                # placeholder
                 self.set_font("Helvetica", "B", 10)
-                self.set_xy(150, 8)
-                self.cell(40, 5, "[LOGO]", border=0, align="C")
-            
-        # Main Title (Centered)
-        self.set_font("Helvetica", "B", 16)
+                self.set_xy(self.w - 15 - 50, 8)
+                self.cell(50, 8, "[LOGO]", border=0, align="C")
+
+        # Title area (kept minimal - content placed in add_page_one_intro)
         self.set_y(15)
-        self.ln(5)
 
     def footer(self):
-        self.set_y(-18)
+        # Simple footer with address and clickable email/phone/website
+        self.set_y(-24)
         self.set_font("Helvetica", "", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-        
-        # Make footer emails and phone clickable - FIXED OVERLAP
-        self.set_text_color(0, 0, 255)  # Blue color for links
-        
-        # Website link
-        # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
-        
-        # Email and phone on same line - FIXED
+
+        # Clickable email and phone centered on one line
+        self.set_text_color(0, 0, 255)
         self.set_font("Helvetica", "U", 10)
-        email_text = " info@cminfotech.com "
-        phone_text = " +91 873 391 5721"
-        
-        # Calculate positions for proper alignment
+        email_text = "info@cminfotech.com"
+        phone_text = "+91 873 391 5721"
+        sep = " | "
         page_width = self.w - 2 * self.l_margin
-        email_width = self.get_string_width(email_text)
-        phone_width = self.get_string_width(phone_text)
-        separator_width = self.get_string_width(" | ")
-        
-        total_width = email_width + separator_width + phone_width
-        start_x = (page_width - total_width) / 2 + self.l_margin
-        
+        email_w = self.get_string_width(email_text)
+        phone_w = self.get_string_width(phone_text)
+        sep_w = self.get_string_width(sep)
+        total_w = email_w + sep_w + phone_w
+        start_x = (page_width - total_w) / 2 + self.l_margin
         self.set_x(start_x)
-        self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text}")
-        self.cell(separator_width, 4, " | ", ln=0)
-        self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
+        self.cell(email_w, 4, email_text, ln=0, link=f"mailto:{email_text}")
+        self.cell(sep_w, 4, sep, ln=0)
+        self.cell(phone_w, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
 
+        # Website line below
+        self.set_text_color(0, 0, 255)
         self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
-        
-        self.set_text_color(0, 0, 0)  # Reset to black
-        # self.set_y(-8)
-        # self.set_font("Helvetica", "I", 7)
-        # self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
+        self.set_text_color(0, 0, 0)
 
-# --- Page Content Generation Helpers ---
+    # --- Clickable helpers (used in body) ---
+    def add_clickable_email(self, email, label="Email: "):
+        self.set_font("Helvetica", "B", 12)
+        label_w = self.get_string_width(label)
+        self.cell(label_w, 5, label, ln=0)
+        self.set_text_color(0, 0, 255)
+        self.set_font("Helvetica", "", 12)
+        self.cell(0, 5, email, ln=True, link=f"mailto:{email}")
+        self.set_text_color(0, 0, 0)
 
-def add_clickable_email(pdf, email, label="Email: "):
-    """Add clickable email with label - FIXED OVERLAP"""
-    pdf.set_font("Helvetica", "B", 12)
-    label_width = pdf.get_string_width(label)
-    pdf.cell(label_width, 4, label, ln=0)
-    
-    pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Helvetica", "", 12)
-    pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
-    pdf.set_text_color(0, 0, 0)  # Reset to black
+    def add_clickable_phone(self, phone, label="Mobile: "):
+        self.set_font("Helvetica", "B", 12)
+        label_w = self.get_string_width(label)
+        self.cell(label_w, 5, label, ln=0)
+        self.set_text_color(0, 0, 255)
+        self.set_font("Helvetica", "", 12)
+        tel = phone.replace(' ', '').replace('+', '')
+        self.cell(0, 5, phone, ln=True, link=f"tel:{tel}")
+        self.set_text_color(0, 0, 0)
 
-def add_clickable_phone(pdf, phone, label="Mobile: "):
-    """Add clickable phone number with label - FIXED OVERLAP"""
-    pdf.set_font("Helvetica", "B", 12)
-    label_width = pdf.get_string_width(label)
-    pdf.cell(label_width, 4, label, ln=0)
-    
-    pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Helvetica", "", 12)
-    # Remove spaces and + for tel link
-    tel_number = phone.replace(' ', '').replace('+', '')
-    pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
-    pdf.set_text_color(0, 0, 0)  # Reset to black
+    # ------------------------------
+    # JUSTIFIED + FORMATTED ENGINE
+    # ------------------------------
+    def _split_words_preserve_spaces(self, text):
+        """Split text into tokens that are either a word or whitespace chunk."""
+        tokens = []
+        current = ""
+        for ch in text:
+            if ch.isspace():
+                if current:
+                    tokens.append(current)
+                    current = ""
+                tokens.append(ch)
+            else:
+                current += ch
+        if current:
+            tokens.append(current)
+        return tokens
 
-def add_page_one_intro(pdf, data):
-    # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.set_y(25)
-    pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
-    pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
-    pdf.ln(5)
-
-    # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "", 12)
-    pdf.cell(0, 5, "To,", ln=True)
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-    pdf.set_font("Helvetica", "", 12)
-    
-    # Address handling
-    pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
-    
-    pdf.ln(3)
-    
-    # Clickable Email - FIXED
-    if data.get('vendor_email'):
-        add_clickable_email(pdf, data['vendor_email'])
-        
-    pdf.ln(1)
-    # Clickable Mobile - FIXED
-    if data.get('vendor_mobile'):
-        add_clickable_phone(pdf, data['vendor_mobile'])
-    
-    pdf.set_font("Helvetica", "BU", 12)
-    pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
-    pdf.ln(5)
-
-    # Subject Line (from user input)
-    pdf.set_font("Helvetica", "BU", 12)
-    pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
-    pdf.ln(5)
-    
-# -------------------------------------------------------------
-# PERFECT JUSTIFIED + FORMATTED PARAGRAPH WRITER (FINAL VERSION)
-# -------------------------------------------------------------
-
-def split_words_preserve_spaces(text):
-    """Split text into words while keeping spaces for perfect rendering."""
-    result = []
-    word = ""
-
-    for char in text:
-        if char.isspace():
-            if word:
-                result.append(word)
-                word = ""
-            result.append(char)
-        else:
-            word += char
-
-    if word:
-        result.append(word)
-
-    return result
-
-
-def measure_styled_width(pdf, text, bold_terms, under_terms):
-    """Measure width considering bold & underline correctly."""
-    temp_pdf = FPDF()
-    temp_pdf.add_page()
-    temp_pdf.set_font("Helvetica", "", 12)
-
-    width = 0
-    i = 0
-    lower = text.lower()
-
-    while i < len(text):
-        style = ""
-        found = None
-
-        # Bold terms
-        for term in bold_terms:
-            if lower.startswith(term.lower(), i):
-                found = term
-                style = "B"
-                break
-
-        # Underlined terms
-        if not found:
-            for term in under_terms:
-                if lower.startswith(term.lower(), i):
-                    found = term
-                    style = "U"
+    def _measure_styled_width(self, text, bold_terms, under_terms):
+        """
+        Measure the width of text considering inline bold/underline tokens.
+        We temporarily set font on self to measure (no separate temp PDF needed).
+        """
+        width = 0.0
+        i = 0
+        lower = text.lower()
+        while i < len(text):
+            matched = None
+            # check bold first
+            for t in bold_terms:
+                lt = t.lower()
+                if lower.startswith(lt, i):
+                    matched = t
+                    style = "B"
                     break
+            if not matched:
+                for t in under_terms:
+                    lt = t.lower()
+                    if lower.startswith(lt, i):
+                        matched = t
+                        style = "U"
+                        break
+            if matched:
+                # measure the matched token in style (B or U)
+                self.set_font("Helvetica", style, 12)
+                width += self.get_string_width(matched)
+                i += len(matched)
+            else:
+                # measure single character in normal font
+                self.set_font("Helvetica", "", 12)
+                width += self.get_string_width(text[i])
+                i += 1
+        # restore normal font
+        self.set_font("Helvetica", "", 12)
+        return width
 
-        if found:
-            temp_pdf.set_font("Helvetica", style, 12)
-            width += temp_pdf.get_string_width(found)
-            i += len(found)
-        else:
-            temp_pdf.set_font("Helvetica", "", 12)
-            width += temp_pdf.get_string_width(text[i])
-            i += 1
-
-    return width
-
-
-def draw_styled(pdf, text, bold_terms, under_terms):
-    """Draw formatted text correctly (bold & underline)."""
-    i = 0
-    lower = text.lower()
-
-    while i < len(text):
-        match = None
-        style = ""
-
-        # Bold
-        for term in bold_terms:
-            if lower.startswith(term.lower(), i):
-                match = term
-                style = "B"
-                break
-
-        # Underline
-        if not match:
-            for term in under_terms:
-                if lower.startswith(term.lower(), i):
-                    match = term
-                    style = "U"
+    def _draw_styled(self, text, bold_terms, under_terms):
+        """Write text to PDF honoring bold/underline tokens."""
+        i = 0
+        lower = text.lower()
+        while i < len(text):
+            matched = None
+            style = ""
+            for t in bold_terms:
+                if lower.startswith(t.lower(), i):
+                    matched = t
+                    style = "B"
                     break
+            if not matched:
+                for t in under_terms:
+                    if lower.startswith(t.lower(), i):
+                        matched = t
+                        style = "U"
+                        break
+            if matched:
+                self.set_font("Helvetica", style, 12)
+                self.write(5, matched)
+                i += len(matched)
+            else:
+                self.set_font("Helvetica", "", 12)
+                self.write(5, text[i])
+                i += 1
+        # ensure normal font at end
+        self.set_font("Helvetica", "", 12)
 
-        if match:
-            pdf.set_font("Helvetica", style, 12)
-            pdf.write(5, match)
-            i += len(match)
-        else:
-            pdf.set_font("Helvetica", "", 12)
-            pdf.write(5, text[i])
-            i += 1
+    def write_paragraph(self, text):
+        """
+        Main method to write a paragraph with justification and inline formatting.
+        Uses Helvetica 12. Does NOT hyphenate or break words.
+        """
+        if text is None:
+            return
 
+        bold_terms = [
+            "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
+        ]
 
-def write_paragraph(pdf, text):
-    """MAIN FUNCTION — Clean justification + formatting."""
-    
-    bold_terms = [
-        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
-    ]
+        under_terms = [
+            "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
+            "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
+            "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+        ]
 
-    under_terms = [
-        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
-        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks",
-        "Solid Edge", "Bluebeam", "Adobe", "Microsoft", "Corel",
-        "Chaos", "Nitro", "Tally Quick Heal"
-    ]
+        max_width = self.w - self.l_margin - self.r_margin
+        # normalize newlines and split into logical paragraphs
+        paragraphs = str(text).replace("\r", "").split("\n")
 
-    max_width = pdf.w - pdf.l_margin - pdf.r_margin
-    words = split_words_preserve_spaces(text)
-
-    current_line = ""
-    lines = []
-
-    for w in words:
-        test = current_line + w
-        if measure_styled_width(pdf, test, bold_terms, under_terms) <= max_width:
-            current_line = test
-        else:
-            lines.append(current_line.rstrip())
-            current_line = w
-
-    if current_line.strip():
-        lines.append(current_line.rstrip())
-
-    # Render lines
-    for i, line in enumerate(lines):
-        is_last = (i == len(lines) - 1)
-
-        if is_last:
-            draw_styled(pdf, line, bold_terms, under_terms)
-            pdf.ln(6)
-            continue
-
-        # FULL JUSTIFICATION
-        parts = split_words_preserve_spaces(line)
-        words_only = [p for p in parts if not p.isspace()]
-        gaps = len(words_only) - 1
-
-        if gaps <= 0:
-            draw_styled(pdf, line, bold_terms, under_terms)
-            pdf.ln(6)
-            continue
-
-        actual_width = measure_styled_width(pdf, line, bold_terms, under_terms)
-        extra_space = max_width - actual_width
-        add_per_gap = extra_space / gaps
-
-        # Draw each word with stretched gaps
-        word_index = 0
-        for p in parts:
-            if p.isspace():
+        for para in paragraphs:
+            para = para.strip()
+            if not para:
+                self.ln(6)
                 continue
 
-            draw_styled(pdf, p, bold_terms, under_terms)
+            # Build lines by adding tokens until width exceeds max_width
+            tokens = self._split_words_preserve_spaces(para)
+            lines = []
+            current = ""
+            for tok in tokens:
+                test = current + tok
+                w = self._measure_styled_width(test, bold_terms, under_terms)
+                if w <= max_width:
+                    current = test
+                else:
+                    lines.append(current.rstrip())
+                    current = tok
+            if current.strip():
+                lines.append(current.rstrip())
 
-            if word_index < gaps:
-                pdf.set_x(pdf.get_x() + pdf.get_string_width(" ") + add_per_gap)
+            # Render each line
+            for li, line in enumerate(lines):
+                is_last = (li == len(lines) - 1)
+                if is_last:
+                    # left-aligned last line
+                    self._draw_styled(line, bold_terms, under_terms)
+                    self.ln(6)
+                    continue
 
-            word_index += 1
+                # justify this line
+                # compute gaps between words (only word tokens)
+                parts = [p for p in self._split_words_preserve_spaces(line) if not p.isspace()]
+                gaps = len(parts) - 1
+                if gaps <= 0:
+                    self._draw_styled(line, bold_terms, under_terms)
+                    self.ln(6)
+                    continue
 
-        pdf.ln(6)
+                actual_width = self._measure_styled_width(line, bold_terms, under_terms)
+                extra = max_width - actual_width
+                add_per_gap = extra / gaps
 
-# --- UPDATED add_page_one_intro WITH GUARANTEED JUSTIFICATION ---
-def add_page_one_intro(pdf, data):
-    # Reference Number & Date (Top Right)
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.set_y(25)
-    pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
-    pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
-    pdf.ln(5)
+                # draw words and add stretched gap after each word (except last)
+                word_idx = 0
+                for p in self._split_words_preserve_spaces(line):
+                    if p.isspace():
+                        continue
+                    self._draw_styled(p, bold_terms, under_terms)
+                    if word_idx < gaps:
+                        # move cursor by (normal space width + additional)
+                        space_w = self.get_string_width(" ")
+                        self.set_x(self.get_x() + space_w + add_per_gap)
+                    word_idx += 1
 
-    # Recipient Details
-    pdf.set_font("Helvetica", "", 12)
-    pdf.cell(0, 5, "To,", ln=True)
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-    pdf.set_font("Helvetica", "", 12)
-    
-    # Address handling
-    pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
-    
-    pdf.ln(3)
-    
-    # Clickable Email
-    if data.get('vendor_email'):
-        add_clickable_email(pdf, data['vendor_email'])
+                self.ln(6)
+
+    # ------------------------------
+    # Page generation helpers
+    # ------------------------------
+    def add_page_one_intro(self, data):
+        """
+        Write page one intro content into the PDF. Expects 'data' dict with keys:
+        'quotation_number','quotation_date','vendor_name','vendor_address',
+        'vendor_email','vendor_mobile','vendor_contact','subject','intro_paragraph',
+        'sales_person_code' (optional)
+        """
+        self.add_page()
+
+        # Top refs
+        self.set_font("Helvetica", "B", 12)
+        self.set_y(25)
+        self.cell(0, 5, f"REF NO.: {data.get('quotation_number', '')}", ln=True, align="L")
+        self.cell(0, 5, f"Date: {data.get('quotation_date', '')}", ln=True, align="L")
+        self.ln(5)
+
+        # Recipient
+        self.set_font("Helvetica", "", 12)
+        self.cell(0, 5, "To,", ln=True)
+        self.set_font("Helvetica", "B", 12)
+        self.cell(0, 6, self.sanitize_text(data.get('vendor_name', '')), ln=True)
+        self.set_font("Helvetica", "", 12)
+        self.multi_cell(0, 4, self.sanitize_text(data.get('vendor_address', '')))
+        self.ln(3)
+
+        # Contact clickable
+        if data.get('vendor_email'):
+            self.add_clickable_email(data['vendor_email'])
+        if data.get('vendor_mobile'):
+            # small spacing
+            self.ln(1)
+            self.add_clickable_phone(data['vendor_mobile'])
+
+        # Kind Attention
+        self.set_font("Helvetica", "BU", 12)
+        self.cell(0, 5, f"Kind Attention :- {self.sanitize_text(data.get('vendor_contact',''))}", align="C", ln=True)
+        self.ln(5)
+
+        # Subject
+        self.set_font("Helvetica", "BU", 12)
+        self.cell(0, 6, f"Subject :- {self.sanitize_text(data.get('subject',''))}", ln=True)
+        self.ln(8)
+
+        # Intro paragraph (justified + formatted)
+        intro_text = data.get("intro_paragraph", "")
+        if intro_text:
+            self.write_paragraph(intro_text)
+
+        # Fixed company paragraphs
+        fixed_paragraphs = [
+            "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
+            "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
+            "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
+            "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
+        ]
+
+        for p in fixed_paragraphs:
+            self.write_paragraph(p)
+
+        # Contact information footer area (body)
+        if self.get_y() > 220:
+            self.add_page()
+
+        self.set_font("Helvetica", "", 12)
+        self.set_text_color(0, 0, 0)
+        contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
+        self.write(5, contact_text)
+
+        sales_person_code = data.get('sales_person_code', 'SD')
+        sp = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+
+        self.set_text_color(0, 0, 255)
+        self.set_font("Helvetica", "U", 12)
+        self.write(5, sp['email'], link=f"mailto:{sp['email']}")
+
+        self.set_text_color(0, 0, 0)
+        self.set_font("Helvetica", "", 12)
+        self.write(5, "  Mobile: ")
+
+        self.set_text_color(0, 0, 255)
+        self.set_font("Helvetica", "U", 12)
+        self.write(5, sp['mobile'], link=f"tel:{sp['mobile'].replace(' ', '').replace('+','')}")
+
+        self.ln(10)
+
+        # Social links area
+        self.set_font("Helvetica", "", 12)
+        self.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
+        self.set_text_color(0, 0, 255)
+        self.set_font("Helvetica", "U", 12)
+
+        links = [
+            "https://www.cminfotech.com/",
+            "https://www.linkedin.com/",
+            "https://wa.me/8733915721",
+            "https://www.facebook.com/",
+            "https://www.instagram.com/"
+        ]
+
+        # print each link on its own line (safe)
+        for link in links:
+            self.cell(0, 4, link, ln=True, link=link)
+
+        self.set_text_color(0, 0, 0)
         
-    pdf.ln(1)
-    # Clickable Mobile
-    if data.get('vendor_mobile'):
-        add_clickable_phone(pdf, data['vendor_mobile'])
-    
-    pdf.set_font("Helvetica", "BU", 12)
-    pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", align="C", ln=True)
-    pdf.ln(5)
-
-    # Subject Line
-    pdf.set_font("Helvetica", "BU", 12)
-    pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
-    pdf.ln(8)
-
-    # Write the user's custom intro paragraph WITH JUSTIFICATION
-    intro_text = data.get("intro_paragraph", "")
-    write_paragraph(pdf, intro_text)
-
-    # Fixed company introduction paragraphs - USE JUSTIFIED VERSION
-    fixed_paragraphs = [
-        "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
-        
-        "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
-        
-        "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
-        
-        "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
-    ]
-
-    for p in fixed_paragraphs:
-        write_paragraph(pdf, p)
-
-
-    # Contact Information
-    if pdf.get_y() > 220:
-        pdf.add_page()
-    
-    pdf.set_font("Helvetica", "", 12)
-    pdf.set_text_color(0, 0, 0)
-
-    # Contact text - Use write for clickable links
-    contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
-    pdf.write(5, contact_text)
-
-    # Get sales person info dynamically
-    sales_person_code = data.get('sales_person_code', 'SD')
-    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-    
-    # Email clickable
-    pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 12)
-    pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
-
-    # Mobile
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 12)
-    pdf.write(5, "  Mobile: ")
-    pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 12)
-    pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-
-    pdf.ln(10)
-    
-    # Rest of contact information...
-    pdf.set_font("Helvetica", "", 12)
-    pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-    
-    # Clickable website links
-    pdf.set_font("Helvetica", "U", 12)
-    pdf.set_text_color(0, 0, 255)
-
-    links = [
-        "https://www.cminfotech.com/",
-        "https://www.linkedin.com/", 
-        "https://wa.me/8733915721",
-        "https://www.facebook.com/",
-        "https://www.instagram.com/"
-    ]
-
-    max_link_width = max(pdf.get_string_width(link) for link in links)
-    right_margin = pdf.w - pdf.r_margin
-
-    for link in links:
-        x_position = right_margin - max_link_width
-        pdf.set_x(x_position)
-        pdf.cell(max_link_width, 4, link, ln=True, link=link)
-
-    pdf.set_text_color(0, 0, 0)
-
 # # --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---
 # def write_justified_paragraph_with_formatting(pdf, text):
 #     """Write paragraphs with full justification using multi_cell"""

@@ -340,23 +340,23 @@ class QUOTATION_PDF(FPDF):
 
 def add_clickable_email(pdf, email, label="Email: "):
     """Add clickable email with label - FIXED OVERLAP"""
-    pdf.set_font("Calibri", "B", 12)
+    pdf.set_font("Calibri", "B", 15)
     label_width = pdf.get_string_width(label)
     pdf.cell(label_width, 4, label, ln=0)
     
     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Calibri", "", 12)
+    pdf.set_font("Calibri", "", 15)
     pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
     pdf.set_text_color(0, 0, 0)  # Reset to black
 
 def add_clickable_phone(pdf, phone, label="Mobile: "):
     """Add clickable phone number with label - FIXED OVERLAP"""
-    pdf.set_font("Calibri", "B", 12)
+    pdf.set_font("Calibri", "B", 15)
     label_width = pdf.get_string_width(label)
     pdf.cell(label_width, 4, label, ln=0)
     
     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Calibri", "", 12)
+    pdf.set_font("Calibri", "", 15)
     # Remove spaces and + for tel link
     tel_number = phone.replace(' ', '').replace('+', '')
     pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
@@ -364,18 +364,18 @@ def add_clickable_phone(pdf, phone, label="Mobile: "):
 
 def add_page_one_intro(pdf, data):
     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-    pdf.set_font("Calibri", "B", 12)
+    pdf.set_font("Calibri", "B", 15)
     pdf.set_y(30)
     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
     pdf.ln(5)
 
     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-    pdf.set_font("Calibri", "", 12)
+    pdf.set_font("Calibri", "", 15)
     pdf.cell(0, 5, "To,", ln=True)
-    pdf.set_font("Calibri", "B", 12)
+    pdf.set_font("Calibri", "B", 15)
     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-    pdf.set_font("Calibri", "", 12)
+    pdf.set_font("Calibri", "", 15)
     
     # Address handling
     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
@@ -390,12 +390,12 @@ def add_page_one_intro(pdf, data):
     if data.get('vendor_mobile'):
         add_clickable_phone(pdf, data['vendor_mobile'])
     
-    pdf.set_font("Calibri", "BU", 12)
+    pdf.set_font("Calibri", "BU", 15)
     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
     pdf.ln(5)
 
     # Subject Line (from user input)
-    pdf.set_font("Calibri", "BU", 12)
+    pdf.set_font("Calibri", "BU", 15)
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
 
@@ -453,22 +453,22 @@ def add_page_one_intro(pdf, data):
                 for start, end, style in format_positions:
                     # Write text before formatting
                     if start > current_pos:
-                        pdf.set_font("Calibri", "", 10)
+                        pdf.set_font("Calibri", "", 12)
                         pdf.write(5, line[current_pos:start])
                     
                     # Write formatted text
                     formatted_text = line[start:end]
                     if style == "bold":
-                        pdf.set_font("Calibri", "B", 10)
+                        pdf.set_font("Calibri", "B", 12)
                     else:  # underline
-                        pdf.set_font("Calibri", "BU", 10)
+                        pdf.set_font("Calibri", "BU", 12)
                     pdf.write(5, formatted_text)
                     
                     current_pos = end
                 
                 # Write remaining text
                 if current_pos < len(line):
-                    pdf.set_font("Calibri", "", 10)
+                    pdf.set_font("Calibri", "", 12)
                     pdf.write(5, line[current_pos:])
                 
                 pdf.ln(5)
@@ -499,13 +499,13 @@ def add_page_one_intro(pdf, data):
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin
-    pdf.set_font("Calibri", "", 12)
+    pdf.set_font("Calibri", "", 15)
     pdf.set_text_color(0, 0, 0)
 
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin
-    pdf.set_font("Calibri", "", 12)
+    pdf.set_font("Calibri", "", 15)
     pdf.set_text_color(0, 0, 0)
 
     # Normal text
@@ -518,28 +518,28 @@ def add_page_one_intro(pdf, data):
     
     # Email clickable - DYNAMIC from sales person
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Calibri", "U", 12)  # underline
+    pdf.set_font("Calibri", "U", 15)  # underline
     pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
 
     # Back to normal for separator + Mobile:
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Calibri", "", 12)
+    pdf.set_font("Calibri", "", 15)
     pdf.write(5, "  Mobile: ")
 
     # Mobile clickable - DYNAMIC from sales person
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Calibri", "U", 12)
+    pdf.set_font("Calibri", "U", 15)
     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
 
     pdf.ln(10)  # Add space after contact info
     pdf.set_text_color(0, 0, 0)
     # Continue with the rest of your contact information...
-    pdf.set_font("Calibri", "", 12)
+    pdf.set_font("Calibri", "", 15)
     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-    pdf.set_font("Calibri", "", 12)
+    pdf.set_font("Calibri", "", 15)
     
     # Clickable website - RIGHT ALIGNED
-    pdf.set_font("Calibri", "U", 12)
+    pdf.set_font("Calibri", "U", 15)
     pdf.set_text_color(0, 0, 255)
 
     # Calculate the width needed for the longest link
@@ -571,7 +571,7 @@ def add_quotation_header(pdf, annexure_text, quotation_text):
     """Add dynamic quotation header with both annexure and title"""
     pdf.set_font("Calibri", "BU", 14)
     pdf.cell(0, 8, annexure_text, ln=True, align="C")
-    pdf.set_font("Calibri", "BU", 12)
+    pdf.set_font("Calibri", "BU", 15)
     pdf.cell(0, 6, quotation_text, ln=True, align="C")
     pdf.ln(8)
 
@@ -725,7 +725,7 @@ def add_page_two_commercials(pdf, data):
     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
 
     # Add section headers
-    pdf.set_font("Calibri", "B", 12)
+    pdf.set_font("Calibri", "B", 15)
 
     # Terms & Conditions header
     pdf.set_xy(x_start + padding, y_start + padding)
@@ -759,10 +759,10 @@ def add_page_two_commercials(pdf, data):
         terms_y = pdf.get_y()
 
     # Bank Details header - INSIDE THE BOX
-    pdf.set_font("Calibri", "B", 12)
+    pdf.set_font("Calibri", "B", 15)
     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-    pdf.set_font("Calibri", "", 12)  # Set to regular for labels
+    pdf.set_font("Calibri", "", 15)  # Set to regular for labels
 
     # Bank details content - INSIDE THE BOX
     bank_y = pdf.get_y()

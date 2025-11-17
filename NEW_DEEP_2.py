@@ -395,75 +395,99 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
     
+def wrap_text_exact(pdf, text, max_width):
+    words = text.split()
+    lines = []
+    current = ""
+
+    for w in words:
+        test = (current + " " + w).strip()
+        if pdf.get_string_width(test) <= max_width:
+            current = test
+        else:
+            lines.append(current)
+            current = w
+
+    if current:
+        lines.append(current)
+    return lines
+
+def draw_formatted(pdf, text, bold_terms, under_terms):
+    i = 0
+    lower = text.lower()
+
+    while i < len(text):
+        found = None
+        style = ""
+
+        for t in bold_terms:
+            if lower.startswith(t.lower(), i):
+                found = t
+                style = "B"
+                break
+
+        if not found:
+            for t in under_terms:
+                if lower.startswith(t.lower(), i):
+                    found = t
+                    style = "U"
+                    break
+
+        if found:
+            pdf.set_font("Helvetica", style, 12)
+            pdf.write(5, text[i:i+len(found)])
+            i += len(found)
+        else:
+            pdf.set_font("Helvetica", "", 12)
+            pdf.write(5, text[i])
+            i += 1
+
 
 def write_paragraph_with_formatting(pdf, text):
+
     bold_terms = [
         "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)"
     ]
 
-    underlined_terms = [
+    underline_terms = [
         "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
-        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
-        "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks",
+        "Solid Edge", "Bluebeam", "Adobe", "Microsoft", "Corel",
+        "Chaos", "Nitro", "Tally Quick Heal"
     ]
 
     max_width = pdf.w - pdf.l_margin - pdf.r_margin
+    lines = wrap_text_exact(pdf, text, max_width)
 
-    # --- Convert paragraph to words ---
-    words = text.split()
-    lines = []
-    current_line = []
+    for idx, line in enumerate(lines):
+        is_last = (idx == len(lines) - 1)
 
-    for word in words:
-        test_line = " ".join(current_line + [word])
-        if pdf.get_string_width(test_line) <= max_width:
-            current_line.append(word)
-        else:
-            lines.append(current_line)
-            current_line = [word]
-
-    if current_line:
-        lines.append(current_line)
-
-    # --- Write each justified line ---
-    for i, line_words in enumerate(lines):
-        is_last_line = (i == len(lines) - 1)
-
-        # Normal left-aligned last line
-        if is_last_line:
-            pdf.set_font("Helvetica", "", 12)
-            rendered_line = " ".join(line_words)
-
-            write_formatted_line(pdf, rendered_line, bold_terms, underlined_terms)
+        # LAST LINE = left aligned
+        if is_last:
+            draw_formatted(pdf, line, bold_terms, underline_terms)
             pdf.ln(5)
             continue
 
-        # Justify the line
-        total_words = len(line_words)
-        if total_words == 1:
-            # Single word -> cannot justify
-            rendered_line = line_words[0]
-            write_formatted_line(pdf, rendered_line, bold_terms, underlined_terms)
+        # JUSTIFY LINE
+        words = line.split()
+        gaps = len(words) - 1
+
+        if gaps <= 0:
+            draw_formatted(pdf, line, bold_terms, underline_terms)
             pdf.ln(5)
             continue
 
-        normal_line = " ".join(line_words)
-        normal_width = pdf.get_string_width(normal_line)
+        normal_width = pdf.get_string_width(line)
         extra_space = max_width - normal_width
+        space_each = extra_space / gaps
 
-        gaps = total_words - 1
-        extra_space_per_gap = extra_space / gaps
-
-        # Create justified line with custom spacing
-        x = pdf.get_x()
-        for idx, word in enumerate(line_words):
-            write_formatted_line(pdf, word, bold_terms, underlined_terms)
-
-            if idx < gaps:
-                space_w = pdf.get_string_width(" ") + extra_space_per_gap
-                pdf.set_x(pdf.get_x() + space_w)
+        for i, w in enumerate(words):
+            draw_formatted(pdf, w, bold_terms, underline_terms)
+            if i < gaps:
+                pdf.set_x(pdf.get_x() + pdf.get_string_width(" ") + space_each)
 
         pdf.ln(5)
+
 def write_formatted_line(pdf, text, bold_terms, underlined_terms):
     i = 0
     lower = text.lower()

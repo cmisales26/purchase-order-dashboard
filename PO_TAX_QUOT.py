@@ -270,12 +270,6 @@ class QUOTATION_PDF(FPDF):
         self.quotation_number = quotation_number
         self.quotation_date = quotation_date
         self.sales_person_code = sales_person_code
-        font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-        # Comment out font loading to avoid errors if fonts don't exist
-        self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
-        self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
-        self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
-        self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
         
     def sanitize_text(self, text):
         try:
@@ -389,7 +383,6 @@ def add_page_one_intro(pdf, data):
     # Clickable Mobile - FIXED
     if data.get('vendor_mobile'):
         add_clickable_phone(pdf, data['vendor_mobile'])
-    
     pdf.set_font("Helvetica", "BU", 12)
     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
     pdf.ln(5)

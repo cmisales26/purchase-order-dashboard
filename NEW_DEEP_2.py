@@ -611,7 +611,7 @@ def add_page_one_intro(pdf, data):
     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
 
     pdf.ln(10)  # Add space after contact info
-    
+    pdf.set_text_color(0, 0, 0)
     # Continue with the rest of your contact information...
     pdf.set_font("Helvetica", "", 12)
     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)

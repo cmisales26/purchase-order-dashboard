@@ -483,7 +483,7 @@ def write_simple_formatted_paragraph(pdf, text):
             for start, end, style in format_positions:
                 # Write text before formatting
                 if start > current_pos:
-                    pdf.set_font("Helvetica", "J", 12)
+                    pdf.set_font("Helvetica", "", 12)
                     pdf.write(5, line[current_pos:start])
                 
                 # Write formatted text
@@ -498,7 +498,7 @@ def write_simple_formatted_paragraph(pdf, text):
             
             # Write remaining text
             if current_pos < len(line):
-                pdf.set_font("Helvetica", "J", 12)
+                pdf.set_font("Helvetica", "", 12)
                 pdf.write(5, line[current_pos:])
             
             pdf.ln(5)

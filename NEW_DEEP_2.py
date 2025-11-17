@@ -396,7 +396,6 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
     
 
-# --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---
 def write_justified_paragraph_with_formatting(pdf, text):
     """Write paragraphs with full justification using multi_cell"""
     
@@ -421,16 +420,20 @@ def write_justified_paragraph_with_formatting(pdf, text):
             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
         ]
         
-        has_formatting = any(term in paragraph for term in bold_terms + underlined_terms)
+        # Check for exact matches (not case-sensitive)
+        has_formatting = False
+        for term in bold_terms + underlined_terms:
+            if term.lower() in paragraph.lower():
+                has_formatting = True
+                break
         
         if has_formatting:
-            # Use the original method for paragraphs with formatting
+            # Use the FIXED method for paragraphs with formatting
             write_simple_formatted_paragraph(pdf, paragraph)
         else:
             # Use multi_cell for clean justified text
             pdf.multi_cell(0, 5, paragraph, align='J')
-        
-        pdf.ln(3)
+            pdf.ln(3)
 
 def write_simple_formatted_paragraph(pdf, text):
     """Simple method for paragraphs with mixed formatting"""

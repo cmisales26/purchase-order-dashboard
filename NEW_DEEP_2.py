@@ -8,7 +8,7 @@ from PIL import Image
 import os
 from fpdf import FPDF, HTMLMixin
 import textwrap
-
+import html as _html 
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {
 
@@ -262,7 +262,7 @@ def get_next_sequence_number_invoice(invoice_number):
 
 
 # --- PDF Class for Two-Page Quotation (Matching Demo Format) ---
-class QUOTATION_PDF(FPDF,HTMLMixin):
+class QUOTATION_PDF(FPDF):
     def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="CP"):
         super().__init__()
         self.set_auto_page_break(auto=True, margin=15)
@@ -394,6 +394,48 @@ def add_page_one_intro(pdf, data):
     pdf.set_font("Helvetica", "BU", 12)
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
+
+def write_paragraph_html(pdf, text):
+    """
+    Write ONE paragraph using HTML justification and inline <b>/<u> tags.
+    Use this only for the paragraph(s) you want HTML-justified.
+    """
+    if not text:
+        return
+
+    # Terms you want bold / underlined
+    bold_terms = [
+        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
+        "CM Infotech", "CMI"
+    ]
+    under_terms = [
+        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
+        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
+        "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+    ]
+
+    # Escape HTML special chars first
+    h = _html.escape(text)
+
+    # Replace long terms first to avoid overlapping replacements
+    bold_terms_sorted = sorted(bold_terms, key=len, reverse=True)
+    under_terms_sorted = sorted(under_terms, key=len, reverse=True)
+
+    # Apply bold
+    for term in bold_terms_sorted:
+        h = h.replace(_html.escape(term), f"<b>{_html.escape(term)}</b>")
+
+    # Apply underline
+    for term in under_terms_sorted:
+        h = h.replace(_html.escape(term), f"<u>{_html.escape(term)}</u>")
+
+    # Wrap single paragraph in justified <p>
+    html_par = f'<p align="justify" style="font-family: Helvetica; font-size:12pt;">{h}</p>'
+
+    # Write as HTML
+    pdf.write_html(html_par)
+    # small spacing after
+    pdf.ln(2)
     
 # --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---
 def write_justified_paragraph_with_formatting(pdf, text):
@@ -577,7 +619,7 @@ def add_page_one_intro(pdf, data):
     for paragraph in fixed_paragraphs:
         # write_justified_paragraph_with_formatting(pdf, paragraph)
         # write_simple_justified_paragraph(pdf, paragraph)
-        write_simple_formatted_paragraph(pdf,paragraph)
+        write_paragraph_html(pdf,paragraph)
         pdf.ln(3)  # Add space between paragraphs
 
     # Contact Information - MAKE SURE WE HAVE ENOUGH SPACE

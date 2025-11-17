@@ -562,7 +562,7 @@ def add_page_one_intro(pdf, data):
     # Write the user's custom intro paragraph WITH FORMATTING
     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
     if intro_text:
-        write_simple_formatted_paragraph(pdf, intro_text)
+        write_simple_justified_paragraph(pdf, intro_text)
 
     # Fixed company introduction paragraphs - USE THE FORMATTED VERSION
     fixed_paragraphs = [

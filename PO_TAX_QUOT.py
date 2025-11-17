@@ -660,8 +660,10 @@ def add_page_two_commercials(pdf, data):
         ("7. Price Validity: ", "10 days from Quotation date"),
         ("8. Payment: ", "100% Advance along with purchase order"),
         ("9. Delivery period: ", "1-2 Weeks from the date of Purchase Order"),
-        ("10. Cheque to be issued on name of: ", '"CM INFOTECH"'),
-        ("11. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481")
+        ("10. Support: ","Includes 12 months of technical support and software updates from OEM."),
+        ("11. Installation: ","Online"),
+        ("12. Cheque to be issued on name of: ", '"CM INFOTECH"'),
+        ("13. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481")
     ]
 
     # Bank Details

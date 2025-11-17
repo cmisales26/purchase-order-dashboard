@@ -379,11 +379,11 @@ def add_page_one_intro(pdf, data):
     # Clickable Email - FIXED
     if data.get('vendor_email'):
         add_clickable_email(pdf, data['vendor_email'])
-    
+    pdf.ln(2)
     # Clickable Mobile - FIXED
     if data.get('vendor_mobile'):
         add_clickable_phone(pdf, data['vendor_mobile'])
-    pdf.ln(2)
+    
     pdf.set_font("Helvetica", "BU", 12)
     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
     pdf.ln(5)

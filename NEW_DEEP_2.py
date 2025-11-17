@@ -559,12 +559,12 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(8)  # Increased spacing
 
-    # Write the user's custom intro paragraph
+    # Write the user's custom intro paragraph WITH FORMATTING
     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
     if intro_text:
-        write_simple_justified_paragraph(pdf, intro_text)
+        write_justified_paragraph_with_formatting(pdf, intro_text)
 
-    # Fixed company introduction paragraphs - USE THE SIMPLE VERSION
+    # Fixed company introduction paragraphs - USE THE FORMATTED VERSION
     fixed_paragraphs = [
         "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
         
@@ -576,7 +576,7 @@ def add_page_one_intro(pdf, data):
     ]
 
     for paragraph in fixed_paragraphs:
-        write_simple_justified_paragraph(pdf, paragraph)
+        write_justified_paragraph_with_formatting(pdf, paragraph)
         pdf.ln(2)  # Add space between paragraphs
 
     # Contact Information - MAKE SURE WE HAVE ENOUGH SPACE

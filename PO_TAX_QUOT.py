@@ -524,40 +524,40 @@ def add_page_one_intro(pdf, data):
     pdf.set_font("Helvetica", "U", 12)
     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
 
-pdf.ln(10)  # Add space after contact info
-    pdf.set_text_color(0, 0, 0)
-    # Continue with the rest of your contact information...
-    pdf.set_font("Helvetica", "", 12)
-    pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-    pdf.set_font("Helvetica", "", 12)
-    
-    # Clickable website - RIGHT ALIGNED
-    pdf.set_font("Helvetica", "U", 12)
-    pdf.set_text_color(0, 0, 255)
+    pdf.ln(10)  # Add space after contact info
+        pdf.set_text_color(0, 0, 0)
+        # Continue with the rest of your contact information...
+        pdf.set_font("Helvetica", "", 12)
+        pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
+        pdf.set_font("Helvetica", "", 12)
+        
+        # Clickable website - RIGHT ALIGNED
+        pdf.set_font("Helvetica", "U", 12)
+        pdf.set_text_color(0, 0, 255)
 
-    # Calculate the width needed for the longest link
-    links = [
-        "https://www.cminfotech.com/",
-        "https://www.linkedin.com/", 
-        "https://wa.me/918733915721",
-        "https://www.facebook.com/",
-        "https://www.instagram.com/"
-    ]
+        # Calculate the width needed for the longest link
+        links = [
+            "https://www.cminfotech.com/",
+            "https://www.linkedin.com/", 
+            "https://wa.me/918733915721",
+            "https://www.facebook.com/",
+            "https://www.instagram.com/"
+        ]
 
-    # Get the maximum width
-    max_link_width = max(pdf.get_string_width(link) for link in links)
+        # Get the maximum width
+        max_link_width = max(pdf.get_string_width(link) for link in links)
 
-    # Set right margin position
-    right_margin = pdf.w - pdf.r_margin
+        # Set right margin position
+        right_margin = pdf.w - pdf.r_margin
 
-    # Print each link aligned to the right
-    for link in links:
-        # Calculate x position to right-align
-        x_position = right_margin - max_link_width
-        pdf.set_x(x_position)
-        pdf.cell(max_link_width, 4, link, ln=True, link=link)
+        # Print each link aligned to the right
+        for link in links:
+            # Calculate x position to right-align
+            x_position = right_margin - max_link_width
+            pdf.set_x(x_position)
+            pdf.cell(max_link_width, 4, link, ln=True, link=link)
 
-    pdf.set_text_color(0, 0, 0)
+        pdf.set_text_color(0, 0, 0)
 
 
 def add_quotation_header(pdf, annexure_text, quotation_text):

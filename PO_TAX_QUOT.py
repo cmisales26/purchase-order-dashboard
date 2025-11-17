@@ -489,6 +489,7 @@ def add_page_one_intro(pdf, data):
 
     for paragraph in fixed_paragraphs:
         write_paragraph_with_formatting(pdf, paragraph)
+        pdf.ln(3)
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin

@@ -455,21 +455,21 @@ def write_simple_formatted_paragraph(pdf, text):
             current_pos = 0
             format_positions = []
             
-            # Find bold terms
+            # Find bold terms - FIXED: Use exact text matching
             for term in bold_terms:
                 start = 0
                 while True:
-                    pos = line.lower().find(term.lower(), start)
+                    pos = line.find(term, start)  # Use exact match, not case-insensitive
                     if pos == -1:
                         break
                     format_positions.append((pos, pos + len(term), "bold"))
                     start = pos + 1
             
-            # Find underlined terms
+            # Find underlined terms - FIXED: Use exact text matching
             for term in underlined_terms:
                 start = 0
                 while True:
-                    pos = line.lower().find(term.lower(), start)
+                    pos = line.find(term, start)  # Use exact match, not case-insensitive
                     if pos == -1:
                         break
                     format_positions.append((pos, pos + len(term), "underline"))

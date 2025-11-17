@@ -7,7 +7,13 @@ import io
 from PIL import Image
 import os
 from fpdf import FPDF, HTMLMixin
+import html
 import textwrap
+from fpdf.html import HTML2FPDF
+def unescape(self, txt):
+    return html.unescape(txt)
+
+HTML2FPDF.unescape = unescape
 
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {

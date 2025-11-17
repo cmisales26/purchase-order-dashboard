@@ -6,6 +6,7 @@ import datetime
 import io
 from PIL import Image
 import os
+from fpdf import FPDF, HTMLMixin
 import textwrap
 
 # --- Global Data and Configuration ---
@@ -261,7 +262,7 @@ def get_next_sequence_number_invoice(invoice_number):
 
 
 # --- PDF Class for Two-Page Quotation (Matching Demo Format) ---
-class QUOTATION_PDF(FPDF):
+class QUOTATION_PDF(FPDF,HTMLMixin):
     def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="CP"):
         super().__init__()
         self.set_auto_page_break(auto=True, margin=15)

@@ -578,7 +578,7 @@ def add_page_one_intro(pdf, data):
         # write_justified_paragraph_with_formatting(pdf, paragraph)
         # write_simple_justified_paragraph(pdf, paragraph)
         write_simple_formatted_paragraph(pdf,paragraph)
-        pdf.ln(2)  # Add space between paragraphs
+        pdf.ln(3)  # Add space between paragraphs
 
     # Contact Information - MAKE SURE WE HAVE ENOUGH SPACE
     # Check if we need a new page

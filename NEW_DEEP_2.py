@@ -396,13 +396,16 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
     
 
-    # --- Simple and Reliable Paragraph Formatting ---
-    def write_paragraph_with_formatting(pdf, text):
-        """Write paragraph with specific terms in BOLD and UNDERLINE"""
+    # --- Best Method: HTML-like formatting with proper justification ---
+    def write_justified_paragraph_with_formatting(pdf, text):
+        """Write paragraphs with full justification and preserved formatting"""
+        
+        # Available width
+        available_width = pdf.w - 2 * pdf.l_margin
         
         # Terms that should be BOLD
         bold_terms = [
-            "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)"
+            "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
         ]
         
         # Terms that should be UNDERLINED (software partnership list)
@@ -412,72 +415,143 @@ def add_page_one_intro(pdf, data):
             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
         ]
         
-        # Process the text
-        lines = text.split('\n')
+        def get_word_formatting(word):
+            """Determine formatting for a single word"""
+            word_clean = word.strip('.,!?;:()"\'')
+            
+            # Check for bold terms
+            for bold_term in bold_terms:
+                if bold_term.lower() in word_clean.lower():
+                    return "bold"
+            
+            # Check for underlined terms  
+            for underlined_term in underlined_terms:
+                if underlined_term.lower() in word_clean.lower():
+                    return "underline"
+            
+            return "normal"
         
-        for line_idx, line in enumerate(lines):
-            if line.strip():
-                current_pos = 0
-                
-                # Find all formatting positions
-                format_positions = []
-                
-                # Find bold terms
-                for term in bold_terms:
-                    start = 0
-                    while True:
-                        pos = line.lower().find(term.lower(), start)
-                        if pos == -1:
-                            break
-                        format_positions.append((pos, pos + len(term), "bold"))
-                        start = pos + 1
-                
-                # Find underlined terms
-                for term in underlined_terms:
-                    start = 0
-                    while True:
-                        pos = line.lower().find(term.lower(), start)
-                        if pos == -1:
-                            break
-                        format_positions.append((pos, pos + len(term), "underline"))
-                        start = pos + 1
-                
-                # Sort by position
-                format_positions.sort()
-                
-                # Write the line with formatting
-                current_pos = 0
-                for start, end, style in format_positions:
-                    # Write text before formatting
-                    if start > current_pos:
-                        pdf.set_font("Helvetica", "", 12)
-                        pdf.write(5, line[current_pos:start])
-                    
-                    # Write formatted text
-                    formatted_text = line[start:end]
-                    if style == "bold":
-                        pdf.set_font("Helvetica", "B", 12)
-                    else:  # underline
-                        pdf.set_font("Helvetica", "BU", 12)
-                    pdf.write(5, formatted_text)
-                    
-                    current_pos = end
-                
-                # Write remaining text
-                if current_pos < len(line):
+        def write_justified_line(pdf, words, available_width):
+            """Write a single line with full justification"""
+            if not words:
+                return
+            
+            # Calculate total width of all words
+            total_words_width = 0
+            for word in words:
+                # Set appropriate font for width calculation
+                formatting = get_word_formatting(word)
+                if formatting == "bold":
+                    pdf.set_font("Helvetica", "B", 12)
+                elif formatting == "underline":
+                    pdf.set_font("Helvetica", "BU", 12)
+                else:
                     pdf.set_font("Helvetica", "", 12)
-                    pdf.write(5, line[current_pos:])
+                total_words_width += pdf.get_string_width(word)
+            
+            # Calculate spacing for justification
+            if len(words) > 1:
+                total_spaces_width = available_width - total_words_width
+                space_width = total_spaces_width / (len(words) - 1)
+            else:
+                space_width = 0
+            
+            # Write the line with calculated spacing
+            x_start = pdf.get_x()
+            
+            for i, word in enumerate(words):
+                # Determine formatting for this word
+                formatting = get_word_formatting(word)
+                
+                # Set appropriate font
+                if formatting == "bold":
+                    pdf.set_font("Helvetica", "B", 12)
+                    pdf.set_text_color(0, 0, 0)  # Black for bold
+                elif formatting == "underline":
+                    pdf.set_font("Helvetica", "BU", 12)
+                    pdf.set_text_color(0, 0, 0)  # Black for underlined
+                else:
+                    pdf.set_font("Helvetica", "", 12)
+                    pdf.set_text_color(0, 0, 0)  # Black for normal
+                
+                # Write the word
+                pdf.write(5, word)
+                
+                # Add space (except after last word)
+                if i < len(words) - 1:
+                    pdf.set_x(pdf.get_x() + space_width)
+            
+            pdf.ln(5)
+        
+        # Process the text paragraph by paragraph
+        paragraphs = text.split('\n')
+        
+        for paragraph in paragraphs:
+            paragraph = paragraph.strip()
+            if not paragraph:
+                pdf.ln(3)  # Empty line between paragraphs
+                continue
+                
+            words = paragraph.split()
+            current_line_words = []
+            current_line_width = 0
+            
+            for word in words:
+                # Determine formatting for width calculation
+                formatting = get_word_formatting(word)
+                if formatting == "bold":
+                    pdf.set_font("Helvetica", "B", 12)
+                elif formatting == "underline":
+                    pdf.set_font("Helvetica", "BU", 12)
+                else:
+                    pdf.set_font("Helvetica", "", 12)
+                
+                word_width = pdf.get_string_width(word + " ")
+                
+                # Check if adding this word would exceed available width
+                if current_line_width + word_width <= available_width or not current_line_words:
+                    # Add word to current line
+                    current_line_words.append(word)
+                    current_line_width += word_width
+                else:
+                    # Write current line and start new line
+                    write_justified_line(pdf, current_line_words, available_width)
+                    current_line_words = [word]
+                    current_line_width = word_width
+            
+            # Write the last line of the paragraph (left-aligned, not justified)
+            if current_line_words:
+                # For the last line of paragraph, use left alignment
+                x_start = pdf.get_x()
+                
+                for i, word in enumerate(current_line_words):
+                    # Determine formatting for this word
+                    formatting = get_word_formatting(word)
+                    
+                    # Set appropriate font
+                    if formatting == "bold":
+                        pdf.set_font("Helvetica", "B", 12)
+                    elif formatting == "underline":
+                        pdf.set_font("Helvetica", "BU", 12)
+                    else:
+                        pdf.set_font("Helvetica", "", 12)
+                    
+                    # Write word with normal spacing
+                    pdf.write(5, word)
+                    if i < len(current_line_words) - 1:
+                        pdf.write(5, " ")  # Normal space between words
                 
                 pdf.ln(5)
-        
-        pdf.ln(3)
+            
+            # Add space between paragraphs
+            pdf.ln(2)
 
-    # --- Write all paragraphs with formatting ---
-    
+    # --- Write all paragraphs with justification and formatting ---
+
     # Write the user's custom intro paragraph
     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
     if intro_text:
-        write_paragraph_with_formatting(pdf, intro_text)
+        write_justified_paragraph_with_formatting(pdf, intro_text)
 
     # Fixed company introduction paragraphs
     fixed_paragraphs = [
@@ -491,7 +565,7 @@ def add_page_one_intro(pdf, data):
     ]
 
     for paragraph in fixed_paragraphs:
-        write_paragraph_with_formatting(pdf, paragraph)
+        write_justified_paragraph_with_formatting(pdf, paragraph)
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin

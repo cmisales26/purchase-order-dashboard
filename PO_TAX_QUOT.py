@@ -389,7 +389,7 @@ def add_page_one_intro(pdf, data):
     pdf.ln(5)
 
     # Subject Line (from user input)
-    pdf.set_font("Helvetica", "BU", 10)
+    pdf.set_font("Helvetica", "BU", 12)
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
 
@@ -462,7 +462,7 @@ def add_page_one_intro(pdf, data):
                 
                 # Write remaining text
                 if current_pos < len(line):
-                    pdf.set_font("Helvetica", "", 12)
+                    pdf.set_font("Helvetica", "", 10)
                     pdf.write(5, line[current_pos:])
                 
                 pdf.ln(5)

@@ -415,7 +415,10 @@ def add_page_one_intro(pdf, data):
         
         for line_idx, line in enumerate(lines):
             if line.strip():
-                current_pos = 0
+                pdf.set_font("Helvetica", "", 12)
+                pdf.multi_cell(0, 5, line, align='J')
+                pdf.ln(2)
+                # current_pos = 0
                 
                 # Find all formatting positions
                 format_positions = []

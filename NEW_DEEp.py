@@ -415,10 +415,7 @@ def add_page_one_intro(pdf, data):
         
         for line_idx, line in enumerate(lines):
             if line.strip():
-                pdf.set_font("Helvetica", "", 12)
-                pdf.multi_cell(0, 5, line, align='J')
-                pdf.ln(2)
-                # current_pos = 0
+                current_pos = 0
                 
                 # Find all formatting positions
                 format_positions = []
@@ -478,6 +475,9 @@ def add_page_one_intro(pdf, data):
     # Write the user's custom intro paragraph
     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
     if intro_text:
+        pdf.set_font("Helvetica", "", 12)
+        pdf.multi_cell(0, 5, intro_text, align='J')
+        pdf.ln(2)
         write_paragraph_with_formatting(pdf, intro_text)
 
     # Fixed company introduction paragraphs

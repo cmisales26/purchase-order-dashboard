@@ -395,78 +395,110 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
     
-def wrap_text(pdf, text, max_width):
-    words = text.split()
-    lines = []
-    current = ""
+# -------------------------------------------------------------
+# PERFECT JUSTIFIED + FORMATTED PARAGRAPH WRITER (FINAL VERSION)
+# -------------------------------------------------------------
 
-    for w in words:
-        test = (current + " " + w).strip()
-        if pdf.get_string_width(test) <= max_width:
-            current = test
+def split_words_preserve_spaces(text):
+    """Split text into words while keeping spaces for perfect rendering."""
+    result = []
+    word = ""
+
+    for char in text:
+        if char.isspace():
+            if word:
+                result.append(word)
+                word = ""
+            result.append(char)
         else:
-            lines.append(current)
-            current = w
+            word += char
 
-    if current:
-        lines.append(current)
-    return lines
+    if word:
+        result.append(word)
+
+    return result
 
 
-def draw_styled(pdf, text, bold_terms, under_terms):
+def measure_styled_width(pdf, text, bold_terms, under_terms):
+    """Measure width considering bold & underline correctly."""
+    temp_pdf = FPDF()
+    temp_pdf.add_page()
+    temp_pdf.set_font("Helvetica", "", 12)
+
+    width = 0
     i = 0
-    low = text.lower()
+    lower = text.lower()
 
     while i < len(text):
-        found = None
         style = ""
+        found = None
 
         # Bold terms
-        for t in bold_terms:
-            if low.startswith(t.lower(), i):
-                found = t
+        for term in bold_terms:
+            if lower.startswith(term.lower(), i):
+                found = term
                 style = "B"
                 break
-        
-        # Underline terms
+
+        # Underlined terms
         if not found:
-            for t in under_terms:
-                if low.startswith(t.lower(), i):
-                    found = t
+            for term in under_terms:
+                if lower.startswith(term.lower(), i):
+                    found = term
                     style = "U"
                     break
 
         if found:
-            pdf.set_font("Helvetica", style, 12)
-            pdf.write(5, text[i:i+len(found)])
+            temp_pdf.set_font("Helvetica", style, 12)
+            width += temp_pdf.get_string_width(found)
             i += len(found)
+        else:
+            temp_pdf.set_font("Helvetica", "", 12)
+            width += temp_pdf.get_string_width(text[i])
+            i += 1
+
+    return width
+
+
+def draw_styled(pdf, text, bold_terms, under_terms):
+    """Draw formatted text correctly (bold & underline)."""
+    i = 0
+    lower = text.lower()
+
+    while i < len(text):
+        match = None
+        style = ""
+
+        # Bold
+        for term in bold_terms:
+            if lower.startswith(term.lower(), i):
+                match = term
+                style = "B"
+                break
+
+        # Underline
+        if not match:
+            for term in under_terms:
+                if lower.startswith(term.lower(), i):
+                    match = term
+                    style = "U"
+                    break
+
+        if match:
+            pdf.set_font("Helvetica", style, 12)
+            pdf.write(5, match)
+            i += len(match)
         else:
             pdf.set_font("Helvetica", "", 12)
             pdf.write(5, text[i])
             i += 1
 
 
-def wrap_text(pdf, text, max_width):
-    words = text.split()
-    lines = []
-    current = ""
-
-    for w in words:
-        test = (current + " " + w).strip()
-        if pdf.get_string_width(test) <= max_width:
-            current = test
-        else:
-            lines.append(current)
-            current = w
-
-    if current:
-        lines.append(current)
-    return lines
-
 def write_paragraph(pdf, text):
-
+    """MAIN FUNCTION — Clean justification + formatting."""
+    
     bold_terms = [
-        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)"
+        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
     ]
 
     under_terms = [
@@ -477,67 +509,59 @@ def write_paragraph(pdf, text):
     ]
 
     max_width = pdf.w - pdf.l_margin - pdf.r_margin
-    lines = wrap_text(pdf, text, max_width)
+    words = split_words_preserve_spaces(text)
 
-    for idx, line in enumerate(lines):
-        is_last = (idx == len(lines) - 1)
+    current_line = ""
+    lines = []
+
+    for w in words:
+        test = current_line + w
+        if measure_styled_width(pdf, test, bold_terms, under_terms) <= max_width:
+            current_line = test
+        else:
+            lines.append(current_line.rstrip())
+            current_line = w
+
+    if current_line.strip():
+        lines.append(current_line.rstrip())
+
+    # Render lines
+    for i, line in enumerate(lines):
+        is_last = (i == len(lines) - 1)
 
         if is_last:
             draw_styled(pdf, line, bold_terms, under_terms)
             pdf.ln(6)
             continue
 
-        # Justification
-        words = line.split()
-        gap_count = len(words) - 1
+        # FULL JUSTIFICATION
+        parts = split_words_preserve_spaces(line)
+        words_only = [p for p in parts if not p.isspace()]
+        gaps = len(words_only) - 1
 
-        if gap_count == 0:
+        if gaps <= 0:
             draw_styled(pdf, line, bold_terms, under_terms)
             pdf.ln(6)
             continue
 
-        normal_width = pdf.get_string_width(line)
-        extra = max_width - normal_width
-        add_per_gap = extra / gap_count
+        actual_width = measure_styled_width(pdf, line, bold_terms, under_terms)
+        extra_space = max_width - actual_width
+        add_per_gap = extra_space / gaps
 
-        for i, w in enumerate(words):
-            draw_styled(pdf, w, bold_terms, under_terms)
-            if i < gap_count:
+        # Draw each word with stretched gaps
+        word_index = 0
+        for p in parts:
+            if p.isspace():
+                continue
+
+            draw_styled(pdf, p, bold_terms, under_terms)
+
+            if word_index < gaps:
                 pdf.set_x(pdf.get_x() + pdf.get_string_width(" ") + add_per_gap)
 
+            word_index += 1
+
         pdf.ln(6)
-
-def write_formatted_line(pdf, text, bold_terms, underlined_terms):
-    i = 0
-    lower = text.lower()
-
-    while i < len(text):
-        match = None
-        style = ""
-
-        # Check bold terms
-        for term in bold_terms:
-            if lower.startswith(term.lower(), i):
-                match = term
-                style = "B"
-                break
-
-        # Check underline terms
-        if not match:
-            for term in underlined_terms:
-                if lower.startswith(term.lower(), i):
-                    match = term
-                    style = "U"
-                    break
-
-        if match:
-            pdf.set_font("Helvetica", style, 12)
-            pdf.write(5, text[i:i+len(match)])
-            i += len(match)
-        else:
-            pdf.set_font("Helvetica", "", 12)
-            pdf.write(5, text[i])
-            i += 1
 
 # --- UPDATED add_page_one_intro WITH GUARANTEED JUSTIFICATION ---
 def add_page_one_intro(pdf, data):

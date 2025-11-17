@@ -394,41 +394,23 @@ def add_page_one_intro(pdf, data):
     pdf.set_font("Helvetica", "BU", 12)
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
+    
 
-    import re
-
-# IMPORTANT: You must ensure 'pdf' is an instance of an FPDF class (like fpdf2) 
-# and that 'data' is defined before this code runs.
-# Example setup: 
-# from fpdf import FPDF
-# pdf = FPDF()
-# pdf.add_page()
-# pdf.set_auto_page_break(True, 10) # Set margins for auto-break
-
+    # --- Simple and Reliable Paragraph Formatting ---
     def write_paragraph_with_formatting(pdf, text):
-        """
-        Write paragraph with specific terms in BOLD and UNDERLINE 
-        using the fpdf.multi_cell for layout (non-HTML method).
-        NOTE: This method writes segments. Full justification requires word-by-word 
-        spacing calculation, which multi_cell does not do for inline segments. 
-        This is the best non-HTML compromise for wrapping and flowing text.
-        """
+        """Write paragraph with specific terms in BOLD and UNDERLINE"""
         
         # Terms that should be BOLD
         bold_terms = [
             "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)"
         ]
         
-        # Terms that should be UNDERLINED
+        # Terms that should be UNDERLINED (software partnership list)
         underlined_terms = [
             "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
             "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
         ]
-        
-        # Define constants
-        LINE_HEIGHT = 5
-        PAGE_WIDTH = pdf.w - pdf.l_margin - pdf.r_margin # Total usable width
         
         # Process the text
         lines = text.split('\n')
@@ -437,102 +419,65 @@ def add_page_one_intro(pdf, data):
             if line.strip():
                 current_pos = 0
                 
-                # Find all formatting positions (Original logic maintained)
+                # Find all formatting positions
                 format_positions = []
                 
                 # Find bold terms
                 for term in bold_terms:
                     start = 0
                     while True:
-                        # Use re.IGNORECASE for robust, case-insensitive finding
-                        match = re.search(re.escape(term), line, re.IGNORECASE)
-                        if not match:
+                        pos = line.lower().find(term.lower(), start)
+                        if pos == -1:
                             break
-                        pos = match.start()
-                        term_len = match.end() - match.start()
-                        format_positions.append((pos, pos + term_len, "bold"))
+                        format_positions.append((pos, pos + len(term), "bold"))
                         start = pos + 1
                 
                 # Find underlined terms
                 for term in underlined_terms:
                     start = 0
                     while True:
-                        match = re.search(re.escape(term), line, re.IGNORECASE)
-                        if not match:
+                        pos = line.lower().find(term.lower(), start)
+                        if pos == -1:
                             break
-                        pos = match.start()
-                        term_len = match.end() - match.start()
-                        format_positions.append((pos, pos + term_len, "underline"))
+                        format_positions.append((pos, pos + len(term), "underline"))
                         start = pos + 1
                 
                 # Sort by position
                 format_positions.sort()
                 
-                # Write the line with formatting using multi_cell
+                # Write the line with formatting
                 current_pos = 0
                 for start, end, style in format_positions:
-                    
-                    # Write text before formatting (Normal style)
+                    # Write text before formatting
                     if start > current_pos:
                         pdf.set_font("Helvetica", "", 12)
-                        
-                        # Use multi_cell to write, but KEEP THE CURSOR on the same line (ln=0)
-                        pdf.multi_cell(
-                            w=PAGE_WIDTH, 
-                            h=LINE_HEIGHT, 
-                            txt=line[current_pos:start], 
-                            border=0, 
-                            align='J', 
-                            ln=0 # Keep cursor on the same line
-                        )
+                        pdf.write(5, line[current_pos:start])
                     
                     # Write formatted text
                     formatted_text = line[start:end]
                     if style == "bold":
                         pdf.set_font("Helvetica", "B", 12)
                     else:  # underline
-                        pdf.set_font("Helvetica", "U", 12) # Note: 'BU' style is for Bold and Underline
-                        
-                    # Use multi_cell for the formatted segment (Keep cursor on the same line)
-                    pdf.multi_cell(
-                        w=PAGE_WIDTH, 
-                        h=LINE_HEIGHT, 
-                        txt=formatted_text, 
-                        border=0, 
-                        align='J', 
-                        ln=0 # Keep cursor on the same line
-                    )
-                        
+                        pdf.set_font("Helvetica", "BU", 12)
+                    pdf.write(5, formatted_text)
+                    
                     current_pos = end
                 
                 # Write remaining text
                 if current_pos < len(line):
                     pdf.set_font("Helvetica", "", 12)
-                    
-                    # Use multi_cell for the final segment and ADVANCE THE CURSOR to the next line (ln=1)
-                    pdf.multi_cell(
-                        w=PAGE_WIDTH, 
-                        h=LINE_HEIGHT, 
-                        txt=line[current_pos:], 
-                        border=0, 
-                        align='J', 
-                        ln=1 # Move cursor to the next line after the segment is printed
-                    )
-                else:
-                    # If the line ended on a formatted segment, we need a line break manually
-                    pdf.ln(LINE_HEIGHT)
+                    pdf.write(5, line[current_pos:])
                 
-                # Since multi_cell now handles the line advance, we only need a small separator
-                # pdf.ln(3) # Removed: ln(5) is now handled by the last multi_cell(ln=1)
-
-        pdf.ln(3) # Space after the whole paragraph
+                pdf.ln(5)
+        
+        pdf.ln(3)
 
     # --- Write all paragraphs with formatting ---
-
+    
     # Write the user's custom intro paragraph
-    # intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
-    # if intro_text:
-    #     write_paragraph_with_formatting(pdf, intro_text)
+    intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
+    if intro_text:
+        write_paragraph_with_formatting(pdf, intro_text)
 
     # Fixed company introduction paragraphs
     fixed_paragraphs = [
@@ -545,106 +490,8 @@ def add_page_one_intro(pdf, data):
         "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
     ]
 
-    # Assuming 'pdf' is defined, you can run this:
     for paragraph in fixed_paragraphs:
         write_paragraph_with_formatting(pdf, paragraph)
-
-    # # --- Simple and Reliable Paragraph Formatting ---
-    # def write_paragraph_with_formatting(pdf, text):
-    #     """Write paragraph with specific terms in BOLD and UNDERLINE"""
-        
-    #     # Terms that should be BOLD
-    #     bold_terms = [
-    #         "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)"
-    #     ]
-        
-    #     # Terms that should be UNDERLINED (software partnership list)
-    #     underlined_terms = [
-    #         "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
-    #         "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
-    #         "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-    #     ]
-        
-    #     # Process the text
-    #     lines = text.split('\n')
-        
-    #     for line_idx, line in enumerate(lines):
-    #         if line.strip():
-    #             current_pos = 0
-                
-    #             # Find all formatting positions
-    #             format_positions = []
-                
-    #             # Find bold terms
-    #             for term in bold_terms:
-    #                 start = 0
-    #                 while True:
-    #                     pos = line.lower().find(term.lower(), start)
-    #                     if pos == -1:
-    #                         break
-    #                     format_positions.append((pos, pos + len(term), "bold"))
-    #                     start = pos + 1
-                
-    #             # Find underlined terms
-    #             for term in underlined_terms:
-    #                 start = 0
-    #                 while True:
-    #                     pos = line.lower().find(term.lower(), start)
-    #                     if pos == -1:
-    #                         break
-    #                     format_positions.append((pos, pos + len(term), "underline"))
-    #                     start = pos + 1
-                
-    #             # Sort by position
-    #             format_positions.sort()
-                
-    #             # Write the line with formatting
-    #             current_pos = 0
-    #             for start, end, style in format_positions:
-    #                 # Write text before formatting
-    #                 if start > current_pos:
-    #                     pdf.set_font("Helvetica", "", 12)
-    #                     pdf.write(5, line[current_pos:start])
-                    
-    #                 # Write formatted text
-    #                 formatted_text = line[start:end]
-    #                 if style == "bold":
-    #                     pdf.set_font("Helvetica", "B", 12)
-    #                 else:  # underline
-    #                     pdf.set_font("Helvetica", "BU", 12)
-    #                 pdf.write(5, formatted_text)
-                    
-    #                 current_pos = end
-                
-    #             # Write remaining text
-    #             if current_pos < len(line):
-    #                 pdf.set_font("Helvetica", "", 12)
-    #                 pdf.write(5, line[current_pos:])
-                
-    #             pdf.ln(5)
-        
-    #     pdf.ln(3)
-
-    # # --- Write all paragraphs with formatting ---
-    
-    # # Write the user's custom intro paragraph
-    # intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
-    # if intro_text:
-    #     write_paragraph_with_formatting(pdf, intro_text)
-
-    # # Fixed company introduction paragraphs
-    # fixed_paragraphs = [
-    #     "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
-        
-    #     "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
-        
-    #     "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
-        
-    #     "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
-    # ]
-
-    # for paragraph in fixed_paragraphs:
-    #     write_paragraph_with_formatting(pdf, paragraph)
 
     # Contact Information - FIXED ALIGNMENT with clickable elements - FIXED OVERLAP
     page_width = pdf.w - 2 * pdf.l_margin

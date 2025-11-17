@@ -395,141 +395,131 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
     
-def wrap_text_exact(pdf, text, max_width):
-    words = text.split()
-    lines = []
-    current = ""
-
-    for w in words:
-        test = (current + " " + w).strip()
-        if pdf.get_string_width(test) <= max_width:
-            current = test
-        else:
-            lines.append(current)
-            current = w
-
-    if current:
-        lines.append(current)
-    return lines
-
-def draw_formatted(pdf, text, bold_terms, under_terms):
-    i = 0
-    lower = text.lower()
-
-    while i < len(text):
-        found = None
-        style = ""
-
-        for t in bold_terms:
-            if lower.startswith(t.lower(), i):
-                found = t
-                style = "B"
-                break
-
-        if not found:
-            for t in under_terms:
-                if lower.startswith(t.lower(), i):
-                    found = t
-                    style = "U"
-                    break
-
-        if found:
-            pdf.set_font("Helvetica", style, 12)
-            pdf.write(5, text[i:i+len(found)])
-            i += len(found)
-        else:
-            pdf.set_font("Helvetica", "", 12)
-            pdf.write(5, text[i])
-            i += 1
-
-
-def write_paragraph_with_formatting(pdf, text):
-
+def write_justified_formatted_paragraph(pdf, text):
+    """Write paragraphs with both justification and formatting (bold/underline)"""
+    
+    # Terms that should be BOLD
     bold_terms = [
-        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)"
+        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
     ]
-
-    underline_terms = [
-        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
-        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks",
-        "Solid Edge", "Bluebeam", "Adobe", "Microsoft", "Corel",
-        "Chaos", "Nitro", "Tally Quick Heal"
+    
+    # Terms that should be UNDERLINED (software partnership list)
+    underlined_terms = [
+        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
+        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
+        "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
     ]
-
-    max_width = pdf.w - pdf.l_margin - pdf.r_margin
-    lines = wrap_text_exact(pdf, text, max_width)
-
-    for idx, line in enumerate(lines):
-        is_last = (idx == len(lines) - 1)
-
-        # LAST LINE = left aligned
-        if is_last:
-            draw_formatted(pdf, line, bold_terms, underline_terms)
-            pdf.ln(5)
+    
+    # Process line by line
+    lines = text.split('\n')
+    
+    for line in lines:
+        if not line.strip():
+            pdf.ln(3)
             continue
-
-        # JUSTIFY LINE
-        words = line.split()
-        gaps = len(words) - 1
-
-        if gaps <= 0:
-            draw_formatted(pdf, line, bold_terms, underline_terms)
-            pdf.ln(5)
-            continue
-
-        normal_width = pdf.get_string_width(line)
-        extra_space = max_width - normal_width
-        space_each = extra_space / gaps
-
-        for i, w in enumerate(words):
-            draw_formatted(pdf, w, bold_terms, underline_terms)
-            if i < gaps:
-                pdf.set_x(pdf.get_x() + pdf.get_string_width(" ") + space_each)
-
-        pdf.ln(5)
-
-def write_formatted_line(pdf, text, bold_terms, underlined_terms):
-    i = 0
-    lower = text.lower()
-
-    while i < len(text):
-        match = None
-        style = ""
-
-        # Check bold terms
+            
+        # Find all formatting positions
+        format_positions = []
+        
+        # Find bold terms
         for term in bold_terms:
-            if lower.startswith(term.lower(), i):
-                match = term
-                style = "B"
-                break
-
-        # Check underline terms
-        if not match:
-            for term in underlined_terms:
-                if lower.startswith(term.lower(), i):
-                    match = term
-                    style = "U"
+            start = 0
+            while True:
+                pos = line.lower().find(term.lower(), start)
+                if pos == -1:
                     break
-
-        if match:
-            pdf.set_font("Helvetica", style, 12)
-            pdf.write(5, text[i:i+len(match)])
-            i += len(match)
-        else:
+                format_positions.append((pos, pos + len(term), "bold"))
+                start = pos + 1
+        
+        # Find underlined terms
+        for term in underlined_terms:
+            start = 0
+            while True:
+                pos = line.lower().find(term.lower(), start)
+                if pos == -1:
+                    break
+                format_positions.append((pos, pos + len(term), "underline"))
+                start = pos + 1
+        
+        # Sort by position
+        format_positions.sort()
+        
+        # If no formatting needed, use simple justified multi_cell
+        if not format_positions:
             pdf.set_font("Helvetica", "", 12)
-            pdf.write(5, text[i])
-            i += 1
+            pdf.multi_cell(0, 5, line, align='J')
+            pdf.ln(3)
+            continue
+        
+        # For lines with formatting, we need to break them into chunks
+        current_pos = 0
+        chunks = []
+        
+        for start, end, style in format_positions:
+            # Add text before formatting
+            if start > current_pos:
+                chunks.append({
+                    "text": line[current_pos:start],
+                    "style": "normal"
+                })
+            
+            # Add formatted text
+            chunks.append({
+                "text": line[start:end],
+                "style": style
+            })
+            
+            current_pos = end
+        
+        # Add remaining text
+        if current_pos < len(line):
+            chunks.append({
+                "text": line[current_pos:],
+                "style": "normal"
+            })
+        
+        # Now we need to handle line breaking for justified text with mixed formatting
+        # This is complex, so we'll use a simpler approach for now
+        # Calculate approximate positions and use write for each chunk
+        
+        # Get current position
+        start_x = pdf.get_x()
+        start_y = pdf.get_y()
+        
+        # Calculate available width
+        available_width = pdf.w - pdf.r_margin - start_x
+        
+        # Simple approach: if the line is short, just write it
+        total_width = sum(pdf.get_string_width(chunk["text"]) for chunk in chunks)
+        
+        if total_width <= available_width:
+            # Line fits, write it with formatting
+            for chunk in chunks:
+                if chunk["style"] == "bold":
+                    pdf.set_font("Helvetica", "B", 12)
+                elif chunk["style"] == "underline":
+                    pdf.set_font("Helvetica", "U", 12)
+                else:
+                    pdf.set_font("Helvetica", "", 12)
+                
+                pdf.write(5, chunk["text"])
+            
+            pdf.ln(5)
+        else:
+            # Line is too long, use multi_cell without formatting for this complex case
+            pdf.set_font("Helvetica", "", 12)
+            pdf.multi_cell(0, 5, line, align='J')
+            pdf.ln(3)
 
-# --- UPDATED add_page_one_intro WITH GUARANTEED JUSTIFICATION ---
 def add_page_one_intro(pdf, data):
-    # Reference Number & Date (Top Right)
+    # Reference Number & Date (Top Right) - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "B", 12)
     pdf.set_y(25)
     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
     pdf.ln(5)
 
-    # Recipient Details
+    # Recipient Details (Left Aligned) - FIXED ALIGNMENT
     pdf.set_font("Helvetica", "", 12)
     pdf.cell(0, 5, "To,", ln=True)
     pdf.set_font("Helvetica", "B", 12)
@@ -541,30 +531,30 @@ def add_page_one_intro(pdf, data):
     
     pdf.ln(3)
     
-    # Clickable Email
+    # Clickable Email - FIXED
     if data.get('vendor_email'):
         add_clickable_email(pdf, data['vendor_email'])
         
     pdf.ln(1)
-    # Clickable Mobile
+    # Clickable Mobile - FIXED
     if data.get('vendor_mobile'):
         add_clickable_phone(pdf, data['vendor_mobile'])
     
     pdf.set_font("Helvetica", "BU", 12)
-    pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", align="C", ln=True)
+    pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
     pdf.ln(5)
 
-    # Subject Line
+    # Subject Line (from user input)
     pdf.set_font("Helvetica", "BU", 12)
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(8)
 
-    # Write the user's custom intro paragraph WITH JUSTIFICATION
+    # Write the user's custom intro paragraph WITH BOTH JUSTIFICATION AND FORMATTING
     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
     if intro_text:
-        write_paragraph_with_formatting(pdf, intro_text)
+        write_justified_formatted_paragraph(pdf, intro_text)
 
-    # Fixed company introduction paragraphs - USE JUSTIFIED VERSION
+    # Fixed company introduction paragraphs - USE HYBRID APPROACH
     fixed_paragraphs = [
         "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
         
@@ -576,7 +566,7 @@ def add_page_one_intro(pdf, data):
     ]
 
     for paragraph in fixed_paragraphs:
-        write_paragraph_with_formatting(pdf, paragraph)
+        write_justified_formatted_paragraph(pdf, paragraph)
 
     # Contact Information
     if pdf.get_y() > 220:

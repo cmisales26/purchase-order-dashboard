@@ -574,7 +574,6 @@ def add_page_one_intro(pdf, data):
         
         "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
     ]
-
     for paragraph in fixed_paragraphs:
         write_justified_paragraph_with_formatting(pdf, paragraph)
         # write_simple_justified_paragraph(pdf, paragraph)

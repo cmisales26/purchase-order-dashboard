@@ -9,8 +9,6 @@ import os
 from fpdf import FPDF, HTMLMixin
 import textwrap
 import html as _html 
-import io
-import re
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {
 
@@ -263,12 +261,8 @@ def get_next_sequence_number_invoice(invoice_number):
     return 1
 
 
-
-
-
-
-
-class QUOTATION_PDF(FPDF):
+# --- PDF Class for Two-Page Quotation (Matching Demo Format) ---
+class QUOTATION_PDF(FPDF, HTMLMixin):
     def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="CP"):
         super().__init__()
         self.set_auto_page_break(auto=True, margin=15)
@@ -277,7 +271,6 @@ class QUOTATION_PDF(FPDF):
         self.quotation_number = quotation_number
         self.quotation_date = quotation_date
         self.sales_person_code = sales_person_code
-        self.logo_path = None
         
     def sanitize_text(self, text):
         try:
@@ -286,7 +279,7 @@ class QUOTATION_PDF(FPDF):
             return text
 
     def header(self):
-        # Logo placement (top right)
+        # Logo placement (top right) - FIXED
         if hasattr(self, 'logo_path') and self.logo_path and os.path.exists(self.logo_path):
             try:
                 self.image(self.logo_path, x=155, y=8, w=50)
@@ -306,10 +299,14 @@ class QUOTATION_PDF(FPDF):
         self.set_font("Helvetica", "", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
-        # Make footer emails and phone clickable
+        # Make footer emails and phone clickable - FIXED OVERLAP
         self.set_text_color(0, 0, 255)  # Blue color for links
         
-        # Email and phone on same line
+        # Website link
+        # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
+        
+        # Email and phone on same line - FIXED
+        self.set_font("Helvetica", "U", 10)
         email_text = " info@cminfotech.com "
         phone_text = " +91 873 391 5721"
         
@@ -323,261 +320,650 @@ class QUOTATION_PDF(FPDF):
         start_x = (page_width - total_width) / 2 + self.l_margin
         
         self.set_x(start_x)
-        self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text.strip()}")
+        self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text}")
         self.cell(separator_width, 4, " | ", ln=0)
         self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
 
         self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
         
         self.set_text_color(0, 0, 0)  # Reset to black
+        # self.set_y(-8)
+        # self.set_font("Helvetica", "I", 7)
+        # self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
 
-    def write_justified_paragraph_with_formatting(self, text):
-        """Write paragraphs with full justification and bold/underline formatting"""
-        if not text:
-            return
-            
-        # Terms that should be BOLD
-        bold_terms = [
-            "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
-            "CM Infotech", "CMI"
-        ]
+# --- Page Content Generation Helpers ---
+
+def add_clickable_email(pdf, email, label="Email: "):
+    """Add clickable email with label - FIXED OVERLAP"""
+    pdf.set_font("Helvetica", "B", 12)
+    label_width = pdf.get_string_width(label)
+    pdf.cell(label_width, 4, label, ln=0)
+    
+    pdf.set_text_color(0, 0, 255)  # Blue for clickable
+    pdf.set_font("Helvetica", "", 12)
+    pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
+    pdf.set_text_color(0, 0, 0)  # Reset to black
+
+def add_clickable_phone(pdf, phone, label="Mobile: "):
+    """Add clickable phone number with label - FIXED OVERLAP"""
+    pdf.set_font("Helvetica", "B", 12)
+    label_width = pdf.get_string_width(label)
+    pdf.cell(label_width, 4, label, ln=0)
+    
+    pdf.set_text_color(0, 0, 255)  # Blue for clickable
+    pdf.set_font("Helvetica", "", 12)
+    # Remove spaces and + for tel link
+    tel_number = phone.replace(' ', '').replace('+', '')
+    pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
+    pdf.set_text_color(0, 0, 0)  # Reset to black
+
+def add_page_one_intro(pdf, data):
+    # Reference Number & Date (Top Right) - FIXED ALIGNMENT
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_y(25)
+    pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
+    pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
+    pdf.ln(5)
+
+    # Recipient Details (Left Aligned) - FIXED ALIGNMENT
+    pdf.set_font("Helvetica", "", 12)
+    pdf.cell(0, 5, "To,", ln=True)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
+    pdf.set_font("Helvetica", "", 12)
+    
+    # Address handling
+    pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
+    
+    pdf.ln(3)
+    
+    # Clickable Email - FIXED
+    if data.get('vendor_email'):
+        add_clickable_email(pdf, data['vendor_email'])
         
-        # Terms that should be UNDERLINED
-        under_terms = [
-            "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
-            "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
+    pdf.ln(1)
+    # Clickable Mobile - FIXED
+    if data.get('vendor_mobile'):
+        add_clickable_phone(pdf, data['vendor_mobile'])
+    
+    pdf.set_font("Helvetica", "BU", 12)
+    pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
+    pdf.ln(5)
+
+    # Subject Line (from user input)
+    pdf.set_font("Helvetica", "BU", 12)
+    pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
+    pdf.ln(5)
+
+def write_paragraph_html(self ,pdf, text: str) -> str:
+    """
+    Write ONE paragraph using HTML justification and inline <b>/<u> tags.
+    Use this only for the paragraph(s) you want HTML-justified.
+    """
+    if not text:
+        return
+
+    # Terms you want bold / underlined
+    bold_terms = [
+        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
+        "CM Infotech", "CMI"
+    ]
+    under_terms = [
+        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
+        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
+        "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+    ]
+
+    # Escape HTML special chars first
+    escaped = _html.escape(text)
+
+    # Replace long terms first to avoid overlapping replacements
+    bold_sorted = sorted(bold_terms, key=len, reverse=True)
+    under_sorted = sorted(under_terms, key=len, reverse=True)
+
+    # Replace bold terms (escaped)
+    for term in bold_sorted:
+        esc = _html.escape(term)
+        # Use a simple replace; since we operate on escaped text, repeated replacements won't re-match
+        escaped = escaped.replace(esc, f"<b>{esc}</b>")
+
+    # Replace underline terms
+    for term in under_sorted:
+        esc = _html.escape(term)
+        escaped = escaped.replace(esc, f"<u>{esc}</u>")
+
+    # Wrap with paragraph tag (justify). Use a small inline style for font-size.
+    return f'<p align="justify" style="font-family: Helvetica; font-size:12pt; margin:0 0 6pt 0;">{escaped}</p>'
+
+    # # Write as HTML
+    # pdf.write_html(html_par)
+    # # small spacing after
+    # pdf.ln(2)
+    
+# --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---
+def write_justified_paragraph_with_formatting(pdf, text):
+    """Write paragraphs with full justification using multi_cell"""
+    
+    # Set normal font first
+    pdf.set_font("Helvetica", "", 12)
+    pdf.set_text_color(0, 0, 0)
+    
+    # For paragraphs that need mixed formatting, we'll use a hybrid approach
+    paragraphs = text.split('\n')
+    
+    for paragraph in paragraphs:
+        paragraph = paragraph.strip()
+        if not paragraph:
+            pdf.ln(3)
+            continue
+            
+        # Check if this paragraph contains formatting terms
+        bold_terms = ["Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CMI"]
+        underlined_terms = [
+            "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
+            "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
         ]
         
-        # Check if text needs formatting
-        needs_formatting = any(term in text for term in bold_terms + under_terms)
+        has_formatting = any(term in paragraph for term in bold_terms + underlined_terms)
         
-        if not needs_formatting:
-            # Simple justified text without formatting
-            self.set_font("Helvetica", "", 12)
-            self.multi_cell(0, 5, text, align='J')
-            self.ln(3)
-            return
-        
-        # For text with formatting, we need to process it word by word
-        words = text.split()
-        current_line = []
-        line_width = 0
-        max_width = self.w - self.l_margin - self.r_margin
-        
-        for word in words:
-            # Check if word needs formatting
-            word_needs_bold = any(term.lower() in word.lower() for term in bold_terms)
-            word_needs_underline = any(term.lower() in word.lower() for term in under_terms)
-            
-            # Set appropriate font for width calculation
-            if word_needs_bold and word_needs_underline:
-                self.set_font("Helvetica", "BU", 12)
-            elif word_needs_bold:
-                self.set_font("Helvetica", "B", 12)
-            elif word_needs_underline:
-                self.set_font("Helvetica", "U", 12)
-            else:
-                self.set_font("Helvetica", "", 12)
-            
-            word_width = self.get_string_width(word + " ")
-            
-            if line_width + word_width <= max_width:
-                current_line.append((word, word_needs_bold, word_needs_underline))
-                line_width += word_width
-            else:
-                # Write the current line with formatting
-                self._write_formatted_line(current_line, max_width)
-                self.ln(5)
-                # Start new line
-                current_line = [(word, word_needs_bold, word_needs_underline)]
-                line_width = word_width
-        
-        # Write the last line
-        if current_line:
-            self._write_formatted_line(current_line, max_width)
-            self.ln(5)
-        
-        self.ln(3)
-
-    def _write_formatted_line(self, line_items, max_width):
-        """Write a single line with mixed formatting and justification"""
-        if not line_items:
-            return
-            
-        # Calculate total width of the line
-        total_width = 0
-        for word, bold, underline in line_items:
-            if bold and underline:
-                self.set_font("Helvetica", "BU", 12)
-            elif bold:
-                self.set_font("Helvetica", "B", 12)
-            elif underline:
-                self.set_font("Helvetica", "U", 12)
-            else:
-                self.set_font("Helvetica", "", 12)
-            total_width += self.get_string_width(word + " ")
-        
-        # Calculate extra space for justification
-        extra_space = 0
-        if len(line_items) > 1:
-            extra_space = (max_width - total_width) / (len(line_items) - 1)
-        
-        # Write the line with justification
-        x_start = self.get_x()
-        y_start = self.get_y()
-        
-        for i, (word, bold, underline) in enumerate(line_items):
-            # Set appropriate font
-            if bold and underline:
-                self.set_font("Helvetica", "BU", 12)
-            elif bold:
-                self.set_font("Helvetica", "B", 12)
-            elif underline:
-                self.set_font("Helvetica", "U", 12)
-            else:
-                self.set_font("Helvetica", "", 12)
-            
-            # Add space between words (except first word)
-            if i > 0:
-                # Add normal space plus extra space for justification
-                space_width = self.get_string_width(" ") + extra_space
-                self.set_x(self.get_x() + space_width)
-            
-            # Write the word
-            self.write(5, word)
-        
-        # Move to next line position
-        self.set_xy(x_start, y_start + 5)
-
-    def write_paragraphs(self, text_or_list):
-        """Write multiple paragraphs with formatting"""
-        if isinstance(text_or_list, (list, tuple)):
-            for p in text_or_list:
-                self.write_justified_paragraph_with_formatting(p)
+        if has_formatting:
+            # Use the original method for paragraphs with formatting
+            write_simple_formatted_paragraph(pdf, paragraph)
         else:
-            for p in str(text_or_list).replace("\r", "").split("\n"):
-                p = p.strip()
-                if p:
-                    self.write_justified_paragraph_with_formatting(p)
-                else:
-                    # keep blank line
-                    self.ln(6)
-
-    def add_clickable_email(self, email, label="Email: "):
-        """Add clickable email with label"""
-        self.set_font("Helvetica", "B", 12)
-        label_width = self.get_string_width(label)
-        self.cell(label_width, 5, label, ln=0)
+            # Use multi_cell for clean justified text
+            pdf.multi_cell(0, 5, paragraph, align='J')
         
-        self.set_text_color(0, 0, 255)  # Blue for clickable
-        self.set_font("Helvetica", "", 12)
-        self.cell(0, 5, email, ln=True, link=f"mailto:{email}")
-        self.set_text_color(0, 0, 0)  # Reset to black
+        pdf.ln(3)
 
-    def add_clickable_phone(self, phone, label="Mobile: "):
-        """Add clickable phone number with label"""
-        self.set_font("Helvetica", "B", 12)
-        label_width = self.get_string_width(label)
-        self.cell(label_width, 5, label, ln=0)
+def write_simple_formatted_paragraph(pdf, text):
+    """Simple method for paragraphs with mixed formatting"""
+    
+    # Terms that should be BOLD
+    bold_terms = [
+        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
+    ]
+    
+    # Terms that should be UNDERLINED (software partnership list)
+    underlined_terms = [
+        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
+        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
+        "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+    ]
+    
+    # Process line by line
+    lines = text.split('\n')
+    
+    for line in lines:
+        if line.strip():
+            current_pos = 0
+            format_positions = []
+            
+            # Find bold terms
+            for term in bold_terms:
+                start = 0
+                while True:
+                    pos = line.lower().find(term.lower(), start)
+                    if pos == -1:
+                        break
+                    format_positions.append((pos, pos + len(term), "bold"))
+                    start = pos + 1
+            
+            # Find underlined terms
+            for term in underlined_terms:
+                start = 0
+                while True:
+                    pos = line.lower().find(term.lower(), start)
+                    if pos == -1:
+                        break
+                    format_positions.append((pos, pos + len(term), "underline"))
+                    start = pos + 1
+            
+            # Sort by position
+            format_positions.sort()
+            
+            # Write the line with formatting
+            current_pos = 0
+            for start, end, style in format_positions:
+                # Write text before formatting
+                if start > current_pos:
+                    pdf.set_font("Helvetica", "", 12)
+                    pdf.write(5, line[current_pos:start])
+                
+                # Write formatted text
+                formatted_text = line[start:end]
+                if style == "bold":
+                    pdf.set_font("Helvetica", "B", 12)
+                else:  # underline
+                    pdf.set_font("Helvetica", "BU", 12)
+                pdf.write(5, formatted_text)
+                
+                current_pos = end
+            
+            # Write remaining text
+            if current_pos < len(line):
+                pdf.set_font("Helvetica", "", 12)
+                pdf.write(5, line[current_pos:])
+            
+            pdf.ln(5)
         
-        self.set_text_color(0, 0, 255)  # Blue for clickable
-        self.set_font("Helvetica", "", 12)
-        # Remove spaces and + for tel link
-        tel_number = phone.replace(' ', '').replace('+', '')
-        self.cell(0, 5, phone, ln=True, link=f"tel:{tel_number}")
-        self.set_text_color(0, 0, 0)  # Reset to black
+        pdf.ln(2)
 
-    def add_page_one_intro(self, data: dict):
-        """Write page one intro content"""
-        self.add_page()
+# --- EVEN SIMPLER APPROACH: Use multi_cell for everything ---
+def write_simple_justified_paragraph(pdf, text):
+    """Ultra-simple justified paragraphs using multi_cell"""
+    pdf.set_font("Helvetica", "", 12)
+    pdf.set_text_color(0, 0, 0)
+    
+    paragraphs = text.split('\n')
+    
+    for paragraph in paragraphs:
+        paragraph = paragraph.strip()
+        if paragraph:
+            # Use multi_cell with justification
+            pdf.multi_cell(0, 5, paragraph, align='J')
+            pdf.ln(3)
 
-        # Top refs
-        self.set_font("Helvetica", "B", 12)
-        self.set_y(25)
-        self.cell(0, 5, f"REF NO.: {data.get('quotation_number', '')}", ln=True, align="L")
-        self.cell(0, 5, f"Date: {data.get('quotation_date', '')}", ln=True, align="L")
-        self.ln(5)
 
-        # Recipient
-        self.set_font("Helvetica", "", 12)
-        self.cell(0, 5, "To,", ln=True)
-        self.set_font("Helvetica", "B", 12)
-        self.cell(0, 6, self.sanitize_text(data.get('vendor_name', '')), ln=True)
-        self.set_font("Helvetica", "", 12)
-        self.multi_cell(0, 4, self.sanitize_text(data.get('vendor_address', '')))
-        self.ln(3)
 
-        # Clickable contact
-        if data.get('vendor_email'):
-            self.add_clickable_email(data['vendor_email'])
-        if data.get('vendor_mobile'):
-            self.ln(1)
-            self.add_clickable_phone(data['vendor_mobile'])
 
-        # Kind Attention & Subject
-        self.set_font("Helvetica", "BU", 12)
-        self.cell(0, 5, f"Kind Attention :- {self.sanitize_text(data.get('vendor_contact',''))}", align="C", ln=True)
-        self.ln(5)
-        self.set_font("Helvetica", "BU", 12)
-        self.cell(0, 6, f"Subject :- {self.sanitize_text(data.get('subject',''))}", ln=True)
-        self.ln(8)
+def write_paragraph_html(self, text: str):
+    """
+    Write a paragraph using HTML justification and automatic keyword formatting.
+    Call this for every paragraph you want justified and formatted.
+    """
+    if text is None:
+        return
+        html_par = self._build_html_paragraph(text)
+        # write_html will render the paragraph with justification and inline tags
+        self.write_html(html_par)
+        # small spacing after write_html
+        self.ln(2)
 
-        # Intro paragraph(s) and fixed paragraphs
-        intro_text = data.get("intro_paragraph", "")
-        if intro_text:
-            self.write_paragraphs(intro_text)
+    # Convenience: write many paragraphs (list or multi-line string)
+def write_paragraphs(self, text_or_list):
+    if isinstance(text_or_list, (list, tuple)):
+        for p in text_or_list:
+            self.write_paragraph_html(p)
+    else:
+        for p in str(text_or_list).replace("\r", "").split("\n"):
+            p = p.strip()
+            if p:
+                self.write_paragraph_html(p)
+            else:
+                # keep blank line
+                self.ln(6)
 
-        fixed_paragraphs = [
-            "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
-            "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
-            "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
-            "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
-        ]
 
-        self.write_paragraphs(fixed_paragraphs)
 
-        # Contact information block
-        if self.get_y() > 220:
-            self.add_page()
 
-        self.set_font("Helvetica", "", 12)
-        self.set_text_color(0, 0, 0)
-        contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
-        self.write(5, contact_text)
+# --- UPDATED add_page_one_intro function ---
+def add_page_one_intro(pdf, data):
+    # Reference Number & Date (Top Right)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_y(25)
+    pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
+    pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
+    pdf.ln(5)
 
-        sales_person_code = data.get('sales_person_code', 'SD')
-        sp = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+    # Recipient Details
+    pdf.set_font("Helvetica", "", 12)
+    pdf.cell(0, 5, "To,", ln=True)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
+    pdf.set_font("Helvetica", "", 12)
+    
+    # Address handling
+    pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
+    
+    pdf.ln(3)
+    
+    # Clickable Email
+    if data.get('vendor_email'):
+        add_clickable_email(pdf, data['vendor_email'])
+        
+    pdf.ln(1)
+    # Clickable Mobile
+    if data.get('vendor_mobile'):
+        add_clickable_phone(pdf, data['vendor_mobile'])
+    
+    pdf.set_font("Helvetica", "BU", 12)
+    pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", align="C", ln=True)
+    pdf.ln(5)
 
-        self.set_text_color(0, 0, 255)
-        self.set_font("Helvetica", "U", 12)
-        self.write(5, sp['email'], link=f"mailto:{sp['email']}")
+    # Subject Line
+    pdf.set_font("Helvetica", "BU", 12)
+    pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
+    pdf.ln(8)  # Increased spacing
 
-        self.set_text_color(0, 0, 0)
-        self.set_font("Helvetica", "", 12)
-        self.write(5, "  Mobile: ")
+    # Write the user's custom intro paragraph
+    intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
+    if intro_text:
+        write_simple_justified_paragraph(pdf, intro_text)
 
-        self.set_text_color(0, 0, 255)
-        self.set_font("Helvetica", "U", 12)
-        self.write(5, sp['mobile'], link=f"tel:{sp['mobile'].replace(' ', '').replace('+', '')}")
+    # Fixed company introduction paragraphs - USE THE SIMPLE VERSION
+    fixed_paragraphs = [
+        "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
+        
+        "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
+        
+        "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
+        
+        "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
+    ]
 
-        self.ln(10)
+    for paragraph in fixed_paragraphs:
+        # write_justified_paragraph_with_formatting(pdf, paragraph)
+        # write_simple_justified_paragraph(pdf, paragraph)
+        write_paragraph_html(pdf,paragraph)
+        pdf.ln(3)  # Add space between paragraphs
 
-        # Social / website links (each on its own line)
-        self.set_font("Helvetica", "", 12)
-        self.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-        self.set_text_color(0, 0, 255)
-        self.set_font("Helvetica", "U", 12)
-        links = [
-            "https://www.cminfotech.com/",
-            "https://www.linkedin.com/",
-            "https://wa.me/918733915721",
-            "https://www.facebook.com/",
-            "https://www.instagram.com/"
-        ]
-        for link in links:
-            self.cell(0, 4, link, ln=True, link=link)
-        self.set_text_color(0, 0, 0)
+    # Contact Information - MAKE SURE WE HAVE ENOUGH SPACE
+    # Check if we need a new page
+    if pdf.get_y() > 220:  # If we're too low on the page
+        pdf.add_page()
+    
+    pdf.set_font("Helvetica", "", 12)
+    pdf.set_text_color(0, 0, 0)
+
+    # Normal text - make sure it's complete
+    contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
+    pdf.write(5, contact_text)
+
+    # Get sales person info dynamically
+    sales_person_code = data.get('sales_person_code', 'SD')
+    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+    
+    # Email clickable - DYNAMIC from sales person
+    pdf.set_text_color(0, 0, 255)
+    pdf.set_font("Helvetica", "U", 12)
+    pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
+
+    # Back to normal for separator + Mobile:
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Helvetica", "", 12)
+    pdf.write(5, "  Mobile: ")
+
+    # Mobile clickable - DYNAMIC from sales person
+    pdf.set_text_color(0, 0, 255)
+    pdf.set_font("Helvetica", "U", 12)
+    pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+
+    pdf.ln(10)  # Add space after contact info
+    pdf.set_text_color(0, 0, 0)
+    # Continue with the rest of your contact information...
+    pdf.set_font("Helvetica", "", 12)
+    pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
+    pdf.set_font("Helvetica", "", 12)
+    
+    # Clickable website - RIGHT ALIGNED
+    pdf.set_font("Helvetica", "U", 12)
+    pdf.set_text_color(0, 0, 255)
+
+    # Calculate the width needed for the longest link
+    links = [
+        "https://www.cminfotech.com/",
+        "https://www.linkedin.com/", 
+        "https://wa.me/918733915721",
+        "https://www.facebook.com/",
+        "https://www.instagram.com/"
+    ]
+
+    # Get the maximum width
+    max_link_width = max(pdf.get_string_width(link) for link in links)
+
+    # Set right margin position
+    right_margin = pdf.w - pdf.r_margin
+
+    # Print each link aligned to the right
+    for link in links:
+        # Calculate x position to right-align
+        x_position = right_margin - max_link_width
+        pdf.set_x(x_position)
+        pdf.cell(max_link_width, 4, link, ln=True, link=link)
+
+    pdf.set_text_color(0, 0, 0)
+
+# def write_justified_formatted_paragraph(pdf, text):
+#     """Write paragraphs with both justification and formatting (bold/underline)"""
+    
+#     # Terms that should be BOLD
+#     bold_terms = [
+#         "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
+#     ]
+    
+#     # Terms that should be UNDERLINED (software partnership list)
+#     underlined_terms = [
+#         "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
+#         "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
+#         "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+#     ]
+    
+#     # Process line by line
+#     lines = text.split('\n')
+    
+#     for line in lines:
+#         if not line.strip():
+#             pdf.ln(3)
+#             continue
+            
+#         # Find all formatting positions
+#         format_positions = []
+        
+#         # Find bold terms
+#         for term in bold_terms:
+#             start = 0
+#             while True:
+#                 pos = line.lower().find(term.lower(), start)
+#                 if pos == -1:
+#                     break
+#                 format_positions.append((pos, pos + len(term), "bold"))
+#                 start = pos + 1
+        
+#         # Find underlined terms
+#         for term in underlined_terms:
+#             start = 0
+#             while True:
+#                 pos = line.lower().find(term.lower(), start)
+#                 if pos == -1:
+#                     break
+#                 format_positions.append((pos, pos + len(term), "underline"))
+#                 start = pos + 1
+        
+#         # Sort by position
+#         format_positions.sort()
+        
+#         # If no formatting needed, use simple justified multi_cell
+#         if not format_positions:
+#             pdf.set_font("Helvetica", "", 12)
+#             pdf.multi_cell(0, 5, line, align='J')
+#             pdf.ln(3)
+#             continue
+        
+#         # For lines with formatting, we need to break them into chunks
+#         current_pos = 0
+#         chunks = []
+        
+#         for start, end, style in format_positions:
+#             # Add text before formatting
+#             if start > current_pos:
+#                 chunks.append({
+#                     "text": line[current_pos:start],
+#                     "style": "normal"
+#                 })
+            
+#             # Add formatted text
+#             chunks.append({
+#                 "text": line[start:end],
+#                 "style": style
+#             })
+            
+#             current_pos = end
+        
+#         # Add remaining text
+#         if current_pos < len(line):
+#             chunks.append({
+#                 "text": line[current_pos:],
+#                 "style": "normal"
+#             })
+        
+#         # Now we need to handle line breaking for justified text with mixed formatting
+#         # This is complex, so we'll use a simpler approach for now
+#         # Calculate approximate positions and use write for each chunk
+        
+#         # Get current position
+#         start_x = pdf.get_x()
+#         start_y = pdf.get_y()
+        
+#         # Calculate available width
+#         available_width = pdf.w - pdf.r_margin - start_x
+        
+#         # Simple approach: if the line is short, just write it
+#         total_width = sum(pdf.get_string_width(chunk["text"]) for chunk in chunks)
+        
+#         if total_width <= available_width:
+#             # Line fits, write it with formatting
+#             for chunk in chunks:
+#                 if chunk["style"] == "bold":
+#                     pdf.set_font("Helvetica", "B", 12)
+#                 elif chunk["style"] == "underline":
+#                     pdf.set_font("Helvetica", "U", 12)
+#                 else:
+#                     pdf.set_font("Helvetica", "", 12)
+                
+#                 pdf.write(5, chunk["text"])
+            
+#             pdf.ln(5)
+#         else:
+#             # Line is too long, use multi_cell without formatting for this complex case
+#             pdf.set_font("Helvetica", "", 12)
+#             pdf.multi_cell(0, 5, line, align='J')
+#             pdf.ln(3)
+
+# def add_page_one_intro(pdf, data):
+#     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
+#     pdf.set_font("Helvetica", "B", 12)
+#     pdf.set_y(25)
+#     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
+#     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
+#     pdf.ln(5)
+
+#     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
+#     pdf.set_font("Helvetica", "", 12)
+#     pdf.cell(0, 5, "To,", ln=True)
+#     pdf.set_font("Helvetica", "B", 12)
+#     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
+#     pdf.set_font("Helvetica", "", 12)
+    
+#     # Address handling
+#     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
+    
+#     pdf.ln(3)
+    
+#     # Clickable Email - FIXED
+#     if data.get('vendor_email'):
+#         add_clickable_email(pdf, data['vendor_email'])
+        
+#     pdf.ln(1)
+#     # Clickable Mobile - FIXED
+#     if data.get('vendor_mobile'):
+#         add_clickable_phone(pdf, data['vendor_mobile'])
+    
+#     pdf.set_font("Helvetica", "BU", 12)
+#     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
+#     pdf.ln(5)
+
+#     # Subject Line (from user input)
+#     pdf.set_font("Helvetica", "BU", 12)
+#     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
+#     pdf.ln(8)
+
+#     # Write the user's custom intro paragraph WITH BOTH JUSTIFICATION AND FORMATTING
+#     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
+#     if intro_text:
+#         write_justified_formatted_paragraph(pdf, intro_text)
+
+#     # Fixed company introduction paragraphs - USE HYBRID APPROACH
+#     fixed_paragraphs = [
+#         "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
+        
+#         "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
+        
+#         "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
+        
+#         "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
+#     ]
+
+#     for paragraph in fixed_paragraphs:
+#         write_justified_formatted_paragraph(pdf, paragraph)
+
+#     # Contact Information
+#     if pdf.get_y() > 220:
+#         pdf.add_page()
+    
+#     pdf.set_font("Helvetica", "", 12)
+#     pdf.set_text_color(0, 0, 0)
+
+#     # Contact text - Use write for clickable links
+#     contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
+#     pdf.write(5, contact_text)
+
+#     # Get sales person info dynamically
+#     sales_person_code = data.get('sales_person_code', 'SD')
+#     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+    
+#     # Email clickable
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.set_font("Helvetica", "U", 12)
+#     pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
+
+#     # Mobile
+#     pdf.set_text_color(0, 0, 0)
+#     pdf.set_font("Helvetica", "", 12)
+#     pdf.write(5, "  Mobile: ")
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.set_font("Helvetica", "U", 12)
+#     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+
+#     pdf.ln(10)
+    
+#     # Rest of contact information...
+#     pdf.set_font("Helvetica", "", 12)
+#     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
+    
+#     # Clickable website links
+#     pdf.set_font("Helvetica", "U", 12)
+#     pdf.set_text_color(0, 0, 255)
+
+#     links = [
+#         "https://www.cminfotech.com/",
+#         "https://www.linkedin.com/", 
+#         "https://wa.me/8733915721",
+#         "https://www.facebook.com/",
+#         "https://www.instagram.com/"
+#     ]
+
+#     max_link_width = max(pdf.get_string_width(link) for link in links)
+#     right_margin = pdf.w - pdf.r_margin
+
+#     for link in links:
+#         x_position = right_margin - max_link_width
+#         pdf.set_x(x_position)
+#         pdf.cell(max_link_width, 4, link, ln=True, link=link)
+
+#     pdf.set_text_color(0, 0, 0)
+
+
+#    # Clickable website
+#     pdf.set_font("Helvetica", "U", 12)
+#     pdf.set_text_color(0, 0, 255)
+#     pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, align="R", link="https://www.cminfotech.com/")
+#     pdf.cell(0, 4, "https://www.linkedin.com/", ln=True,align="R", link="https://www.linkedin.com/")
+#     pdf.cell(0, 4, "https://wa.me/8733915721", ln=True, align="R",link="https://wa.me/918733915721")
+#     pdf.cell(0, 4, "https://www.facebook.com/", ln=True,align="R", link="https://www.facebook.com/")
+#     pdf.cell(0, 4, "https://www.instagram.com/", ln=True, align="R",link="https://www.instagram.com/")
+#     pdf.set_text_color(0, 0, 0)
+
 
 def add_quotation_header(pdf, annexure_text, quotation_text):
     """Add dynamic quotation header with both annexure and title"""
@@ -596,8 +982,8 @@ def add_page_two_commercials(pdf, data):
     
     add_quotation_header(pdf, annexure_text, quotation_title)
 
-    # --- Products Table - FIXED COLUMN WIDTHS ---
-    col_widths = [70, 25, 25, 25, 15, 25]
+    # --- Products Table - FIXED COLUMN WIDTHS (Wider Description) ---
+    col_widths = [70, 25, 25, 25, 15, 25]  # Increased Description from 70 to 100
     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
     
     # Table Header
@@ -811,7 +1197,7 @@ def add_page_two_commercials(pdf, data):
         try:
             # Position stamp centered between "For CM INFOTECH" and sales person name
             stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
-            stamp_x = x_start + col1_width + padding
+            stamp_x = x_start + col1_width + padding# + (col2_width - 2*padding - 20) / 2  # Center the stamp
             pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
             # Move cursor down after stamp
             pdf.set_y(stamp_y + 25)  # Space for stamp + some padding
@@ -853,6 +1239,7 @@ def add_page_two_commercials(pdf, data):
     # Move cursor below the box
     pdf.set_xy(x_start, y_start + box_height + 10)
 
+    
 def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
     """Orchestrates the creation of the two-page PDF."""
     sales_person_code = quotation_data.get('sales_person_code', 'SD')
@@ -866,8 +1253,10 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
     
     quotation_data['stamp_path'] = stamp_path
 
+    pdf.add_page()
+    
     # 1. Add Page 1 (Introduction Letter)
-    pdf.add_page_one_intro(quotation_data)
+    add_page_one_intro(pdf, quotation_data)
 
     # 2. Add Page 2 (Commercials, Terms, Bank Details)
     add_page_two_commercials(pdf, quotation_data)
@@ -892,1150 +1281,10 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
             pdf.output(dest=buffer)
             return buffer.getvalue()
         except Exception as e:
-            print(f"PDF generation failed: {e}")
+            st.error(f"PDF generation failed: {e}")
             return b""
 
-
-
-
-
-
-# # --- PDF Class for Two-Page Quotation (Matching Demo Format) ---
-# class QUOTATION_PDF(FPDF, HTMLMixin):
-#     def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="CP"):
-#         super().__init__()
-#         self.set_auto_page_break(auto=True, margin=15)
-#         self.set_left_margin(15)
-#         self.set_right_margin(15)
-#         self.quotation_number = quotation_number
-#         self.quotation_date = quotation_date
-#         self.sales_person_code = sales_person_code
-        
-#     def sanitize_text(self, text):
-#         try:
-#             return text.encode('latin-1', 'ignore').decode('latin-1')
-#         except:
-#             return text
-
-#     def header(self):
-#         # Logo placement (top right) - FIXED
-#         if hasattr(self, 'logo_path') and self.logo_path and os.path.exists(self.logo_path):
-#             try:
-#                 self.image(self.logo_path, x=155, y=8, w=50)
-#             except:
-#                 # If image fails, show placeholder
-#                 self.set_font("Helvetica", "B", 10)
-#                 self.set_xy(150, 8)
-#                 self.cell(40, 5, "[LOGO]", border=0, align="C")
-            
-#         # Main Title (Centered)
-#         self.set_font("Helvetica", "B", 16)
-#         self.set_y(15)
-#         self.ln(5)
-
-#     def footer(self):
-#         self.set_y(-18)
-#         self.set_font("Helvetica", "", 10)
-#         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-        
-#         # Make footer emails and phone clickable - FIXED OVERLAP
-#         self.set_text_color(0, 0, 255)  # Blue color for links
-        
-#         # Website link
-#         # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
-        
-#         # Email and phone on same line - FIXED
-#         self.set_font("Helvetica", "U", 10)
-#         email_text = " info@cminfotech.com "
-#         phone_text = " +91 873 391 5721"
-        
-#         # Calculate positions for proper alignment
-#         page_width = self.w - 2 * self.l_margin
-#         email_width = self.get_string_width(email_text)
-#         phone_width = self.get_string_width(phone_text)
-#         separator_width = self.get_string_width(" | ")
-        
-#         total_width = email_width + separator_width + phone_width
-#         start_x = (page_width - total_width) / 2 + self.l_margin
-        
-#         self.set_x(start_x)
-#         self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text}")
-#         self.cell(separator_width, 4, " | ", ln=0)
-#         self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
-
-#         self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
-        
-#         self.set_text_color(0, 0, 0)  # Reset to black
-#         # self.set_y(-8)
-#         # self.set_font("Helvetica", "I", 7)
-#         # self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
-
-# # --- Page Content Generation Helpers ---
-
-#     def add_clickable_email(pdf, email, label="Email: "):
-#         """Add clickable email with label - FIXED OVERLAP"""
-#         pdf.set_font("Helvetica", "B", 12)
-#         label_width = pdf.get_string_width(label)
-#         pdf.cell(label_width, 4, label, ln=0)
-        
-#         pdf.set_text_color(0, 0, 255)  # Blue for clickable
-#         pdf.set_font("Helvetica", "", 12)
-#         pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
-#         pdf.set_text_color(0, 0, 0)  # Reset to black
-
-#     def add_clickable_phone(pdf, phone, label="Mobile: "):
-#         """Add clickable phone number with label - FIXED OVERLAP"""
-#         pdf.set_font("Helvetica", "B", 12)
-#         label_width = pdf.get_string_width(label)
-#         pdf.cell(label_width, 4, label, ln=0)
-        
-#         pdf.set_text_color(0, 0, 255)  # Blue for clickable
-#         pdf.set_font("Helvetica", "", 12)
-#         # Remove spaces and + for tel link
-#         tel_number = phone.replace(' ', '').replace('+', '')
-#         pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
-#         pdf.set_text_color(0, 0, 0)  # Reset to black
-
-#     def add_page_one_intro(pdf, data):
-#         # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-#         pdf.set_font("Helvetica", "B", 12)
-#         pdf.set_y(25)
-#         pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
-#         pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
-#         pdf.ln(5)
-
-#         # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-#         pdf.set_font("Helvetica", "", 12)
-#         pdf.cell(0, 5, "To,", ln=True)
-#         pdf.set_font("Helvetica", "B", 12)
-#         pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-#         pdf.set_font("Helvetica", "", 12)
-        
-#         # Address handling
-#         pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
-        
-#         pdf.ln(3)
-        
-#         # Clickable Email - FIXED
-#         if data.get('vendor_email'):
-#             add_clickable_email(pdf, data['vendor_email'])
-            
-#         pdf.ln(1)
-#         # Clickable Mobile - FIXED
-#         if data.get('vendor_mobile'):
-#             add_clickable_phone(pdf, data['vendor_mobile'])
-        
-#         pdf.set_font("Helvetica", "BU", 12)
-#         pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
-#         pdf.ln(5)
-
-#         # Subject Line (from user input)
-#         pdf.set_font("Helvetica", "BU", 12)
-#         pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
-#         pdf.ln(5)
-
-#     def write_paragraph_html(self ,pdf, text: str) -> str:
-#         """
-#         Write ONE paragraph using HTML justification and inline <b>/<u> tags.
-#         Use this only for the paragraph(s) you want HTML-justified.
-#         """
-#         if not text:
-#             return
-
-#         # Terms you want bold / underlined
-#         bold_terms = [
-#             "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
-#             "CM Infotech", "CMI"
-#         ]
-#         under_terms = [
-#             "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
-#             "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
-#             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-#         ]
-
-#         # Escape HTML special chars first
-#         escaped = _html.escape(text)
-
-#         # Replace long terms first to avoid overlapping replacements
-#         bold_sorted = sorted(bold_terms, key=len, reverse=True)
-#         under_sorted = sorted(under_terms, key=len, reverse=True)
-
-#         # Replace bold terms (escaped)
-#         for term in bold_sorted:
-#             esc = _html.escape(term)
-#             # Use a simple replace; since we operate on escaped text, repeated replacements won't re-match
-#             escaped = escaped.replace(esc, f"<b>{esc}</b>")
-
-#         # Replace underline terms
-#         for term in under_sorted:
-#             esc = _html.escape(term)
-#             escaped = escaped.replace(esc, f"<u>{esc}</u>")
-
-#         # Wrap with paragraph tag (justify). Use a small inline style for font-size.
-#         return f'<p align="justify" style="font-family: Helvetica; font-size:12pt; margin:0 0 6pt 0;">{escaped}</p>'
-
-#         # # Write as HTML
-#         # pdf.write_html(html_par)
-#         # # small spacing after
-#         # pdf.ln(2)
-        
-#     # --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---
-#     def write_justified_paragraph_with_formatting(pdf, text):
-#         """Write paragraphs with full justification using multi_cell"""
-        
-#         # Set normal font first
-#         pdf.set_font("Helvetica", "", 12)
-#         pdf.set_text_color(0, 0, 0)
-        
-#         # For paragraphs that need mixed formatting, we'll use a hybrid approach
-#         paragraphs = text.split('\n')
-        
-#         for paragraph in paragraphs:
-#             paragraph = paragraph.strip()
-#             if not paragraph:
-#                 pdf.ln(3)
-#                 continue
-                
-#             # Check if this paragraph contains formatting terms
-#             bold_terms = ["Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CMI"]
-#             underlined_terms = [
-#                 "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
-#                 "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
-#                 "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-#             ]
-            
-#             has_formatting = any(term in paragraph for term in bold_terms + underlined_terms)
-            
-#             if has_formatting:
-#                 # Use the original method for paragraphs with formatting
-#                 write_justified_paragraph_with_formatting(pdf, paragraph)
-                
-#             else:
-#                 # Use multi_cell for clean justified text
-#                 pdf.multi_cell(0, 5, paragraph, align='J')
-            
-#             pdf.ln(3)
-
-#     def write_simple_formatted_paragraph(pdf, text):
-#         """Simple method for paragraphs with mixed formatting"""
-        
-#         # Terms that should be BOLD
-#         bold_terms = [
-#             "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
-#         ]
-        
-#         # Terms that should be UNDERLINED (software partnership list)
-#         underlined_terms = [
-#             "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
-#             "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
-#             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-#         ]
-        
-#         # Process line by line
-#         lines = text.split('\n')
-        
-#         for line in lines:
-#             if line.strip():
-#                 current_pos = 0
-#                 format_positions = []
-                
-#                 # Find bold terms
-#                 for term in bold_terms:
-#                     start = 0
-#                     while True:
-#                         pos = line.lower().find(term.lower(), start)
-#                         if pos == -1:
-#                             break
-#                         format_positions.append((pos, pos + len(term), "bold"))
-#                         start = pos + 1
-                
-#                 # Find underlined terms
-#                 for term in underlined_terms:
-#                     start = 0
-#                     while True:
-#                         pos = line.lower().find(term.lower(), start)
-#                         if pos == -1:
-#                             break
-#                         format_positions.append((pos, pos + len(term), "underline"))
-#                         start = pos + 1
-                
-#                 # Sort by position
-#                 format_positions.sort()
-                
-#                 # Write the line with formatting
-#                 current_pos = 0
-#                 for start, end, style in format_positions:
-#                     # Write text before formatting
-#                     if start > current_pos:
-#                         pdf.set_font("Helvetica", "", 12)
-#                         pdf.write(5, line[current_pos:start])
-                    
-#                     # Write formatted text
-#                     formatted_text = line[start:end]
-#                     if style == "bold":
-#                         pdf.set_font("Helvetica", "B", 12)
-#                     else:  # underline
-#                         pdf.set_font("Helvetica", "BU", 12)
-#                     pdf.write(5, formatted_text)
-                    
-#                     current_pos = end
-                
-#                 # Write remaining text
-#                 if current_pos < len(line):
-#                     pdf.set_font("Helvetica", "", 12)
-#                     pdf.write(5, line[current_pos:])
-                
-#                 pdf.ln(5)
-            
-#             pdf.ln(2)
-
-#     # --- EVEN SIMPLER APPROACH: Use multi_cell for everything ---
-#     def write_simple_justified_paragraph(pdf, text):
-#         """Ultra-simple justified paragraphs using multi_cell"""
-#         pdf.set_font("Helvetica", "", 12)
-#         pdf.set_text_color(0, 0, 0)
-        
-#         paragraphs = text.split('\n')
-        
-#         for paragraph in paragraphs:
-#             paragraph = paragraph.strip()
-#             if paragraph:
-#                 # Use multi_cell with justification
-#                 pdf.multi_cell(0, 5, paragraph, align='J')
-#                 pdf.ln(3)
-
-
-
-
-#     def write_paragraph_html(self, text: str):
-#         """
-#         Write a paragraph using HTML justification and automatic keyword formatting.
-#         Call this for every paragraph you want justified and formatted.
-#         """
-#         if text is None:
-#             return
-#             html_par = self._build_html_paragraph(text)
-#             # write_html will render the paragraph with justification and inline tags
-#             self.write_html(html_par)
-#             # small spacing after write_html
-#             self.ln(2)
-
-#         # Convenience: write many paragraphs (list or multi-line string)
-#     def write_paragraphs(self, text_or_list):
-#         if isinstance(text_or_list, (list, tuple)):
-#             for p in text_or_list:
-#                 self.write_paragraph_html(p)
-#         else:
-#             for p in str(text_or_list).replace("\r", "").split("\n"):
-#                 p = p.strip()
-#                 if p:
-#                     self.write_paragraph_html(p)
-#                 else:
-#                     # keep blank line
-#                     self.ln(6)
-
-
-
-#     def add_page_one_intro(self, data: dict):
-#         """Write page one intro content (uses write_paragraphs for all paragraphs)."""
-#         self.add_page()
-
-#         # Top refs
-#         self.set_font("Helvetica", "B", 12)
-#         self.set_y(25)
-#         self.cell(0, 5, f"REF NO.: {data.get('quotation_number', '')}", ln=True, align="L")
-#         self.cell(0, 5, f"Date: {data.get('quotation_date', '')}", ln=True, align="L")
-#         self.ln(5)
-
-#         # Recipient
-#         self.set_font("Helvetica", "", 12)
-#         self.cell(0, 5, "To,", ln=True)
-#         self.set_font("Helvetica", "B", 12)
-#         self.cell(0, 6, self.sanitize_text(data.get('vendor_name', '')), ln=True)
-#         self.set_font("Helvetica", "", 12)
-#         self.multi_cell(0, 4, self.sanitize_text(data.get('vendor_address', '')))
-#         self.ln(3)
-
-#         # Clickable contact
-#         if data.get('vendor_email'):
-#             self.add_clickable_email(data['vendor_email'])
-#         if data.get('vendor_mobile'):
-#             self.ln(1)
-#             self.add_clickable_phone(data['vendor_mobile'])
-
-#         # Kind Attention & Subject
-#         self.set_font("Helvetica", "BU", 12)
-#         self.cell(0, 5, f"Kind Attention :- {self.sanitize_text(data.get('vendor_contact',''))}", align="C", ln=True)
-#         self.ln(5)
-#         self.set_font("Helvetica", "BU", 12)
-#         self.cell(0, 6, f"Subject :- {self.sanitize_text(data.get('subject',''))}", ln=True)
-#         self.ln(8)
-
-#         # Intro paragraph(s) and fixed paragraphs — ALL via HTML justification + auto-format
-#         intro_text = data.get("intro_paragraph", "")
-#         if intro_text:
-#             self.write_paragraphs(intro_text)
-
-#         fixed_paragraphs = [
-#             "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
-#             "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
-#             "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
-#             "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
-#         ]
-
-#         self.write_paragraphs(fixed_paragraphs)
-
-#         # Contact information block
-#         if self.get_y() > 220:
-#             self.add_page()
-
-#         self.set_font("Helvetica", "", 12)
-#         self.set_text_color(0, 0, 0)
-#         contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
-#         # contact_text uses raw write (not HTML) because it's a small inline piece
-#         self.write(5, contact_text)
-
-#         sales_person_code = data.get('sales_person_code', 'SD')
-#         sp = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-
-#         self.set_text_color(0, 0, 255)
-#         self.set_font("Helvetica", "U", 12)
-#         self.write(5, sp['email'], link=f"mailto:{sp['email']}")
-
-#         self.set_text_color(0, 0, 0)
-#         self.set_font("Helvetica", "", 12)
-#         self.write(5, "  Mobile: ")
-
-#         self.set_text_color(0, 0, 255)
-#         self.set_font("Helvetica", "U", 12)
-#         self.write(5, sp['mobile'], link=f"tel:{sp['mobile'].replace(' ', '').replace('+', '')}")
-
-#         self.ln(10)
-
-#         # Social / website links (each on its own line)
-#         self.set_font("Helvetica", "", 12)
-#         self.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-#         self.set_text_color(0, 0, 255)
-#         self.set_font("Helvetica", "U", 12)
-#         links = [
-#             "https://www.cminfotech.com/",
-#             "https://www.linkedin.com/",
-#             "https://wa.me/918733915721",
-#             "https://www.facebook.com/",
-#             "https://www.instagram.com/"
-#         ]
-#         for link in links:
-#             self.cell(0, 4, link, ln=True, link=link)
-#         self.set_text_color(0, 0, 0)
-
-#     # clickable helpers reused as methods (so callers can call pdf.add_clickable_email(...))
-#     def add_clickable_email(self, email, label="Email: "):
-#         self.set_font("Helvetica", "B", 12)
-#         label_w = self.get_string_width(label)
-#         self.cell(label_w, 5, label, ln=0)
-#         self.set_text_color(0, 0, 255)
-#         self.set_font("Helvetica", "", 12)
-#         self.cell(0, 5, email, ln=True, link=f"mailto:{email}")
-#         self.set_text_color(0, 0, 0)
-
-#     def add_clickable_phone(self, phone, label="Mobile: "):
-#         self.set_font("Helvetica", "B", 12)
-#         label_w = self.get_string_width(label)
-#         self.cell(label_w, 5, label, ln=0)
-#         self.set_text_color(0, 0, 255)
-#         self.set_font("Helvetica", "", 12)
-#         tel = phone.replace(' ', '').replace('+', '')
-#         self.cell(0, 5, phone, ln=True, link=f"tel:{tel}")
-#         self.set_text_color(0, 0, 0)
-
-# # # --- UPDATED add_page_one_intro function ---
-# # def add_page_one_intro(pdf, data):
-# #     # Reference Number & Date (Top Right)
-# #     pdf.set_font("Helvetica", "B", 12)
-# #     pdf.set_y(25)
-# #     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
-# #     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
-# #     pdf.ln(5)
-
-# #     # Recipient Details
-# #     pdf.set_font("Helvetica", "", 12)
-# #     pdf.cell(0, 5, "To,", ln=True)
-# #     pdf.set_font("Helvetica", "B", 12)
-# #     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-# #     pdf.set_font("Helvetica", "", 12)
-    
-# #     # Address handling
-# #     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
-    
-# #     pdf.ln(3)
-    
-# #     # Clickable Email
-# #     if data.get('vendor_email'):
-# #         add_clickable_email(pdf, data['vendor_email'])
-        
-# #     pdf.ln(1)
-# #     # Clickable Mobile
-# #     if data.get('vendor_mobile'):
-# #         add_clickable_phone(pdf, data['vendor_mobile'])
-    
-# #     pdf.set_font("Helvetica", "BU", 12)
-# #     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", align="C", ln=True)
-# #     pdf.ln(5)
-
-# #     # Subject Line
-# #     pdf.set_font("Helvetica", "BU", 12)
-# #     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
-# #     pdf.ln(8)  # Increased spacing
-
-# #     # Write the user's custom intro paragraph
-# #     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
-# #     if intro_text:
-# #         write_simple_justified_paragraph(pdf, intro_text)
-
-# #     # Fixed company introduction paragraphs - USE THE SIMPLE VERSION
-# #     fixed_paragraphs = [
-# #         "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
-        
-# #         "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
-        
-# #         "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
-        
-# #         "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
-# #     ]
-
-# #     for paragraph in fixed_paragraphs:
-# #         # write_justified_paragraph_with_formatting(pdf, paragraph)
-# #         # write_simple_justified_paragraph(pdf, paragraph)
-# #         write_paragraph_html(pdf,paragraph)
-# #         pdf.ln(3)  # Add space between paragraphs
-
-# #     # Contact Information - MAKE SURE WE HAVE ENOUGH SPACE
-# #     # Check if we need a new page
-# #     if pdf.get_y() > 220:  # If we're too low on the page
-# #         pdf.add_page()
-    
-# #     pdf.set_font("Helvetica", "", 12)
-# #     pdf.set_text_color(0, 0, 0)
-
-# #     # Normal text - make sure it's complete
-# #     contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
-# #     pdf.write(5, contact_text)
-
-# #     # Get sales person info dynamically
-# #     sales_person_code = data.get('sales_person_code', 'SD')
-# #     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-    
-# #     # Email clickable - DYNAMIC from sales person
-# #     pdf.set_text_color(0, 0, 255)
-# #     pdf.set_font("Helvetica", "U", 12)
-# #     pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
-
-# #     # Back to normal for separator + Mobile:
-# #     pdf.set_text_color(0, 0, 0)
-# #     pdf.set_font("Helvetica", "", 12)
-# #     pdf.write(5, "  Mobile: ")
-
-# #     # Mobile clickable - DYNAMIC from sales person
-# #     pdf.set_text_color(0, 0, 255)
-# #     pdf.set_font("Helvetica", "U", 12)
-# #     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-
-# #     pdf.ln(10)  # Add space after contact info
-# #     pdf.set_text_color(0, 0, 0)
-# #     # Continue with the rest of your contact information...
-# #     pdf.set_font("Helvetica", "", 12)
-# #     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-# #     pdf.set_font("Helvetica", "", 12)
-    
-# #     # Clickable website - RIGHT ALIGNED
-# #     pdf.set_font("Helvetica", "U", 12)
-# #     pdf.set_text_color(0, 0, 255)
-
-# #     # Calculate the width needed for the longest link
-# #     links = [
-# #         "https://www.cminfotech.com/",
-# #         "https://www.linkedin.com/", 
-# #         "https://wa.me/918733915721",
-# #         "https://www.facebook.com/",
-# #         "https://www.instagram.com/"
-# #     ]
-
-# #     # Get the maximum width
-# #     max_link_width = max(pdf.get_string_width(link) for link in links)
-
-# #     # Set right margin position
-# #     right_margin = pdf.w - pdf.r_margin
-
-# #     # Print each link aligned to the right
-# #     for link in links:
-# #         # Calculate x position to right-align
-# #         x_position = right_margin - max_link_width
-# #         pdf.set_x(x_position)
-# #         pdf.cell(max_link_width, 4, link, ln=True, link=link)
-
-# #     pdf.set_text_color(0, 0, 0)
-
-# # def write_justified_formatted_paragraph(pdf, text):
-# #     """Write paragraphs with both justification and formatting (bold/underline)"""
-    
-# #     # Terms that should be BOLD
-# #     bold_terms = [
-# #         "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
-# #     ]
-    
-# #     # Terms that should be UNDERLINED (software partnership list)
-# #     underlined_terms = [
-# #         "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
-# #         "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
-# #         "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-# #     ]
-    
-# #     # Process line by line
-# #     lines = text.split('\n')
-    
-# #     for line in lines:
-# #         if not line.strip():
-# #             pdf.ln(3)
-# #             continue
-            
-# #         # Find all formatting positions
-# #         format_positions = []
-        
-# #         # Find bold terms
-# #         for term in bold_terms:
-# #             start = 0
-# #             while True:
-# #                 pos = line.lower().find(term.lower(), start)
-# #                 if pos == -1:
-# #                     break
-# #                 format_positions.append((pos, pos + len(term), "bold"))
-# #                 start = pos + 1
-        
-# #         # Find underlined terms
-# #         for term in underlined_terms:
-# #             start = 0
-# #             while True:
-# #                 pos = line.lower().find(term.lower(), start)
-# #                 if pos == -1:
-# #                     break
-# #                 format_positions.append((pos, pos + len(term), "underline"))
-# #                 start = pos + 1
-        
-# #         # Sort by position
-# #         format_positions.sort()
-        
-# #         # If no formatting needed, use simple justified multi_cell
-# #         if not format_positions:
-# #             pdf.set_font("Helvetica", "", 12)
-# #             pdf.multi_cell(0, 5, line, align='J')
-# #             pdf.ln(3)
-# #             continue
-        
-# #         # For lines with formatting, we need to break them into chunks
-# #         current_pos = 0
-# #         chunks = []
-        
-# #         for start, end, style in format_positions:
-# #             # Add text before formatting
-# #             if start > current_pos:
-# #                 chunks.append({
-# #                     "text": line[current_pos:start],
-# #                     "style": "normal"
-# #                 })
-            
-# #             # Add formatted text
-# #             chunks.append({
-# #                 "text": line[start:end],
-# #                 "style": style
-# #             })
-            
-# #             current_pos = end
-        
-# #         # Add remaining text
-# #         if current_pos < len(line):
-# #             chunks.append({
-# #                 "text": line[current_pos:],
-# #                 "style": "normal"
-# #             })
-        
-# #         # Now we need to handle line breaking for justified text with mixed formatting
-# #         # This is complex, so we'll use a simpler approach for now
-# #         # Calculate approximate positions and use write for each chunk
-        
-# #         # Get current position
-# #         start_x = pdf.get_x()
-# #         start_y = pdf.get_y()
-        
-# #         # Calculate available width
-# #         available_width = pdf.w - pdf.r_margin - start_x
-        
-# #         # Simple approach: if the line is short, just write it
-# #         total_width = sum(pdf.get_string_width(chunk["text"]) for chunk in chunks)
-        
-# #         if total_width <= available_width:
-# #             # Line fits, write it with formatting
-# #             for chunk in chunks:
-# #                 if chunk["style"] == "bold":
-# #                     pdf.set_font("Helvetica", "B", 12)
-# #                 elif chunk["style"] == "underline":
-# #                     pdf.set_font("Helvetica", "U", 12)
-# #                 else:
-# #                     pdf.set_font("Helvetica", "", 12)
-                
-# #                 pdf.write(5, chunk["text"])
-            
-# #             pdf.ln(5)
-# #         else:
-# #             # Line is too long, use multi_cell without formatting for this complex case
-# #             pdf.set_font("Helvetica", "", 12)
-# #             pdf.multi_cell(0, 5, line, align='J')
-# #             pdf.ln(3)
-
-# # def add_page_one_intro(pdf, data):
-# #     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-# #     pdf.set_font("Helvetica", "B", 12)
-# #     pdf.set_y(25)
-# #     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
-# #     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
-# #     pdf.ln(5)
-
-# #     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-# #     pdf.set_font("Helvetica", "", 12)
-# #     pdf.cell(0, 5, "To,", ln=True)
-# #     pdf.set_font("Helvetica", "B", 12)
-# #     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-# #     pdf.set_font("Helvetica", "", 12)
-    
-# #     # Address handling
-# #     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
-    
-# #     pdf.ln(3)
-    
-# #     # Clickable Email - FIXED
-# #     if data.get('vendor_email'):
-# #         add_clickable_email(pdf, data['vendor_email'])
-        
-# #     pdf.ln(1)
-# #     # Clickable Mobile - FIXED
-# #     if data.get('vendor_mobile'):
-# #         add_clickable_phone(pdf, data['vendor_mobile'])
-    
-# #     pdf.set_font("Helvetica", "BU", 12)
-# #     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
-# #     pdf.ln(5)
-
-# #     # Subject Line (from user input)
-# #     pdf.set_font("Helvetica", "BU", 12)
-# #     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
-# #     pdf.ln(8)
-
-# #     # Write the user's custom intro paragraph WITH BOTH JUSTIFICATION AND FORMATTING
-# #     intro_text = pdf.sanitize_text(data.get("intro_paragraph", ""))
-# #     if intro_text:
-# #         write_justified_formatted_paragraph(pdf, intro_text)
-
-# #     # Fixed company introduction paragraphs - USE HYBRID APPROACH
-# #     fixed_paragraphs = [
-# #         "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
-        
-# #         "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
-        
-# #         "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
-        
-# #         "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
-# #     ]
-
-# #     for paragraph in fixed_paragraphs:
-# #         write_justified_formatted_paragraph(pdf, paragraph)
-
-# #     # Contact Information
-# #     if pdf.get_y() > 220:
-# #         pdf.add_page()
-    
-# #     pdf.set_font("Helvetica", "", 12)
-# #     pdf.set_text_color(0, 0, 0)
-
-# #     # Contact text - Use write for clickable links
-# #     contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
-# #     pdf.write(5, contact_text)
-
-# #     # Get sales person info dynamically
-# #     sales_person_code = data.get('sales_person_code', 'SD')
-# #     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-    
-# #     # Email clickable
-# #     pdf.set_text_color(0, 0, 255)
-# #     pdf.set_font("Helvetica", "U", 12)
-# #     pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
-
-# #     # Mobile
-# #     pdf.set_text_color(0, 0, 0)
-# #     pdf.set_font("Helvetica", "", 12)
-# #     pdf.write(5, "  Mobile: ")
-# #     pdf.set_text_color(0, 0, 255)
-# #     pdf.set_font("Helvetica", "U", 12)
-# #     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-
-# #     pdf.ln(10)
-    
-# #     # Rest of contact information...
-# #     pdf.set_font("Helvetica", "", 12)
-# #     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-    
-# #     # Clickable website links
-# #     pdf.set_font("Helvetica", "U", 12)
-# #     pdf.set_text_color(0, 0, 255)
-
-# #     links = [
-# #         "https://www.cminfotech.com/",
-# #         "https://www.linkedin.com/", 
-# #         "https://wa.me/8733915721",
-# #         "https://www.facebook.com/",
-# #         "https://www.instagram.com/"
-# #     ]
-
-# #     max_link_width = max(pdf.get_string_width(link) for link in links)
-# #     right_margin = pdf.w - pdf.r_margin
-
-# #     for link in links:
-# #         x_position = right_margin - max_link_width
-# #         pdf.set_x(x_position)
-# #         pdf.cell(max_link_width, 4, link, ln=True, link=link)
-
-# #     pdf.set_text_color(0, 0, 0)
-
-
-# #    # Clickable website
-# #     pdf.set_font("Helvetica", "U", 12)
-# #     pdf.set_text_color(0, 0, 255)
-# #     pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, align="R", link="https://www.cminfotech.com/")
-# #     pdf.cell(0, 4, "https://www.linkedin.com/", ln=True,align="R", link="https://www.linkedin.com/")
-# #     pdf.cell(0, 4, "https://wa.me/8733915721", ln=True, align="R",link="https://wa.me/918733915721")
-# #     pdf.cell(0, 4, "https://www.facebook.com/", ln=True,align="R", link="https://www.facebook.com/")
-# #     pdf.cell(0, 4, "https://www.instagram.com/", ln=True, align="R",link="https://www.instagram.com/")
-# #     pdf.set_text_color(0, 0, 0)
-
-
-# def add_quotation_header(pdf, annexure_text, quotation_text):
-#     """Add dynamic quotation header with both annexure and title"""
-#     pdf.set_font("Helvetica", "BU", 14)
-#     pdf.cell(0, 8, annexure_text, ln=True, align="C")
-#     pdf.set_font("Helvetica", "BU", 12)
-#     pdf.cell(0, 6, quotation_text, ln=True, align="C")
-#     pdf.ln(8)
-
-# def add_page_two_commercials(pdf, data):
-#     pdf.add_page()
-    
-#     # Use dynamic header function
-#     annexure_text = data.get('annexure_text', 'Annexure I - Commercials')
-#     quotation_title = data.get('quotation_title', 'Quotation for Adobe Software')
-    
-#     add_quotation_header(pdf, annexure_text, quotation_title)
-
-#     # --- Products Table - FIXED COLUMN WIDTHS (Wider Description) ---
-#     col_widths = [70, 25, 25, 25, 15, 25]  # Increased Description from 70 to 100
-#     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
-    
-#     # Table Header
-#     pdf.set_fill_color(220, 220, 220)
-#     pdf.set_font("Helvetica", "B", 9)
-#     for width, header in zip(col_widths, headers):
-#         pdf.cell(width, 7, header, border=1, align="C", fill=True)
-#     pdf.ln()
-
-#     # Table Rows
-#     pdf.set_font("Helvetica", "", 9)
-#     grand_total = 0.0
-    
-#     for product in data["products"]:
-#         basic_price = product["basic"]
-#         qty = product["qty"]
-#         gst_amount = basic_price * 0.18
-#         per_unit_price = basic_price + gst_amount
-#         total = per_unit_price * qty
-#         grand_total += total
-        
-#         # Get current position
-#         start_y = pdf.get_y()
-        
-#         # Description cell (with proper text wrapping)
-#         desc = product["name"]
-#         pdf.set_font("Helvetica", "", 9)
-        
-#         # Calculate how many lines the description will take
-#         desc_lines = pdf.multi_cell(col_widths[0], 6, desc, border=0, split_only=True)
-#         desc_height = len(desc_lines) * 6
-        
-#         # Set position for description
-#         pdf.set_xy(pdf.l_margin, start_y)
-        
-#         # Draw description cell with proper height
-#         if len(desc_lines) > 1:
-#             # Multi-line description
-#             pdf.multi_cell(col_widths[0], 6, desc, border=1)
-#             current_y = pdf.get_y()
-            
-#             # Set positions for other cells
-#             pdf.set_xy(pdf.l_margin + col_widths[0], start_y)
-#             pdf.cell(col_widths[1], desc_height, f"{basic_price:,.2f}", border=1, align="R")
-#             pdf.cell(col_widths[2], desc_height, f"{gst_amount:,.2f}", border=1, align="R")
-#             pdf.cell(col_widths[3], desc_height, f"{per_unit_price:,.2f}", border=1, align="R")
-#             pdf.cell(col_widths[4], desc_height, f"{qty:.0f}", border=1, align="C")
-#             pdf.cell(col_widths[5], desc_height, f"{total:,.2f}", border=1, align="R")
-            
-#             # Move to next row
-#             pdf.set_y(current_y)
-#         else:
-#             # Single line description
-#             pdf.cell(col_widths[0], 6, desc, border=1)
-#             pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
-#             pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
-#             pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
-#             pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
-#             pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
-#             pdf.ln()
-
-#     # Grand Total Row - FIXED ALIGNMENT
-#     pdf.set_font("Helvetica", "B", 10)
-#     pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
-#     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
-#     pdf.ln(15)
-
-#     # --- Enhanced Box for Terms & Conditions and Bank Details ---
-#     pdf.set_font("Helvetica", "", 9)
-
-#     # Terms & Conditions with ALL terms in bold
-#     terms = [
-#         ("1. Above charges are Inclusive of GST.", ""),
-#         ("2. Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.", ""),
-#         ("3. TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.", ""),
-#         ("4. ELD licenses are paper licenses that do not contain media.", ""),
-#         ("5. An Internet connection is required to access cloud services.", ""),
-#         ("6. Training will be charged at extra cost depending on no. of participants.", ""),
-#         ("7. Price Validity: ", "10 days from Quotation date"),
-#         ("8. Payment: ", "100% Advance along with purchase order"),
-#         ("9. Delivery period: ", "1-2 Weeks from the date of Purchase Order"),
-#         ("10. Support: ","Includes 12 months of technical support and software updates from OEM."),
-#         ("11. Installation: ","Online"),
-#         ("12. Cheque to be issued on name of: ", '"CM INFOTECH"'),
-#         ("13. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,\nJagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481")
-#     ]
-
-#     # Bank Details
-#     bank_info = [
-#         ("Name", "CM INFOTECH"),
-#         ("Account Number", "88130420182"),
-#         ("IFSC Code", "IDFB0040335"),
-#         ("SWIFT Code", "IDFBINBBMUM"),
-#         ("Bank Name", "IDFC FIRST"),
-#         ("Branch", "AHMEDABAD - SHYAMAL BRANCH"),
-#         ("MSME", "UDYAM-GJ-01-0117646"),
-#         ("GSTIN", "24ANMPP4891R1ZX"),
-#         ("PAN No", "ANMPP4891R")
-#     ]
-
-#     # Box dimensions and styling
-#     x_start = pdf.get_x()
-#     y_start = pdf.get_y()
-#     page_width = pdf.w - 1.6 * pdf.l_margin
-#     col1_width = page_width * 0.6  # 60% for Terms
-#     col2_width = page_width * 0.4  # 40% for Bank Details
-#     padding = 4
-#     line_height = 4.5
-#     section_spacing = 2
-
-#     # Calculate required height for both columns
-#     def calculate_column_height(items, col_width):
-#         height = 0
-#         for label, value in items:
-#             if value:  # If there's a value part
-#                 text = f"{label}{value}"
-#             else:
-#                 text = label
-#             lines = pdf.multi_cell(col_width - 2*padding, line_height, text, split_only=True)
-#             height += len(lines) * line_height + section_spacing
-#         return height + 3*padding  # Add padding
-
-#     terms_height = calculate_column_height(terms, col1_width)
-
-#     # Calculate bank details height including signature section
-#     bank_items_height = calculate_column_height(bank_info, col2_width)
-#     signature_height = 35  # Estimated height for signature section
-#     bank_height = bank_items_height + signature_height + padding
-
-#     # Use the maximum height
-#     box_height = max(terms_height, bank_height) + padding
-
-#     # Draw the main box
-#     pdf.rect(x_start, y_start, page_width, box_height)
-
-#     # Draw vertical separator line
-#     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
-
-#     # Add section headers
-#     pdf.set_font("Helvetica", "B", 12)
-
-#     # Terms & Conditions header
-#     pdf.set_xy(x_start + padding, y_start + padding)
-#     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
-
-#     # Terms content - INSIDE THE BOX
-#     terms_y = pdf.get_y()
-#     for i, (label, value) in enumerate(terms):
-#         pdf.set_xy(x_start + padding, terms_y)
-        
-#         if i < 6:  # First 6 terms - ALL BOLD
-#             pdf.set_font("Helvetica", "B", 10)
-#             pdf.multi_cell(col1_width - 2*padding, line_height, label)
-            
-#         elif value:  # Terms 7-13 with mixed formatting (label + bold value)
-#             # Write the regular font part
-#             pdf.set_font("Helvetica", "", 10)
-#             pdf.cell(pdf.get_string_width(label), line_height, label, ln=0)
-            
-#             # Write the bold part
-#             pdf.set_font("Helvetica", "B", 10)
-#             remaining_width = col1_width - 2*padding - pdf.get_string_width(label)
-#             pdf.multi_cell(remaining_width, line_height, value)
-            
-#             # Reset to regular font
-#             pdf.set_font("Helvetica", "", 10)
-#         else:
-#             # Regular terms without special formatting
-#             pdf.multi_cell(col1_width - 2*padding, line_height, label)
-        
-#         terms_y = pdf.get_y()
-
-#     # Bank Details header - INSIDE THE BOX
-#     pdf.set_font("Helvetica", "B", 12)
-#     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
-#     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-#     pdf.set_font("Helvetica", "", 12)  # Set to regular for labels
-
-#     # Bank details content - INSIDE THE BOX
-#     bank_y = pdf.get_y()
-#     for label, value in bank_info:
-#         pdf.set_xy(x_start + col1_width + padding, bank_y)
-        
-#         # Write label in regular font
-#         pdf.set_font("Helvetica", "", 10)
-#         pdf.cell(pdf.get_string_width(f"{label}: "), line_height, f"{label}: ", ln=0)
-        
-#         # Write value in BOLD font
-#         pdf.set_font("Helvetica", "B", 10)
-#         remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{label}: ")
-#         pdf.multi_cell(remaining_width, line_height, value)
-        
-#         bank_y = pdf.get_y()
-
-    
-#     # --- Signature Block INSIDE BANK DETAILS BOX ---
-#     signature_start_y = bank_y + 5
-#     pdf.set_font("Helvetica", "B", 10)
-#     pdf.set_xy(x_start + col1_width + padding, signature_start_y)
-#     pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
-    
-#     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-#     pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
-    
-#     # --- Signature Block with Dynamic Sales Person ---
-#     sales_person_code = data.get('sales_person_code', 'SD')
-#     sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-    
-#     # Add stamp between "For CM INFOTECH" and sales person name
-#     if data.get('stamp_path') and os.path.exists(data['stamp_path']):
-#         try:
-#             # Position stamp centered between "For CM INFOTECH" and sales person name
-#             stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
-#             stamp_x = x_start + col1_width + padding# + (col2_width - 2*padding - 20) / 2  # Center the stamp
-#             pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
-#             # Move cursor down after stamp
-#             pdf.set_y(stamp_y + 25)  # Space for stamp + some padding
-#         except:
-#             pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
-#     else:
-#         pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
-    
-#     pdf.set_font("Helvetica", "", 9)
-#     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-#     pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
-    
-#     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-#     pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
-    
-#     # Clickable email in signature
-#     pdf.set_font("Helvetica", "", 9)
-#     pdf.set_text_color(0, 0, 0)
-#     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-#     label = "Email: "
-#     pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-#     pdf.set_font("Helvetica", "U", 9)
-#     pdf.set_text_color(0, 0, 255)
-#     pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
-#              ln=True, link=f"mailto:{sales_person_info['email']}")
-    
-#     # Clickable phone in signature
-#     pdf.set_text_color(0, 0, 0)
-#     pdf.set_font("Helvetica", "", 9)
-#     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-#     label = "Mobile: "
-#     pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-#     pdf.set_font("Helvetica", "U", 9)
-#     pdf.set_text_color(0, 0, 255)
-#     pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
-#              ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-#     pdf.set_text_color(0, 0, 0)         
-
-#     # Move cursor below the box
-#     pdf.set_xy(x_start, y_start + box_height + 10)
-
-    
-# def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
-#     """Orchestrates the creation of the two-page PDF."""
-#     sales_person_code = quotation_data.get('sales_person_code', 'SD')
-#     pdf = QUOTATION_PDF(quotation_number=quotation_data['quotation_number'], 
-#                         quotation_date=quotation_data['quotation_date'],
-#                         sales_person_code=sales_person_code)
-    
-#     # Set logo path for header
-#     if logo_path and os.path.exists(logo_path):
-#         pdf.logo_path = logo_path
-    
-#     quotation_data['stamp_path'] = stamp_path
-
-#     pdf.add_page()
-    
-#     # 1. Add Page 1 (Introduction Letter)
-#     add_page_one_intro(pdf, quotation_data)
-
-#     # 2. Add Page 2 (Commercials, Terms, Bank Details)
-#     add_page_two_commercials(pdf, quotation_data)
-    
-#     # Handle PDF output properly
-#     try:
-#         pdf_output = pdf.output(dest='S')
-        
-#         if isinstance(pdf_output, str):
-#             return pdf_output.encode('latin-1')
-#         elif isinstance(pdf_output, bytearray):
-#             return bytes(pdf_output)
-#         elif isinstance(pdf_output, bytes):
-#             return pdf_output
-#         else:
-#             return str(pdf_output).encode('latin-1')
-            
-#     except Exception:
-#         # Fallback method
-#         try:
-#             buffer = io.BytesIO()
-#             pdf.output(dest=buffer)
-#             return buffer.getvalue()
-#         except Exception as e:
-#             st.error(f"PDF generation failed: {e}")
-#             return b""
-
-# from fpdf import FPDF
+from fpdf import FPDF
 
 # --- PDF Class for Tax Invoice ---
 from fpdf import FPDF

@@ -582,80 +582,80 @@ def _write_formatted_line_justified(pdf, line_items, max_width):
     
     # Move to next line position
     pdf.set_xy(x_start, y_start + 5)
-    
 
-def write_simple_formatted_paragraph(pdf, text):
-    """Simple method for paragraphs with mixed formatting"""
+
+# def write_simple_formatted_paragraph(pdf, text):
+#     """Simple method for paragraphs with mixed formatting"""
     
-    # Terms that should be BOLD
-    bold_terms = [
-        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
-    ]
+#     # Terms that should be BOLD
+#     bold_terms = [
+#         "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)", "CM Infotech", "CMI"
+#     ]
     
-    # Terms that should be UNDERLINED (software partnership list)
-    underlined_terms = [
-        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
-        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
-        "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-    ]
+#     # Terms that should be UNDERLINED (software partnership list)
+#     underlined_terms = [
+#         "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad", 
+#         "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge", 
+#         "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+#     ]
     
-    # Process line by line
-    lines = text.split('\n')
+#     # Process line by line
+#     lines = text.split('\n')
     
-    for line in lines:
-        if line.strip():
-            current_pos = 0
-            format_positions = []
+#     for line in lines:
+#         if line.strip():
+#             current_pos = 0
+#             format_positions = []
             
-            # Find bold terms
-            for term in bold_terms:
-                start = 0
-                while True:
-                    pos = line.lower().find(term.lower(), start)
-                    if pos == -1:
-                        break
-                    format_positions.append((pos, pos + len(term), "bold"))
-                    start = pos + 1
+#             # Find bold terms
+#             for term in bold_terms:
+#                 start = 0
+#                 while True:
+#                     pos = line.lower().find(term.lower(), start)
+#                     if pos == -1:
+#                         break
+#                     format_positions.append((pos, pos + len(term), "bold"))
+#                     start = pos + 1
             
-            # Find underlined terms
-            for term in underlined_terms:
-                start = 0
-                while True:
-                    pos = line.lower().find(term.lower(), start)
-                    if pos == -1:
-                        break
-                    format_positions.append((pos, pos + len(term), "underline"))
-                    start = pos + 1
+#             # Find underlined terms
+#             for term in underlined_terms:
+#                 start = 0
+#                 while True:
+#                     pos = line.lower().find(term.lower(), start)
+#                     if pos == -1:
+#                         break
+#                     format_positions.append((pos, pos + len(term), "underline"))
+#                     start = pos + 1
             
-            # Sort by position
-            format_positions.sort()
+#             # Sort by position
+#             format_positions.sort()
             
-            # Write the line with formatting
-            current_pos = 0
-            for start, end, style in format_positions:
-                # Write text before formatting
-                if start > current_pos:
-                    pdf.set_font("Helvetica", "", 12)
-                    pdf.write(5, line[current_pos:start])
+#             # Write the line with formatting
+#             current_pos = 0
+#             for start, end, style in format_positions:
+#                 # Write text before formatting
+#                 if start > current_pos:
+#                     pdf.set_font("Helvetica", "", 12)
+#                     pdf.write(5, line[current_pos:start])
                 
-                # Write formatted text
-                formatted_text = line[start:end]
-                if style == "bold":
-                    pdf.set_font("Helvetica", "B", 12)
-                else:  # underline
-                    pdf.set_font("Helvetica", "BU", 12)
-                pdf.write(5, formatted_text)
+#                 # Write formatted text
+#                 formatted_text = line[start:end]
+#                 if style == "bold":
+#                     pdf.set_font("Helvetica", "B", 12)
+#                 else:  # underline
+#                     pdf.set_font("Helvetica", "BU", 12)
+#                 pdf.write(5, formatted_text)
                 
-                current_pos = end
+#                 current_pos = end
             
-            # Write remaining text
-            if current_pos < len(line):
-                pdf.set_font("Helvetica", "", 12)
-                pdf.write(5, line[current_pos:])
+#             # Write remaining text
+#             if current_pos < len(line):
+#                 pdf.set_font("Helvetica", "", 12)
+#                 pdf.write(5, line[current_pos:])
             
-            pdf.ln(5)
+#             pdf.ln(5)
         
-        pdf.ln(2)
+#         pdf.ln(2)
 
 # --- EVEN SIMPLER APPROACH: Use multi_cell for everything ---
 def write_simple_justified_paragraph(pdf, text):

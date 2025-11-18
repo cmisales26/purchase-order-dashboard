@@ -397,13 +397,12 @@ def add_page_one_intro(pdf, data):
 
 def write_paragraph_html(pdf, text):
     """
-    Write ONE paragraph using HTML justification and inline <b>/<u> tags.
-    Use this only for the paragraph(s) you want HTML-justified.
+    Write ONE paragraph with justified text and bold/underline formatting.
     """
     if not text:
         return
 
-    # Terms you want bold / underlined
+    # Terms that should be BOLD
     bold_terms = [
         "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
         "CM Infotech", "CMI"
@@ -414,28 +413,107 @@ def write_paragraph_html(pdf, text):
         "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
     ]
 
-    # Escape HTML special chars first
-    h = _html.escape(text)
+    # Simple approach: if no special formatting needed, use multi_cell
+    needs_formatting = any(term in text for term in bold_terms + under_terms)
+    
+    if not needs_formatting:
+        # Simple justified text without formatting
+        pdf.set_font("Helvetica", "", 12)
+        pdf.multi_cell(0, 5, text, align='J')
+        pdf.ln(3)
+        return
+    
+    # For text with formatting, process word by word
+    words = text.split()
+    current_line = []
+    line_width = 0
+    max_width = pdf.w - pdf.l_margin - pdf.r_margin
+    
+    for word in words:
+        # Check if word needs formatting
+        word_needs_bold = any(term.lower() in word.lower() for term in bold_terms)
+        word_needs_underline = any(term.lower() in word.lower() for term in under_terms)
+        
+        # Set appropriate font for width calculation
+        if word_needs_bold and word_needs_underline:
+            pdf.set_font("Helvetica", "BU", 12)
+        elif word_needs_bold:
+            pdf.set_font("Helvetica", "B", 12)
+        elif word_needs_underline:
+            pdf.set_font("Helvetica", "U", 12)
+        else:
+            pdf.set_font("Helvetica", "", 12)
+        
+        word_width = pdf.get_string_width(word + " ")
+        
+        if line_width + word_width <= max_width:
+            current_line.append((word, word_needs_bold, word_needs_underline))
+            line_width += word_width
+        else:
+            # Write the current line with formatting
+            _write_formatted_line(pdf, current_line, max_width)
+            pdf.ln(5)
+            # Start new line
+            current_line = [(word, word_needs_bold, word_needs_underline)]
+            line_width = word_width
+    
+    # Write the last line
+    if current_line:
+        _write_formatted_line(pdf, current_line, max_width)
+        pdf.ln(5)
+    
+    pdf.ln(3)
 
-    # Replace long terms first to avoid overlapping replacements
-    bold_terms_sorted = sorted(bold_terms, key=len, reverse=True)
-    under_terms_sorted = sorted(under_terms, key=len, reverse=True)
+def _write_formatted_line(pdf, line_items, max_width):
+    """Write a single line with mixed formatting and justification"""
+    if not line_items:
+        return
+        
+    # Calculate total width of the line
+    total_width = 0
+    for word, bold, underline in line_items:
+        if bold and underline:
+            pdf.set_font("Helvetica", "BU", 12)
+        elif bold:
+            pdf.set_font("Helvetica", "B", 12)
+        elif underline:
+            pdf.set_font("Helvetica", "U", 12)
+        else:
+            pdf.set_font("Helvetica", "", 12)
+        total_width += pdf.get_string_width(word + " ")
+    
+    # Calculate extra space for justification
+    extra_space = 0
+    if len(line_items) > 1:
+        extra_space = (max_width - total_width) / (len(line_items) - 1)
+    
+    # Write the line with justification
+    x_start = pdf.get_x()
+    y_start = pdf.get_y()
+    
+    for i, (word, bold, underline) in enumerate(line_items):
+        # Set appropriate font
+        if bold and underline:
+            pdf.set_font("Helvetica", "BU", 12)
+        elif bold:
+            pdf.set_font("Helvetica", "B", 12)
+        elif underline:
+            pdf.set_font("Helvetica", "U", 12)
+        else:
+            pdf.set_font("Helvetica", "", 12)
+        
+        # Add space between words (except first word)
+        if i > 0:
+            # Add normal space plus extra space for justification
+            space_width = pdf.get_string_width(" ") + extra_space
+            pdf.set_x(pdf.get_x() + space_width)
+        
+        # Write the word
+        pdf.write(5, word)
+    
+    # Move to next line position
+    pdf.set_xy(x_start, y_start + 5)
 
-    # Apply bold
-    for term in bold_terms_sorted:
-        h = h.replace(_html.escape(term), f"<b>{_html.escape(term)}</b>")
-
-    # Apply underline
-    for term in under_terms_sorted:
-        h = h.replace(_html.escape(term), f"<u>{_html.escape(term)}</u>")
-
-    # Wrap single paragraph in justified <p>
-    html_par = f'<p align="justify" style="font-family: Helvetica; font-size:12pt;">{h}</p>'
-
-    # Write as HTML
-    pdf.write_html(html_par)
-    # small spacing after
-    pdf.ln(2)
     
 # --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---
 def write_justified_paragraph_with_formatting(pdf, text):

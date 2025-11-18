@@ -1183,13 +1183,12 @@ def add_page_two_commercials(pdf, data):
 
     terms_height = calculate_column_height(terms, col1_width)
 
-    # Calculate bank details height including signature section
+    # Calculate bank details height WITHOUT signature section
     bank_items_height = calculate_column_height(bank_info, col2_width)
     signature_height = 35  # Estimated height for signature section
-    bank_height = bank_items_height + signature_height + padding
-
-    # Use the maximum height
-    box_height = max(terms_height, bank_height) + padding
+    
+    # Use the maximum height between terms and bank items + signature
+    box_height = max(terms_height, bank_items_height + signature_height + 15) + padding
 
     # Draw the main box
     pdf.rect(x_start, y_start, page_width, box_height)
@@ -1253,9 +1252,10 @@ def add_page_two_commercials(pdf, data):
         
         bank_y = pdf.get_y()
 
-    pdf.ln(5)
-    # --- Signature Block INSIDE BANK DETAILS BOX ---
-    signature_start_y = bank_y + 5
+    # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
+    # Calculate position to place signature near bottom of the box
+    signature_start_y = y_start + box_height - signature_height - padding
+    
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_xy(x_start + col1_width + padding, signature_start_y)
     pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
@@ -1272,7 +1272,7 @@ def add_page_two_commercials(pdf, data):
         try:
             # Position stamp centered between "For CM INFOTECH" and sales person name
             stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
-            stamp_x = x_start + col1_width + padding# + (col2_width - 2*padding - 20) / 2  # Center the stamp
+            stamp_x = x_start + col1_width + padding  # Center the stamp
             pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
             # Move cursor down after stamp
             pdf.set_y(stamp_y + 25)  # Space for stamp + some padding
@@ -1309,8 +1309,9 @@ def add_page_two_commercials(pdf, data):
     pdf.set_text_color(0, 0, 255)
     pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
              ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-    pdf.set_text_color(0, 0, 0)         
+    pdf.set_text_color(0, 0, 0)
 
+    
     # Move cursor below the box
     pdf.set_xy(x_start, y_start + box_height + 10)
 

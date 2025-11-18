@@ -1254,7 +1254,7 @@ def add_page_two_commercials(pdf, data):
 
     # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
     # Calculate position to place signature near bottom of the box
-    signature_start_y = y_start + box_height - signature_height - padding
+    signature_start_y = y_start + box_height - signature_height - 20
     
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_xy(x_start + col1_width + padding, signature_start_y)
@@ -1311,7 +1311,7 @@ def add_page_two_commercials(pdf, data):
              ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
     pdf.set_text_color(0, 0, 0)
 
-    
+
     # Move cursor below the box
     pdf.set_xy(x_start, y_start + box_height + 10)
 

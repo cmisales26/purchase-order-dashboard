@@ -9,6 +9,8 @@ import os
 from fpdf import FPDF, HTMLMixin
 import textwrap
 import html as _html 
+import io
+import re
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {
 

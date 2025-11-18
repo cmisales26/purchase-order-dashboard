@@ -331,65 +331,102 @@ class QUOTATION_PDF(FPDF, HTMLMixin):
         
         self.set_text_color(0, 0, 0)  # Reset to black
 
-    def _build_html_paragraph(self, text: str) -> str:
-        """Build HTML paragraph with formatting"""
+    def write_formatted_paragraph(self, text):
+        """Write paragraphs with formatting using multi_cell approach (no HTML)"""
         if not text:
-            return ""
+            return
             
-        # Terms you want bold / underlined
+        # Terms that should be BOLD
         bold_terms = [
             "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
             "CM Infotech", "CMI"
         ]
+        
+        # Terms that should be UNDERLINED
         under_terms = [
             "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
             "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
             "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
         ]
-
-        # Escape HTML special chars first
-        escaped = _html.escape(text)
-
-        # Replace long terms first to avoid overlapping replacements
-        bold_sorted = sorted(bold_terms, key=len, reverse=True)
-        under_sorted = sorted(under_terms, key=len, reverse=True)
-
-        # Replace bold terms (escaped)
-        for term in bold_sorted:
-            esc = _html.escape(term)
-            escaped = escaped.replace(esc, f"<b>{esc}</b>")
-
-        # Replace underline terms
-        for term in under_sorted:
-            esc = _html.escape(term)
-            escaped = escaped.replace(esc, f"<u>{esc}</u>")
-
-        # Wrap with paragraph tag (justify)
-        return f'<p align="justify" style="font-family: Helvetica; font-size:12pt; margin:0 0 6pt 0;">{escaped}</p>'
-
-    def write_paragraph_html(self, text: str):
-        """
-        Write ONE paragraph using HTML justification and inline <b>/<u> tags.
-        """
-        if not text:
+        
+        # Simple approach: if no special formatting needed, use multi_cell
+        has_bold = any(term in text for term in bold_terms)
+        has_underline = any(term in text for term in under_terms)
+        
+        if not has_bold and not has_underline:
+            # Simple justified text
+            self.set_font("Helvetica", "", 12)
+            self.multi_cell(0, 5, text, align='J')
+            self.ln(3)
             return
+        
+        # For text with formatting, use a simpler approach
+        # Split into words and apply formatting
+        words = text.split()
+        line = ""
+        self.set_font("Helvetica", "", 12)
+        
+        for word in words:
+            # Check if word needs formatting
+            word_has_bold = any(term.lower() in word.lower() for term in bold_terms)
+            word_has_underline = any(term.lower() in word.lower() for term in under_terms)
             
-        html_par = self._build_html_paragraph(text)
-        # write_html will render the paragraph with justification and inline tags
-        self.write_html(html_par)
-        # small spacing after write_html
-        self.ln(2)
+            test_line = line + " " + word if line else word
+            test_width = self.get_string_width(test_line)
+            
+            if test_width < (self.w - self.l_margin - self.r_margin - 10):
+                line = test_line
+            else:
+                # Write the current line
+                self._write_formatted_line(line, bold_terms, under_terms)
+                self.ln(5)
+                line = word
+        
+        # Write the last line
+        if line:
+            self._write_formatted_line(line, bold_terms, under_terms)
+            self.ln(5)
+        
+        self.ln(3)
+
+    def _write_formatted_line(self, line, bold_terms, under_terms):
+        """Write a single line with formatted words"""
+        words = line.split()
+        x_start = self.get_x()
+        y_start = self.get_y()
+        
+        for i, word in enumerate(words):
+            # Check formatting
+            word_has_bold = any(term.lower() in word.lower() for term in bold_terms)
+            word_has_underline = any(term.lower() in word.lower() for term in under_terms)
+            
+            # Set appropriate font
+            if word_has_bold and word_has_underline:
+                self.set_font("Helvetica", "BU", 12)
+            elif word_has_bold:
+                self.set_font("Helvetica", "B", 12)
+            elif word_has_underline:
+                self.set_font("Helvetica", "U", 12)
+            else:
+                self.set_font("Helvetica", "", 12)
+            
+            # Add space between words (except first word)
+            if i > 0:
+                word = " " + word
+                
+            # Write the word
+            self.write(5, word)
 
     def write_paragraphs(self, text_or_list):
         """Write multiple paragraphs"""
         if isinstance(text_or_list, (list, tuple)):
             for p in text_or_list:
-                self.write_paragraph_html(p)
+                self.write_formatted_paragraph(p)
         else:
             for p in str(text_or_list).replace("\r", "").split("\n"):
                 p = p.strip()
                 if p:
-                    self.write_paragraph_html(p)
+                    self.write_formatted_paragraph(p)
                 else:
                     # keep blank line
                     self.ln(6)
@@ -419,7 +456,7 @@ class QUOTATION_PDF(FPDF, HTMLMixin):
         self.set_text_color(0, 0, 0)  # Reset to black
 
     def add_page_one_intro(self, data: dict):
-        """Write page one intro content (uses write_paragraphs for all paragraphs)."""
+        """Write page one intro content"""
         self.add_page()
 
         # Top refs
@@ -453,7 +490,7 @@ class QUOTATION_PDF(FPDF, HTMLMixin):
         self.cell(0, 6, f"Subject :- {self.sanitize_text(data.get('subject',''))}", ln=True)
         self.ln(8)
 
-        # Intro paragraph(s) and fixed paragraphs — ALL via HTML justification + auto-format
+        # Intro paragraph(s) and fixed paragraphs
         intro_text = data.get("intro_paragraph", "")
         if intro_text:
             self.write_paragraphs(intro_text)
@@ -474,7 +511,6 @@ class QUOTATION_PDF(FPDF, HTMLMixin):
         self.set_font("Helvetica", "", 12)
         self.set_text_color(0, 0, 0)
         contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
-        # contact_text uses raw write (not HTML) because it's a small inline piece
         self.write(5, contact_text)
 
         sales_person_code = data.get('sales_person_code', 'SD')
@@ -527,7 +563,7 @@ def add_page_two_commercials(pdf, data):
     
     add_quotation_header(pdf, annexure_text, quotation_title)
 
-    # --- Products Table - FIXED COLUMN WIDTHS (Wider Description) ---
+    # --- Products Table - FIXED COLUMN WIDTHS ---
     col_widths = [70, 25, 25, 25, 15, 25]
     headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
     

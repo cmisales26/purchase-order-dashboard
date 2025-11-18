@@ -9,6 +9,14 @@ import os
 from fpdf import FPDF, HTMLMixin
 import textwrap
 import html as _html 
+
+# GitHub Configuration
+# GITHUB_USERNAME = "cmisales26"
+# GITHUB_REPO = "purchase-order-dashboardpurchase-order-dashboard"
+# GITHUB_BRANCH = "main"  # or "master"
+
+LOGO_URL = f"https://github.com/cmisales26/purchase-order-dashboard/blob/main/logo_final.jpg"
+STAMP_URL = f"https://github.com/cmisales26/purchase-order-dashboard/blob/main/stamp.jpg"
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {
 
@@ -1059,7 +1067,7 @@ def add_quotation_header(pdf, annexure_text, quotation_text):
 
 def add_page_two_commercials(pdf, data):
     pdf.add_page()
-    pdf.ln(15)
+    pdf.ln(13)
     # Use dynamic header function
     annexure_text = data.get('annexure_text', 'Annexure I - Commercials')
     quotation_title = data.get('quotation_title', 'Quotation for Adobe Software')

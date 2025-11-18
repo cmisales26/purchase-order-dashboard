@@ -514,7 +514,7 @@ def _write_formatted_line(pdf, line_items, max_width):
     # Move to next line position
     pdf.set_xy(x_start, y_start + 5)
 
-    
+
 # --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---
 def write_justified_paragraph_with_formatting(pdf, text):
     """Write paragraphs with full justification using multi_cell"""
@@ -696,8 +696,8 @@ def add_page_one_intro(pdf, data):
 
     for paragraph in fixed_paragraphs:
         # write_justified_paragraph_with_formatting(pdf, paragraph)
-        # write_simple_justified_paragraph(pdf, paragraph)
-        write_paragraph_html(pdf,paragraph)
+        write_simple_justified_paragraph(pdf, paragraph)
+        # write_paragraph_html(pdf,paragraph)
         pdf.ln(3)  # Add space between paragraphs
 
     # Contact Information - MAKE SURE WE HAVE ENOUGH SPACE

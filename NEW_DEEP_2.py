@@ -738,7 +738,7 @@ def add_page_two_commercials(pdf, data):
             stamp_x = x_start + col1_width + padding  # Center the stamp
             pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
             # Move cursor down after stamp
-            pdf.set_y(stamp_y + 25)  # Space for stamp + some padding
+            pdf.set_y(stamp_y + 20)  # Space for stamp + some padding
         except:
             pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
     else:

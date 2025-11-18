@@ -464,55 +464,6 @@ def write_paragraph_html(pdf, text):
     
     pdf.ln(3)
 
-def _write_formatted_line(pdf, line_items, max_width):
-    """Write a single line with mixed formatting and justification"""
-    if not line_items:
-        return
-        
-    # Calculate total width of the line
-    total_width = 0
-    for word, bold, underline in line_items:
-        if bold and underline:
-            pdf.set_font("Helvetica", "BU", 12)
-        elif bold:
-            pdf.set_font("Helvetica", "B", 12)
-        elif underline:
-            pdf.set_font("Helvetica", "U", 12)
-        else:
-            pdf.set_font("Helvetica", "", 12)
-        total_width += pdf.get_string_width(word + " ")
-    
-    # Calculate extra space for justification
-    extra_space = 0
-    if len(line_items) > 1:
-        extra_space = (max_width - total_width) / (len(line_items) - 1)
-    
-    # Write the line with justification
-    x_start = pdf.get_x()
-    y_start = pdf.get_y()
-    
-    for i, (word, bold, underline) in enumerate(line_items):
-        # Set appropriate font
-        if bold and underline:
-            pdf.set_font("Helvetica", "BU", 12)
-        elif bold:
-            pdf.set_font("Helvetica", "B", 12)
-        elif underline:
-            pdf.set_font("Helvetica", "U", 12)
-        else:
-            pdf.set_font("Helvetica", "", 12)
-        
-        # Add space between words (except first word)
-        if i > 0:
-            # Add normal space plus extra space for justification
-            space_width = pdf.get_string_width(" ") + extra_space
-            pdf.set_x(pdf.get_x() + space_width)
-        
-        # Write the word
-        pdf.write(5, word)
-    
-    # Move to next line position
-    pdf.set_xy(x_start, y_start + 5)
 
 
 # --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---

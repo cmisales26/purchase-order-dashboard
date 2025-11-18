@@ -1202,7 +1202,7 @@ def add_page_two_commercials(pdf, data):
 
     # Calculate bank details height WITHOUT signature section
     bank_items_height = calculate_column_height(bank_info, col2_width)
-    signature_height = 50  # Estimated height for signature section
+    signature_height = 30  # Estimated height for signature section
     
     # Use the maximum height between terms and bank items + signature
     box_height = max(terms_height, bank_items_height + signature_height ) 
@@ -1271,7 +1271,7 @@ def add_page_two_commercials(pdf, data):
 
     # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
     # Calculate position to place signature near bottom of the box
-    signature_start_y = y_start + box_height - signature_height - 15
+    signature_start_y = y_start + box_height - signature_height - 10
     
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.set_xy(x_start + col1_width + padding, signature_start_y)

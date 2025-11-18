@@ -626,10 +626,10 @@ def add_page_two_commercials(pdf, data):
     x_start = pdf.get_x()
     y_start = pdf.get_y()
     page_width = pdf.w - 1.6 * pdf.l_margin
-    col1_width = page_width * 0.6  # 60% for Terms
-    col2_width = page_width * 0.4  # 40% for Bank Details
-    padding = 4
-    line_height = 4.5
+    col1_width = page_width * 0.62  # 60% for Terms
+    col2_width = page_width * 0.38  # 40% for Bank Details
+    padding = 2.5
+    line_height = 4
     section_spacing = 2
 
     # Calculate required height for both columns
@@ -651,7 +651,7 @@ def add_page_two_commercials(pdf, data):
     signature_height = 35  # Estimated height for signature section
     
     # Use the maximum height between terms and bank items + signature
-    box_height = max(terms_height, bank_items_height + signature_height + 15) + padding
+    box_height = max(terms_height, bank_items_height + signature_height)
 
     # Draw the main box
     pdf.rect(x_start, y_start, page_width, box_height)
@@ -717,7 +717,7 @@ def add_page_two_commercials(pdf, data):
 
     # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
     # Calculate position to place signature near bottom of the box
-    signature_start_y = y_start + box_height - signature_height - 26
+    signature_start_y = y_start + box_height - signature_height - 15
     
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.set_xy(x_start + col1_width + padding, signature_start_y)

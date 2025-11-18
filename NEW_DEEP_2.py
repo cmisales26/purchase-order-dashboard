@@ -268,38 +268,8 @@ def get_next_sequence_number_invoice(invoice_number):
 
 
 
-#!/usr/bin/env python3
-# quotation_full_html.py
-# Full working file: HTML-justified paragraphs (manual <b>, <u>, <a>, <br>, <i> tags allowed)
-
-import os
-import re
-import html as _html
-from fpdf import FPDF, HTMLMixin
-
-# Small compatibility patch for very old fpdf versions (optional)
-try:
-    # HTML2FPDF exists in old fpdf; patch unescape if missing (harmless on fpdf2)
-    from fpdf.html import HTML2FPDF  # type: ignore
-    if not hasattr(HTML2FPDF, "unescape"):
-        import html as __html
-        def _unescape(self, txt):
-            return __html.unescape(txt)
-        HTML2FPDF.unescape = _unescape  # type: ignore
-except Exception:
-    pass
-
-# # Example sales person mapping (replace with your real data)
-# SALES_PERSON_MAPPING = {
-#     "SD": {"email": "sales@cminfotech.com", "mobile": "+91 873 391 5721"},
-#     "CP": {"email": "cp@cminfotech.com", "mobile": "+91 90000 00000"},
-# }
-
-# Allowed HTML tags (manual use only). Everything else will be escaped.
-_ALLOWED_TAGS = ["b", "u", "i", "br", "a"]
-
-class QUOTATION_PDF(FPDF, HTMLMixin):
-    def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="SD", logo_path=None):
+class QUOTATION_PDF(FPDF):
+    def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="CP"):
         super().__init__()
         self.set_auto_page_break(auto=True, margin=15)
         self.set_left_margin(15)
@@ -307,121 +277,222 @@ class QUOTATION_PDF(FPDF, HTMLMixin):
         self.quotation_number = quotation_number
         self.quotation_date = quotation_date
         self.sales_person_code = sales_person_code
-        self.logo_path = logo_path
-
+        self.logo_path = None
+        
     def sanitize_text(self, text):
-        if text is None:
-            return ""
         try:
             return text.encode('latin-1', 'ignore').decode('latin-1')
-        except Exception:
-            return str(text)
+        except:
+            return text
 
-    # header & footer (kept minimal)
     def header(self):
+        # Logo placement (top right)
         if hasattr(self, 'logo_path') and self.logo_path and os.path.exists(self.logo_path):
             try:
-                self.image(self.logo_path, x=self.w - 15 - 50, y=8, w=50)
-            except Exception:
+                self.image(self.logo_path, x=155, y=8, w=50)
+            except:
+                # If image fails, show placeholder
                 self.set_font("Helvetica", "B", 10)
-                self.set_xy(self.w - 15 - 50, 8)
-                self.cell(50, 8, "[LOGO]", border=0, align="C")
+                self.set_xy(150, 8)
+                self.cell(40, 5, "[LOGO]", border=0, align="C")
+            
+        # Main Title (Centered)
+        self.set_font("Helvetica", "B", 16)
         self.set_y(15)
+        self.ln(5)
 
     def footer(self):
-        self.set_y(-24)
+        self.set_y(-18)
         self.set_font("Helvetica", "", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-        # clickable email/phone centered
-        self.set_text_color(0, 0, 255)
-        self.set_font("Helvetica", "U", 10)
-        email_text = "info@cminfotech.com"
-        phone_text = "+91 873 391 5721"
-        sep = " | "
+        
+        # Make footer emails and phone clickable
+        self.set_text_color(0, 0, 255)  # Blue color for links
+        
+        # Email and phone on same line
+        email_text = " info@cminfotech.com "
+        phone_text = " +91 873 391 5721"
+        
+        # Calculate positions for proper alignment
         page_width = self.w - 2 * self.l_margin
-        email_w = self.get_string_width(email_text)
-        phone_w = self.get_string_width(phone_text)
-        sep_w = self.get_string_width(sep)
-        total_w = email_w + sep_w + phone_w
-        start_x = (page_width - total_w) / 2 + self.l_margin
+        email_width = self.get_string_width(email_text)
+        phone_width = self.get_string_width(phone_text)
+        separator_width = self.get_string_width(" | ")
+        
+        total_width = email_width + separator_width + phone_width
+        start_x = (page_width - total_width) / 2 + self.l_margin
+        
         self.set_x(start_x)
-        self.cell(email_w, 4, email_text, ln=0, link=f"mailto:{email_text}")
-        self.cell(sep_w, 4, sep, ln=0)
-        self.cell(phone_w, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+','')}")
-        # website below
-        self.set_text_color(0, 0, 255)
+        self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text.strip()}")
+        self.cell(separator_width, 4, " | ", ln=0)
+        self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
+
         self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
-        self.set_text_color(0, 0, 0)
+        
+        self.set_text_color(0, 0, 0)  # Reset to black
 
-    # Helper: produce safe HTML paragraph while allowing specific tags used manually
-    def _sanitize_and_allow_tags(self, text: str) -> str:
-        """
-        Escape text, then un-escape only allowed tags and allowed attributes (href inside <a>).
-        This lets the user include <b>, <u>, <i>, <br>, and <a href="..."> manually.
-        """
-        if text is None:
-            return ""
-
-        # 1) Escape entire string
-        escaped = _html.escape(text)
-
-        # 2) Unescape allowed simple tags: <b>, <u>, <i>, <br>
-        for tag in ("b", "u", "i", "br"):
-            escaped = re.sub(f"&lt;{tag}&gt;", f"<{tag}>", escaped, flags=re.IGNORECASE)
-            escaped = re.sub(f"&lt;/{tag}&gt;", f"</{tag}>", escaped, flags=re.IGNORECASE)
-
-        # 3) Allow <a href="...">...</a> — keep href value unescaped
-        # Find patterns like &lt;a href=&quot;URL&quot;&gt; and replace with <a href="URL">
-        def _unescape_a(match):
-            inner = match.group(1)  # e.g. href=&quot;URL&quot;
-            # convert &quot; back to "
-            inner = inner.replace("&quot;", '"').replace("&#x27;", "'")
-            return f"<a {inner}>"
-        escaped = re.sub(r"&lt;(a\s+[^&]*?href=&quot;[^&]*?&quot;[^&]*?)&gt;", _unescape_a, escaped, flags=re.IGNORECASE)
-        # And close tags
-        escaped = re.sub(r"&lt;/a&gt;", "</a>", escaped, flags=re.IGNORECASE)
-
-        return escaped
-
-    def write_paragraph_html(self, text: str):
-        """
-        Write a single paragraph using HTML justification. The user can include manual <b>, <u>, <i>,
-        <br>, and <a href="..."> tags in the text. Everything else will be escaped.
-        """
-        if text is None:
+    def write_justified_paragraph_with_formatting(self, text):
+        """Write paragraphs with full justification and bold/underline formatting"""
+        if not text:
             return
+            
+        # Terms that should be BOLD
+        bold_terms = [
+            "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
+            "CM Infotech", "CMI"
+        ]
+        
+        # Terms that should be UNDERLINED
+        under_terms = [
+            "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
+            "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
+            "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+        ]
+        
+        # Check if text needs formatting
+        needs_formatting = any(term in text for term in bold_terms + under_terms)
+        
+        if not needs_formatting:
+            # Simple justified text without formatting
+            self.set_font("Helvetica", "", 12)
+            self.multi_cell(0, 5, text, align='J')
+            self.ln(3)
+            return
+        
+        # For text with formatting, we need to process it word by word
+        words = text.split()
+        current_line = []
+        line_width = 0
+        max_width = self.w - self.l_margin - self.r_margin
+        
+        for word in words:
+            # Check if word needs formatting
+            word_needs_bold = any(term.lower() in word.lower() for term in bold_terms)
+            word_needs_underline = any(term.lower() in word.lower() for term in under_terms)
+            
+            # Set appropriate font for width calculation
+            if word_needs_bold and word_needs_underline:
+                self.set_font("Helvetica", "BU", 12)
+            elif word_needs_bold:
+                self.set_font("Helvetica", "B", 12)
+            elif word_needs_underline:
+                self.set_font("Helvetica", "U", 12)
+            else:
+                self.set_font("Helvetica", "", 12)
+            
+            word_width = self.get_string_width(word + " ")
+            
+            if line_width + word_width <= max_width:
+                current_line.append((word, word_needs_bold, word_needs_underline))
+                line_width += word_width
+            else:
+                # Write the current line with formatting
+                self._write_formatted_line(current_line, max_width)
+                self.ln(5)
+                # Start new line
+                current_line = [(word, word_needs_bold, word_needs_underline)]
+                line_width = word_width
+        
+        # Write the last line
+        if current_line:
+            self._write_formatted_line(current_line, max_width)
+            self.ln(5)
+        
+        self.ln(3)
 
-        html_safe = self._sanitize_and_allow_tags(str(text))
-        html_par = f'<p align="justify" style="font-family: Helvetica; font-size:12pt; margin:0;">{html_safe}</p>'
-        # Use FPDF's HTML writer
-        self.write_html(html_par)
-        self.ln(2)
+    def _write_formatted_line(self, line_items, max_width):
+        """Write a single line with mixed formatting and justification"""
+        if not line_items:
+            return
+            
+        # Calculate total width of the line
+        total_width = 0
+        for word, bold, underline in line_items:
+            if bold and underline:
+                self.set_font("Helvetica", "BU", 12)
+            elif bold:
+                self.set_font("Helvetica", "B", 12)
+            elif underline:
+                self.set_font("Helvetica", "U", 12)
+            else:
+                self.set_font("Helvetica", "", 12)
+            total_width += self.get_string_width(word + " ")
+        
+        # Calculate extra space for justification
+        extra_space = 0
+        if len(line_items) > 1:
+            extra_space = (max_width - total_width) / (len(line_items) - 1)
+        
+        # Write the line with justification
+        x_start = self.get_x()
+        y_start = self.get_y()
+        
+        for i, (word, bold, underline) in enumerate(line_items):
+            # Set appropriate font
+            if bold and underline:
+                self.set_font("Helvetica", "BU", 12)
+            elif bold:
+                self.set_font("Helvetica", "B", 12)
+            elif underline:
+                self.set_font("Helvetica", "U", 12)
+            else:
+                self.set_font("Helvetica", "", 12)
+            
+            # Add space between words (except first word)
+            if i > 0:
+                # Add normal space plus extra space for justification
+                space_width = self.get_string_width(" ") + extra_space
+                self.set_x(self.get_x() + space_width)
+            
+            # Write the word
+            self.write(5, word)
+        
+        # Move to next line position
+        self.set_xy(x_start, y_start + 5)
 
-    # Clickable helpers for body (instance methods)
+    def write_paragraphs(self, text_or_list):
+        """Write multiple paragraphs with formatting"""
+        if isinstance(text_or_list, (list, tuple)):
+            for p in text_or_list:
+                self.write_justified_paragraph_with_formatting(p)
+        else:
+            for p in str(text_or_list).replace("\r", "").split("\n"):
+                p = p.strip()
+                if p:
+                    self.write_justified_paragraph_with_formatting(p)
+                else:
+                    # keep blank line
+                    self.ln(6)
+
     def add_clickable_email(self, email, label="Email: "):
+        """Add clickable email with label"""
         self.set_font("Helvetica", "B", 12)
-        label_w = self.get_string_width(label)
-        self.cell(label_w, 5, label, ln=0)
-        self.set_text_color(0, 0, 255)
+        label_width = self.get_string_width(label)
+        self.cell(label_width, 5, label, ln=0)
+        
+        self.set_text_color(0, 0, 255)  # Blue for clickable
         self.set_font("Helvetica", "", 12)
         self.cell(0, 5, email, ln=True, link=f"mailto:{email}")
-        self.set_text_color(0, 0, 0)
+        self.set_text_color(0, 0, 0)  # Reset to black
 
     def add_clickable_phone(self, phone, label="Mobile: "):
+        """Add clickable phone number with label"""
         self.set_font("Helvetica", "B", 12)
-        label_w = self.get_string_width(label)
-        self.cell(label_w, 5, label, ln=0)
-        self.set_text_color(0, 0, 255)
+        label_width = self.get_string_width(label)
+        self.cell(label_width, 5, label, ln=0)
+        
+        self.set_text_color(0, 0, 255)  # Blue for clickable
         self.set_font("Helvetica", "", 12)
-        tel = phone.replace(" ", "").replace("+", "")
-        self.cell(0, 5, phone, ln=True, link=f"tel:{tel}")
-        self.set_text_color(0, 0, 0)
+        # Remove spaces and + for tel link
+        tel_number = phone.replace(' ', '').replace('+', '')
+        self.cell(0, 5, phone, ln=True, link=f"tel:{tel_number}")
+        self.set_text_color(0, 0, 0)  # Reset to black
 
-    # Page one intro (uses write_paragraph_html for all paragraphs)
     def add_page_one_intro(self, data: dict):
+        """Write page one intro content"""
         self.add_page()
 
-        # Reference & date
+        # Top refs
         self.set_font("Helvetica", "B", 12)
         self.set_y(25)
         self.cell(0, 5, f"REF NO.: {data.get('quotation_number', '')}", ln=True, align="L")
@@ -437,14 +508,14 @@ class QUOTATION_PDF(FPDF, HTMLMixin):
         self.multi_cell(0, 4, self.sanitize_text(data.get('vendor_address', '')))
         self.ln(3)
 
-        # Contact clickable
+        # Clickable contact
         if data.get('vendor_email'):
             self.add_clickable_email(data['vendor_email'])
         if data.get('vendor_mobile'):
             self.ln(1)
             self.add_clickable_phone(data['vendor_mobile'])
 
-        # Kind attention & subject
+        # Kind Attention & Subject
         self.set_font("Helvetica", "BU", 12)
         self.cell(0, 5, f"Kind Attention :- {self.sanitize_text(data.get('vendor_contact',''))}", align="C", ln=True)
         self.ln(5)
@@ -452,34 +523,31 @@ class QUOTATION_PDF(FPDF, HTMLMixin):
         self.cell(0, 6, f"Subject :- {self.sanitize_text(data.get('subject',''))}", ln=True)
         self.ln(8)
 
-        # Intro paragraph — write with HTML justification. User may include <b>/<u> tags.
-        intro_text = data.get('intro_paragraph', '')
+        # Intro paragraph(s) and fixed paragraphs
+        intro_text = data.get("intro_paragraph", "")
         if intro_text:
-            self.write_paragraph_html(intro_text)
+            self.write_paragraphs(intro_text)
 
-        # Fixed company paragraphs — also HTML-justified. Use manual tags here as desired.
         fixed_paragraphs = [
-            # you can include <b> or <u> here manually if you want
-            "Enclosed please find our <b>Quotation</b> for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
+            "Enclosed please find our Quotation for your information and necessary action. You're electing CM Infotech's proposal; your company is assured of our pledge to provide immediate and long-term operational advantages.",
             "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
-            "Our partnership with <u>Autodesk</u>, <u>GstarCAD</u>, <u>Grabert</u>, <u>RuleBuddy</u>, <u>CMS Intellicad</u>, <u>ZWCAD</u>, <u>Etabs</u>, <u>Trimble</u>, <u>Bentley</u>, <u>Solidworks</u>, <u>Solid Edge</u>, <u>Bluebeam</u>, <u>Adobe</u>, <u>Microsoft</u>, <u>Corel</u>, <u>Chaos</u>, <u>Nitro</u>, <u>Tally Quick Heal</u> and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
+            "Our partnership with Autodesk, GstarCAD, Grabert, RuleBuddy, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
             "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
         ]
 
-        for p in fixed_paragraphs:
-            self.write_paragraph_html(p)
-            self.ln(3)
+        self.write_paragraphs(fixed_paragraphs)
 
-        # Contact block
+        # Contact information block
         if self.get_y() > 220:
             self.add_page()
+
         self.set_font("Helvetica", "", 12)
         self.set_text_color(0, 0, 0)
         contact_text = "Please revert back to us, if you need any clarification / information at the below mentioned address or email at "
         self.write(5, contact_text)
 
-        sp_code = data.get('sales_person_code', 'SD')
-        sp = SALES_PERSON_MAPPING.get(sp_code, SALES_PERSON_MAPPING['SD'])
+        sales_person_code = data.get('sales_person_code', 'SD')
+        sp = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
 
         self.set_text_color(0, 0, 255)
         self.set_font("Helvetica", "U", 12)
@@ -491,29 +559,25 @@ class QUOTATION_PDF(FPDF, HTMLMixin):
 
         self.set_text_color(0, 0, 255)
         self.set_font("Helvetica", "U", 12)
-        self.write(5, sp['mobile'], link=f"tel:{sp['mobile'].replace(' ', '').replace('+','')}")
+        self.write(5, sp['mobile'], link=f"tel:{sp['mobile'].replace(' ', '').replace('+', '')}")
 
         self.ln(10)
+
+        # Social / website links (each on its own line)
         self.set_font("Helvetica", "", 12)
         self.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-
-        # Social links
         self.set_text_color(0, 0, 255)
         self.set_font("Helvetica", "U", 12)
         links = [
             "https://www.cminfotech.com/",
             "https://www.linkedin.com/",
-            "https://wa.me/8733915721",
+            "https://wa.me/918733915721",
             "https://www.facebook.com/",
             "https://www.instagram.com/"
         ]
         for link in links:
             self.cell(0, 4, link, ln=True, link=link)
         self.set_text_color(0, 0, 0)
-
-
-
-
 
 def add_quotation_header(pdf, annexure_text, quotation_text):
     """Add dynamic quotation header with both annexure and title"""

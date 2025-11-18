@@ -395,74 +395,74 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
 
-def write_paragraph_html(pdf, text):
-    """
-    Write ONE paragraph with justified text and bold/underline formatting.
-    """
-    if not text:
-        return
+# def write_paragraph_html(pdf, text):
+#     """
+#     Write ONE paragraph with justified text and bold/underline formatting.
+#     """
+#     if not text:
+#         return
 
-    # Terms that should be BOLD
-    bold_terms = [
-        "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
-        "CM Infotech", "CMI"
-    ]
-    under_terms = [
-        "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
-        "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
-        "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
-    ]
+#     # Terms that should be BOLD
+#     bold_terms = [
+#         "Quotation", "CM Infotech's proposal", "CMI (CM INFOTECH)",
+#         "CM Infotech", "CMI"
+#     ]
+#     under_terms = [
+#         "Autodesk", "GstarCAD", "Grabert", "RuleBuddy", "CMS Intellicad",
+#         "ZWCAD", "Etabs", "Trimble", "Bentley", "Solidworks", "Solid Edge",
+#         "Bluebeam", "Adobe", "Microsoft", "Corel", "Chaos", "Nitro", "Tally Quick Heal"
+#     ]
 
-    # Simple approach: if no special formatting needed, use multi_cell
-    needs_formatting = any(term in text for term in bold_terms + under_terms)
+#     # Simple approach: if no special formatting needed, use multi_cell
+#     needs_formatting = any(term in text for term in bold_terms + under_terms)
     
-    if not needs_formatting:
-        # Simple justified text without formatting
-        pdf.set_font("Helvetica", "", 12)
-        pdf.multi_cell(0, 5, text, align='J')
-        pdf.ln(3)
-        return
+#     if not needs_formatting:
+#         # Simple justified text without formatting
+#         pdf.set_font("Helvetica", "", 12)
+#         pdf.multi_cell(0, 5, text, align='J')
+#         pdf.ln(3)
+#         return
     
-    # For text with formatting, process word by word
-    words = text.split()
-    current_line = []
-    line_width = 0
-    max_width = pdf.w - pdf.l_margin - pdf.r_margin
+#     # For text with formatting, process word by word
+#     words = text.split()
+#     current_line = []
+#     line_width = 0
+#     max_width = pdf.w - pdf.l_margin - pdf.r_margin
     
-    for word in words:
-        # Check if word needs formatting
-        word_needs_bold = any(term.lower() in word.lower() for term in bold_terms)
-        word_needs_underline = any(term.lower() in word.lower() for term in under_terms)
+#     for word in words:
+#         # Check if word needs formatting
+#         word_needs_bold = any(term.lower() in word.lower() for term in bold_terms)
+#         word_needs_underline = any(term.lower() in word.lower() for term in under_terms)
         
-        # Set appropriate font for width calculation
-        if word_needs_bold and word_needs_underline:
-            pdf.set_font("Helvetica", "BU", 12)
-        elif word_needs_bold:
-            pdf.set_font("Helvetica", "B", 12)
-        elif word_needs_underline:
-            pdf.set_font("Helvetica", "U", 12)
-        else:
-            pdf.set_font("Helvetica", "", 12)
+#         # Set appropriate font for width calculation
+#         if word_needs_bold and word_needs_underline:
+#             pdf.set_font("Helvetica", "BU", 12)
+#         elif word_needs_bold:
+#             pdf.set_font("Helvetica", "B", 12)
+#         elif word_needs_underline:
+#             pdf.set_font("Helvetica", "U", 12)
+#         else:
+#             pdf.set_font("Helvetica", "", 12)
         
-        word_width = pdf.get_string_width(word + " ")
+#         word_width = pdf.get_string_width(word + " ")
         
-        if line_width + word_width <= max_width:
-            current_line.append((word, word_needs_bold, word_needs_underline))
-            line_width += word_width
-        else:
-            # Write the current line with formatting
-            _write_formatted_line(pdf, current_line, max_width)
-            pdf.ln(5)
-            # Start new line
-            current_line = [(word, word_needs_bold, word_needs_underline)]
-            line_width = word_width
+#         if line_width + word_width <= max_width:
+#             current_line.append((word, word_needs_bold, word_needs_underline))
+#             line_width += word_width
+#         else:
+#             # Write the current line with formatting
+#             _write_formatted_line(pdf, current_line, max_width)
+#             pdf.ln(5)
+#             # Start new line
+#             current_line = [(word, word_needs_bold, word_needs_underline)]
+#             line_width = word_width
     
-    # Write the last line
-    if current_line:
-        _write_formatted_line(pdf, current_line, max_width)
-        pdf.ln(5)
+#     # Write the last line
+#     if current_line:
+#         _write_formatted_line(pdf, current_line, max_width)
+#         pdf.ln(5)
     
-    pdf.ln(3)
+#     pdf.ln(3)
 
 
 

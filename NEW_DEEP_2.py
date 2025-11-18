@@ -262,7 +262,7 @@ def get_next_sequence_number_invoice(invoice_number):
 
 
 # --- PDF Class for Two-Page Quotation (Matching Demo Format) ---
-class QUOTATION_PDF(FPDF, HTMLMixin):
+class QUOTATION_PDF(FPDF):
     def __init__(self, quotation_number="Q-N/A", quotation_date="Date N/A", sales_person_code="CP"):
         super().__init__()
         self.set_auto_page_break(auto=True, margin=15)
@@ -395,7 +395,7 @@ def add_page_one_intro(pdf, data):
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
 
-def write_paragraph_html(self ,pdf, text: str) -> str:
+def write_paragraph_html(pdf, text):
     """
     Write ONE paragraph using HTML justification and inline <b>/<u> tags.
     Use this only for the paragraph(s) you want HTML-justified.
@@ -415,30 +415,27 @@ def write_paragraph_html(self ,pdf, text: str) -> str:
     ]
 
     # Escape HTML special chars first
-    escaped = _html.escape(text)
+    h = _html.escape(text)
 
     # Replace long terms first to avoid overlapping replacements
-    bold_sorted = sorted(bold_terms, key=len, reverse=True)
-    under_sorted = sorted(under_terms, key=len, reverse=True)
+    bold_terms_sorted = sorted(bold_terms, key=len, reverse=True)
+    under_terms_sorted = sorted(under_terms, key=len, reverse=True)
 
-    # Replace bold terms (escaped)
-    for term in bold_sorted:
-        esc = _html.escape(term)
-        # Use a simple replace; since we operate on escaped text, repeated replacements won't re-match
-        escaped = escaped.replace(esc, f"<b>{esc}</b>")
+    # Apply bold
+    for term in bold_terms_sorted:
+        h = h.replace(_html.escape(term), f"<b>{_html.escape(term)}</b>")
 
-    # Replace underline terms
-    for term in under_sorted:
-        esc = _html.escape(term)
-        escaped = escaped.replace(esc, f"<u>{esc}</u>")
+    # Apply underline
+    for term in under_terms_sorted:
+        h = h.replace(_html.escape(term), f"<u>{_html.escape(term)}</u>")
 
-    # Wrap with paragraph tag (justify). Use a small inline style for font-size.
-    return f'<p align="justify" style="font-family: Helvetica; font-size:12pt; margin:0 0 6pt 0;">{escaped}</p>'
+    # Wrap single paragraph in justified <p>
+    html_par = f'<p align="justify" style="font-family: Helvetica; font-size:12pt;">{h}</p>'
 
-    # # Write as HTML
-    # pdf.write_html(html_par)
-    # # small spacing after
-    # pdf.ln(2)
+    # Write as HTML
+    pdf.write_html(html_par)
+    # small spacing after
+    pdf.ln(2)
     
 # --- SIMPLE AND RELIABLE Justified Paragraph Formatting ---
 def write_justified_paragraph_with_formatting(pdf, text):
@@ -563,39 +560,6 @@ def write_simple_justified_paragraph(pdf, text):
             # Use multi_cell with justification
             pdf.multi_cell(0, 5, paragraph, align='J')
             pdf.ln(3)
-
-
-
-
-def write_paragraph_html(self, text: str):
-    """
-    Write a paragraph using HTML justification and automatic keyword formatting.
-    Call this for every paragraph you want justified and formatted.
-    """
-    if text is None:
-        return
-        html_par = self._build_html_paragraph(text)
-        # write_html will render the paragraph with justification and inline tags
-        self.write_html(html_par)
-        # small spacing after write_html
-        self.ln(2)
-
-    # Convenience: write many paragraphs (list or multi-line string)
-def write_paragraphs(self, text_or_list):
-    if isinstance(text_or_list, (list, tuple)):
-        for p in text_or_list:
-            self.write_paragraph_html(p)
-    else:
-        for p in str(text_or_list).replace("\r", "").split("\n"):
-            p = p.strip()
-            if p:
-                self.write_paragraph_html(p)
-            else:
-                # keep blank line
-                self.ln(6)
-
-
-
 
 # --- UPDATED add_page_one_intro function ---
 def add_page_one_intro(pdf, data):

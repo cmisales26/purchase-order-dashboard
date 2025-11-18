@@ -1377,7 +1377,7 @@ from fpdf import FPDF
 class PDF(FPDF):
     def __init__(self):
         super().__init__()
-        self.set_font(self.default_font, "", 8)
+        
         font_dir = os.path.join(os.path.dirname(__file__), "fonts")
         try:
             self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
@@ -1387,7 +1387,8 @@ class PDF(FPDF):
             self.default_font = "Calibri"
         except:
             self.default_font = "Helvetica"
-
+            
+        self.set_font(self.default_font, "", 8)
         self.set_left_margin(15)
         self.set_right_margin(15)
 

@@ -1202,7 +1202,7 @@ def add_page_two_commercials(pdf, data):
 
     # Calculate bank details height WITHOUT signature section
     bank_items_height = calculate_column_height(bank_info, col2_width)
-    signature_height = 45  # Estimated height for signature section
+    signature_height = 35  # Estimated height for signature section
     
     # Use the maximum height between terms and bank items + signature
     box_height = max(terms_height, bank_items_height + signature_height ) 

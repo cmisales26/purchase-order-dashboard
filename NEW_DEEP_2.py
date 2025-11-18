@@ -1183,12 +1183,12 @@ def add_page_two_commercials(pdf, data):
     col1_width = page_width * 0.6  # 60% for Terms
     col2_width = page_width * 0.4  # 40% for Bank Details
     padding = 4
-    line_height = 3
+    line_height = 4.5
     section_spacing = 2
 
     # Calculate required height for both columns
     def calculate_column_height(items, col_width):
-        height = 0
+        height = 4
         for label, value in items:
             if value:  # If there's a value part
                 text = f"{label}{value}"

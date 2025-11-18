@@ -1059,7 +1059,7 @@ def add_quotation_header(pdf, annexure_text, quotation_text):
 
 def add_page_two_commercials(pdf, data):
     pdf.add_page()
-    
+    pdf.ln(15)
     # Use dynamic header function
     annexure_text = data.get('annexure_text', 'Annexure I - Commercials')
     quotation_title = data.get('quotation_title', 'Quotation for Adobe Software')

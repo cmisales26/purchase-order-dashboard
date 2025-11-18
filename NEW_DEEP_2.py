@@ -1188,7 +1188,7 @@ def add_page_two_commercials(pdf, data):
 
     # Calculate required height for both columns
     def calculate_column_height(items, col_width):
-        height = 3
+        height = 2
         for label, value in items:
             if value:  # If there's a value part
                 text = f"{label}{value}"

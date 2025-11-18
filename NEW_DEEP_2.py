@@ -1205,7 +1205,7 @@ def add_page_two_commercials(pdf, data):
     signature_height = 35  # Estimated height for signature section
     
     # Use the maximum height between terms and bank items + signature
-    box_height = max(terms_height, bank_items_height + signature_height + 5) + padding
+    box_height = max(terms_height, bank_items_height + signature_height ) + padding
 
     # Draw the main box
     pdf.rect(x_start, y_start, page_width, box_height)

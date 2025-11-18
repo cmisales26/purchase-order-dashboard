@@ -271,6 +271,15 @@ class QUOTATION_PDF(FPDF):
         self.quotation_number = quotation_number
         self.quotation_date = quotation_date
         self.sales_person_code = sales_person_code
+        font_dir = os.path.join(os.path.dirname(__file__), "fonts")
+        try:
+            self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
+            self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
+            self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
+            self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
+            self.default_font = "Calibri"
+        except:
+            self.default_font = "Helvetica"
         
     def sanitize_text(self, text):
         try:
@@ -285,18 +294,18 @@ class QUOTATION_PDF(FPDF):
                 self.image(self.logo_path, x=155, y=8, w=50)
             except:
                 # If image fails, show placeholder
-                self.set_font("Helvetica", "B", 10)
+                self.set_font(self.default_font, "B", 10)
                 self.set_xy(150, 8)
                 self.cell(40, 5, "[LOGO]", border=0, align="C")
             
         # Main Title (Centered)
-        self.set_font("Helvetica", "B", 16)
+        self.set_font(self.default_font, "B", 16)
         self.set_y(15)
         self.ln(5)
 
     def footer(self):
         self.set_y(-18)
-        self.set_font("Helvetica", "", 10)
+        self.set_font(self.default_font, "", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
         # Make footer emails and phone clickable - FIXED OVERLAP
@@ -306,7 +315,7 @@ class QUOTATION_PDF(FPDF):
         # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
         
         # Email and phone on same line - FIXED
-        self.set_font("Helvetica", "U", 10)
+        self.set_font(self.default_font, "U", 10)
         email_text = " info@cminfotech.com "
         phone_text = " +91 873 391 5721"
         
@@ -328,30 +337,30 @@ class QUOTATION_PDF(FPDF):
         
         self.set_text_color(0, 0, 0)  # Reset to black
         # self.set_y(-8)
-        # self.set_font("Helvetica", "I", 7)
+        # self.set_font(self.default_font, "I", 7)
         # self.cell(0, 4, f"Page {self.page_no()}", 0, 0, 'C')
 
 # --- Page Content Generation Helpers ---
 
 def add_clickable_email(pdf, email, label="Email: "):
     """Add clickable email with label - FIXED OVERLAP"""
-    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_font(pdf.default_font, "B", 12)
     label_width = pdf.get_string_width(label)
     pdf.cell(label_width, 4, label, ln=0)
     
     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 4, email, ln=True, link=f"mailto:{email}")
     pdf.set_text_color(0, 0, 0)  # Reset to black
 
 def add_clickable_phone(pdf, phone, label="Mobile: "):
     """Add clickable phone number with label - FIXED OVERLAP"""
-    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_font(pdf.default_font, "B", 12)
     label_width = pdf.get_string_width(label)
     pdf.cell(label_width, 4, label, ln=0)
     
     pdf.set_text_color(0, 0, 255)  # Blue for clickable
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     # Remove spaces and + for tel link
     tel_number = phone.replace(' ', '').replace('+', '')
     pdf.cell(0, 4, phone, ln=True, link=f"tel:{tel_number}")
@@ -359,18 +368,18 @@ def add_clickable_phone(pdf, phone, label="Mobile: "):
 
 def add_page_one_intro(pdf, data):
     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.set_y(25)
     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
     pdf.ln(5)
 
     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 5, "To,", ln=True)
-    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     
     # Address handling
     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
@@ -386,12 +395,12 @@ def add_page_one_intro(pdf, data):
     if data.get('vendor_mobile'):
         add_clickable_phone(pdf, data['vendor_mobile'])
     
-    pdf.set_font("Helvetica", "BU", 12)
+    pdf.set_font(pdf.default_font, "BU", 12)
     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
     pdf.ln(5)
 
     # Subject Line (from user input)
-    pdf.set_font("Helvetica", "BU", 12)
+    pdf.set_font(pdf.default_font, "BU", 12)
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(5)
 
@@ -418,7 +427,7 @@ def add_page_one_intro(pdf, data):
     
 #     if not needs_formatting:
 #         # Simple justified text without formatting
-#         pdf.set_font("Helvetica", "", 12)
+#         pdf.set_font(pdf.default_font, "", 12)
 #         pdf.multi_cell(0, 5, text, align='J')
 #         pdf.ln(3)
 #         return
@@ -436,13 +445,13 @@ def add_page_one_intro(pdf, data):
         
 #         # Set appropriate font for width calculation
 #         if word_needs_bold and word_needs_underline:
-#             pdf.set_font("Helvetica", "BU", 12)
+#             pdf.set_font(pdf.default_font, "BU", 12)
 #         elif word_needs_bold:
-#             pdf.set_font("Helvetica", "B", 12)
+#             pdf.set_font(pdf.default_font, "B", 12)
 #         elif word_needs_underline:
-#             pdf.set_font("Helvetica", "U", 12)
+#             pdf.set_font(pdf.default_font, "U", 12)
 #         else:
-#             pdf.set_font("Helvetica", "", 12)
+#             pdf.set_font(pdf.default_font, "", 12)
         
 #         word_width = pdf.get_string_width(word + " ")
         
@@ -487,7 +496,7 @@ def write_justified_paragraph_with_formatting(pdf, text):
     
     if not needs_formatting:
         # Simple justified text without formatting
-        pdf.set_font("Helvetica", "", 12)
+        pdf.set_font(pdf.default_font, "", 12)
         pdf.multi_cell(0, 5, text, align='J')
         pdf.ln(3)
         return
@@ -505,13 +514,13 @@ def write_justified_paragraph_with_formatting(pdf, text):
         
         # Set appropriate font for width calculation
         if word_needs_bold and word_needs_underline:
-            pdf.set_font("Helvetica", "BU", 12)
+            pdf.set_font(pdf.default_font, "BU", 12)
         elif word_needs_bold:
-            pdf.set_font("Helvetica", "B", 12)
+            pdf.set_font(pdf.default_font, "B", 12)
         elif word_needs_underline:
-            pdf.set_font("Helvetica", "U", 12)
+            pdf.set_font(pdf.default_font, "U", 12)
         else:
-            pdf.set_font("Helvetica", "", 12)
+            pdf.set_font(pdf.default_font, "", 12)
         
         word_width = pdf.get_string_width(word + " ")
         
@@ -542,13 +551,13 @@ def _write_formatted_line_justified(pdf, line_items, max_width):
     total_width = 0
     for word, bold, underline in line_items:
         if bold and underline:
-            pdf.set_font("Helvetica", "BU", 12)
+            pdf.set_font(pdf.default_font, "BU", 12)
         elif bold:
-            pdf.set_font("Helvetica", "B", 12)
+            pdf.set_font(pdf.default_font, "B", 12)
         elif underline:
-            pdf.set_font("Helvetica", "U", 12)
+            pdf.set_font(pdf.default_font, "U", 12)
         else:
-            pdf.set_font("Helvetica", "", 12)
+            pdf.set_font(pdf.default_font, "", 12)
         total_width += pdf.get_string_width(word + " ")
     
     # Calculate extra space for justification
@@ -563,13 +572,13 @@ def _write_formatted_line_justified(pdf, line_items, max_width):
     for i, (word, bold, underline) in enumerate(line_items):
         # Set appropriate font
         if bold and underline:
-            pdf.set_font("Helvetica", "BU", 12)
+            pdf.set_font(pdf.default_font, "BU", 12)
         elif bold:
-            pdf.set_font("Helvetica", "B", 12)
+            pdf.set_font(pdf.default_font, "B", 12)
         elif underline:
-            pdf.set_font("Helvetica", "U", 12)
+            pdf.set_font(pdf.default_font, "U", 12)
         else:
-            pdf.set_font("Helvetica", "", 12)
+            pdf.set_font(pdf.default_font, "", 12)
         
         # Add space between words (except first word)
         if i > 0:
@@ -635,22 +644,22 @@ def _write_formatted_line_justified(pdf, line_items, max_width):
 #             for start, end, style in format_positions:
 #                 # Write text before formatting
 #                 if start > current_pos:
-#                     pdf.set_font("Helvetica", "", 12)
+#                     pdf.set_font(pdf.default_font, "", 12)
 #                     pdf.write(5, line[current_pos:start])
                 
 #                 # Write formatted text
 #                 formatted_text = line[start:end]
 #                 if style == "bold":
-#                     pdf.set_font("Helvetica", "B", 12)
+#                     pdf.set_font(pdf.default_font, "B", 12)
 #                 else:  # underline
-#                     pdf.set_font("Helvetica", "BU", 12)
+#                     pdf.set_font(pdf.default_font, "BU", 12)
 #                 pdf.write(5, formatted_text)
                 
 #                 current_pos = end
             
 #             # Write remaining text
 #             if current_pos < len(line):
-#                 pdf.set_font("Helvetica", "", 12)
+#                 pdf.set_font(pdf.default_font, "", 12)
 #                 pdf.write(5, line[current_pos:])
             
 #             pdf.ln(5)
@@ -660,7 +669,7 @@ def _write_formatted_line_justified(pdf, line_items, max_width):
 # --- EVEN SIMPLER APPROACH: Use multi_cell for everything ---
 def write_simple_justified_paragraph(pdf, text):
     """Ultra-simple justified paragraphs using multi_cell"""
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.set_text_color(0, 0, 0)
     
     paragraphs = text.split('\n')
@@ -675,18 +684,18 @@ def write_simple_justified_paragraph(pdf, text):
 # --- UPDATED add_page_one_intro function ---
 def add_page_one_intro(pdf, data):
     # Reference Number & Date (Top Right)
-    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.set_y(35)
     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
     pdf.ln(5)
 
     # Recipient Details
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 5, "To,", ln=True)
-    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     
     # Address handling
     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
@@ -702,12 +711,12 @@ def add_page_one_intro(pdf, data):
     if data.get('vendor_mobile'):
         add_clickable_phone(pdf, data['vendor_mobile'])
     
-    pdf.set_font("Helvetica", "BU", 12)
+    pdf.set_font(pdf.default_font, "BU", 12)
     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}", align="C", ln=True)
     pdf.ln(5)
 
     # Subject Line
-    pdf.set_font("Helvetica", "BU", 12)
+    pdf.set_font(pdf.default_font, "BU", 12)
     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
     pdf.ln(8)  # Increased spacing
 
@@ -738,7 +747,7 @@ def add_page_one_intro(pdf, data):
     if pdf.get_y() > 220:  # If we're too low on the page
         pdf.add_page()
     
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.set_text_color(0, 0, 0)
 
     # Normal text - make sure it's complete
@@ -751,28 +760,28 @@ def add_page_one_intro(pdf, data):
     
     # Email clickable - DYNAMIC from sales person
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 12)
+    pdf.set_font(pdf.default_font, "U", 12)
     pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
 
     # Back to normal for separator + Mobile:
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.write(5, "  Mobile: ")
 
     # Mobile clickable - DYNAMIC from sales person
     pdf.set_text_color(0, 0, 255)
-    pdf.set_font("Helvetica", "U", 12)
+    pdf.set_font(pdf.default_font, "U", 12)
     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
 
     pdf.ln(10)  # Add space after contact info
     pdf.set_text_color(0, 0, 0)
     # Continue with the rest of your contact information...
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
-    pdf.set_font("Helvetica", "", 12)
+    pdf.set_font(pdf.default_font, "", 12)
     
     # Clickable website - RIGHT ALIGNED
-    pdf.set_font("Helvetica", "U", 12)
+    pdf.set_font(pdf.default_font, "U", 12)
     pdf.set_text_color(0, 0, 255)
 
     # Calculate the width needed for the longest link
@@ -850,7 +859,7 @@ def add_page_one_intro(pdf, data):
         
 #         # If no formatting needed, use simple justified multi_cell
 #         if not format_positions:
-#             pdf.set_font("Helvetica", "", 12)
+#             pdf.set_font(pdf.default_font, "", 12)
 #             pdf.multi_cell(0, 5, line, align='J')
 #             pdf.ln(3)
 #             continue
@@ -900,35 +909,35 @@ def add_page_one_intro(pdf, data):
 #             # Line fits, write it with formatting
 #             for chunk in chunks:
 #                 if chunk["style"] == "bold":
-#                     pdf.set_font("Helvetica", "B", 12)
+#                     pdf.set_font(pdf.default_font, "B", 12)
 #                 elif chunk["style"] == "underline":
-#                     pdf.set_font("Helvetica", "U", 12)
+#                     pdf.set_font(pdf.default_font, "U", 12)
 #                 else:
-#                     pdf.set_font("Helvetica", "", 12)
+#                     pdf.set_font(pdf.default_font, "", 12)
                 
 #                 pdf.write(5, chunk["text"])
             
 #             pdf.ln(5)
 #         else:
 #             # Line is too long, use multi_cell without formatting for this complex case
-#             pdf.set_font("Helvetica", "", 12)
+#             pdf.set_font(pdf.default_font, "", 12)
 #             pdf.multi_cell(0, 5, line, align='J')
 #             pdf.ln(3)
 
 # def add_page_one_intro(pdf, data):
 #     # Reference Number & Date (Top Right) - FIXED ALIGNMENT
-#     pdf.set_font("Helvetica", "B", 12)
+#     pdf.set_font(pdf.default_font, "B", 12)
 #     pdf.set_y(25)
 #     pdf.cell(0, 5, f"REF NO.: {data['quotation_number']}", ln=True, align="L")
 #     pdf.cell(0, 5, f"Date: {data['quotation_date']}", ln=True, align="L")
 #     pdf.ln(5)
 
 #     # Recipient Details (Left Aligned) - FIXED ALIGNMENT
-#     pdf.set_font("Helvetica", "", 12)
+#     pdf.set_font(pdf.default_font, "", 12)
 #     pdf.cell(0, 5, "To,", ln=True)
-#     pdf.set_font("Helvetica", "B", 12)
+#     pdf.set_font(pdf.default_font, "B", 12)
 #     pdf.cell(0, 6, pdf.sanitize_text(data['vendor_name']), ln=True)
-#     pdf.set_font("Helvetica", "", 12)
+#     pdf.set_font(pdf.default_font, "", 12)
     
 #     # Address handling
 #     pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
@@ -944,12 +953,12 @@ def add_page_one_intro(pdf, data):
 #     if data.get('vendor_mobile'):
 #         add_clickable_phone(pdf, data['vendor_mobile'])
     
-#     pdf.set_font("Helvetica", "BU", 12)
+#     pdf.set_font(pdf.default_font, "BU", 12)
 #     pdf.cell(0, 5, f"Kind Attention :- {pdf.sanitize_text(data['vendor_contact'])}",align="C", ln=True)
 #     pdf.ln(5)
 
 #     # Subject Line (from user input)
-#     pdf.set_font("Helvetica", "BU", 12)
+#     pdf.set_font(pdf.default_font, "BU", 12)
 #     pdf.cell(0, 6, f"Subject :- {pdf.sanitize_text(data['subject'])}", ln=True)
 #     pdf.ln(8)
 
@@ -976,7 +985,7 @@ def add_page_one_intro(pdf, data):
 #     if pdf.get_y() > 220:
 #         pdf.add_page()
     
-#     pdf.set_font("Helvetica", "", 12)
+#     pdf.set_font(pdf.default_font, "", 12)
 #     pdf.set_text_color(0, 0, 0)
 
 #     # Contact text - Use write for clickable links
@@ -989,25 +998,25 @@ def add_page_one_intro(pdf, data):
     
 #     # Email clickable
 #     pdf.set_text_color(0, 0, 255)
-#     pdf.set_font("Helvetica", "U", 12)
+#     pdf.set_font(pdf.default_font, "U", 12)
 #     pdf.write(5, sales_person_info["email"], link=f"mailto:{sales_person_info['email']}")
 
 #     # Mobile
 #     pdf.set_text_color(0, 0, 0)
-#     pdf.set_font("Helvetica", "", 12)
+#     pdf.set_font(pdf.default_font, "", 12)
 #     pdf.write(5, "  Mobile: ")
 #     pdf.set_text_color(0, 0, 255)
-#     pdf.set_font("Helvetica", "U", 12)
+#     pdf.set_font(pdf.default_font, "U", 12)
 #     pdf.write(5, sales_person_info["mobile"], link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
 
 #     pdf.ln(10)
     
 #     # Rest of contact information...
-#     pdf.set_font("Helvetica", "", 12)
+#     pdf.set_font(pdf.default_font, "", 12)
 #     pdf.cell(0, 4, "For more information, please visit our web site & Social Media :-", ln=True)
     
 #     # Clickable website links
-#     pdf.set_font("Helvetica", "U", 12)
+#     pdf.set_font(pdf.default_font, "U", 12)
 #     pdf.set_text_color(0, 0, 255)
 
 #     links = [
@@ -1030,7 +1039,7 @@ def add_page_one_intro(pdf, data):
 
 
 #    # Clickable website
-#     pdf.set_font("Helvetica", "U", 12)
+#     pdf.set_font(pdf.default_font, "U", 12)
 #     pdf.set_text_color(0, 0, 255)
 #     pdf.cell(0, 4, "https://www.cminfotech.com/", ln=True, align="R", link="https://www.cminfotech.com/")
 #     pdf.cell(0, 4, "https://www.linkedin.com/", ln=True,align="R", link="https://www.linkedin.com/")
@@ -1042,9 +1051,9 @@ def add_page_one_intro(pdf, data):
 
 def add_quotation_header(pdf, annexure_text, quotation_text):
     """Add dynamic quotation header with both annexure and title"""
-    pdf.set_font("Helvetica", "BU", 14)
+    pdf.set_font(pdf.default_font, "BU", 14)
     pdf.cell(0, 8, annexure_text, ln=True, align="C")
-    pdf.set_font("Helvetica", "BU", 12)
+    pdf.set_font(pdf.default_font, "BU", 12)
     pdf.cell(0, 6, quotation_text, ln=True, align="C")
     pdf.ln(8)
 
@@ -1063,13 +1072,13 @@ def add_page_two_commercials(pdf, data):
     
     # Table Header
     pdf.set_fill_color(220, 220, 220)
-    pdf.set_font("Helvetica", "B", 9)
+    pdf.set_font(pdf.default_font, "B", 9)
     for width, header in zip(col_widths, headers):
         pdf.cell(width, 7, header, border=1, align="C", fill=True)
     pdf.ln()
 
     # Table Rows
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font(pdf.default_font, "", 9)
     grand_total = 0.0
     
     for product in data["products"]:
@@ -1085,7 +1094,7 @@ def add_page_two_commercials(pdf, data):
         
         # Description cell (with proper text wrapping)
         desc = product["name"]
-        pdf.set_font("Helvetica", "", 9)
+        pdf.set_font(pdf.default_font, "", 9)
         
         # Calculate how many lines the description will take
         desc_lines = pdf.multi_cell(col_widths[0], 6, desc, border=0, split_only=True)
@@ -1121,13 +1130,13 @@ def add_page_two_commercials(pdf, data):
             pdf.ln()
 
     # Grand Total Row - FIXED ALIGNMENT
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
     pdf.ln(15)
 
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font(pdf.default_font, "", 9)
 
     # Terms & Conditions with ALL terms in bold
     terms = [
@@ -1197,7 +1206,7 @@ def add_page_two_commercials(pdf, data):
     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
 
     # Add section headers
-    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_font(pdf.default_font, "B", 12)
 
     # Terms & Conditions header
     pdf.set_xy(x_start + padding, y_start + padding)
@@ -1209,21 +1218,21 @@ def add_page_two_commercials(pdf, data):
         pdf.set_xy(x_start + padding, terms_y)
         
         if i < 6:  # First 6 terms - ALL BOLD
-            pdf.set_font("Helvetica", "B", 10)
+            pdf.set_font(pdf.default_font, "B", 10)
             pdf.multi_cell(col1_width - 2*padding, line_height, label)
             
         elif value:  # Terms 7-13 with mixed formatting (label + bold value)
             # Write the regular font part
-            pdf.set_font("Helvetica", "", 10)
+            pdf.set_font(pdf.default_font, "", 10)
             pdf.cell(pdf.get_string_width(label), line_height, label, ln=0)
             
             # Write the bold part
-            pdf.set_font("Helvetica", "B", 10)
+            pdf.set_font(pdf.default_font, "B", 10)
             remaining_width = col1_width - 2*padding - pdf.get_string_width(label)
             pdf.multi_cell(remaining_width, line_height, value)
             
             # Reset to regular font
-            pdf.set_font("Helvetica", "", 10)
+            pdf.set_font(pdf.default_font, "", 10)
         else:
             # Regular terms without special formatting
             pdf.multi_cell(col1_width - 2*padding, line_height, label)
@@ -1231,10 +1240,10 @@ def add_page_two_commercials(pdf, data):
         terms_y = pdf.get_y()
 
     # Bank Details header - INSIDE THE BOX
-    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-    pdf.set_font("Helvetica", "", 12)  # Set to regular for labels
+    pdf.set_font(pdf.default_font, "", 12)  # Set to regular for labels
 
     # Bank details content - INSIDE THE BOX
     bank_y = pdf.get_y()
@@ -1242,11 +1251,11 @@ def add_page_two_commercials(pdf, data):
         pdf.set_xy(x_start + col1_width + padding, bank_y)
         
         # Write label in regular font
-        pdf.set_font("Helvetica", "", 10)
+        pdf.set_font(pdf.default_font, "", 10)
         pdf.cell(pdf.get_string_width(f"{label}: "), line_height, f"{label}: ", ln=0)
         
         # Write value in BOLD font
-        pdf.set_font("Helvetica", "B", 10)
+        pdf.set_font(pdf.default_font, "B", 10)
         remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{label}: ")
         pdf.multi_cell(remaining_width, line_height, value)
         
@@ -1256,7 +1265,7 @@ def add_page_two_commercials(pdf, data):
     # Calculate position to place signature near bottom of the box
     signature_start_y = y_start + box_height - signature_height - 20
     
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.set_xy(x_start + col1_width + padding, signature_start_y)
     pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
     
@@ -1281,7 +1290,7 @@ def add_page_two_commercials(pdf, data):
     else:
         pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
     
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font(pdf.default_font, "", 9)
     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
     pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
     
@@ -1289,23 +1298,23 @@ def add_page_two_commercials(pdf, data):
     pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
     
     # Clickable email in signature
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font(pdf.default_font, "", 9)
     pdf.set_text_color(0, 0, 0)
     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
     label = "Email: "
     pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    pdf.set_font("Helvetica", "U", 9)
+    pdf.set_font(pdf.default_font, "U", 9)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
              ln=True, link=f"mailto:{sales_person_info['email']}")
     
     # Clickable phone in signature
     pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font(pdf.default_font, "", 9)
     pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
     label = "Mobile: "
     pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    pdf.set_font("Helvetica", "U", 9)
+    pdf.set_font(pdf.default_font, "U", 9)
     pdf.set_text_color(0, 0, 255)
     pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
              ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
@@ -1368,12 +1377,22 @@ from fpdf import FPDF
 class PDF(FPDF):
     def __init__(self):
         super().__init__()
-        self.set_font("Helvetica", "", 8)
+        self.set_font(self.default_font, "", 8)
+        font_dir = os.path.join(os.path.dirname(__file__), "fonts")
+        try:
+            self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
+            self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
+            self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
+            self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
+            self.default_font = "Calibri"
+        except:
+            self.default_font = "Helvetica"
+
         self.set_left_margin(15)
         self.set_right_margin(15)
 
     def header(self):
-        self.set_font("Helvetica", "B", 12)
+        self.set_font(self.default_font, "B", 12)
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
         self.ln(3)
 
@@ -1392,7 +1411,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             st.warning(f"Could not add logo: {e}")
 
     # === HEADER (Vendor + Invoice Details) ===
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(92, 8, "CM Infotech.", border=1, ln=0)
     pdf.cell(44, 8, "Invoice No.", border=1, ln=0, align="C")
     pdf.cell(44, 8, "Invoice Date", border=1, ln=1, align="C")
@@ -1400,7 +1419,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_left_start = pdf.get_y()
 
     # --- Left Side (Vendor Details) ---
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.multi_cell(92, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="LB")
     
     # Vendor details lines
@@ -1413,10 +1432,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     for i, (label, value) in enumerate(vendor_lines):
         pdf.set_x(15)
-        pdf.set_font("Helvetica", "B", 8)
+        pdf.set_font(pdf.default_font, "B", 8)
         label_width = pdf.get_string_width(label)
         pdf.cell(label_width, 6, label, border="LB", ln=0)
-        pdf.set_font("Helvetica", "", 8)
+        pdf.set_font(pdf.default_font, "", 8)
         border = "RB" if i < len(vendor_lines) - 1 else "RB"
         pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
@@ -1424,30 +1443,30 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Right Side (Invoice Details) ---
     pdf.set_xy(107, y_left_start)
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.cell(44, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="C")
     pdf.cell(44, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
 
     # Payment terms
     pdf.set_x(107)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(44, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.cell(44, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(107)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(44, 8, "Supplier's Reference:", border="LRT", ln=0)
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     other_ref_value = invoice_data['Reference']['Suppliers_Reference']
     pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 
     # Other's reference
     pdf.set_x(107)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(44, 8, "Other's Reference:", border="RTB", ln=0)
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     other_ref_value = invoice_data['Reference']['Other']
     pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 
@@ -1458,7 +1477,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # pdf.ln(6)
 
     # === BUYER SECTION ===
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(92, 8, "Buyer", border=1, ln=0)
     pdf.cell(44, 8, "Buyer's Order No.", border=1, ln=0, align="C")
     pdf.cell(44, 8, "Buyer's Order Date", border=1, ln=1, align="C")
@@ -1470,10 +1489,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_left_buyer_start = pdf.get_y()
     
     # Buyer name and address
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(92, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.multi_cell(92, 4, invoice_data['buyer']['address'], border="LRB")
     
     # Buyer contact details
@@ -1485,10 +1504,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     for i, (label, value) in enumerate(buyer_lines):
         pdf.set_x(15)
-        pdf.set_font("Helvetica", "B", 8)
+        pdf.set_font(pdf.default_font, "B", 8)
         label_width = pdf.get_string_width(label)
         pdf.cell(label_width, 6, label, border="LBT", ln=0)
-        pdf.set_font("Helvetica", "", 8)
+        pdf.set_font(pdf.default_font, "", 8)
         border = "RB" if i < len(buyer_lines) - 1 else "RB"
         pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
@@ -1501,7 +1520,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(107, y_buyer_start)
     
     # Row 1: Buyer's Order No/Date - FIXED POSITION (doesn't stretch with address)
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.cell(44, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="C")
     pdf.cell(44, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="C")
 
@@ -1517,23 +1536,23 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Row 2: Dispatched Through
     pdf.set_x(107)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(44, 6, "Dispatched Through", border="LRT", ln=0)
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.cell(44, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
     # Row 3: Destination
     pdf.set_x(107)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(44, 6, "Destination", border="LRT", ln=0)
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.cell(44, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
 
     # Row 4: Terms of delivery
     pdf.set_x(107)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(44, 6, "Terms of delivery", border="LRT", ln=0)
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.cell(44, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
 
     # Closing row
@@ -1542,7 +1561,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Item Table Header ---
     pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(10, 5, "Sr. No.", border=1, align="C")
     pdf.cell(75, 5, "Description of Goods", border=1, align="C")#-5
     pdf.cell(20, 5, "HSN/SAC", border=1, align="C")
@@ -1551,7 +1570,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(31, 5, "Amount", border=1, ln=True, align="C")#-2
 
     # --- Items ---
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     col_widths = [10, 75, 20, 20, 24, 31]
     line_height = 4
 
@@ -1586,7 +1605,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_xy(x_start, y_start + row_height)
 
     # --- Totals ---
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")
     pdf.cell(31, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
@@ -1601,12 +1620,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # --- Amount in Words ---
     pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(180, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # --- Tax Summary Table ---
     pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(33, 5, "HSN/SAN", border=1, align="C")
     pdf.cell(33, 5, "Taxable Value", border=1, align="C")
     pdf.cell(58, 5, "Central Tax", border=1, align="C")
@@ -1619,7 +1638,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(29, 5, "Rate", border="L", align="C")
     pdf.cell(27, 5, "Amount", border="LR", ln=True, align="C")
 
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
     hsn_sgst = hsn_tax_value * 0.09
     hsn_cgst = hsn_tax_value * 0.09
@@ -1631,7 +1650,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(29, 5, "9%", border=1, align="C")
     pdf.cell(27, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(33, 5, "Total", border=1, align="C")
     pdf.cell(33, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
     pdf.cell(29, 5, "", border=1, align="C")
@@ -1640,7 +1659,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(27, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(180, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # --- Reserve footer space ---
@@ -1650,9 +1669,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # # --- Bank Details ---
     # pdf.ln(3)
-    # pdf.set_font("Helvetica", "B", 8)
+    # pdf.set_font(pdf.default_font, "B", 8)
     # pdf.cell(0, 5, "Company's Bank Details", ln=True)
-    # pdf.set_font("Helvetica", "", 8)
+    # pdf.set_font(pdf.default_font, "", 8)
     # pdf.multi_cell(0, 4,
     #         f"Bank Nmae : IDFC FIRST\n"
     #         "Branch        : AHMEDABAD Shyamal Branch\n"
@@ -1666,17 +1685,17 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # # --- Declaration ---
     # pdf.ln(2)
-    # pdf.set_font("Helvetica", "B", 8)
+    # pdf.set_font(pdf.default_font, "B", 8)
     # pdf.cell(0, 5, "Declaration:", ln=True)
-    # pdf.set_font("Helvetica", "", 8)
+    # pdf.set_font(pdf.default_font, "", 8)
     # pdf.multi_cell(0, 4, invoice_data['declaration'])
     # --- Bank Details & Declaration (Side by Side) ---
     # pdf.ln(5)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(90, 5, "Company's Bank Details", ln=0)  # left side
     pdf.cell(90, 5, "Declaration:", ln=1)             # right side
 
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
 
     # Left column (bank)
     bank_text = (
@@ -1698,7 +1717,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Signature ---
     pdf.ln(1)
-    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_font(pdf.default_font, "B", 8)
     pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
 
     if stamp_file:
@@ -1713,21 +1732,21 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     else:
         pdf.ln(15)
         
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
     
     # --- Footer with clickable email and mobile ---
     pdf.set_y(-24)
-    pdf.set_font("Helvetica", "U", 8)
+    pdf.set_font(pdf.default_font, "U", 8)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     
     # Company address
     pdf.set_y(-18)
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
     
     # Clickable email and mobile
-    pdf.set_font("Helvetica", "U", 8)
+    pdf.set_font(pdf.default_font, "U", 8)
     pdf.set_text_color(0, 0, 255)
     email1 = "info@cminfotech.com "
     phone_number = " +91 873 391 5721"
@@ -1750,11 +1769,15 @@ class PO_PDF(FPDF):
         self.set_right_margin(15)
         self.logo_path = os.path.join(os.path.dirname(__file__),"logo_final.jpg")
         font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-        # Comment out font loading to avoid errors if fonts don't exist
-        # self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
-        # self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
-        # self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
-        # self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
+        try:
+            self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
+            self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
+            self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
+            self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
+            self.default_font = "Calibri"
+        except:
+            self.default_font = "Helvetica"
+
         self.website_url = "https://cminfotech.com/"
     def header(self):
         if self.page_no() == 1:
@@ -1765,12 +1788,12 @@ class PO_PDF(FPDF):
 
             
             # Title
-            self.set_font("Helvetica", "B", 15)
+            self.set_font(self.default_font, "B", 15)
             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
             self.ln(1)
 
             # PO info
-            self.set_font("Helvetica", "", 12)
+            self.set_font(self.default_font, "", 12)
             # PO Number (right aligned)
             self.set_xy(140,25)
             self.multi_cell(60,4,
@@ -1783,10 +1806,10 @@ class PO_PDF(FPDF):
 
     def footer(self):
         self.set_y(-18)
-        self.set_font("Helvetica", "", 10)
+        self.set_font(self.default_font, "", 10)
         self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
         self.set_text_color(0, 0, 255)
-        self.set_font("Helvetica", "U", 10)
+        self.set_font(self.default_font, "U", 10)
         # email1 = "cad@cmi.com"
         email1 = "info@cminfotech.com "
         phone_number =" +91 873 391 5721"
@@ -1801,7 +1824,7 @@ class PO_PDF(FPDF):
         self.set_text_color(0, 0, 0)
 
     def section_title(self, title):
-        self.set_font("Helvetica", "B", 12)
+        self.set_font(self.default_font, "B", 12)
         self.cell(0, 6, self.sanitize_text(title), ln=True)
         self.ln(1)
 
@@ -1839,7 +1862,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     
     # --- Vendor & Bill/Ship ---
     pdf.section_title("Vendor & Addresses")
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
     pdf.ln(7)
     # pdf.set_xy(110, pdf.get_y() - 20)
@@ -1855,12 +1878,12 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     col_widths = [65, 22, 30, 25, 15, 22]
     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
     pdf.set_fill_color(220, 220, 220)
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font(pdf.default_font, "B", 10)
     for h, w in zip(headers, col_widths):
         pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
     pdf.ln()
 
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font(pdf.default_font, "", 10)
     line_height = 5
     for p in po_data["products"]:
         gst_amt = p["basic"] * p["gst_percent"] / 100
@@ -1885,35 +1908,35 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
         pdf.ln(row_height)
 
     # Grand Total Row
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
     pdf.cell(col_widths[5], 6, f"{po_data['grand_total']:.2f}", border=1, align="R")
     pdf.ln(4)
 
     # --- Amount in Words ---
     pdf.ln(5)
-    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(0, 5, "Amount in Words:", ln=True)
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(0, 5, pdf.sanitize_text(po_data['amount_words']))
     pdf.ln(4)
 
     # # --- Terms ---
     # pdf.section_title("Terms & Conditions")
-    # pdf.set_font("Helvetica", "", 10)
+    # pdf.set_font(pdf.default_font, "", 10)
     # pdf.multi_cell(0, 4, f"Taxes            : As specified above\nPayment                     : {sanitized_payment_terms}\nDelivery                      : {sanitized_delivery_terms}")
     # pdf.ln(2)
 
     # # --- End User ---
     # pdf.section_title("End User Details")
-    # pdf.set_font("Helvetica", "", 10)
+    # pdf.set_font(pdf.default_font, "", 10)
     # pdf.multi_cell(0, 4, f"Company Name         :{sanitized_end_company}\nCompany Address   :{sanitized_end_address}\nContact                       : {sanitized_end_person} | {sanitized_end_contact}\nEmail                           : {sanitized_end_email}")
     # pdf.ln(2)
 
 
     # --- Terms & Conditions ---
     pdf.section_title("Terms & Conditions")
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font(pdf.default_font, "", 10)
 
     # Taxes
     pdf.cell(45, 4, "Taxes")
@@ -1934,7 +1957,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # --- End User ---
     pdf.section_title("End User Details")
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font(pdf.default_font, "", 10)
 
     # Company Name
     pdf.cell(45, 4, "Company Name")
@@ -1958,7 +1981,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     pdf.ln(2)
     # Authorization Section
-    # pdf.set_font("Helvetica", "", 10)
+    # pdf.set_font(pdf.default_font, "", 10)
     # pdf.set_x(pdf.l_margin)
     # pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
 
@@ -1967,7 +1990,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
     stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
     if os.path.exists(stamp_path):

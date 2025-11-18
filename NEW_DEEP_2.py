@@ -728,8 +728,8 @@ def add_page_one_intro(pdf, data):
     ]
 
     for paragraph in fixed_paragraphs:
-        write_justified_paragraph_with_formatting(pdf, paragraph)
-        # write_simple_justified_paragraph(pdf, paragraph)
+        # write_justified_paragraph_with_formatting(pdf, paragraph)
+        write_simple_justified_paragraph(pdf, paragraph)
         # write_paragraph_html(pdf,paragraph)
         pdf.ln(3)  # Add space between paragraphs
 

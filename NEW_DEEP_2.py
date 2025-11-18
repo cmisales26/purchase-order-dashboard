@@ -1180,8 +1180,8 @@ def add_page_two_commercials(pdf, data):
     x_start = pdf.get_x()
     y_start = pdf.get_y()
     page_width = pdf.w - 1.6 * pdf.l_margin
-    col1_width = page_width * 0.6  # 60% for Terms
-    col2_width = page_width * 0.4  # 40% for Bank Details
+    col1_width = page_width * 0.65  # 60% for Terms
+    col2_width = page_width * 0.45  # 40% for Bank Details
     padding = 4
     line_height = 4.5
     section_spacing = 2

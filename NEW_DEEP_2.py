@@ -845,7 +845,7 @@ class PDF(FPDF):
 
     def header(self):
         self.set_font(self.default_font, "B", 15)
-        self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
+        self.cell(0, 6, "TAX INVOICE", ln=True, align="L")
         self.ln(3)
         
     def footer(self):
@@ -871,9 +871,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === HEADER (Vendor + Invoice Details) ===
     pdf.set_font(pdf.default_font, "B", 13)
-    pdf.cell(97, 8, "CM Infotech.", border=1, ln=0)
-    pdf.cell(48, 8, "Invoice No.", border=1, ln=0, align="L")
-    pdf.cell(48, 8, "Invoice Date", border=1, ln=1, align="L")
+    pdf.cell(92, 8, "CM Infotech.", border=1, ln=0)
+    pdf.cell(44, 8, "Invoice No.", border=1, ln=0, align="C")
+    pdf.cell(44, 8, "Invoice Date", border=1, ln=1, align="C")
 
     y_left_start = pdf.get_y()
 
@@ -890,12 +890,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     ]
     
     for i, (label, value) in enumerate(vendor_lines):
-        pdf.set_x(10)
+        pdf.set_x(15)
         pdf.set_font(pdf.default_font, "B", 12)
         label_width = pdf.get_string_width(label) 
-        pdf.cell(label_width, 5, label, border="L", ln=0)#L
+        pdf.cell(label_width, 5, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
-        border = "L" if i < len(vendor_lines) - 1 else "R"
+        border = "R" if i < len(vendor_lines) - 1 else "R"
         pdf.cell(92 - label_width, 5, value, border=border, ln=1)
 
     y_left_end = pdf.get_y()

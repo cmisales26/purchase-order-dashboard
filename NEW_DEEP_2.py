@@ -841,11 +841,11 @@ class PDF(FPDF):
 
         self.set_font(self.default_font, "", 8)
         self.set_left_margin(10)
-        self.set_right_margin(10)
+        self.set_right_margin(15)
 
     def header(self):
         self.set_font(self.default_font, "B", 15)
-        self.cell(-10, 6, "TAX INVOICE", ln=True, align="L")
+        self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
         self.ln(3)
         
     def footer(self):
@@ -859,7 +859,7 @@ class PDF(FPDF):
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_auto_page_break(auto=True, margin=10)
     pdf.add_page()
 
     # --- Logo on top right ---

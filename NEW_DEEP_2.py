@@ -1112,14 +1112,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 12)
     
     # Main header
-    pdf.cell(33, 6, "HSN/SAN", border=1, align="C")
-    pdf.cell(33, 6, "Taxable Value", border=1, align="C")
+    pdf.cell(34, 6, "HSN/SAN", border=1, align="C")
+    pdf.cell(34, 6, "Taxable Value", border=1, align="C")
     pdf.cell(60, 6, "Central Tax", border=1, align="C")
     pdf.cell(58, 6, "State Tax", border=1, ln=True, align="C")
 
     # Sub-header
-    pdf.cell(33, 6, "", border="L", ln=False)
-    pdf.cell(33, 6, "", border="L", ln=False)
+    pdf.cell(34, 6, "", border="L", ln=False)
+    pdf.cell(34, 6, "", border="L", ln=False)
     pdf.cell(30, 6, "Rate", border="L", align="C")
     pdf.cell(30, 6, "Amount", border="LR", align="C")
     pdf.cell(30, 6, "Rate", border="L", align="C")
@@ -1131,21 +1131,21 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     hsn_cgst = hsn_tax_value * 0.09
     
     # Data row
-    pdf.cell(33, 6, "997331", border=1, align="C")
-    pdf.cell(33, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(29, 6, "9%", border=1, align="C")
-    pdf.cell(29, 6, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(29, 6, "9%", border=1, align="C")
-    pdf.cell(27, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(34, 6, "997331", border=1, align="C")
+    pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(30, 6, "9%", border=1, align="C")
+    pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(30, 6, "9%", border=1, align="C")
+    pdf.cell(28, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
     # Total row
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(33, 6, "Total", border=1, align="C")
-    pdf.cell(33, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(29, 6, "", border=1, align="C")
-    pdf.cell(29, 6, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(29, 6, "", border=1, align="C")
-    pdf.cell(27, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(34, 6, "Total", border=1, align="C")
+    pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(30, 6, "", border=1, align="C")
+    pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(30, 6, "", border=1, align="C")
+    pdf.cell(28, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     # Tax in words
     pdf.ln(2)

@@ -1301,7 +1301,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(20, 5, "Bill To:", ln=0)
     pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(50, 5, f"\n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    pdf.multi_cell(20, 5, f"\n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
 
 
     pdf.set_xy(125, pdf.get_y() - 25)

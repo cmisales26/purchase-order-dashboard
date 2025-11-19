@@ -1351,25 +1351,14 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # pdf.multi_cell(0, 5, pdf.sanitize_text(po_data['amount_words']))
     # pdf.ln(4)
 
+    # --- Amount in Words ---
     pdf.ln(5)
-    # First write the label
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(pdf.get_string_width("Amount in Words "), 5, "Amount in Words:", ln=0)
+    pdf.cell(45, 4, "Amount in Words")
     pdf.cell(5, 4, ":")
-    # Then write the amount text starting from the same position
-    x_pos = pdf.get_x()
-    y_pos = pdf.get_y()
     pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(0, 5, pdf.sanitize_text(po_data['amount_words']))
-
-    # If the amount text wrapped to multiple lines, we need to adjust
-    if pdf.get_y() > y_pos + 5:
-        # Multi-line amount text
-        pdf.ln(2)
-    else:
-        # Single line amount text
-        pdf.ln(4)
-
+    pdf.multi_cell(0, 4, pdf.sanitize_text(po_data['amount_words']))
+    pdf.ln(2)
 
     # --- Terms & Conditions ---
     pdf.section_title("Terms & Conditions")

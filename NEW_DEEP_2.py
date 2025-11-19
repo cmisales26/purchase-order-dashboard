@@ -1294,10 +1294,16 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.section_title("Vendor & Addresses")
     pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
-    pdf.ln(7)
+    pdf.ln(5)
     # pdf.set_xy(110, pdf.get_y() - 20)
+    # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.multi_cell(70, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.multi_cell(70, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    pdf.cell(20, 5, "Bill To:", ln=0)
+    pdf.set_font(pdf.default_font, "", 10)
+    pdf.multi_cell(50, 5, f"\n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+
+
     pdf.set_xy(125, pdf.get_y() - 25)
     pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
     pdf.ln(2)

@@ -845,7 +845,7 @@ class PDF(FPDF):
 
     def header(self):
         self.set_font(self.default_font, "B", 15)
-        self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
+        self.cell(0, 6, "TAX INVOICE", ln=True, align="L")
         self.ln(3)
         
     def footer(self):

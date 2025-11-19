@@ -2201,23 +2201,31 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 10)
 
     # Company Name
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(45, 4, "Company Name")
     pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(0, 4, f"{sanitized_end_company}")
 
     # Company Address
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(45, 4, "Company Address")
     pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(0, 4, f"{sanitized_end_address}")
 
     # Contact
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(45, 4, "Contact")
     pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(0, 4, f"{sanitized_end_person} | {sanitized_end_mobile}")
 
     # Email
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(45, 4, "Email")
     pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(0, 4, f"{sanitized_end_email}")
 
     pdf.ln(2)

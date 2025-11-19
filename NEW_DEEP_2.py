@@ -840,7 +840,7 @@ class PDF(FPDF):
             self.default_font = "Helvetica"
 
         self.set_font(self.default_font, "", 8)
-        self.set_left_margin(15)
+        self.set_left_margin(10)
         self.set_right_margin(15)
 
     def header(self):

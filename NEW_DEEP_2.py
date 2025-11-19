@@ -896,7 +896,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.cell(label_width, 5, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 10)
         border = "R" if i < len(vendor_lines) - 1 else "R"
-        pdf.cell(92 - label_width, 6, value, border=border, ln=1)
+        pdf.cell(92 - label_width, 5, value, border=border, ln=1)
 
     y_left_end = pdf.get_y()
 
@@ -2012,7 +2012,7 @@ class PO_PDF(FPDF):
             # Logo (if available)
             self.ln(1)
             if self.logo_path and os.path.exists(self.logo_path):
-                self.image(self.logo_path, x=155, y=8, w=45,link=self.website_url)
+                self.image(self.logo_path, x=155, y=5.5, w=45,link=self.website_url)
                 # (self.logo_path, x=155, y=8, w=50)
                 # (self.logo_path, x=160, y=5.5, w=45,link=self.website_url)
                 # self.image(self.logo_path, x=150, y=10, w=40)

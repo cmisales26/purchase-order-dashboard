@@ -859,7 +859,7 @@ class PDF(FPDF):
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()
-    pdf.set_auto_page_break(auto=True, margin=10)
+    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
     # --- Logo on top right ---
@@ -871,7 +871,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === HEADER (Vendor + Invoice Details) ===
     pdf.set_font(pdf.default_font, "B", 13)
-    pdf.cell(92, 8, "CM Infotech.", border=1, ln=0)
+    pdf.cell(95, 8, "CM Infotech.", border=1, ln=0)
     pdf.cell(44, 8, "Invoice No.", border=1, ln=0, align="C")
     pdf.cell(44, 8, "Invoice Date", border=1, ln=1, align="C")
 

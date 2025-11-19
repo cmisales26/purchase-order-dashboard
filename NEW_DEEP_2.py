@@ -1214,7 +1214,7 @@ class PO_PDF(FPDF):
             # Logo (if available)
             self.ln(1)
             if self.logo_path and os.path.exists(self.logo_path):
-                self.image(self.logo_path, x=160, y=5.5, w=35,link=self.website_url)
+                self.image(self.logo_path, x=160, y=5.5, w=45,link=self.website_url)
                 # self.image(self.logo_path, x=150, y=10, w=40)
             self.ln(1)
             # Title

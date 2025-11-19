@@ -1212,10 +1212,19 @@ class PO_PDF(FPDF):
         if self.page_no() == 1:
             # Logo (if available)
             if self.logo_path and os.path.exists(self.logo_path):
-                self.image(self.logo_path, x=162.5, y=2.5, w=45,link=self.website_url)
+                self.image(self.logo_path, x=180, y=2.5, w=45,link=self.website_url)
                 # self.image(self.logo_path, x=150, y=10, w=40)
 
-            
+        #         def header(self):
+        # # Logo placement (top right) - FIXED
+        # if hasattr(self, 'logo_path') and self.logo_path and os.path.exists(self.logo_path):
+        #     try:
+        #         self.image(self.logo_path, x=155, y=8, w=50)
+        #     except:
+        #         # If image fails, show placeholder
+        #         self.set_font(self.default_font, "B", 10)
+        #         self.set_xy(150, 8)
+        #         self.cell(40, 5, "[LOGO]", border=0, align="C")
             # Title
             self.set_font(self.default_font, "B", 15)
             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")

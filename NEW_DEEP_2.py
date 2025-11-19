@@ -1115,9 +1115,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(180, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # --- Reserve footer space ---
-    needed_space = 70
-    if pdf.get_y() + needed_space > pdf.h - pdf.b_margin:
-        pdf.set_y(pdf.h - pdf.b_margin - needed_space)
+    # needed_space = 70
+    # if pdf.get_y() + needed_space > pdf.h - pdf.b_margin:
+    #     pdf.set_y(pdf.h - pdf.b_margin - needed_space)
 
     # --- Bank Details & Declaration (Side by Side) ---
     pdf.set_font(pdf.default_font, "B", 10)

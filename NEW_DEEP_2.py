@@ -1218,7 +1218,7 @@ class PO_PDF(FPDF):
                 # (self.logo_path, x=155, y=8, w=50)
                 # (self.logo_path, x=160, y=5.5, w=45,link=self.website_url)
                 # self.image(self.logo_path, x=150, y=10, w=40)
-            self.ln(2)
+            self.ln(4)
             # Title
             self.set_font(self.default_font, "B", 15)
             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
@@ -1227,7 +1227,7 @@ class PO_PDF(FPDF):
             # PO info
             self.set_font(self.default_font, "", 12)
             # PO Number (right aligned)
-            self.set_xy(140,45)
+            self.set_xy(140,30)
             self.multi_cell(60,4,
                             f"PO No: {self.sanitize_text(st.session_state.po_number)}\n"
                             f"Date: {self.sanitize_text(st.session_state.po_date)}")

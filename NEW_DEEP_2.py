@@ -863,7 +863,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             st.warning(f"Could not add logo: {e}")
 
     # === HEADER (Vendor + Invoice Details) ===
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(92, 8, "CM Infotech.", border=1, ln=0)
     pdf.cell(44, 8, "Invoice No.", border=1, ln=0, align="C")
     pdf.cell(44, 8, "Invoice Date", border=1, ln=1, align="C")

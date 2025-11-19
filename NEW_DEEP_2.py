@@ -908,10 +908,20 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Payment terms
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 11)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 11)
-    pdf.multi_cell(48, 8, "100% Advance with\nPurchase", border="RT", ln=1)
+    pdf.set_font(pdf.default_font, "", 12)
+
+    # Use multi_cell to wrap text to next line
+    pdf.set_xy(151, pdf.get_y())  # Set position for the right cell
+    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="C")
+
+    # Payment terms
+    # pdf.set_x(107)
+    # pdf.set_font(pdf.default_font, "B", 11)
+    # pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
+    # pdf.set_font(pdf.default_font, "", 11)
+    # pdf.cell(48, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(107)

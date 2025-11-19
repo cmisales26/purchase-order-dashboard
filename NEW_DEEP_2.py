@@ -970,7 +970,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         label_width = pdf.get_string_width(label) + 1
         pdf.cell(label_width, 5, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
-        border = "B" if i < len(buyer_lines) - 1 else "B"
+        border = "" if i < len(buyer_lines) - 1 else "B"
         pdf.cell(92 - label_width, 5, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
@@ -980,7 +980,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(107, y_buyer_start)
     
     # Row 1: Buyer's Order No/Date
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="L")
     pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="L")
 

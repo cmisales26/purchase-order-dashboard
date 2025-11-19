@@ -1161,7 +1161,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     else:
         pdf.ln(15)
         
-    pdf.set_font(pdf.default_font, "", 8)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
     
     # --- Footer with clickable email and mobile ---

@@ -1310,7 +1310,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.multi_cell(0, 5, f"\n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
 
     # Reset position for Ship To
-    pdf.set_xy(125, pdf.get_y() - 25)  # Adjusted Y position since we used multi_cell
+    pdf.set_xy(125, pdf.get_y() - 15)  # Adjusted Y position since we used multi_cell
 
     # Ship To section - only "Ship To:" in bold
     pdf.set_font(pdf.default_font, "B", 10)

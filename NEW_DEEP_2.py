@@ -1419,7 +1419,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
     if os.path.exists(stamp_path):
         pdf.ln(2)
-        pdf.image(stamp_path, x=pdf.get_x(), y=pdf.get_y(), w=30)
+        pdf.image(stamp_path, x=pdf.get_x(), y=pdf.get_y(), w=20)
         pdf.ln(15)
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1')

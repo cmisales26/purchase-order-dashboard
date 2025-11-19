@@ -895,7 +895,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         label_width = pdf.get_string_width(label) + 1
         pdf.cell(label_width, 6, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
-        border = "RB" if i < len(vendor_lines) - 1 else "R"
+        border = "R" if i < len(vendor_lines) - 1 else "R"
         pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
     y_left_end = pdf.get_y()

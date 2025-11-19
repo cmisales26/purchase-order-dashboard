@@ -863,7 +863,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             st.warning(f"Could not add logo: {e}")
 
     # === HEADER (Vendor + Invoice Details) ===
-    pdf.set_font(pdf.default_font, "B", 15)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(92, 8, "CM Infotech.", border=1, ln=0)
     pdf.cell(44, 8, "Invoice No.", border=1, ln=0, align="C")
     pdf.cell(44, 8, "Invoice Date", border=1, ln=1, align="C")
@@ -871,7 +871,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_left_start = pdf.get_y()
 
     # --- Left Side (Vendor Details) ---
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.multi_cell(92, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="LB")
     
     # Vendor details lines

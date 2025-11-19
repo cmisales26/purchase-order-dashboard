@@ -841,7 +841,7 @@ class PDF(FPDF):
 
         self.set_font(self.default_font, "", 8)
         self.set_left_margin(10)
-        self.set_right_margin(15)
+        self.set_right_margin(10)
 
     def header(self):
         self.set_font(self.default_font, "B", 15)

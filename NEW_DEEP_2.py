@@ -884,10 +884,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     for i, (label, value) in enumerate(vendor_lines):
         pdf.set_x(15)
-        pdf.set_font(pdf.default_font, "B", 8)
+        pdf.set_font(pdf.default_font, "B", 10)
         label_width = pdf.get_string_width(label)
         pdf.cell(label_width, 6, label, border="LB", ln=0)
-        pdf.set_font(pdf.default_font, "", 8)
+        pdf.set_font(pdf.default_font, "", 10)
         border = "RB" if i < len(vendor_lines) - 1 else "RB"
         pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
@@ -895,22 +895,22 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Right Side (Invoice Details) ---
     pdf.set_xy(107, y_left_start)
-    pdf.set_font(pdf.default_font, "", 8)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.cell(44, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="C")
     pdf.cell(44, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
 
     # Payment terms
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 8)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 8)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.cell(44, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 8)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 8, "Supplier's Reference:", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 8)
+    pdf.set_font(pdf.default_font, "", 10)
     other_ref_value = invoice_data['Reference']['Suppliers_Reference']
     pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 

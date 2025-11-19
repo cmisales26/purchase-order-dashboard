@@ -1148,9 +1148,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(29, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     # Tax in words
-    pdf.ln(2)
+    # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(180, 6, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    pdf.cell(188, 6, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before footer content
     if pdf.get_y() + 80 > pdf.page_break_trigger:

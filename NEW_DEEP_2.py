@@ -1032,7 +1032,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
 
     # --- Items ---
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     line_height = 5
 
     for i, item in enumerate(invoice_data["items"], start=1):
@@ -1040,14 +1040,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         if pdf.get_y() + 25 > pdf.page_break_trigger:
             pdf.add_page()
             # Re-add header for new page
-            pdf.set_font(pdf.default_font, "B", 10)
+            pdf.set_font(pdf.default_font, "B", 12)
             pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
             pdf.cell(col_widths[1], 6, "Description of Goods", border=1, align="C")
             pdf.cell(col_widths[2], 6, "HSN/SAC", border=1, align="C")
             pdf.cell(col_widths[3], 6, "Quantity", border=1, align="C")
             pdf.cell(col_widths[4], 6, "Unit Rate", border=1, align="C")
             pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
-            pdf.set_font(pdf.default_font, "", 10)
+            pdf.set_font(pdf.default_font, "", 12)
             
         x_start = pdf.get_x()
         y_start = pdf.get_y()
@@ -1083,7 +1083,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.add_page()
 
     # --- Totals ---
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     total_width = sum(col_widths[:5])
     
     pdf.cell(total_width, 6, "Basic Amount", border=1, align="L")
@@ -1100,7 +1100,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # --- Amount in Words ---
     # pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(188, 6, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before tax summary
@@ -1109,7 +1109,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Tax Summary Table ---
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     
     # Main header
     pdf.cell(33, 6, "HSN/SAN", border=1, align="C")

@@ -884,10 +884,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     for i, (label, value) in enumerate(vendor_lines):
         pdf.set_x(15)
-        pdf.set_font(pdf.default_font, "B", 10)
+        pdf.set_font(pdf.default_font, "B", 12)
         label_width = pdf.get_string_width(label)
         pdf.cell(label_width, 6, label, border="LB", ln=0)
-        pdf.set_font(pdf.default_font, "", 10)
+        pdf.set_font(pdf.default_font, "", 12)
         border = "RB" if i < len(vendor_lines) - 1 else "RB"
         pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
@@ -895,30 +895,30 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Right Side (Invoice Details) ---
     pdf.set_xy(107, y_left_start)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(44, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="C")
     pdf.cell(44, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
 
     # Payment terms
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(44, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(44, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(44, 8, "Supplier's Reference:", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     other_ref_value = invoice_data['Reference']['Suppliers_Reference']
     pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 
     # Other's reference
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(44, 8, "Other's Reference:", border="RTB", ln=0)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     other_ref_value = invoice_data['Reference']['Other']
     pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 
@@ -941,10 +941,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_left_buyer_start = pdf.get_y()
     
     # Buyer name and address
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(92, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(92, 4, invoice_data['buyer']['address'], border="LRB")
     
     # Buyer contact details
@@ -956,10 +956,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     for i, (label, value) in enumerate(buyer_lines):
         pdf.set_x(15)
-        pdf.set_font(pdf.default_font, "B", 10)
+        pdf.set_font(pdf.default_font, "B", 12)
         label_width = pdf.get_string_width(label)
         pdf.cell(label_width, 6, label, border="LBT", ln=0)
-        pdf.set_font(pdf.default_font, "", 10)
+        pdf.set_font(pdf.default_font, "", 12)
         border = "RB" if i < len(buyer_lines) - 1 else "RB"
         pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
@@ -972,7 +972,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(107, y_buyer_start)
     
     # Row 1: Buyer's Order No/Date - FIXED POSITION (doesn't stretch with address)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(44, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="C")
     pdf.cell(44, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="C")
 
@@ -988,23 +988,23 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Row 2: Dispatched Through
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(44, 6, "Dispatched Through", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(44, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
     # Row 3: Destination
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(44, 6, "Destination", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(44, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
 
     # Row 4: Terms of delivery
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(44, 6, "Terms of delivery", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(44, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
 
     # Closing row
@@ -1013,7 +1013,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Item Table Header ---
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(10, 5, "Sr. No.", border=1, align="C")
     pdf.cell(75, 5, "Description of Goods", border=1, align="C")#-5
     pdf.cell(20, 5, "HSN/SAC", border=1, align="C")
@@ -1022,7 +1022,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(31, 5, "Amount", border=1, ln=True, align="C")#-2
 
     # --- Items ---
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     col_widths = [10, 75, 20, 20, 24, 31]
     line_height = 4
 
@@ -1057,7 +1057,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_xy(x_start, y_start + row_height)
 
     # --- Totals ---
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(sum(col_widths[:5]), 5, "Basic Amount", border=1, align="L")
     pdf.cell(31, 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
@@ -1072,12 +1072,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # --- Amount in Words ---
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(180, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # --- Tax Summary Table ---
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(33, 5, "HSN/SAN", border=1, align="C")
     pdf.cell(33, 5, "Taxable Value", border=1, align="C")
     pdf.cell(58, 5, "Central Tax", border=1, align="C")
@@ -1090,7 +1090,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(29, 5, "Rate", border="L", align="C")
     pdf.cell(27, 5, "Amount", border="LR", ln=True, align="C")
 
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
     hsn_sgst = hsn_tax_value * 0.09
     hsn_cgst = hsn_tax_value * 0.09
@@ -1102,7 +1102,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(29, 5, "9%", border=1, align="C")
     pdf.cell(27, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(33, 5, "Total", border=1, align="C")
     pdf.cell(33, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
     pdf.cell(29, 5, "", border=1, align="C")
@@ -1111,7 +1111,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(27, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(180, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # --- Reserve footer space ---
@@ -1120,11 +1120,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_y(pdf.h - pdf.b_margin - needed_space)
 
     # --- Bank Details & Declaration (Side by Side) ---
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(90, 5, "Company's Bank Details", ln=0)  # left side
     pdf.cell(90, 5, "Declaration:", ln=1)             # right side
 
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
 
     # Left column (bank)
     bank_text = (
@@ -1146,7 +1146,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Signature ---
     pdf.ln(1)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(0, 5, "For CM Infotech.", ln=True, align="R")
 
     if stamp_file:
@@ -1161,21 +1161,21 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     else:
         pdf.ln(15)
         
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 5, "Authorized Signatory", ln=True, align="R")
     
     # --- Footer with clickable email and mobile ---
     pdf.set_y(-24)
-    pdf.set_font(pdf.default_font, "U", 10)
+    pdf.set_font(pdf.default_font, "U", 12)
     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     
     # Company address
     pdf.set_y(-18)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
     
     # Clickable email and mobile
-    pdf.set_font(pdf.default_font, "U", 10)
+    pdf.set_font(pdf.default_font, "U", 12)
     pdf.set_text_color(0, 0, 255)
     email1 = "info@cminfotech.com "
     phone_number = " +91 873 391 5721"

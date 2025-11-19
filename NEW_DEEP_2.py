@@ -894,7 +894,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_font(pdf.default_font, "B", 10)
         label_width = pdf.get_string_width(label) + 1
         pdf.cell(label_width, 6, label, border="L", ln=0)
-        pdf.set_font(pdf.default_font, "", 12)
+        pdf.set_font(pdf.default_font, "", 10)
         border = "R" if i < len(vendor_lines) - 1 else "R"
         pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
@@ -908,24 +908,24 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Payment terms
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(44, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 8, "Supplier's Reference:", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     other_ref_value = invoice_data['Reference']['Suppliers_Reference']
     pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 
     # Other's reference
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 8, "Other's Reference:", border="RTB", ln=0)
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     other_ref_value = invoice_data['Reference']['Other']
     pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 
@@ -941,10 +941,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_left_buyer_start = pdf.get_y()
     
     # Buyer name and address
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(92, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(92, 4, invoice_data['buyer']['address'], border="LRB")
     
     # Buyer contact details
@@ -956,10 +956,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     for i, (label, value) in enumerate(buyer_lines):
         pdf.set_x(15)
-        pdf.set_font(pdf.default_font, "B", 12)
+        pdf.set_font(pdf.default_font, "B", 10)
         label_width = pdf.get_string_width(label) + 1
         pdf.cell(label_width, 6, label, border="LBT", ln=0)
-        pdf.set_font(pdf.default_font, "", 12)
+        pdf.set_font(pdf.default_font, "", 10)
         border = "RB" if i < len(buyer_lines) - 1 else "RB"
         pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 
@@ -970,7 +970,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(107, y_buyer_start)
     
     # Row 1: Buyer's Order No/Date
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.cell(44, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="C")
     pdf.cell(44, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="C")
 
@@ -986,23 +986,23 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Row 2: Dispatched Through
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 6, "Dispatched Through", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.cell(44, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
     # Row 3: Destination
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 6, "Destination", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.cell(44, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
 
     # Row 4: Terms of delivery
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 6, "Terms of delivery", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.cell(44, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
 
     # Closing row
@@ -1011,7 +1011,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Item Table Header ---
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     col_widths = [10, 75, 20, 20, 24, 31]
     
     # Header row
@@ -1023,7 +1023,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
 
     # --- Items ---
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     line_height = 5
 
     for i, item in enumerate(invoice_data["items"], start=1):
@@ -1031,14 +1031,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         if pdf.get_y() + 25 > pdf.page_break_trigger:
             pdf.add_page()
             # Re-add header for new page
-            pdf.set_font(pdf.default_font, "B", 12)
+            pdf.set_font(pdf.default_font, "B", 10)
             pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
             pdf.cell(col_widths[1], 6, "Description of Goods", border=1, align="C")
             pdf.cell(col_widths[2], 6, "HSN/SAC", border=1, align="C")
             pdf.cell(col_widths[3], 6, "Quantity", border=1, align="C")
             pdf.cell(col_widths[4], 6, "Unit Rate", border=1, align="C")
             pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
-            pdf.set_font(pdf.default_font, "", 12)
+            pdf.set_font(pdf.default_font, "", 10)
             
         x_start = pdf.get_x()
         y_start = pdf.get_y()
@@ -1074,7 +1074,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.add_page()
 
     # --- Totals ---
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     total_width = sum(col_widths[:5])
     
     pdf.cell(total_width, 6, "Basic Amount", border=1, align="L")
@@ -1091,7 +1091,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # --- Amount in Words ---
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(180, 6, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before tax summary
@@ -1100,7 +1100,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Tax Summary Table ---
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     
     # Main header
     pdf.cell(33, 6, "HSN/SAN", border=1, align="C")
@@ -1116,7 +1116,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(29, 6, "Rate", border="L", align="C")
     pdf.cell(27, 6, "Amount", border="LR", ln=True, align="C")
 
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
     hsn_sgst = hsn_tax_value * 0.09
     hsn_cgst = hsn_tax_value * 0.09
@@ -1130,7 +1130,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(27, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
     # Total row
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(33, 6, "Total", border=1, align="C")
     pdf.cell(33, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
     pdf.cell(29, 6, "", border=1, align="C")
@@ -1140,7 +1140,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Tax in words
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(180, 6, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before footer content
@@ -1149,11 +1149,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Bank Details & Declaration (Side by Side) ---
     pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(90, 6, "Company's Bank Details", ln=0)
     pdf.cell(90, 6, "Declaration:", ln=1)
 
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
 
     # Left column (bank)
     bank_text = (
@@ -1182,7 +1182,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Signature ---
     pdf.ln(5)
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(0, 6, "For CM Infotech.", ln=True, align="R")
 
     if stamp_file:
@@ -1197,7 +1197,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     else:
         pdf.ln(20)
         
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.cell(0, 6, "Authorized Signatory", ln=True, align="R")
     
     # --- Professional Footer ---

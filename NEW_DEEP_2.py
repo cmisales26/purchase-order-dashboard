@@ -916,9 +916,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Other's reference
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 8)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 8, "Other's Reference:", border="RTB", ln=0)
-    pdf.set_font(pdf.default_font, "", 8)
+    pdf.set_font(pdf.default_font, "", 10)
     other_ref_value = invoice_data['Reference']['Other']
     pdf.cell(44, 8, other_ref_value, border="LRTB", ln=1)
 
@@ -929,7 +929,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # pdf.ln(6)
 
     # === BUYER SECTION ===
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(92, 8, "Buyer", border=1, ln=0)
     pdf.cell(44, 8, "Buyer's Order No.", border=1, ln=0, align="C")
     pdf.cell(44, 8, "Buyer's Order Date", border=1, ln=1, align="C")
@@ -941,10 +941,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_left_buyer_start = pdf.get_y()
     
     # Buyer name and address
-    pdf.set_font(pdf.default_font, "B", 8)
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(92, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
-    pdf.set_font(pdf.default_font, "", 8)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(92, 4, invoice_data['buyer']['address'], border="LRB")
     
     # Buyer contact details
@@ -956,10 +956,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     for i, (label, value) in enumerate(buyer_lines):
         pdf.set_x(15)
-        pdf.set_font(pdf.default_font, "B", 8)
+        pdf.set_font(pdf.default_font, "B", 10)
         label_width = pdf.get_string_width(label)
         pdf.cell(label_width, 6, label, border="LBT", ln=0)
-        pdf.set_font(pdf.default_font, "", 8)
+        pdf.set_font(pdf.default_font, "", 10)
         border = "RB" if i < len(buyer_lines) - 1 else "RB"
         pdf.cell(92 - label_width, 6, value, border=border, ln=1)
 

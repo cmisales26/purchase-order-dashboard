@@ -871,7 +871,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_left_start = pdf.get_y()
 
     # --- Left Side (Vendor Details) ---
-    pdf.set_font(pdf.default_font, "", 8)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(92, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="LB")
     
     # Vendor details lines

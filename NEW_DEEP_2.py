@@ -902,8 +902,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Right Side (Invoice Details) ---
     pdf.set_xy(107, y_left_start)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(44, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="C")
-    pdf.cell(44, 8, invoice_data['invoice']['date'], border="R", ln=1, align="C")
+    pdf.cell(44, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="L")
+    pdf.cell(44, 8, invoice_data['invoice']['date'], border="R", ln=1, align="L")
 
     # Payment terms
     pdf.set_x(107)
@@ -931,8 +931,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # === BUYER SECTION ===
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(92, 8, "Buyer", border=1, ln=0)
-    pdf.cell(44, 8, "Buyer's Order No.", border=1, ln=0, align="C")
-    pdf.cell(44, 8, "Buyer's Order Date", border=1, ln=1, align="C")
+    pdf.cell(44, 8, "Buyer's Order No.", border=1, ln=0, align="L")
+    pdf.cell(44, 8, "Buyer's Order Date", border=1, ln=1, align="L")
 
     y_buyer_start = pdf.get_y()
 

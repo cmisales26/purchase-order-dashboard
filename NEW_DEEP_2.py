@@ -996,24 +996,24 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Row 2: Dispatched Through
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(44, 6, "Dispatched Through", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.cell(44, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(48, 6, "Dispatched Through", border="LRT", ln=0)
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.cell(48, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
     # Row 3: Destination
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(44, 6, "Destination", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.cell(44, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(48, 6, "Destination", border="LRT", ln=0)
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.cell(48, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
 
     # Row 4: Terms of delivery
     pdf.set_x(107)
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(44, 6, "Terms of delivery", border="LRT", ln=0)
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.cell(44, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
 
     # Closing row
     pdf.set_x(107)

@@ -840,12 +840,12 @@ class PDF(FPDF):
             self.default_font = "Helvetica"
 
         self.set_font(self.default_font, "", 8)
-        self.set_left_margin(10)
+        self.set_left_margin(15)
         self.set_right_margin(15)
 
     def header(self):
         self.set_font(self.default_font, "B", 15)
-        self.cell(0, 6, "TAX INVOICE", ln=True, align="L")
+        self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
         self.ln(3)
         
     def footer(self):
@@ -911,7 +911,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(44, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 8, "100% Advance with Purchase", border="RT", ln=1)
+    pdf.cell(44, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(107)

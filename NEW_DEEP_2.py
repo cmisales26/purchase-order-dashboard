@@ -1122,8 +1122,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(34, 6, "", border="L", ln=False)
     pdf.cell(30, 6, "Rate", border="L", align="C")
     pdf.cell(30, 6, "Amount", border="LR", align="C")
-    pdf.cell(30, 6, "Rate", border="L", align="C")
-    pdf.cell(28, 6, "Amount", border="LR", ln=True, align="C")
+    pdf.cell(31, 6, "Rate", border="L", align="C")
+    pdf.cell(29, 6, "Amount", border="LR", ln=True, align="C")
 
     pdf.set_font(pdf.default_font, "", 10)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
@@ -1135,8 +1135,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
     pdf.cell(30, 6, "9%", border=1, align="C")
     pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(30, 6, "9%", border=1, align="C")
-    pdf.cell(28, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(31, 6, "9%", border=1, align="C")
+    pdf.cell(29, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
     # Total row
     pdf.set_font(pdf.default_font, "B", 10)
@@ -1144,8 +1144,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
     pdf.cell(30, 6, "", border=1, align="C")
     pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(30, 6, "", border=1, align="C")
-    pdf.cell(28, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(31, 6, "", border=1, align="C")
+    pdf.cell(29, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     # Tax in words
     pdf.ln(2)

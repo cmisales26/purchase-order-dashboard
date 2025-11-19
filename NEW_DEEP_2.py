@@ -1211,6 +1211,7 @@ class PO_PDF(FPDF):
     def header(self):
         if self.page_no() == 1:
             # Logo (if available)
+            self.ln(1)
             if self.logo_path and os.path.exists(self.logo_path):
                 self.image(self.logo_path, x=160, y=2.5, w=45,link=self.website_url)
                 # self.image(self.logo_path, x=150, y=10, w=40)

@@ -911,7 +911,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 11)
     pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 11)
-    pdf.cell(48, 8, "100% Advance with\nPurchase", border="RT", ln=1)
+    pdf.multi_cell(48, 8, "100% Advance with\nPurchase", border="RT", ln=1)
 
     # Supplier's reference
     pdf.set_x(107)

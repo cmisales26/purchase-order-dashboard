@@ -1017,7 +1017,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Closing row
     pdf.set_x(107)
-    pdf.cell(98, 1, "", border="LRB", ln=1)
+    pdf.cell(95, 1, "", border="LRB", ln=1)
 
     # --- Item Table Header ---
     pdf.ln(2)

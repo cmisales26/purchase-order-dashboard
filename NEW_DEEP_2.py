@@ -1295,20 +1295,35 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
     pdf.ln(5)
-    # pdf.set_xy(110, pdf.get_y() - 20)
+    # # pdf.set_xy(110, pdf.get_y() - 20)
     # pdf.set_font(pdf.default_font, "B", 10)
     # pdf.multi_cell(70, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    # pdf.set_xy(125, pdf.get_y() - 25)
+    # pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+    # pdf.ln(2)
+    # pdf.multi_cell(0, 5, f"GST NO: {sanitized_gst_no}\nPAN NO: {sanitized_pan_no}\nMSME Registration No: {sanitized_msme_no}")
+    # pdf.ln(2)
+    # Bill To section - only "Bill To:" in bold
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(20, 5, "Bill To:", ln=0)
+    pdf.cell(70, 5, "Bill To:", ln=0)
     pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(0, 5, f"\n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
 
+    # Reset position for Ship To
+    pdf.set_xy(125, pdf.get_y() - 25)  # Adjusted Y position since we used multi_cell
 
-    pdf.set_xy(125, pdf.get_y() - 25)
-    pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+    # Ship To section - only "Ship To:" in bold
+    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.cell(0, 5, "Ship To:", ln=0)
+    pdf.set_font(pdf.default_font, "", 10)
+    pdf.multi_cell(0, 5, f"\n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+
     pdf.ln(2)
+
+    # GST/PAN/MSME details
     pdf.multi_cell(0, 5, f"GST NO: {sanitized_gst_no}\nPAN NO: {sanitized_pan_no}\nMSME Registration No: {sanitized_msme_no}")
     pdf.ln(2)
+
 
     # --- Products Table ---
     pdf.section_title("Products & Services")

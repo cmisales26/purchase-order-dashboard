@@ -2172,21 +2172,26 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # --- Terms & Conditions ---
     # pdf.section_title("Terms & Conditions")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "B", 10)
 
     # Taxes
     pdf.cell(45, 4, "Taxes")
     pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(0, 4, f"As specified above")
 
     # Payment
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(45, 4, "Payment")
     pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(0, 4, f"{sanitized_payment_terms}")
 
     # Delivery
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(45, 4, "Delivery")
     pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(0, 4, f"{sanitized_delivery_terms}")
 
     pdf.ln(2)

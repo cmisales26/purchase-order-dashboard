@@ -914,7 +914,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Use multi_cell to wrap text to next line
     pdf.set_xy(155, pdf.get_y())  # Set position for the right cell
-    pdf.multi_cell(58, 4, "100% Advance with\nPurchase", border="RT", align="C")
+    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="C")
 
     # Payment terms
     # pdf.set_x(107)

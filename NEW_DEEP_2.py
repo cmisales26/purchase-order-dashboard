@@ -892,7 +892,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     for i, (label, value) in enumerate(vendor_lines):
         pdf.set_x(15)
         pdf.set_font(pdf.default_font, "B", 10)
-        label_width = pdf.get_string_width(label) + 1
+        label_width = pdf.get_string_width(label) 
         pdf.cell(label_width, 6, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 10)
         border = "R" if i < len(vendor_lines) - 1 else "R"

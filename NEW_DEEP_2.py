@@ -1020,7 +1020,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(96, 1, "", border="LRB", ln=1)
 
     # --- Item Table Header ---
-    pdf.ln()
     pdf.set_font(pdf.default_font, "B", 12)
     col_widths = [15, 75, 20, 20, 24, 31]
     
@@ -2101,7 +2100,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     sanitized_company_name = pdf.sanitize_text(po_data['company_name'])
     
     # --- Vendor & Bill/Ship ---
-    pdf.section_title("Vendor & Addresses")
+    pdf.section_title("To:")
     pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
     pdf.ln(5)

@@ -1096,14 +1096,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="L")
 
     # Calculate remaining height needed for address space
-    # name_height = 5
-    # contact_lines_height = 18
-    # remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
+    name_height = 5
+    contact_lines_height = 18
+    remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
     
-    # # Add empty space for address if needed
-    # if remaining_height_for_address > 0:
-    #     pdf.set_x(105)
-    #     pdf.cell(96, remaining_height_for_address, "", border="R", ln=1)
+    # Add empty space for address if needed
+    if remaining_height_for_address > 0:
+        pdf.set_x(105)
+        pdf.cell(96, remaining_height_for_address, "", border="R", ln=1)
 
     # Row 2: Dispatched Through
     pdf.set_x(105)
@@ -1122,19 +1122,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Row 4: Terms of delivery
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 6, "Terms of delivery", border="LRTB", ln=0)
+    pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 7, invoice_data['invoice_details']['terms_of_delivery'], border="RTB", ln=1)
+    pdf.cell(48, 7, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
 
-    # Calculate remaining height needed for address space
-    name_height = 5
-    contact_lines_height = 18
-    remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
-    
-    # Add empty space for address if needed
-    if remaining_height_for_address > 0:
-        pdf.set_x(105)
-        pdf.cell(96, remaining_height_for_address, "", border="R", ln=1)
 
     # Closing row
     pdf.set_x(105)

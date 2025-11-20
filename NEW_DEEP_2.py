@@ -981,7 +981,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 8, invoice_data['invoice']['date'], border="R", ln=1, align="L")
 
     # Payment terms
-    pdf.set_x(107)
+    pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
@@ -998,7 +998,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # pdf.cell(48, 8, "100% Advance with Purchase", border="RT", ln=1)
 
     # Supplier's reference
-    pdf.set_x(107)
+    pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 8, "Supplier's Reference:", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
@@ -1006,7 +1006,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 8, other_ref_value, border="LRTB", ln=1)
 
     # Other's reference
-    pdf.set_x(107)
+    pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 8, "Other's Reference:", border="RTB", ln=0)
     pdf.set_font(pdf.default_font, "", 12)

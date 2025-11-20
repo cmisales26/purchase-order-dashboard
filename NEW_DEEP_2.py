@@ -987,7 +987,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "", 12)
 
     # Use multi_cell to wrap text to next line
-    pdf.set_xy(155, pdf.get_y())  # Set position for the right cell
+    pdf.set_xy(153, pdf.get_y())  # Set position for the right cell
     pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="C")
 
     # Payment terms
@@ -1026,10 +1026,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer name and address
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(94, 5, invoice_data['buyer']['name'], border="LR", ln=1)
+    pdf.cell(95, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(94, 4, invoice_data['buyer']['address'], border="LRB")
+    pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="LRB")
     
     # Buyer contact details
     buyer_lines = [

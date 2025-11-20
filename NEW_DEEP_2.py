@@ -2082,23 +2082,62 @@ class PO_PDF(FPDF):
             # self.ln(4)
 
     def footer(self):
-        self.set_y(-18)
-        self.set_font(self.default_font, "", 10)
-        self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
-        self.set_text_color(0, 0, 255)
-        self.set_font(self.default_font, "U", 10)
-        # email1 = "cad@cmi.com"
-        email1 = "info@cminfotech.com "
-        phone_number =" +91 873 391 5721"
-        self.set_text_color(0, 0, 255)
-        self.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
-        self.set_x((self.w - 80) / 2)
-        self.cell(0, 0, "", link=f"tel:{phone_number}")
-        self.set_x((self.w - 60) / 2)
-        website ="www.cminfotech.com"
-        self.set_text_color(0, 0, 255)
-        self.cell(60, 4, f"{website}", ln=True, align="C", link=website)
+        # Position from bottom (same as invoice)
+        self.set_y(-15)
+        
+        # Horizontal line
+        self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
+        self.ln(2)
+        
+        # Footer content - Computer generated text
+        # self.set_font("Helvetica", "I", 10)
+        # self.cell(0, 4, "This is a Computer Generated Quotation", ln=True, align="C")
+        
+        # Company address
+        self.set_font("Helvetica", "", 10)
+        self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
+        
+        # Clickable contact info (same as invoice)
+        self.set_font("Helvetica", "U", 10)
+        self.set_text_color(0, 0, 255)  # Blue for links
+        
+        email1 = "info@cminfotech.com"
+        phone_number = "+91 873 391 5721"
+        website = "www.cminfotech.com"
+        
+        # Center the contact information
+        contact_text = f"{email1} | {phone_number} | {website}"
+        contact_width = self.get_string_width(contact_text)
+        x_contact = (self.w - contact_width) / 2
+        
+        self.set_x(x_contact)
+        self.cell(self.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
+        self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | "))
+        self.cell(self.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
+        self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | ") + self.get_string_width(phone_number) + self.get_string_width(" | "))
+        self.cell(self.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
+        
         self.set_text_color(0, 0, 0)
+
+        
+    # def footer(self):
+    #     self.set_y(-18)
+    #     self.set_font(self.default_font, "", 10)
+    #     self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
+    #     self.set_text_color(0, 0, 255)
+    #     self.set_font(self.default_font, "U", 10)
+    #     # email1 = "cad@cmi.com"
+    #     email1 = "info@cminfotech.com "
+    #     phone_number =" +91 873 391 5721"
+    #     self.set_text_color(0, 0, 255)
+    #     self.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
+    #     self.set_x((self.w - 80) / 2)
+    #     self.cell(0, 0, "", link=f"tel:{phone_number}")
+    #     self.set_x((self.w - 60) / 2)
+    #     website ="www.cminfotech.com"
+    #     self.set_text_color(0, 0, 255)
+    #     self.cell(60, 4, f"{website}", ln=True, align="C", link=website)
+    #     self.set_text_color(0, 0, 0)
 
     def section_title(self, title):
         self.set_font(self.default_font, "B", 12)

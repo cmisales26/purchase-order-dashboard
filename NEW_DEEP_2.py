@@ -1139,7 +1139,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Amount in Words ---
     # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(188, 6, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
+    pdf.cell(193, 6, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before tax summary
     if pdf.get_y() + 60 > pdf.page_break_trigger:
@@ -1151,17 +1151,17 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Main header
     pdf.cell(34, 6, "HSN/SAN", border=1, align="C")
-    pdf.cell(34, 6, "Taxable Value", border=1, align="C")
-    pdf.cell(60, 6, "Central Tax", border=1, align="C")
-    pdf.cell(60, 6, "State Tax", border=1, ln=True, align="C")
+    pdf.cell(35, 6, "Taxable Value", border=1, align="C")
+    pdf.cell(62, 6, "Central Tax", border=1, align="C")
+    pdf.cell(62, 6, "State Tax", border=1, ln=True, align="C")
 
     # Sub-header
     pdf.cell(34, 6, "", border="L", ln=False)
     pdf.cell(34, 6, "", border="L", ln=False)
-    pdf.cell(30, 6, "Rate", border="L", align="C")
-    pdf.cell(30, 6, "Amount", border="LR", align="C")
     pdf.cell(31, 6, "Rate", border="L", align="C")
-    pdf.cell(29, 6, "Amount", border="LR", ln=True, align="C")
+    pdf.cell(31, 6, "Amount", border="LR", align="C")
+    pdf.cell(32, 6, "Rate", border="L", align="C")
+    pdf.cell(30, 6, "Amount", border="LR", ln=True, align="C")
 
     pdf.set_font(pdf.default_font, "", 10)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
@@ -1171,24 +1171,24 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Data row
     pdf.cell(34, 6, "997331", border=1, align="C")
     pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(30, 6, "9%", border=1, align="C")
-    pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
     pdf.cell(31, 6, "9%", border=1, align="C")
-    pdf.cell(29, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(31, 6, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(32, 6, "9%", border=1, align="C")
+    pdf.cell(30, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
     # Total row
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(34, 6, "Total", border=1, align="C")
     pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(30, 6, "", border=1, align="C")
-    pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
     pdf.cell(31, 6, "", border=1, align="C")
-    pdf.cell(29, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(31, 6, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(32, 6, "", border=1, align="C")
+    pdf.cell(30, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     # Tax in words
     # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(188, 6, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    pdf.cell(193, 6, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before footer content
     if pdf.get_y() + 80 > pdf.page_break_trigger:
@@ -1197,8 +1197,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Bank Details & Declaration (Side by Side) ---
     # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(94, 6, "Company's Bank Details", ln=0,border=1)
-    pdf.cell(94, 6, "Declaration:", ln=1,border=1)
+    pdf.cell(96, 6, "Company's Bank Details", ln=0,border=1)
+    pdf.cell(97, 6, "Declaration:", ln=1,border=1)
 
     pdf.set_font(pdf.default_font, "", 10)
 

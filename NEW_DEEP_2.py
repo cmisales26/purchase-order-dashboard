@@ -878,7 +878,7 @@ class PDF(FPDF):
             self.default_font = "Helvetica"
 
         self.set_font(self.default_font, "", 8)
-        self.set_left_margin(15)
+        self.set_left_margin(10)
         self.set_right_margin(15)
 
     def header(self):
@@ -897,7 +897,7 @@ class PDF(FPDF):
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_auto_page_break(auto=True, margin=10)
     pdf.add_page()
 
     # --- Logo on top right ---
@@ -2119,7 +2119,7 @@ class PO_PDF(FPDF):
         
         self.set_text_color(0, 0, 0)
 
-        
+
     # def footer(self):
     #     self.set_y(-18)
     #     self.set_font(self.default_font, "", 10)

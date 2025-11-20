@@ -1177,7 +1177,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     x_left = pdf.get_x()
 
     # Left cell (Bank) with border
-    pdf.multi_cell(94, 5, bank_text, border=1)
+    pdf.multi_cell(94, 8, bank_text, border=1)
     y_after_left = pdf.get_y()
     
     # Right cell (Declaration) with border

@@ -1177,12 +1177,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     x_left = pdf.get_x()
 
     # Left cell (Bank) with border
-    pdf.multi_cell(90, 5, bank_text, border=1)
+    pdf.multi_cell(94, 5, bank_text, border=1)
     y_after_left = pdf.get_y()
     
     # Right cell (Declaration) with border
     pdf.set_xy(x_left + 90, y_before)
-    pdf.multi_cell(90, 5, invoice_data['declaration'], border=1)
+    pdf.multi_cell(94, 5, invoice_data['declaration'], border=1)
     y_after_right = pdf.get_y()
     
     # Set Y to the maximum of both columns
@@ -1190,7 +1190,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_y(max_y)
 
     # --- Signature ---
-    pdf.ln(5)
+    pdf.ln(3)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(0, 6, "For CM Infotech.", ln=True, align="R")
 

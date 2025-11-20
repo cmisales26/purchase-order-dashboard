@@ -158,6 +158,43 @@ def get_current_quarter():
     else:
         return "Q4"
 
+import os
+
+# Simple file-based counter for PO sequence
+PO_COUNTER_FILE = "po_counter.txt"
+
+def get_next_po_sequence():
+    """Simple file-based PO sequence counter"""
+    try:
+        # Read current number from file
+        if os.path.exists(PO_COUNTER_FILE):
+            with open(PO_COUNTER_FILE, 'r') as f:
+                current = int(f.read().strip())
+        else:
+            current = 0
+    except:
+        current = 0
+    
+    # Increment
+    next_seq = current + 1
+    
+    # Save the new number back to file
+    with open(PO_COUNTER_FILE, 'w') as f:
+        f.write(str(next_seq))
+    
+    return next_seq
+
+def get_current_po_sequence():
+    """Get current PO sequence without incrementing"""
+    try:
+        if os.path.exists(PO_COUNTER_FILE):
+            with open(PO_COUNTER_FILE, 'r') as f:
+                return int(f.read().strip())
+    except:
+        pass
+    return 1
+
+
 def parse_po_number(po_number):
     """Parse PO number to extract components"""
     try:
@@ -1751,7 +1788,10 @@ def main():
     # if "last_quotation_number" not in st.session_state:
     #     st.session_state.last_quotation_number = ""
     if "po_seq" not in st.session_state:
-        st.session_state.po_seq = 1
+        # Load from file instead of starting from 1
+        st.session_state.po_seq = get_current_po_sequence()
+    # if "po_seq" not in st.session_state:
+    #     st.session_state.po_seq = 1
     if "products" not in st.session_state:
         st.session_state.products = []
     if "company_name" not in st.session_state:
@@ -2371,12 +2411,16 @@ def main():
                 
                 # Auto-increment for next PO
                 if po_auto_increment:
-                    try:
-                        next_sequence = get_next_sequence_number_po(st.session_state.po_number)
-                        # Update the sequence in session state for next time
-                        st.session_state.po_seq = next_sequence
-                    except:
-                        st.session_state.po_seq += 1
+                    # This automatically increments and saves to file
+                    next_sequence = get_next_po_sequence()
+                    st.session_state.po_seq = next_sequence
+                # if po_auto_increment:
+                #     try:
+                #         next_sequence = get_next_sequence_number_po(st.session_state.po_number)
+                #         # Update the sequence in session state for next time
+                #         st.session_state.po_seq = next_sequence
+                #     except:
+                #         st.session_state.po_seq += 1
 
                 st.success("Purchase Order generated!")
                 st.info(f"📧 Sales Person: {current_sales_person_info['name']}")

@@ -564,13 +564,13 @@ def add_page_two_commercials(pdf, data):
     
     # Table Header
     pdf.set_fill_color(220, 220, 220)
-    pdf.set_font(pdf.default_font, "B", 9)
+    pdf.set_font(pdf.default_font, "B", 10)
     for width, header in zip(col_widths, headers):
         pdf.cell(width, 7, header, border=1, align="C", fill=True)
     pdf.ln()
 
     # Table Rows
-    pdf.set_font(pdf.default_font, "", 9)
+    pdf.set_font(pdf.default_font, "", 10)
     grand_total = 0.0
     
     for product in data["products"]:

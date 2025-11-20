@@ -1157,7 +1157,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Sub-header
     pdf.cell(34, 6, "", border="L", ln=False)
-    pdf.cell(34, 6, "", border="L", ln=False)
+    pdf.cell(35, 6, "", border="L", ln=False)
     pdf.cell(31, 6, "Rate", border="L", align="C")
     pdf.cell(31, 6, "Amount", border="LR", align="C")
     pdf.cell(32, 6, "Rate", border="L", align="C")
@@ -1170,7 +1170,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Data row
     pdf.cell(34, 6, "997331", border=1, align="C")
-    pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(35, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
     pdf.cell(31, 6, "9%", border=1, align="C")
     pdf.cell(31, 6, f"{hsn_sgst:.2f}", border=1, align="C")
     pdf.cell(32, 6, "9%", border=1, align="C")
@@ -1179,7 +1179,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Total row
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(34, 6, "Total", border=1, align="C")
-    pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(35, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
     pdf.cell(31, 6, "", border=1, align="C")
     pdf.cell(31, 6, f"{hsn_sgst:.2f}", border=1, align="C")
     pdf.cell(32, 6, "", border=1, align="C")
@@ -1215,12 +1215,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     x_left = pdf.get_x()
 
     # Left cell (Bank) with border
-    pdf.multi_cell(94, 6.22, bank_text, border=1)
+    pdf.multi_cell(96, 6.22, bank_text, border=1)
     y_after_left = pdf.get_y()
     
     # Right cell (Declaration) with border
     pdf.set_xy(x_left + 94, y_before)
-    pdf.multi_cell(94, 5, invoice_data['declaration'], border=1)
+    pdf.multi_cell(97, 5, invoice_data['declaration'], border=1)
     y_after_right = pdf.get_y()
     
     # Set Y to the maximum of both columns

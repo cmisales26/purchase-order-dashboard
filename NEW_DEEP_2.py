@@ -953,7 +953,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Left Side (Vendor Details) ---
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(95, 8, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="LB")
+    pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="LB")
     
     # Vendor details lines
     vendor_lines = [
@@ -967,15 +967,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_x(10)
         pdf.set_font(pdf.default_font, "B", 12)
         label_width = pdf.get_string_width(label) 
-        pdf.cell(label_width, 6.2, label, border="L", ln=0)
+        pdf.cell(label_width, 6, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "R" if i < len(vendor_lines) - 1 else "R"
-        pdf.cell(95 - label_width, 6.2, value, border=border, ln=1)
+        pdf.cell(95 - label_width, 6, value, border=border, ln=1)
 
     y_left_end = pdf.get_y()
 
     # --- Right Side (Invoice Details) ---
-    pdf.set_xy(107, y_left_start)
+    pdf.set_xy(105, y_left_start)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="L")
     pdf.cell(48, 8, invoice_data['invoice']['date'], border="R", ln=1, align="L")

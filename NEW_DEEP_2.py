@@ -1045,13 +1045,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.cell(label_width, 5, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "" if i < len(buyer_lines) - 1 else "B"
-        pdf.cell(94 - label_width, 5, value, border=border, ln=1)
+        pdf.cell(95 - label_width, 5, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
     total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
 
     # --- Buyer Right Details ---
-    pdf.set_xy(107, y_buyer_start)
+    pdf.set_xy(105, y_buyer_start)
     
     # Row 1: Buyer's Order No/Date
     pdf.set_font(pdf.default_font, "", 12)
@@ -1065,32 +1065,32 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Add empty space for address if needed
     if remaining_height_for_address > 0:
-        pdf.set_x(107)
+        pdf.set_x(105)
         pdf.cell(96, remaining_height_for_address, "", border="R", ln=1)
 
     # Row 2: Dispatched Through
-    pdf.set_x(107)
+    pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 6, "Dispatched Through", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
     # Row 3: Destination
-    pdf.set_x(107)
+    pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 6, "Destination", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
 
     # Row 4: Terms of delivery
-    pdf.set_x(107)
+    pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
 
     # Closing row
-    pdf.set_x(107)
+    pdf.set_x(105)
     pdf.cell(96, 1, "", border="LRB", ln=1)
 
     # --- Item Table Header ---

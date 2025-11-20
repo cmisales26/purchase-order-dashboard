@@ -979,7 +979,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === BUYER SECTION ===
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(92, 8, "Buyer", border=1, ln=0)
+    pdf.cell(97, 8, "Buyer", border=1, ln=0)
     pdf.cell(48, 8, "Buyer's Order No.", border=1, ln=0, align="C")
     pdf.cell(48, 8, "Buyer's Order Date", border=1, ln=1, align="C")
 
@@ -990,10 +990,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer name and address
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(92, 5, invoice_data['buyer']['name'], border="LR", ln=1)
+    pdf.cell(97, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(92, 4, invoice_data['buyer']['address'], border="LRB")
+    pdf.multi_cell(97, 4, invoice_data['buyer']['address'], border="LRB")
     
     # Buyer contact details
     buyer_lines = [
@@ -1003,13 +1003,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     ]
     
     for i, (label, value) in enumerate(buyer_lines):
-        pdf.set_x(15)
+        pdf.set_x(10)
         pdf.set_font(pdf.default_font, "B", 12)
         label_width = pdf.get_string_width(label) + 1
         pdf.cell(label_width, 5, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "" if i < len(buyer_lines) - 1 else "B"
-        pdf.cell(92 - label_width, 5, value, border=border, ln=1)
+        pdf.cell(97 - label_width, 5, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
     total_left_buyer_height = y_buyer_left_end - y_left_buyer_start

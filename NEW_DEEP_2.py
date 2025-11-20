@@ -566,7 +566,7 @@ def add_page_two_commercials(pdf, data):
     pdf.set_fill_color(220, 220, 220)
     pdf.set_font(pdf.default_font, "B", 10)
     for width, header in zip(col_widths, headers):
-        pdf.cell(width, 6, header, border=1, align="C", fill=True)
+        pdf.cell(width, 5, header, border=1, align="C", fill=True)
     pdf.ln()
 
     # Table Rows

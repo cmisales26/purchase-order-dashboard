@@ -308,38 +308,76 @@ class QUOTATION_PDF(FPDF):
         self.ln(5)
 
     def footer(self):
-        self.set_y(-18)
-        self.set_font(self.default_font, "", 10)
+        # Position from bottom (same as invoice)
+        self.set_y(-30)
+        
+        # Horizontal line
+        self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
+        self.ln(2)
+        
+        # Footer content - Computer generated text
+        # self.set_font("Helvetica", "I", 10)
+        # self.cell(0, 4, "This is a Computer Generated Quotation", ln=True, align="C")
+        
+        # Company address
+        self.set_font("Helvetica", "", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
-        # Make footer emails and phone clickable - FIXED OVERLAP
-        self.set_text_color(0, 0, 255)  # Blue color for links
+        # Clickable contact info (same as invoice)
+        self.set_font("Helvetica", "U", 10)
+        self.set_text_color(0, 0, 255)  # Blue for links
         
-        # Website link
-        # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
+        email1 = "info@cminfotech.com"
+        phone_number = "+91 873 391 5721"
+        website = "www.cminfotech.com"
         
-        # Email and phone on same line - FIXED
-        self.set_font(self.default_font, "U", 10)
-        email_text = " info@cminfotech.com "
-        phone_text = " +91 873 391 5721"
+        # Center the contact information
+        contact_text = f"{email1} | {phone_number} | {website}"
+        contact_width = self.get_string_width(contact_text)
+        x_contact = (self.w - contact_width) / 2
         
-        # Calculate positions for proper alignment
-        page_width = self.w - 2 * self.l_margin
-        email_width = self.get_string_width(email_text)
-        phone_width = self.get_string_width(phone_text)
-        separator_width = self.get_string_width(" | ")
+        self.set_x(x_contact)
+        self.cell(self.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
+        self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | "))
+        self.cell(self.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
+        self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | ") + self.get_string_width(phone_number) + self.get_string_width(" | "))
+        self.cell(self.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
         
-        total_width = email_width + separator_width + phone_width
-        start_x = (page_width - total_width) / 2 + self.l_margin
-        
-        self.set_x(start_x)
-        self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text}")
-        self.cell(separator_width, 4, " | ", ln=0)
-        self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
+        self.set_text_color(0, 0, 0)
 
-        self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
+    # def footer(self):
+    #     self.set_y(-18)
+    #     self.set_font(self.default_font, "", 10)
+    #     self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
-        self.set_text_color(0, 0, 0)  # Reset to black
+    #     # Make footer emails and phone clickable - FIXED OVERLAP
+    #     self.set_text_color(0, 0, 255)  # Blue color for links
+        
+    #     # Website link
+    #     # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
+        
+    #     # Email and phone on same line - FIXED
+    #     self.set_font(self.default_font, "U", 10)
+    #     email_text = " info@cminfotech.com "
+    #     phone_text = " +91 873 391 5721"
+        
+    #     # Calculate positions for proper alignment
+    #     page_width = self.w - 2 * self.l_margin
+    #     email_width = self.get_string_width(email_text)
+    #     phone_width = self.get_string_width(phone_text)
+    #     separator_width = self.get_string_width(" | ")
+        
+    #     total_width = email_width + separator_width + phone_width
+    #     start_x = (page_width - total_width) / 2 + self.l_margin
+        
+    #     self.set_x(start_x)
+    #     self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text}")
+    #     self.cell(separator_width, 4, " | ", ln=0)
+    #     self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
+
+    #     self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
+        
+    #     self.set_text_color(0, 0, 0)  # Reset to black
 
 def add_clickable_email(pdf, email, label="Email: "):
     """Add clickable email with label - FIXED OVERLAP"""

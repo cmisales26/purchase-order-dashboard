@@ -1159,7 +1159,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Bank Details & Declaration (Side by Side) ---
     # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(94, 8, "Company's Bank Details", ln=0,border=1)
+    pdf.cell(94, 4, "Company's Bank Details", ln=0,border=1)
     pdf.cell(94, 6, "Declaration:", ln=1,border=1)
 
     pdf.set_font(pdf.default_font, "", 10)

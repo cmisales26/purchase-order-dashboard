@@ -1122,9 +1122,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Row 4: Terms of delivery
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
+    pdf.cell(48, 7, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
+    pdf.cell(48, 7, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
 
 
     # Closing row

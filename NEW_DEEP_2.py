@@ -917,7 +917,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Left Side (Vendor Details) ---
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(97, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="LB")
+    pdf.multi_cell(94, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="LB")
     
     # Vendor details lines
     vendor_lines = [
@@ -934,7 +934,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.cell(label_width, 6.2, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "R" if i < len(vendor_lines) - 1 else "R"
-        pdf.cell(97 - label_width, 6.2, value, border=border, ln=1)
+        pdf.cell(94 - label_width, 6.2, value, border=border, ln=1)
 
     y_left_end = pdf.get_y()
 
@@ -979,7 +979,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === BUYER SECTION ===
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(97, 8, "Buyer", border=1, ln=0)
+    pdf.cell(94, 8, "Buyer", border=1, ln=0)
     pdf.cell(48, 8, "Buyer's Order No.", border=1, ln=0, align="C")
     pdf.cell(48, 8, "Buyer's Order Date", border=1, ln=1, align="C")
 
@@ -990,10 +990,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer name and address
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(97, 5, invoice_data['buyer']['name'], border="LR", ln=1)
+    pdf.cell(94, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(97, 4, invoice_data['buyer']['address'], border="LRB")
+    pdf.multi_cell(94, 4, invoice_data['buyer']['address'], border="LRB")
     
     # Buyer contact details
     buyer_lines = [
@@ -1009,7 +1009,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.cell(label_width, 5, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "" if i < len(buyer_lines) - 1 else "B"
-        pdf.cell(97 - label_width, 5, value, border=border, ln=1)
+        pdf.cell(94 - label_width, 5, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
     total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
@@ -1059,7 +1059,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
-    col_widths = [15, 79, 23, 23, 23, 30]
+    col_widths = [15, 77, 22, 23, 23, 30]
     
     # Header row
     pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
@@ -1151,15 +1151,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Main header
     pdf.cell(34, 6, "HSN/SAN", border=1, align="C")
-    pdf.cell(35, 6, "Taxable Value", border=1, align="C")
-    pdf.cell(62, 6, "Central Tax", border=1, align="C")
+    pdf.cell(34, 6, "Taxable Value", border=1, align="C")
+    pdf.cell(60, 6, "Central Tax", border=1, align="C")
     pdf.cell(62, 6, "State Tax", border=1, ln=True, align="C")
 
     # Sub-header
     pdf.cell(34, 6, "", border="L", ln=False)
-    pdf.cell(35, 6, "", border="L", ln=False)
-    pdf.cell(31, 6, "Rate", border="L", align="C")
-    pdf.cell(31, 6, "Amount", border="LR", align="C")
+    pdf.cell(34, 6, "", border="L", ln=False)
+    pdf.cell(30, 6, "Rate", border="L", align="C")
+    pdf.cell(30, 6, "Amount", border="LR", align="C")
     pdf.cell(32, 6, "Rate", border="L", align="C")
     pdf.cell(30, 6, "Amount", border="LR", ln=True, align="C")
 
@@ -1170,18 +1170,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Data row
     pdf.cell(34, 6, "997331", border=1, align="C")
-    pdf.cell(35, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(31, 6, "9%", border=1, align="C")
-    pdf.cell(31, 6, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(30, 6, "9%", border=1, align="C")
+    pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
     pdf.cell(32, 6, "9%", border=1, align="C")
     pdf.cell(30, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
     # Total row
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(34, 6, "Total", border=1, align="C")
-    pdf.cell(35, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(31, 6, "", border=1, align="C")
-    pdf.cell(31, 6, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(30, 6, "", border=1, align="C")
+    pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
     pdf.cell(32, 6, "", border=1, align="C")
     pdf.cell(30, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
@@ -1197,8 +1197,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Bank Details & Declaration (Side by Side) ---
     # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(96, 6, "Company's Bank Details", ln=0,border=1)
-    pdf.cell(97, 6, "Declaration:", ln=1,border=1)
+    pdf.cell(95, 6, "Company's Bank Details", ln=0,border=1)
+    pdf.cell(95, 6, "Declaration:", ln=1,border=1)
 
     pdf.set_font(pdf.default_font, "", 10)
 
@@ -1215,12 +1215,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     x_left = pdf.get_x()
 
     # Left cell (Bank) with border
-    pdf.multi_cell(96, 6.22, bank_text, border=1)
+    pdf.multi_cell(95, 6.22, bank_text, border=1)
     y_after_left = pdf.get_y()
     
     # Right cell (Declaration) with border
-    pdf.set_xy(x_left + 96, y_before)
-    pdf.multi_cell(97, 5, invoice_data['declaration'], border=1)
+    pdf.set_xy(x_left + 95, y_before)
+    pdf.multi_cell(95, 5, invoice_data['declaration'], border=1)
     y_after_right = pdf.get_y()
     
     # Set Y to the maximum of both columns

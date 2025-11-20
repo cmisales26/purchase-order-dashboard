@@ -1096,7 +1096,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="L")
 
     # Calculate remaining height needed for address space
-    name_height = 0
+    name_height = 1
     contact_lines_height = 18
     remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
     

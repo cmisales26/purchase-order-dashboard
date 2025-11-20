@@ -566,11 +566,11 @@ def add_page_two_commercials(pdf, data):
     pdf.set_fill_color(220, 220, 220)
     pdf.set_font(pdf.default_font, "B", 10)
     for width, header in zip(col_widths, headers):
-        pdf.cell(width, 5, header, border=1, align="C", fill=True)
+        pdf.cell(width, 6, header, border=1, align="C", fill=True)
     pdf.ln()
 
     # Table Rows
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     grand_total = 0.0
     
     for product in data["products"]:
@@ -589,7 +589,7 @@ def add_page_two_commercials(pdf, data):
         pdf.set_font(pdf.default_font, "", 10)
         
         # Calculate how many lines the description will take
-        desc_lines = pdf.multi_cell(col_widths[0], 6, desc, border=0, split_only=True)
+        desc_lines = pdf.multi_cell(col_widths[0], 5, desc, border=0, split_only=True)
         desc_height = len(desc_lines) * 6
         
         # Set position for description

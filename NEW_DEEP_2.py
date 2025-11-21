@@ -1514,11 +1514,11 @@ class PO_PDF(FPDF):
         # self.cell(0, 4, "This is a Computer Generated Quotation", ln=True, align="C")
         
         # Company address
-        self.set_font("Helvetica", "", 10)
+        self.set_font("Helvetica", "", 12)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
         # Clickable contact info (same as invoice)
-        self.set_font("Helvetica", "U", 10)
+        self.set_font("Helvetica", "U", 12)
         self.set_text_color(0, 0, 255)  # Blue for links
         
         email1 = "info@cminfotech.com"
@@ -1598,7 +1598,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     
     # --- Vendor & Bill/Ship ---
     pdf.section_title("To:")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
     pdf.ln(5)
     # pdf.set_xy(110, pdf.get_y() - 20)
@@ -1615,12 +1615,12 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     col_widths = [65, 22, 30, 25, 15, 22]
     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
     pdf.set_fill_color(220, 220, 220)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     for h, w in zip(headers, col_widths):
         pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
     pdf.ln()
 
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     line_height = 5
     for p in po_data["products"]:
         gst_amt = p["basic"] * p["gst_percent"] / 100
@@ -1645,7 +1645,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
         pdf.ln(row_height)
 
     # Grand Total Row
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
     pdf.cell(col_widths[5], 6, f"{po_data['grand_total']:.2f}", border=1, align="R")
     pdf.ln(4)
@@ -1660,81 +1660,81 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # --- Amount in Words ---
     pdf.ln(5)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Amount in Words")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 4, pdf.sanitize_text(po_data['amount_words']))
     # pdf.ln(2)
 
     # --- Terms & Conditions ---
     # pdf.section_title("Terms & Conditions")
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
 
     # Taxes
     pdf.cell(45, 4, "Taxes")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 4, f"As specified above")
 
     # Payment
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Payment")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 4, f"{sanitized_payment_terms}")
 
     # Delivery
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Delivery")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 4, f"{sanitized_delivery_terms}")
 
     pdf.ln(2)
 
     # --- End User ---
     pdf.section_title("End User Details")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
 
     # Company Name
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Company Name")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 4, f"{sanitized_end_company}")
 
     # Company Address
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Company Address")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 4, f"{sanitized_end_address}")
 
     # Contact
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Contact")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 4, f"{sanitized_end_person} | {sanitized_end_mobile}")
 
     # Email
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Email")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 4, f"{sanitized_end_email}")
 
     pdf.ln(2)
 
     # Authorization Section
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
     pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
 
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
     stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
     if os.path.exists(stamp_path):

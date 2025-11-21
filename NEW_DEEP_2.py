@@ -1506,15 +1506,15 @@ class PO_PDF(FPDF):
         self.set_y(-15)
         
         # Horizontal line
-        self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
-        self.ln(2)
+        # self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
+        # self.ln(2)
         
         # Footer content - Computer generated text
         # self.set_font("Helvetica", "I", 10)
         # self.cell(0, 4, "This is a Computer Generated Quotation", ln=True, align="C")
         
         # Company address
-        self.set_font("Helvetica", "", 12)
+        self.set_font("Helvetica", "", 10)
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
         # Clickable contact info (same as invoice)

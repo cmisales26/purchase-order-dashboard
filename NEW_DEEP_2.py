@@ -1722,18 +1722,59 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(96, 6, "For CM Infotech.", border=1, ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
-    left_signature_box_height = 88  # <-- Change this number for left box height only
+    left_signature_box_height = 35  # <-- Change this number for left box height only
     right_signature_box_height = 35  # Keep this as is for right box
 
     # Left signature box (Buyer - Blank)
     pdf.set_font(pdf.default_font, "I", 10)
     pdf.set_text_color(128, 128, 128)  # Gray color for placeholder text
 
-    # Left box with border and placeholder text - using left height
-    pdf.multi_cell(95, left_signature_box_height/5, "(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+        # Check if buyer logo is available
+    buyer_logo_file = invoice_data.get('buyer', {}).get('logo_file')
 
-    # Get Y position after left box
-    y_after_left_signature = pdf.get_y()
+    if buyer_logo_file:
+        try:
+            # Add buyer logo at the top of the left box
+            logo_width = 25
+            logo_x = 10 + (95 - logo_width) / 2  # Center the logo horizontally
+            logo_y = pdf.get_y() + 5  # Small margin from top
+            
+            # Add buyer company logo
+            pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
+            
+            # Add buyer company name below logo
+            pdf.set_xy(10, logo_y + logo_width + 2)
+            pdf.set_font(pdf.default_font, "B", 9)
+            pdf.cell(95, 4, invoice_data['buyer']['name'], border=0, ln=1, align="C")
+            
+            # Add signature line and text
+            pdf.set_xy(10, pdf.get_y() + 8)
+            pdf.set_font(pdf.default_font, "", 9)
+            pdf.cell(95, 4, "_________________________", border=0, ln=1, align="C")
+            pdf.cell(95, 4, "Authorized Signatory", border=0, ln=1, align="C")
+            
+            # Draw the border around everything
+            pdf.set_xy(10, y_signature_start + 6)
+            pdf.cell(95, left_signature_box_height, "", border=1)
+            
+            # Update Y position after left box
+            y_after_left_signature = y_signature_start + 6 + left_signature_box_height
+            
+        except Exception as e:
+            st.warning(f"Could not add buyer logo: {e}")
+            # Fallback without logo
+            pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+            y_after_left_signature = pdf.get_y()
+    else:
+        # No buyer logo available, show original placeholder
+        pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+        y_after_left_signature = pdf.get_y()
+
+    # # Left box with border and placeholder text - using left height
+    # pdf.multi_cell(95, left_signature_box_height/5, "(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+
+    # # Get Y position after left box
+    # y_after_left_signature = pdf.get_y()
 
     # Right signature box (Our Company)
     pdf.set_xy(105, y_signature_start + 6)  # Position for right box (6 is the header height)

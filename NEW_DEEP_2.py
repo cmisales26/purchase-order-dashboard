@@ -1093,8 +1093,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # === BUYER SECTION ===
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(95, 8, "Buyer", border="LT", ln=0)
-    pdf.cell(48, 8, "Buyer's Order No.", border="LRT", ln=0, align="L")
-    pdf.cell(48, 8, "Buyer's Order Date", border="LRT", ln=1, align="L")
+    pdf.cell(48, 8, "Buyer's Order No.", border=1, ln=0, align="L")
+    pdf.cell(48, 8, "Buyer's Order Date", border=1, ln=1, align="L")
 
     y_buyer_start = pdf.get_y()
 
@@ -1131,9 +1131,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(105, y_buyer_start)
     
     # Row 1: Buyer's Order No/Date
-    pdf.set_font(pdf.default_font, "", 16)
-    pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_no'], border="LR", ln=0, align="L")
-    pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_date'], border="LR", ln=1, align="L")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="L")
+    pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="L")
 
     # Calculate remaining height needed for address space
     name_height = 5
@@ -1168,7 +1168,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
-    col_widths = [15, 80, 22, 23, 23, 28]
+    col_widths = [15, 80, 22, 23, 23, 20]
     
     # Header row
     pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")

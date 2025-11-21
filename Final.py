@@ -303,6 +303,43 @@ def get_next_sequence_number(quotation_number):
         pass
     return 1
 
+
+import os
+
+# Simple file-based counter for Invoice sequence
+INVOICE_COUNTER_FILE = "invoice_counter.txt"
+
+def get_next_invoice_sequence():
+    """Simple file-based Invoice sequence counter"""
+    try:
+        # Read current number from file
+        if os.path.exists(INVOICE_COUNTER_FILE):
+            with open(INVOICE_COUNTER_FILE, 'r') as f:
+                current = int(f.read().strip())
+        else:
+            current = 0
+    except:
+        current = 0
+    
+    # Increment
+    next_seq = current + 1
+    
+    # Save the new number back to file
+    with open(INVOICE_COUNTER_FILE, 'w') as f:
+        f.write(str(next_seq))
+    
+    return next_seq
+
+def get_current_invoice_sequence():
+    """Get current Invoice sequence without incrementing"""
+    try:
+        if os.path.exists(INVOICE_COUNTER_FILE):
+            with open(INVOICE_COUNTER_FILE, 'r') as f:
+                return int(f.read().strip())
+    except:
+        pass
+    return 1
+
 # --- Helper Functions for Invoice ---
 def parse_invoice_number(invoice_number):
     """Parse invoice number to extract components"""
@@ -385,8 +422,8 @@ class QUOTATION_PDF(FPDF):
         self.set_y(-15)
         
         # Horizontal line
-        self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
-        self.ln(2)
+        # self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
+        # self.ln(2)
         
         # Footer content - Computer generated text
         # self.set_font("Helvetica", "I", 10)
@@ -717,7 +754,7 @@ def add_page_two_commercials(pdf, data):
         ("10. Support: ","Includes 12 months of technical support and software updates from OEM."),
         ("11. Installation: ","Online"),
         ("12. Cheque to be issued on name of: ", '"CM INFOTECH"'),
-        ("13. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory, Near BSNL Office,Jagatpur - Chenpur Road, \nJagatpur Village,Ahmedabad - 382481")
+        ("13. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory 11, Near BSNL Office,Jagatpur - Chenpur Road, \nJagatpur Village,Ahmedabad - 382481")
     ]
 
     # Bank Details
@@ -935,7 +972,6 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
 
 from fpdf import FPDF
 # --- PDF Class for Tax Invoice ---
-# --- PDF Class for Tax Invoice ---
 class PDF(FPDF):
     def __init__(self):
         super().__init__()
@@ -953,8 +989,19 @@ class PDF(FPDF):
         self.set_font(self.default_font, "", 8)
         self.set_left_margin(10)
         self.set_right_margin(15)
+        
+        # Store logo file path for use in header
+        self.logo_file = None
 
     def header(self):
+        # Add logo on every page (including second page)
+        if self.logo_file and self.page_no() >= 1:  # Show logo on all pages
+            try:
+                self.image(self.logo_file, x=165, y=2.5, w=35)
+            except Exception as e:
+                # You can add a warning here if needed, but don't show in header
+                pass
+        
         self.set_font(self.default_font, "B", 15)
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
         self.ln(3)
@@ -971,18 +1018,18 @@ class PDF(FPDF):
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()
     pdf.set_auto_page_break(auto=True, margin=10)
+    
+    # Store logo file path in the PDF instance for use in header
+    pdf.logo_file = logo_file
+    
     pdf.add_page()
 
-    # --- Logo on top right ---
-    if logo_file:
-        try:
-            pdf.image(logo_file, x=165, y=2.5, w=35)
-        except Exception as e:
-            st.warning(f"Could not add logo: {e}")
+    # --- Logo on top right --- (This will now be handled by header() on all pages)
+    # Remove the individual logo placement since it's now in header()
 
     # === HEADER (Vendor + Invoice Details) ===
     pdf.set_font(pdf.default_font, "B", 13)
-    pdf.cell(95, 8, "CM Infotech.", border=1, ln=0)
+    pdf.cell(95, 8, "CM Infotech.", border="LRT", ln=0)
     pdf.cell(48, 8, "Invoice No.", border=1, ln=0, align="L")
     pdf.cell(48, 8, "Invoice Date", border=1, ln=1, align="L")
 
@@ -990,7 +1037,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Left Side (Vendor Details) ---
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="L")
+    pdf.multi_cell(95, 4, invoice_data['vendor']['address'], border="L")
     
     # Vendor details lines
     vendor_lines = [
@@ -1027,13 +1074,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(153, pdf.get_y())  # Set position for the right cell
     pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="C")
 
-    # Payment terms
-    # pdf.set_x(107)
-    # pdf.set_font(pdf.default_font, "B", 11)
-    # pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
-    # pdf.set_font(pdf.default_font, "", 11)
-    # pdf.cell(48, 8, "100% Advance with Purchase", border="RT", ln=1)
-
     # Supplier's reference
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
@@ -1052,9 +1092,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === BUYER SECTION ===
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(95, 8, "Buyer", border=1, ln=0)
-    pdf.cell(48, 8, "Buyer's Order No.", border=1, ln=0, align="C")
-    pdf.cell(48, 8, "Buyer's Order Date", border=1, ln=1, align="C")
+    pdf.cell(95, 8, "Buyer", border="LT", ln=0)
+    pdf.cell(48, 8, "Buyer's Order No.", border=1, ln=0, align="L")
+    pdf.cell(48, 8, "Buyer's Order Date", border=1, ln=1, align="L")
 
     y_buyer_start = pdf.get_y()
 
@@ -1081,7 +1121,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         label_width = pdf.get_string_width(label) + 1
         pdf.cell(label_width, 5, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
-        border = "" if i < len(buyer_lines) - 1 else "B"
+        border = "" if i < len(buyer_lines) - 1 else ""
         pdf.cell(95 - label_width, 5, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
@@ -1124,15 +1164,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="RT", ln=1)
-
-    # Closing row
-    pdf.set_x(105)
-    pdf.cell(96, 1, "", border="LRB", ln=1)
+    pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
 
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
-    col_widths = [15, 77, 22, 23, 23, 31]
+    col_widths = [15, 80, 22, 23, 23, 28]
     
     # Header row
     pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
@@ -1210,7 +1246,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
     
     # --- Amount in Words ---
-    # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(191, 6, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
@@ -1219,7 +1254,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.add_page()
 
     # --- Tax Summary Table ---
-    # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 12)
     
     # Main header
@@ -1259,7 +1293,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(31, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     # Tax in words
-    # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(191, 6, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
@@ -1268,10 +1301,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.add_page()
 
     # --- Bank Details & Declaration (Side by Side) ---
-    # pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Company's Bank Details", ln=0,border=1)
-    pdf.cell(96, 6, "Declaration:", ln=1,border=1)
+    pdf.cell(95, 6, "Company's Bank Details", ln=0, border=1)
+    pdf.cell(96, 6, "Declaration:", ln=1, border=1)
 
     pdf.set_font(pdf.default_font, "", 10)
 
@@ -1300,32 +1332,96 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     max_y = max(y_after_left, y_after_right)
     pdf.set_y(max_y)
 
-    # --- Signature ---
-    pdf.ln(2)
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(0, 6, "For CM Infotech.", ln=True, align="R")
+# --- Signature Boxes (Side by Side) ---
+    # pdf.ln(2) 
 
+    # Save current Y position for signature boxes
+    y_signature_start = pdf.get_y()
+
+    # Left side - Buyer's Company Signature (Blank box for future use)
+    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.cell(95, 6, "Buyer's Company Signature", border="LR", ln=0, align="C")
+
+    # Right side - Our Company Signature
+    pdf.cell(96, 6, "For CM Infotech.", border="LR", ln=1, align="C")
+
+    # Create the signature boxes with DIFFERENT heights
+    left_signature_box_height = 35  # <-- Change this number for left box height only
+    right_signature_box_height = 35  # Keep this as is for right box
+
+    # Left signature box (Buyer - Blank)
+    pdf.set_font(pdf.default_font, "I", 10)
+    pdf.set_text_color(128, 128, 128)  # Gray color for placeholder text
+
+        # Check if buyer logo is available
+    buyer_logo_file = invoice_data.get('buyer', {}).get('logo_file')
+
+    if buyer_logo_file:
+        try:
+            # Add buyer logo at the top of the left box
+            logo_width = 25
+            logo_x = 10 + (95 - logo_width) / 2  # Center the logo horizontally
+            logo_y = pdf.get_y() + 5  # Small margin from top
+            
+            # Add buyer company logo
+            pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
+            
+            # Add buyer company name below logo
+            pdf.set_xy(10, logo_y + logo_width + 2)
+            pdf.set_font(pdf.default_font, "B", 9)
+            pdf.cell(95, 4, invoice_data['buyer']['name'], border=0, ln=1, align="C")
+            
+            # Add signature line and text
+            pdf.set_xy(10, pdf.get_y() + 8)
+            pdf.set_font(pdf.default_font, "", 9)
+            pdf.cell(95, 4, "_________________________", border=0, ln=1, align="C")
+            pdf.cell(95, 4, "Authorized Signatory", border=0, ln=1, align="C")
+            
+            # Draw the border around everything
+            pdf.set_xy(10, y_signature_start + 6)
+            pdf.cell(95, left_signature_box_height, "", border="LRB")
+            
+            # Update Y position after left box
+            y_after_left_signature = y_signature_start + 6 + left_signature_box_height
+            
+        except Exception as e:
+            st.warning(f"Could not add buyer logo: {e}")
+            # Fallback without logo
+            pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
+            y_after_left_signature = pdf.get_y()
+    else:
+        # No buyer logo available, show original placeholder
+        pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
+        y_after_left_signature = pdf.get_y()
+
+    # Right signature box (Our Company)
+    pdf.set_xy(105, y_signature_start + 6)  # Position for right box (6 is the header height)
+    pdf.set_text_color(0, 0, 0)  # Black color for our content
+
+    # Add stamp if available
     if stamp_file:
         try:
-            stamp_width = 25
-            stamp_x = pdf.w - pdf.r_margin - stamp_width
-            stamp_y = pdf.get_y()
+            stamp_width = 20
+            stamp_x = 105 + (96 - stamp_width) / 2  # Center the stamp in the right box
+            stamp_y = pdf.get_y() + 2
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
-            pdf.ln(25)
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
-    else:
-        pdf.ln(20)
-        
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.cell(0, 6, "Authorized Signatory", ln=True, align="R")
+
+    # Position for the signature text in right box - using right height
+    pdf.set_xy(105, y_signature_start + 6 + right_signature_box_height - 10)
+    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
+
+    # Draw border for right signature box - using right height
+    pdf.set_xy(105, y_signature_start + 6)
+    pdf.cell(96, right_signature_box_height, "", border="LRB")  # Empty cell with border
+
+    # Set Y position to continue after both signature boxes (use the taller one)
+    pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
     
     # --- Professional Footer ---
     pdf.set_y(-30)  # Position from bottom
-    
-    # Horizontal line
-    pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-    pdf.ln(2)
     
     # Footer content
     pdf.set_font(pdf.default_font, "I", 10)
@@ -1358,7 +1454,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
-
 
 # --- PDF Class ---
 class PO_PDF(FPDF):
@@ -1412,8 +1507,8 @@ class PO_PDF(FPDF):
         self.set_y(-15)
         
         # Horizontal line
-        self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
-        self.ln(2)
+        # self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
+        # self.ln(2)
         
         # Footer content - Computer generated text
         # self.set_font("Helvetica", "I", 10)
@@ -1504,7 +1599,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     
     # --- Vendor & Bill/Ship ---
     pdf.section_title("To:")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
     pdf.ln(5)
     # pdf.set_xy(110, pdf.get_y() - 20)
@@ -1521,12 +1616,12 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     col_widths = [65, 22, 30, 25, 15, 22]
     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
     pdf.set_fill_color(220, 220, 220)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     for h, w in zip(headers, col_widths):
         pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
     pdf.ln()
 
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     line_height = 5
     for p in po_data["products"]:
         gst_amt = p["basic"] * p["gst_percent"] / 100
@@ -1551,7 +1646,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
         pdf.ln(row_height)
 
     # Grand Total Row
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
     pdf.cell(col_widths[5], 6, f"{po_data['grand_total']:.2f}", border=1, align="R")
     pdf.ln(4)
@@ -1566,81 +1661,81 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # --- Amount in Words ---
     pdf.ln(5)
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Amount in Words")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 4, pdf.sanitize_text(po_data['amount_words']))
     # pdf.ln(2)
 
     # --- Terms & Conditions ---
     # pdf.section_title("Terms & Conditions")
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
 
     # Taxes
-    pdf.cell(45, 4, "Taxes")
+    pdf.cell(45, 5, "Taxes")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(0, 4, f"As specified above")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"As specified above")
 
     # Payment
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(45, 4, "Payment")
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Payment")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(0, 4, f"{sanitized_payment_terms}")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_payment_terms}")
 
     # Delivery
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(45, 4, "Delivery")
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Delivery")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(0, 4, f"{sanitized_delivery_terms}")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_delivery_terms}")
 
     pdf.ln(2)
 
     # --- End User ---
     pdf.section_title("End User Details")
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
 
     # Company Name
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(45, 4, "Company Name")
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Company Name")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(0, 4, f"{sanitized_end_company}")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_end_company}")
 
     # Company Address
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(45, 4, "Company Address")
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Company Address")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(0, 4, f"{sanitized_end_address}")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_end_address}")
 
     # Contact
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(45, 4, "Contact")
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Contact")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(0, 4, f"{sanitized_end_person} | {sanitized_end_mobile}")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_end_person} | {sanitized_end_mobile}")
 
     # Email
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(45, 4, "Email")
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Email")
     pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(0, 4, f"{sanitized_end_email}")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_end_email}")
 
     pdf.ln(2)
 
     # Authorization Section
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
     pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
 
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
     stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
     if os.path.exists(stamp_path):
@@ -1811,6 +1906,10 @@ def main():
     if "current_po_quarter" not in st.session_state:
         st.session_state.current_po_quarter = get_current_quarter()
 
+
+    if "invoice_seq" not in st.session_state:
+        # Load from file instead of starting from 1
+        st.session_state.invoice_seq = get_current_invoice_sequence()
     # NEW: Invoice session state
     if "invoice_seq" not in st.session_state:
         st.session_state.invoice_seq = 1
@@ -2055,7 +2154,7 @@ def main():
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},
                     "Reference": {"Suppliers_Reference":Suppliers_Reference, "Other": Others_Reference},
                     "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
-                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
+                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},#'logo_file': 'path/to/buyer_logo.jpg' add this when you have to add the buyer logo
                     "invoice_details": {
                         "buyers_order_no": buyers_order_no,
                         "buyers_order_date": buyers_order_date,
@@ -2082,12 +2181,16 @@ def main():
                 
                 # Auto-increment for next invoice
                 if invoice_auto_increment:
-                    try:
-                        next_sequence = get_next_sequence_number_invoice(invoice_no)
-                        # Update the sequence in session state for next time
-                        st.session_state.invoice_seq = next_sequence
-                    except:
-                        st.session_state.invoice_seq += 1
+                    # This automatically increments and saves to file
+                    next_sequence = get_next_invoice_sequence()
+                    st.session_state.invoice_seq = next_sequence
+                # if invoice_auto_increment:
+                #     try:
+                #         next_sequence = get_next_sequence_number_invoice(invoice_no)
+                #         # Update the sequence in session state for next time
+                #         st.session_state.invoice_seq = next_sequence
+                #     except:
+                #         st.session_state.invoice_seq += 1
 
                 st.success("Invoice generated successfully!")
                 
@@ -2740,7 +2843,7 @@ def main():
                     st.download_button(
                         "⬇ Download Quotation PDF",
                         data=pdf_bytes,
-                        file_name=f"Quotation_{st.session_state.quotation_number.replace('/', '_')}.pdf",
+                        file_name=f"{st.session_state.quote_vendor_name}_{st.session_state.quotation_number.replace('/', '_')}.pdf",
                         mime="application/pdf",
                         use_container_width=True
                     )

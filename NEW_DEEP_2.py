@@ -1723,7 +1723,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Create the signature boxes with DIFFERENT heights
     left_signature_box_height = 45  # Height for left box
-    right_signature_box_height = 45  # Same height for right box
+    right_signature_box_height = 35  # Same height for right box
 
     # Left signature box (Buyer - with their stamp)
     pdf.set_font(pdf.default_font, "I", 10)

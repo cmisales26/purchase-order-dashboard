@@ -1722,7 +1722,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(96, 6, "For CM Infotech.", border=1, ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
-    left_signature_box_height = 35  # <-- Change this number for left box height only
+    left_signature_box_height = 45  # <-- Change this number for left box height only
     right_signature_box_height = 35  # Keep this as is for right box
 
     # Left signature box (Buyer - Blank)
@@ -1767,7 +1767,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             y_after_left_signature = pdf.get_y()
     else:
         # No buyer logo available, show original placeholder
-        pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+        pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
         y_after_left_signature = pdf.get_y()
 
     # # Left box with border and placeholder text - using left height
@@ -2536,7 +2536,7 @@ def main():
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},
                     "Reference": {"Suppliers_Reference":Suppliers_Reference, "Other": Others_Reference},
                     "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
-                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
+                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},#'logo_file': 'path/to/buyer_logo.jpg' add this when you have to add the buyer logo
                     "invoice_details": {
                         "buyers_order_no": buyers_order_no,
                         "buyers_order_date": buyers_order_date,

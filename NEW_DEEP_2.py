@@ -989,8 +989,19 @@ class PDF(FPDF):
         self.set_font(self.default_font, "", 8)
         self.set_left_margin(10)
         self.set_right_margin(15)
+        
+        # Store logo file path for use in header
+        self.logo_file = None
 
     def header(self):
+        # Add logo on every page (including second page)
+        if self.logo_file and self.page_no() >= 1:  # Show logo on all pages
+            try:
+                self.image(self.logo_file, x=165, y=2.5, w=35)
+            except Exception as e:
+                # You can add a warning here if needed, but don't show in header
+                pass
+        
         self.set_font(self.default_font, "B", 15)
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
         self.ln(3)
@@ -1007,14 +1018,14 @@ class PDF(FPDF):
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()
     pdf.set_auto_page_break(auto=True, margin=10)
+    
+    # Store logo file path in the PDF instance for use in header
+    pdf.logo_file = logo_file
+    
     pdf.add_page()
 
-    # --- Logo on top right ---
-    if logo_file:
-        try:
-            pdf.image(logo_file, x=165, y=2.5, w=35)
-        except Exception as e:
-            st.warning(f"Could not add logo: {e}")
+    # --- Logo on top right --- (This will now be handled by header() on all pages)
+    # Remove the individual logo placement since it's now in header()
 
     # === HEADER (Vendor + Invoice Details) ===
     pdf.set_font(pdf.default_font, "B", 13)
@@ -1383,12 +1394,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
         y_after_left_signature = pdf.get_y()
 
-    # # Left box with border and placeholder text - using left height
-    # pdf.multi_cell(95, left_signature_box_height/5, "(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
-
-    # # Get Y position after left box
-    # y_after_left_signature = pdf.get_y()
-
     # Right signature box (Our Company)
     pdf.set_xy(105, y_signature_start + 6)  # Position for right box (6 is the header height)
     pdf.set_text_color(0, 0, 0)  # Black color for our content
@@ -1417,10 +1422,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # --- Professional Footer ---
     pdf.set_y(-30)  # Position from bottom
-    
-    # Horizontal line
-    # pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - 10, pdf.get_y())
-    # pdf.ln(2)
     
     # Footer content
     pdf.set_font(pdf.default_font, "I", 10)

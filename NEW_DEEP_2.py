@@ -1712,6 +1712,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.multi_cell(0, 4, f"{sanitized_end_address}")
 
     # Contact
+    pdf.ln()
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Contact")
     pdf.cell(5, 4, ":")
@@ -1719,6 +1720,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.multi_cell(0, 4, f"{sanitized_end_person} | {sanitized_end_mobile}")
 
     # Email
+    pdf.ln()
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Email")
     pdf.cell(5, 4, ":")

@@ -1329,10 +1329,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Buyer's Company Signature (Blank box for future use)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Buyer's Company Signature", border=0, ln=0, align="C")
+    pdf.cell(95, 6, "Buyer's Company Signature", border="LR", ln=0, align="C")
 
     # Right side - Our Company Signature
-    pdf.cell(96, 6, "For CM Infotech.", border=0, ln=1, align="C")
+    pdf.cell(96, 6, "For CM Infotech.", border="LR", ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
     left_signature_box_height = 35  # <-- Change this number for left box height only
@@ -1368,7 +1368,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             
             # Draw the border around everything
             pdf.set_xy(10, y_signature_start + 6)
-            pdf.cell(95, left_signature_box_height, "", border=1)
+            pdf.cell(95, left_signature_box_height, "", border=0)
             
             # Update Y position after left box
             y_after_left_signature = y_signature_start + 6 + left_signature_box_height
@@ -1410,7 +1410,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Draw border for right signature box - using right height
     pdf.set_xy(105, y_signature_start + 6)
-    pdf.cell(96, right_signature_box_height, "", border=1)  # Empty cell with border
+    pdf.cell(96, right_signature_box_height, "", border=0)  # Empty cell with border
 
     # Set Y position to continue after both signature boxes (use the taller one)
     pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))

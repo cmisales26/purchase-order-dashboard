@@ -303,6 +303,43 @@ def get_next_sequence_number(quotation_number):
         pass
     return 1
 
+
+import os
+
+# Simple file-based counter for Invoice sequence
+INVOICE_COUNTER_FILE = "invoice_counter.txt"
+
+def get_next_invoice_sequence():
+    """Simple file-based Invoice sequence counter"""
+    try:
+        # Read current number from file
+        if os.path.exists(INVOICE_COUNTER_FILE):
+            with open(INVOICE_COUNTER_FILE, 'r') as f:
+                current = int(f.read().strip())
+        else:
+            current = 0
+    except:
+        current = 0
+    
+    # Increment
+    next_seq = current + 1
+    
+    # Save the new number back to file
+    with open(INVOICE_COUNTER_FILE, 'w') as f:
+        f.write(str(next_seq))
+    
+    return next_seq
+
+def get_current_invoice_sequence():
+    """Get current Invoice sequence without incrementing"""
+    try:
+        if os.path.exists(INVOICE_COUNTER_FILE):
+            with open(INVOICE_COUNTER_FILE, 'r') as f:
+                return int(f.read().strip())
+    except:
+        pass
+    return 1
+
 # --- Helper Functions for Invoice ---
 def parse_invoice_number(invoice_number):
     """Parse invoice number to extract components"""
@@ -935,430 +972,6 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
 
 from fpdf import FPDF
 # --- PDF Class for Tax Invoice ---
-# --- PDF Class for Tax Invoice ---
-# class PDF(FPDF):
-#     def __init__(self):
-#         super().__init__()
-        
-#         font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-#         try:
-#             self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
-#             self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
-#             self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
-#             self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
-#             self.default_font = "Calibri"
-#         except:
-#             self.default_font = "Helvetica"
-
-#         self.set_font(self.default_font, "", 8)
-#         self.set_left_margin(10)
-#         self.set_right_margin(15)
-
-#     def header(self):
-#         self.set_font(self.default_font, "B", 15)
-#         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
-#         self.ln(3)
-        
-#     def footer(self):
-#         # Position at 1.5 cm from bottom
-#         self.set_y(-15)
-#         self.set_font(self.default_font, "I", 8)
-#         # Page number
-#         self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
-
-
-# # --- Function to Create Invoice PDF ---
-# def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
-#     pdf = PDF()
-#     pdf.set_auto_page_break(auto=True, margin=10)
-#     pdf.add_page()
-
-#     # --- Logo on top right ---
-#     if logo_file:
-#         try:
-#             pdf.image(logo_file, x=165, y=2.5, w=35)
-#         except Exception as e:
-#             st.warning(f"Could not add logo: {e}")
-
-#     # === HEADER (Vendor + Invoice Details) ===
-#     pdf.set_font(pdf.default_font, "B", 13)
-#     pdf.cell(95, 8, "CM Infotech.", border=1, ln=0)
-#     pdf.cell(48, 8, "Invoice No.", border=1, ln=0, align="L")
-#     pdf.cell(48, 8, "Invoice Date", border=1, ln=1, align="L")
-
-#     y_left_start = pdf.get_y()
-
-#     # --- Left Side (Vendor Details) ---
-#     pdf.set_font(pdf.default_font, "", 12)
-#     pdf.multi_cell(95, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur,\nChenpur Road, Jagatpur Village, Ahmedabad - 382481", border="L")
-    
-#     # Vendor details lines
-#     vendor_lines = [
-#         ("GST No.:", invoice_data['vendor']['gst']),
-#         ("MSME Registration No.:", invoice_data['vendor']['msme']),
-#         ("E-Mail:", "cm.infotech2014@gmail.com"),
-#         ("Mobile No.:", "8733915721"),
-#     ]
-    
-#     for i, (label, value) in enumerate(vendor_lines):
-#         pdf.set_x(10)
-#         pdf.set_font(pdf.default_font, "B", 12)
-#         label_width = pdf.get_string_width(label) 
-#         pdf.cell(label_width, 6, label, border="L", ln=0)
-#         pdf.set_font(pdf.default_font, "", 12)
-#         border = "R" if i < len(vendor_lines) - 1 else "R"
-#         pdf.cell(95 - label_width, 6, value, border=border, ln=1)
-
-#     y_left_end = pdf.get_y()
-
-#     # --- Right Side (Invoice Details) ---
-#     pdf.set_xy(105, y_left_start)
-#     pdf.set_font(pdf.default_font, "", 12)
-#     pdf.cell(48, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="L")
-#     pdf.cell(48, 8, invoice_data['invoice']['date'], border="R", ln=1, align="L")
-
-#     # Payment terms
-#     pdf.set_x(105)
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
-#     pdf.set_font(pdf.default_font, "", 12)
-
-#     # Use multi_cell to wrap text to next line
-#     pdf.set_xy(153, pdf.get_y())  # Set position for the right cell
-#     pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="C")
-
-#     # Payment terms
-#     # pdf.set_x(107)
-#     # pdf.set_font(pdf.default_font, "B", 11)
-#     # pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
-#     # pdf.set_font(pdf.default_font, "", 11)
-#     # pdf.cell(48, 8, "100% Advance with Purchase", border="RT", ln=1)
-
-#     # Supplier's reference
-#     pdf.set_x(105)
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     pdf.cell(48, 8, "Supplier's Reference:", border="LRT", ln=0)
-#     pdf.set_font(pdf.default_font, "", 12)
-#     other_ref_value = invoice_data['Reference']['Suppliers_Reference']
-#     pdf.cell(48, 8, other_ref_value, border="LRTB", ln=1)
-
-#     # Other's reference
-#     pdf.set_x(105)
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     pdf.cell(48, 8, "Other's Reference:", border="RTB", ln=0)
-#     pdf.set_font(pdf.default_font, "", 12)
-#     other_ref_value = invoice_data['Reference']['Other']
-#     pdf.cell(48, 8, other_ref_value, border="LRTB", ln=1)
-
-#     # === BUYER SECTION ===
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     pdf.cell(95, 8, "Buyer", border=1, ln=0)
-#     pdf.cell(48, 8, "Buyer's Order No.", border=1, ln=0, align="C")
-#     pdf.cell(48, 8, "Buyer's Order Date", border=1, ln=1, align="C")
-
-#     y_buyer_start = pdf.get_y()
-
-#     # --- Buyer Left Details ---
-#     y_left_buyer_start = pdf.get_y()
-    
-#     # Buyer name and address
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     pdf.cell(95, 5, invoice_data['buyer']['name'], border="LR", ln=1)
-    
-#     pdf.set_font(pdf.default_font, "", 12)
-#     pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="LR")
-    
-#     # Buyer contact details
-#     buyer_lines = [
-#         ("Email:", "dmistry@baseengr.com"),
-#         ("Tel No.:", "98987 91813"),
-#         ("GST No.:", invoice_data['buyer']['gst']),
-#     ]
-    
-#     for i, (label, value) in enumerate(buyer_lines):
-#         pdf.set_x(10)
-#         pdf.set_font(pdf.default_font, "B", 12)
-#         label_width = pdf.get_string_width(label) + 1
-#         pdf.cell(label_width, 5, label, border="L", ln=0)
-#         pdf.set_font(pdf.default_font, "", 12)
-#         border = "" if i < len(buyer_lines) - 1 else ""
-#         pdf.cell(95 - label_width, 5, value, border=border, ln=1)
-
-#     y_buyer_left_end = pdf.get_y()
-#     total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
-
-#     # --- Buyer Right Details ---
-#     pdf.set_xy(105, y_buyer_start)
-    
-#     # Row 1: Buyer's Order No/Date
-#     pdf.set_font(pdf.default_font, "", 12)
-#     pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="L")
-#     pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="L")
-
-#     # Calculate remaining height needed for address space
-#     name_height = 5
-#     contact_lines_height = 18
-#     remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
-    
-#     # Add empty space for address if needed
-#     if remaining_height_for_address > 0:
-#         pdf.set_x(105)
-#         pdf.cell(96, remaining_height_for_address, "", border="R", ln=1)
-
-#     # Row 2: Dispatched Through
-#     pdf.set_x(105)
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     pdf.cell(48, 6, "Dispatched Through", border="LRT", ln=0)
-#     pdf.set_font(pdf.default_font, "", 12)
-#     pdf.cell(48, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
-
-#     # Row 3: Destination
-#     pdf.set_x(105)
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     pdf.cell(48, 6, "Destination", border="LRT", ln=0)
-#     pdf.set_font(pdf.default_font, "", 12)
-#     pdf.cell(48, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
-
-#     # Row 4: Terms of delivery
-#     pdf.set_x(105)
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
-#     pdf.set_font(pdf.default_font, "", 12)
-#     pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
-
-
-#     # Closing row
-#     # pdf.set_x(105)
-#     # pdf.cell(96, 1, "", border="LRB", ln=1)
-
-#     # --- Item Table Header ---
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     col_widths = [15, 77, 22, 23, 23, 31]
-    
-#     # Header row
-#     pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
-#     pdf.cell(col_widths[1], 6, "Description of Goods", border=1, align="C")
-#     pdf.cell(col_widths[2], 6, "HSN/SAC", border=1, align="C")
-#     pdf.cell(col_widths[3], 6, "Quantity", border=1, align="C")
-#     pdf.cell(col_widths[4], 6, "Unit Rate", border=1, align="C")
-#     pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
-
-#     # --- Items ---
-#     pdf.set_font(pdf.default_font, "", 12)
-#     line_height = 5
-
-#     for i, item in enumerate(invoice_data["items"], start=1):
-#         # Check if we need a new page before adding each item
-#         if pdf.get_y() + 25 > pdf.page_break_trigger:
-#             pdf.add_page()
-#             # Re-add header for new page
-#             pdf.set_font(pdf.default_font, "B", 12)
-#             pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
-#             pdf.cell(col_widths[1], 6, "Description of Goods", border=1, align="C")
-#             pdf.cell(col_widths[2], 6, "HSN/SAC", border=1, align="C")
-#             pdf.cell(col_widths[3], 6, "Quantity", border=1, align="C")
-#             pdf.cell(col_widths[4], 6, "Unit Rate", border=1, align="C")
-#             pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
-#             pdf.set_font(pdf.default_font, "", 12)
-            
-#         x_start = pdf.get_x()
-#         y_start = pdf.get_y()
-
-#         # Description cell (multi-line)
-#         pdf.set_xy(x_start + col_widths[0], y_start)
-#         pdf.multi_cell(col_widths[1], line_height, item['description'], border=1, align="L")
-#         y_after_desc = pdf.get_y()
-        
-#         row_height = y_after_desc - y_start
-        
-#         # Other cells for the row
-#         pdf.set_xy(x_start, y_start)
-#         pdf.multi_cell(col_widths[0], row_height, str(i), border=1, align="C")
-        
-#         pdf.set_xy(x_start + col_widths[0] + col_widths[1], y_start)
-#         pdf.multi_cell(col_widths[2], row_height, item['hsn'], border=1, align="C")
-        
-#         pdf.set_xy(x_start + sum(col_widths[:3]), y_start)
-#         pdf.multi_cell(col_widths[3], row_height, str(item['quantity']), border=1, align="C")
-        
-#         pdf.set_xy(x_start + sum(col_widths[:4]), y_start)
-#         pdf.multi_cell(col_widths[4], row_height, f"{item['unit_rate']:.2f}", border=1, align="R")
-        
-#         amount = item['quantity'] * item['unit_rate']
-#         pdf.set_xy(x_start + sum(col_widths[:-1]), y_start)
-#         pdf.multi_cell(col_widths[5], row_height, f"{amount:.2f}", border=1, align="R")
-
-#         pdf.set_xy(x_start, y_start + row_height)
-
-#     # Check if we need a new page before totals
-#     if pdf.get_y() + 60 > pdf.page_break_trigger:
-#         pdf.add_page()
-
-#     # --- Totals ---
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     total_width = sum(col_widths[:5])
-    
-#     pdf.cell(total_width, 6, "Basic Amount", border=1, align="L")
-#     pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
-    
-#     pdf.cell(total_width, 6, "SGST @ 9%", border=1, align="L")
-#     pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
-    
-#     pdf.cell(total_width, 6, "CGST @ 9%", border=1, align="L")
-#     pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
-
-#     pdf.cell(total_width, 6, "Final Amount to be Paid", border=1, align="L")
-#     pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
-    
-#     # --- Amount in Words ---
-#     # pdf.ln(2)
-#     pdf.set_font(pdf.default_font, "B", 12)
-#     pdf.cell(191, 6, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
-
-#     # Check if we need a new page before tax summary
-#     if pdf.get_y() + 60 > pdf.page_break_trigger:
-#         pdf.add_page()
-
-#     # --- Tax Summary Table ---
-#     # pdf.ln(2)
-#     pdf.set_font(pdf.default_font, "B", 12)
-    
-#     # Main header
-#     pdf.cell(34, 6, "HSN/SAN", border=1, align="C")
-#     pdf.cell(34, 6, "Taxable Value", border=1, align="C")
-#     pdf.cell(60, 6, "Central Tax", border=1, align="C")
-#     pdf.cell(63, 6, "State Tax", border=1, ln=True, align="C")
-
-#     # Sub-header
-#     pdf.cell(34, 6, "", border="L", ln=False)
-#     pdf.cell(34, 6, "", border="L", ln=False)
-#     pdf.cell(30, 6, "Rate", border="L", align="C")
-#     pdf.cell(30, 6, "Amount", border="LR", align="C")
-#     pdf.cell(32, 6, "Rate", border="L", align="C")
-#     pdf.cell(31, 6, "Amount", border="LR", ln=True, align="C")
-
-#     pdf.set_font(pdf.default_font, "", 10)
-#     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
-#     hsn_sgst = hsn_tax_value * 0.09
-#     hsn_cgst = hsn_tax_value * 0.09
-    
-#     # Data row
-#     pdf.cell(34, 6, "997331", border=1, align="C")
-#     pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-#     pdf.cell(30, 6, "9%", border=1, align="C")
-#     pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
-#     pdf.cell(32, 6, "9%", border=1, align="C")
-#     pdf.cell(31, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
-
-#     # Total row
-#     pdf.set_font(pdf.default_font, "B", 10)
-#     pdf.cell(34, 6, "Total", border=1, align="C")
-#     pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-#     pdf.cell(30, 6, "", border=1, align="C")
-#     pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
-#     pdf.cell(32, 6, "", border=1, align="C")
-#     pdf.cell(31, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
-    
-#     # Tax in words
-#     # pdf.ln(2)
-#     pdf.set_font(pdf.default_font, "B", 10)
-#     pdf.cell(191, 6, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
-
-#     # Check if we need a new page before footer content
-#     if pdf.get_y() + 80 > pdf.page_break_trigger:
-#         pdf.add_page()
-
-#     # --- Bank Details & Declaration (Side by Side) ---
-#     # pdf.ln(2)
-#     pdf.set_font(pdf.default_font, "B", 10)
-#     pdf.cell(95, 6, "Company's Bank Details", ln=0,border=1)
-#     pdf.cell(96, 6, "Declaration:", ln=1,border=1)
-
-#     pdf.set_font(pdf.default_font, "", 10)
-
-#     # Left column (bank)
-#     bank_text = (
-#         "Bank Name : IDFC FIRST\n"
-#         "Branch        : AHMEDABAD Shyamal Branch\n"
-#         "Account No : 88130420182\n"
-#         "IFS Code    : IDFB0040335"
-#     )
-
-#     # Save current Y position
-#     y_before = pdf.get_y()
-#     x_left = pdf.get_x()
-
-#     # Left cell (Bank) with border
-#     pdf.multi_cell(95, 6.22, bank_text, border=1)
-#     y_after_left = pdf.get_y()
-    
-#     # Right cell (Declaration) with border
-#     pdf.set_xy(x_left + 95, y_before)
-#     pdf.multi_cell(96, 5, invoice_data['declaration'], border=1)
-#     y_after_right = pdf.get_y()
-    
-#     # Set Y to the maximum of both columns
-#     max_y = max(y_after_left, y_after_right)
-#     pdf.set_y(max_y)
-
-#     # --- Signature ---
-#     pdf.ln(2)
-#     pdf.set_font(pdf.default_font, "B", 10)
-#     pdf.cell(0, 6, "For CM Infotech.", ln=True, align="R")
-
-#     if stamp_file:
-#         try:
-#             stamp_width = 25
-#             stamp_x = pdf.w - pdf.r_margin - stamp_width
-#             stamp_y = pdf.get_y()
-#             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
-#             pdf.ln(25)
-#         except Exception as e:
-#             st.warning(f"Could not add stamp: {e}")
-#     else:
-#         pdf.ln(20)
-        
-#     pdf.set_font(pdf.default_font, "", 10)
-#     pdf.cell(0, 6, "Authorized Signatory", ln=True, align="R")
-    
-#     # --- Professional Footer ---
-#     pdf.set_y(-30)  # Position from bottom
-    
-#     # Horizontal line
-#     pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-#     pdf.ln(2)
-    
-#     # Footer content
-#     pdf.set_font(pdf.default_font, "I", 10)
-#     pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
-    
-#     pdf.set_font(pdf.default_font, "", 10)
-#     pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-    
-#     # Clickable contact info
-#     pdf.set_font(pdf.default_font, "U", 10)
-#     pdf.set_text_color(0, 0, 255)
-    
-#     email1 = "info@cminfotech.com"
-#     phone_number = "+91 873 391 5721"
-#     website = "www.cminfotech.com"
-    
-#     # Center the contact information
-#     contact_text = f"{email1} | {phone_number} | {website}"
-#     contact_width = pdf.get_string_width(contact_text)
-#     x_contact = (pdf.w - contact_width) / 2
-    
-#     pdf.set_x(x_contact)
-#     pdf.cell(pdf.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
-#     pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | "))
-#     pdf.cell(pdf.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
-#     pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | ") + pdf.get_string_width(phone_number) + pdf.get_string_width(" | "))
-#     pdf.cell(pdf.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
-    
-#     pdf.set_text_color(0, 0, 0)
-
-#     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
-#     return pdf_bytes
 class PDF(FPDF):
     def __init__(self):
         super().__init__()
@@ -2292,6 +1905,10 @@ def main():
     if "current_po_quarter" not in st.session_state:
         st.session_state.current_po_quarter = get_current_quarter()
 
+
+    if "invoice_seq" not in st.session_state:
+        # Load from file instead of starting from 1
+        st.session_state.invoice_seq = get_current_invoice_sequence()
     # NEW: Invoice session state
     if "invoice_seq" not in st.session_state:
         st.session_state.invoice_seq = 1
@@ -2563,12 +2180,16 @@ def main():
                 
                 # Auto-increment for next invoice
                 if invoice_auto_increment:
-                    try:
-                        next_sequence = get_next_sequence_number_invoice(invoice_no)
-                        # Update the sequence in session state for next time
-                        st.session_state.invoice_seq = next_sequence
-                    except:
-                        st.session_state.invoice_seq += 1
+                    # This automatically increments and saves to file
+                    next_sequence = get_next_invoice_sequence()
+                    st.session_state.invoice_seq = next_sequence
+                # if invoice_auto_increment:
+                #     try:
+                #         next_sequence = get_next_sequence_number_invoice(invoice_no)
+                #         # Update the sequence in session state for next time
+                #         st.session_state.invoice_seq = next_sequence
+                #     except:
+                #         st.session_state.invoice_seq += 1
 
                 st.success("Invoice generated successfully!")
                 

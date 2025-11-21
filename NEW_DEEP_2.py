@@ -1765,7 +1765,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_y(-30)  # Position from bottom
     
     # Horizontal line
-    pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
+    pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - 10, pdf.get_y())
     pdf.ln(2)
     
     # Footer content

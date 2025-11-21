@@ -1168,7 +1168,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
-    col_widths = [15, 77, 22, 23, 23, 31]
+    col_widths = [15, 79, 22, 23, 23, 29]
     
     # Header row
     pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")

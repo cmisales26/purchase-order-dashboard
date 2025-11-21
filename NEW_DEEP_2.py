@@ -1518,7 +1518,7 @@ class PO_PDF(FPDF):
         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
         
         # Clickable contact info (same as invoice)
-        self.set_font("Helvetica", "U", 12)
+        self.set_font("Helvetica", "U", 10)
         self.set_text_color(0, 0, 255)  # Blue for links
         
         email1 = "info@cminfotech.com"

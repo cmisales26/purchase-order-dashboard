@@ -1131,7 +1131,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(105, y_buyer_start)
     
     # Row 1: Buyer's Order No/Date
-    pdf.set_font(pdf.default_font, "", 14)
+    pdf.set_font(pdf.default_font, "", 16)
     pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_no'], border="LR", ln=0, align="L")
     pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_date'], border="LR", ln=1, align="L")
 

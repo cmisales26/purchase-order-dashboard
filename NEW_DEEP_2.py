@@ -1322,7 +1322,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_y(max_y)
 
 # --- Signature Boxes (Side by Side) ---
-    pdf.ln(2)
+    # pdf.ln(2)
 
     # Save current Y position for signature boxes
     y_signature_start = pdf.get_y()

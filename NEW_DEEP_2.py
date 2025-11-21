@@ -1368,7 +1368,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             
             # Draw the border around everything
             pdf.set_xy(10, y_signature_start + 6)
-            pdf.cell(95, left_signature_box_height, "", border="LR")
+            pdf.cell(95, left_signature_box_height, "", border="LRB")
             
             # Update Y position after left box
             y_after_left_signature = y_signature_start + 6 + left_signature_box_height
@@ -1376,11 +1376,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         except Exception as e:
             st.warning(f"Could not add buyer logo: {e}")
             # Fallback without logo
-            pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+            pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
             y_after_left_signature = pdf.get_y()
     else:
         # No buyer logo available, show original placeholder
-        pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+        pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
         y_after_left_signature = pdf.get_y()
 
     # # Left box with border and placeholder text - using left height
@@ -1410,7 +1410,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Draw border for right signature box - using right height
     pdf.set_xy(105, y_signature_start + 6)
-    pdf.cell(96, right_signature_box_height, "", border="LR")  # Empty cell with border
+    pdf.cell(96, right_signature_box_height, "", border="LRB")  # Empty cell with border
 
     # Set Y position to continue after both signature boxes (use the taller one)
     pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))

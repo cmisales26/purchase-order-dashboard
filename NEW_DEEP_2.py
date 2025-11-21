@@ -1708,36 +1708,37 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     max_y = max(y_after_left, y_after_right)
     pdf.set_y(max_y)
 
-    # --- Signature Boxes (Side by Side) ---
+# --- Signature Boxes (Side by Side) ---
     pdf.ln(2)
-    
+
     # Save current Y position for signature boxes
     y_signature_start = pdf.get_y()
-    
+
     # Left side - Buyer's Company Signature (Blank box for future use)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 10, "Buyer's Company Signature", border=1, ln=0, align="C")
-    
+    pdf.cell(95, 6, "Buyer's Company Signature", border=1, ln=0, align="C")
+
     # Right side - Our Company Signature
     pdf.cell(96, 6, "For CM Infotech.", border=1, ln=1, align="C")
-    
-    # Create the signature boxes with proper height
-    signature_box_height = 35
-    
+
+    # Create the signature boxes with DIFFERENT heights
+    left_signature_box_height = 45  # <-- Change this number for left box height only
+    right_signature_box_height = 35  # Keep this as is for right box
+
     # Left signature box (Buyer - Blank)
     pdf.set_font(pdf.default_font, "I", 10)
     pdf.set_text_color(128, 128, 128)  # Gray color for placeholder text
-    
-    # Left box with border and placeholder text
-    pdf.multi_cell(95, signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
-    
+
+    # Left box with border and placeholder text - using left height
+    pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+
     # Get Y position after left box
     y_after_left_signature = pdf.get_y()
-    
+
     # Right signature box (Our Company)
     pdf.set_xy(105, y_signature_start + 6)  # Position for right box (6 is the header height)
     pdf.set_text_color(0, 0, 0)  # Black color for our content
-    
+
     # Add stamp if available
     if stamp_file:
         try:
@@ -1747,18 +1748,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
-    
-    # Position for the signature text in right box
-    pdf.set_xy(105, y_signature_start + 6 + signature_box_height - 10)
+
+    # Position for the signature text in right box - using right height
+    pdf.set_xy(105, y_signature_start + 6 + right_signature_box_height - 10)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
-    
-    # Draw border for right signature box
+
+    # Draw border for right signature box - using right height
     pdf.set_xy(105, y_signature_start + 6)
-    pdf.cell(96, signature_box_height, "", border=1)  # Empty cell with border
-    
-    # Set Y position to continue after both signature boxes
-    pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + signature_box_height))
+    pdf.cell(96, right_signature_box_height, "", border=1)  # Empty cell with border
+
+    # Set Y position to continue after both signature boxes (use the taller one)
+    pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
     
     # --- Professional Footer ---
     pdf.set_y(-30)  # Position from bottom

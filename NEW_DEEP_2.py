@@ -1716,7 +1716,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Left side - Buyer's Company Signature (Blank box for future use)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6.22, "Buyer's Company Signature", border=1, ln=0, align="C")
+    pdf.cell(95, 6, "Buyer's Company Signature", border=1, ln=0, align="C")
     
     # Right side - Our Company Signature
     pdf.cell(96, 6, "For CM Infotech.", border=1, ln=1, align="C")
@@ -1729,7 +1729,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_text_color(128, 128, 128)  # Gray color for placeholder text
     
     # Left box with border and placeholder text
-    pdf.multi_cell(95, signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+    pdf.multi_cell(98, signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
     
     # Get Y position after left box
     y_after_left_signature = pdf.get_y()

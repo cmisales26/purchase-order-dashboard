@@ -1730,7 +1730,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_text_color(128, 128, 128)  # Gray color for placeholder text
 
     # Left box with border and placeholder text - using left height
-    pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+    pdf.multi_cell(90, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
 
     # Get Y position after left box
     y_after_left_signature = pdf.get_y()

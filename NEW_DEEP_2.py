@@ -1672,24 +1672,24 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "B", 12)
 
     # Taxes
-    pdf.cell(45, 4, "Taxes")
+    pdf.cell(45, 5, "Taxes")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 4, f"As specified above")
+    pdf.multi_cell(0, 5, f"As specified above")
 
     # Payment
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 4, "Payment")
+    pdf.cell(45, 5, "Payment")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 4, f"{sanitized_payment_terms}")
+    pdf.multi_cell(0, 5, f"{sanitized_payment_terms}")
 
     # Delivery
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 4, "Delivery")
+    pdf.cell(45, 5, "Delivery")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 4, f"{sanitized_delivery_terms}")
+    pdf.multi_cell(0, 5, f"{sanitized_delivery_terms}")
 
     pdf.ln(2)
 
@@ -1699,17 +1699,17 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # Company Name
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 4, "Company Name")
+    pdf.cell(45, 5, "Company Name")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 4, f"{sanitized_end_company}")
+    pdf.multi_cell(0, 5, f"{sanitized_end_company}")
 
     # Company Address
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 4, "Company Address")
+    pdf.cell(45, 5, "Company Address")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 4, f"{sanitized_end_address}")
+    pdf.multi_cell(0, 5, f"{sanitized_end_address}")
 
     # Contact
     pdf.set_font(pdf.default_font, "B", 12)

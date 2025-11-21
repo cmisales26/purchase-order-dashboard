@@ -1708,13 +1708,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     max_y = max(y_after_left, y_after_right)
     pdf.set_y(max_y)
 
-    # --- Signature Boxes (Side by Side) ---
+# --- Signature Boxes (Side by Side) ---
     pdf.ln(2)
 
     # Save current Y position for signature boxes
     y_signature_start = pdf.get_y()
 
-    # Left side - Buyer's Company Signature
+    # Left side - Buyer's Company Signature (Blank box for future use)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(95, 6, "Buyer's Company Signature", border=1, ln=0, align="C")
 
@@ -1722,68 +1722,43 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(96, 6, "For CM Infotech.", border=1, ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
-    left_signature_box_height = 45  # Height for left box
-    right_signature_box_height = 37  # Same height for right box
+    left_signature_box_height = 88  # <-- Change this number for left box height only
+    right_signature_box_height = 35  # Keep this as is for right box
 
-    # Left signature box (Buyer - with their stamp)
+    # Left signature box (Buyer - Blank)
     pdf.set_font(pdf.default_font, "I", 10)
     pdf.set_text_color(128, 128, 128)  # Gray color for placeholder text
 
-    # Check if buyer stamp is available
-    buyer_stamp_file = invoice_data.get('buyer', {}).get('stamp_file')
-
-    if buyer_stamp_file:
-        try:
-            # Add buyer stamp in the center of left box
-            buyer_stamp_width = 25
-            buyer_stamp_x = 10 + (95 - buyer_stamp_width) / 2  # Center horizontally
-            buyer_stamp_y = y_signature_start + 6 + (left_signature_box_height - buyer_stamp_width) / 2  # Center vertically
-            
-            pdf.image(buyer_stamp_file, x=buyer_stamp_x, y=buyer_stamp_y, w=buyer_stamp_width)
-            
-            # Add authorized signatory text at the bottom
-            pdf.set_xy(10, y_signature_start + 6 + left_signature_box_height - 8)
-            pdf.set_font(pdf.default_font, "B", 10)
-            pdf.set_text_color(0, 0, 0)  # Black color
-            pdf.cell(95, 5, "Authorized Signatory", border=0, ln=True, align="C")
-            
-        except Exception as e:
-            st.warning(f"Could not add buyer stamp: {e}")
-            # Fallback: show placeholder without stamp
-            pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
-    else:
-        # No buyer stamp available, show placeholder
-        pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
+    # Left box with border and placeholder text - using left height
+    pdf.multi_cell(95, left_signature_box_height/5, "(Space for Buyer's Company\nStamp and Signature)", border=1, align="C")
 
     # Get Y position after left box
     y_after_left_signature = pdf.get_y()
 
-    # Right signature box (Our Company - with our stamp)
-    pdf.set_xy(105, y_signature_start + 6)
+    # Right signature box (Our Company)
+    pdf.set_xy(105, y_signature_start + 6)  # Position for right box (6 is the header height)
     pdf.set_text_color(0, 0, 0)  # Black color for our content
 
-    # Add our stamp in the center of right box
+    # Add stamp if available
     if stamp_file:
         try:
-            our_stamp_width = 25
-            our_stamp_x = 105 + (96 - our_stamp_width) / 2  # Center horizontally
-            our_stamp_y = y_signature_start + 6 + (right_signature_box_height - our_stamp_width) / 2  # Center vertically
-            
-            pdf.image(stamp_file, x=our_stamp_x, y=our_stamp_y, w=our_stamp_width)
-            
+            stamp_width = 20
+            stamp_x = 105 + (96 - stamp_width) / 2  # Center the stamp in the right box
+            stamp_y = pdf.get_y() + 2
+            pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
         except Exception as e:
-            st.warning(f"Could not add our stamp: {e}")
+            st.warning(f"Could not add stamp: {e}")
 
-    # Add authorized signatory text at the bottom
-    pdf.set_xy(105, y_signature_start + 6 + right_signature_box_height - 8)
+    # Position for the signature text in right box - using right height
+    pdf.set_xy(105, y_signature_start + 6 + right_signature_box_height - 10)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
 
-    # Draw border for right signature box
+    # Draw border for right signature box - using right height
     pdf.set_xy(105, y_signature_start + 6)
-    pdf.cell(96, right_signature_box_height, "", border=1)
+    pdf.cell(96, right_signature_box_height, "", border=1)  # Empty cell with border
 
-    # Set Y position to continue after both signature boxes
+    # Set Y position to continue after both signature boxes (use the taller one)
     pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
     
     # --- Professional Footer ---

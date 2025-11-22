@@ -1201,27 +1201,27 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
         # Description cell (multi-line)
         pdf.set_xy(x_start + col_widths[0], y_start)
-        pdf.multi_cell(col_widths[1], line_height, item['description'], border="LRT", align="L")
+        pdf.multi_cell(col_widths[1], line_height, item['description'], border=1, align="L")
         y_after_desc = pdf.get_y()
         
         row_height = y_after_desc - y_start
         
         # Other cells for the row
         pdf.set_xy(x_start, y_start)
-        pdf.multi_cell(col_widths[0], row_height, str(i), border="LRT", align="C")
+        pdf.multi_cell(col_widths[0], row_height, str(i), border=1, align="C")
         
         pdf.set_xy(x_start + col_widths[0] + col_widths[1], y_start)
-        pdf.multi_cell(col_widths[2], row_height, item['hsn'], border="LRT", align="C")
+        pdf.multi_cell(col_widths[2], row_height, item['hsn'], border=1, align="C")
         
         pdf.set_xy(x_start + sum(col_widths[:3]), y_start)
-        pdf.multi_cell(col_widths[3], row_height, str(item['quantity']), border="LRT", align="C")
+        pdf.multi_cell(col_widths[3], row_height, str(item['quantity']), border=1, align="C")
         
         pdf.set_xy(x_start + sum(col_widths[:4]), y_start)
-        pdf.multi_cell(col_widths[4], row_height, f"{item['unit_rate']:.2f}", border="LRT", align="R")
+        pdf.multi_cell(col_widths[4], row_height, f"{item['unit_rate']:.2f}", border=1, align="R")
         
         amount = item['quantity'] * item['unit_rate']
         pdf.set_xy(x_start + sum(col_widths[:-1]), y_start)
-        pdf.multi_cell(col_widths[5], row_height, f"{amount:.2f}", border="LRT", align="R")
+        pdf.multi_cell(col_widths[5], row_height, f"{amount:.2f}", border=1, align="R")
 
         pdf.set_xy(x_start, y_start + row_height)
 
@@ -1232,7 +1232,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Totals ---
     pdf.set_font(pdf.default_font, "B", 12)
     total_width = sum(col_widths[:5])
-    pdf.ln(0.5)
+    # pdf.ln(0.2)
     pdf.cell(total_width, 6, "Basic Amount", border=1, align="L")
     pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     

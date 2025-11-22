@@ -1012,6 +1012,31 @@ class PDF(FPDF):
         self.set_font(self.default_font, "I", 8)
         # Page number
         self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+        self.set_font(self.default_font, "I", 10)
+        self.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
+        
+        self.set_font(self.default_font, "", 10)
+        self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
+        
+        # Clickable contact info
+        self.set_font(self.default_font, "U", 10)
+        self.set_text_color(0, 0, 255)
+        
+        email1 = "info@cminfotech.com"
+        phone_number = "+91 873 391 5721"
+        website = "www.cminfotech.com"
+        
+        # Center the contact information
+        contact_text = f"{email1} | {phone_number} | {website}"
+        contact_width = self.get_string_width(contact_text)
+        x_contact = (self.w - contact_width) / 2
+        
+        self.set_x(x_contact)
+        self.cell(self.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
+        self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | "))
+        self.cell(self.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
+        self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | ") + self.get_string_width(phone_number) + self.get_string_width(" | "))
+        self.cell(self.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
 
 
 # --- Function to Create Invoice PDF ---

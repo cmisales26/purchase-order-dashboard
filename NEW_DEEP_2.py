@@ -1038,11 +1038,7 @@ class PDF(FPDF):
         self.cell(self.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
         
         self.set_text_color(0, 0, 0)
-        
-        # # Page number at the very bottom
-        # self.set_y(-15)
-        # self.set_font(self.default_font, "I", 8)
-        # self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()
@@ -1369,14 +1365,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Buyer's Company Signature (Blank box for future use)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Buyer's Company Signature", border="LR", ln=0, align="C")
+    pdf.cell(95, 5, "Buyer's Company Signature", border="LR", ln=0, align="C")
 
     # Right side - Our Company Signature
-    pdf.cell(96, 6, "For CM Infotech.", border="LR", ln=1, align="C")
+    pdf.cell(96, 5, "For CM Infotech.", border="LR", ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
-    left_signature_box_height = 35  # <-- Change this number for left box height only
-    right_signature_box_height = 35  # Keep this as is for right box
+    left_signature_box_height = 33  # <-- Change this number for left box height only
+    right_signature_box_height = 33  # Keep this as is for right box
 
     # Left signature box (Buyer - Blank)
     pdf.set_font(pdf.default_font, "I", 10)
@@ -1388,9 +1384,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if buyer_logo_file:
         try:
             # Add buyer logo at the top of the left box
-            logo_width = 25
+            logo_width = 20
             logo_x = 10 + (95 - logo_width) / 2  # Center the logo horizontally
-            logo_y = pdf.get_y() + 5  # Small margin from top
+            logo_y = pdf.get_y() + 2  # Small margin from top
             
             # Add buyer company logo
             pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
@@ -1424,7 +1420,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         y_after_left_signature = pdf.get_y()
 
     # Right signature box (Our Company)
-    pdf.set_xy(105, y_signature_start + 6)  # Position for right box (6 is the header height)
+    pdf.set_xy(105, y_signature_start + 5)  # Position for right box (6 is the header height)
     pdf.set_text_color(0, 0, 0)  # Black color for our content
 
     # Add stamp if available
@@ -1432,18 +1428,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         try:
             stamp_width = 20
             stamp_x = 105 + (96 - stamp_width) / 2  # Center the stamp in the right box
-            stamp_y = pdf.get_y() + 2
+            stamp_y = pdf.get_y()#+2
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
 
     # Position for the signature text in right box - using right height
-    pdf.set_xy(105, y_signature_start + 6 + right_signature_box_height - 10)
+    pdf.set_xy(105, y_signature_start + 5 + right_signature_box_height - 10)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
 
     # Draw border for right signature box - using right height
-    pdf.set_xy(105, y_signature_start + 6)
+    pdf.set_xy(105, y_signature_start + 5)
     pdf.cell(96, right_signature_box_height, "", border="LRB")  # Empty cell with border
 
     # Set Y position to continue after both signature boxes (use the taller one)

@@ -1643,12 +1643,18 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     start_y = pdf.get_y()
 
     # --- BILL TO (Left Side) ---
-    # pdf.set_xy(10, start_y)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(90, 5, "Bill To:", ln=1)
+    pdf.set_x(10)
+
+    # Bill To - Company Name in Bold
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.multi_cell(90, 5, sanitized_bill_to_company)
+
+    # Bill To - Address in Normal
+    pdf.set_x(10)
     pdf.set_font(pdf.default_font, "", 12)
-    # pdf.set_x(10)
-    pdf.multi_cell(90, 5, f"{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    pdf.multi_cell(90, 5, sanitized_bill_to_address)
 
     # Get Y position after Bill To
     y_after_bill = pdf.get_y()
@@ -1657,9 +1663,16 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_xy(110, start_y)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(90, 5, "Ship To:", ln=1)
-    pdf.set_font(pdf.default_font, "", 12)
     pdf.set_x(110)
-    pdf.multi_cell(90, 5, f"{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+
+    # Ship To - Company Name in Bold
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.multi_cell(90, 5, sanitized_ship_to_company)
+
+    # Ship To - Address in Normal
+    pdf.set_x(110)
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(90, 5, sanitized_ship_to_address)
 
     # Get Y position after Ship To
     y_after_ship = pdf.get_y()
@@ -1667,7 +1680,6 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # Set to the maximum Y position
     pdf.set_y(max(y_after_bill, y_after_ship))
     pdf.ln(2)
-
     # GST NO:
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.write(5, "GST NO: ")

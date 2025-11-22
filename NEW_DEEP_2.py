@@ -1232,7 +1232,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Totals ---
     pdf.set_font(pdf.default_font, "B", 12)
     total_width = sum(col_widths[:5])
-    pdf.ln(0.2)
+    pdf.ln(0.5)
     pdf.cell(total_width, 6, "Basic Amount", border=1, align="L")
     pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     

@@ -1119,10 +1119,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_x(10)
         pdf.set_font(pdf.default_font, "B", 12)
         label_width = pdf.get_string_width(label) + 2
-        pdf.cell(label_width, 4, label, border="L", ln=0)
+        pdf.cell(label_width, 5, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "" if i < len(buyer_lines) - 1 else ""
-        pdf.cell(95 - label_width, 4, value, border=border, ln=1)
+        pdf.cell(95 - label_width, 5, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
     total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
@@ -1165,7 +1165,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
-
+    pdf.ln()
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
     col_widths = [15, 80, 22, 23, 23, 28]

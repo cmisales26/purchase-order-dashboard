@@ -1598,9 +1598,12 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     sanitized_company_name = pdf.sanitize_text(po_data['company_name'])
     
     # --- Vendor & Bill/Ship ---
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.section_title("To:")
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.multi_cell(95, 5, sanitized_vendor_name)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
+    pdf.multi_cell(95, 5, f"{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
     pdf.ln(5)
     # pdf.set_xy(110, pdf.get_y() - 20)
     # pdf.set_font(pdf.default_font, "B", 10)

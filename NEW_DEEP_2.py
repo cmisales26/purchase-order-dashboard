@@ -1800,13 +1800,12 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_address}")
-
-    # Contact
+    # Authorization Section
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "Contact")
+    pdf.cell(45, 5, "Mobile NO:")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"{sanitized_end_person}")
+    pdf.multi_cell(0, 5, f"{sanitized_end_mobile}")
 
     # Email
     pdf.set_font(pdf.default_font, "B", 12)
@@ -1814,15 +1813,19 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_email}")
+    
+    # Contact
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Contact")
+    pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_end_person}")
+
+
 
     # pdf.ln(2)
 
-    # Authorization Section
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "Mobile NO:")
-    pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"{sanitized_end_mobile}")
+
 
     # pdf.set_font(pdf.default_font, "B", 12)
     # pdf.cell(45, 5, "Authorized By")

@@ -1012,6 +1012,8 @@ class PDF(FPDF):
         self.set_font(self.default_font, "I", 8)
         # Page number
         self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+        self.set_font(self.default_font, "I", 10)
+        self.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
 
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):

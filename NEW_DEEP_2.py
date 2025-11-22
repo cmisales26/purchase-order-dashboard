@@ -992,169 +992,19 @@ class PDF(FPDF):
         
         # Store logo file path for use in header
         self.logo_file = None
-        self.invoice_data = None  # Store invoice data for use in header
 
     def header(self):
-        # Add logo on every page
-        if self.logo_file:
+        # Add logo on every page (including second page)
+        if self.logo_file and self.page_no() >= 1:  # Show logo on all pages
             try:
                 self.image(self.logo_file, x=165, y=2.5, w=35)
             except Exception as e:
+                # You can add a warning here if needed, but don't show in header
                 pass
         
-        # On first page, show "TAX INVOICE" header
-        if self.page_no() == 1:
-            self.set_font(self.default_font, "B", 15)
-            self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
-            self.ln(3)
-        # On continuation pages, show vendor and buyer details instead
-        elif self.page_no() > 1 and self.invoice_data:
-            self.add_continuation_header()
-        
-    def add_continuation_header(self):
-        """Add vendor and buyer details on continuation pages (replaces regular header)"""
-        # Start from the top of the page
-        self.set_y(5)  # Small margin from top
-        
-        # === HEADER (Vendor + Invoice Details) ===
-        self.set_font(self.default_font, "B", 13)
-        self.cell(95, 8, "CM Infotech.", border="LRT", ln=0)
-        self.cell(48, 8, "Invoice No.", border=1, ln=0, align="L")
-        self.cell(48, 8, "Invoice Date", border=1, ln=1, align="L")
-
-        y_left_start = self.get_y()
-
-        # --- Left Side (Vendor Details) ---
-        self.set_font(self.default_font, "", 12)
-        self.multi_cell(95, 4, self.invoice_data['vendor']['address'], border="L")
-        
-        # Vendor details lines
-        vendor_lines = [
-            ("GST No.:", self.invoice_data['vendor']['gst']),
-            ("MSME Registration No.:", self.invoice_data['vendor']['msme']),
-            ("E-Mail:", "cm.infotech2014@gmail.com"),
-            ("Mobile No.:", "8733915721"),
-        ]
-        
-        for i, (label, value) in enumerate(vendor_lines):
-            self.set_x(10)
-            self.set_font(self.default_font, "B", 12)
-            label_width = self.get_string_width(label) 
-            self.cell(label_width, 6, label, border="L", ln=0)
-            self.set_font(self.default_font, "", 12)
-            border = "R" if i < len(vendor_lines) - 1 else "R"
-            self.cell(95 - label_width, 6, value, border=border, ln=1)
-
-        y_left_end = self.get_y()
-
-        # --- Right Side (Invoice Details) ---
-        self.set_xy(105, y_left_start)
-        self.set_font(self.default_font, "", 12)
-        self.cell(48, 8, self.invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="L")
-        self.cell(48, 8, self.invoice_data['invoice']['date'], border="R", ln=1, align="L")
-
-        # Payment terms
-        self.set_x(105)
-        self.set_font(self.default_font, "B", 12)
-        self.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
-        self.set_font(self.default_font, "", 12)
-
-        # Use multi_cell to wrap text to next line
-        self.set_xy(153, self.get_y())  # Set position for the right cell
-        self.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="L")
-
-        # Supplier's reference
-        self.set_x(105)
-        self.set_font(self.default_font, "B", 12)
-        self.cell(48, 8, "Supplier's Reference:", border="LRT", ln=0)
-        self.set_font(self.default_font, "", 12)
-        other_ref_value = self.invoice_data['Reference']['Suppliers_Reference']
-        self.cell(48, 8, other_ref_value, border="LRTB", ln=1)
-
-        # Other's reference
-        self.set_x(105)
-        self.set_font(self.default_font, "B", 12)
-        self.cell(48, 8, "Other's Reference:", border="RTB", ln=0)
-        self.set_font(self.default_font, "", 12)
-        other_ref_value = self.invoice_data['Reference']['Other']
-        self.cell(48, 8, other_ref_value, border="LRTB", ln=1)
-
-        # === BUYER SECTION ===
-        self.set_font(self.default_font, "B", 12)
-        self.cell(95, 6, "Buyer", border="LT", ln=0)
-        self.cell(48, 6, "Buyer's Order No.", border=1, ln=0, align="L")
-        self.cell(48, 6, "Buyer's Order Date", border=1, ln=1, align="L")
-
-        y_buyer_start = self.get_y()
-
-        # --- Buyer Left Details ---
-        y_left_buyer_start = self.get_y()
-        
-        # Buyer name and address
-        self.set_font(self.default_font, "B", 12)
-        self.cell(95, 5, self.invoice_data['buyer']['name'], border="LR", ln=1)
-        
-        self.set_font(self.default_font, "", 12)
-        self.multi_cell(95, 4, self.invoice_data['buyer']['address'], border="LR")
-        
-        # Buyer contact details
-        buyer_lines = [
-            ("Email:", "dmistry@baseengr.com"),
-            ("Tel No.:", "98987 91813"),
-            ("GST No.:", self.invoice_data['buyer']['gst']),
-        ]
-        
-        for i, (label, value) in enumerate(buyer_lines):
-            self.set_x(10)
-            self.set_font(self.default_font, "B", 12)
-            label_width = self.get_string_width(label) + 2
-            self.cell(label_width, 5, label, border="L", ln=0)
-            self.set_font(self.default_font, "", 12)
-            border = "" if i < len(buyer_lines) - 1 else ""
-            self.cell(95 - label_width, 5, value, border=border, ln=1)
-
-        y_buyer_left_end = self.get_y()
-        total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
-
-        # --- Buyer Right Details ---
-        self.set_xy(105, y_buyer_start)
-        
-        # Row 1: Buyer's Order No/Date
-        self.set_font(self.default_font, "", 12)
-        self.cell(48, 4, self.invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="L")
-        self.cell(48, 4, self.invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="L")
-
-        # Calculate remaining height needed for address space
-        name_height = 5
-        contact_lines_height = 18
-        remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
-        
-        # Add empty space for address if needed
-        if remaining_height_for_address > 0:
-            self.set_x(105)
-            self.cell(96, remaining_height_for_address, "", border="R", ln=1)
-
-        # Row 2: Dispatched Through
-        self.set_x(105)
-        self.set_font(self.default_font, "B", 12)
-        self.cell(48, 6, "Dispatched Through", border="LRT", ln=0)
-        self.set_font(self.default_font, "", 12)
-        self.cell(48, 6, self.invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
-
-        # Row 3: Destination
-        self.set_x(105)
-        self.set_font(self.default_font, "B", 12)
-        self.cell(48, 6, "Destination", border="LRT", ln=0)
-        self.set_font(self.default_font, "", 12)
-        self.cell(48, 6, self.invoice_data['invoice_details']['destination'], border="RT", ln=1)
-
-        # Row 4: Terms of delivery
-        self.set_x(105)
-        self.set_font(self.default_font, "B", 12)
-        self.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
-        self.set_font(self.default_font, "", 12)
-        self.cell(48, 6, self.invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
-        self.ln(0.3)
+        self.set_font(self.default_font, "B", 15)
+        self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
+        self.ln(3)
         
     def footer(self):
         # Position at 1.5 cm from bottom
@@ -1188,78 +1038,11 @@ class PDF(FPDF):
         self.cell(self.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
         
         self.set_text_color(0, 0, 0)
-
-# class PDF(FPDF):
-#     def __init__(self):
-#         super().__init__()
         
-#         font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-#         try:
-#             self.add_font("Calibri", "", os.path.join(font_dir, "calibri.ttf"), uni=True)
-#             self.add_font("Calibri", "B", os.path.join(font_dir, "calibrib.ttf"), uni=True)
-#             self.add_font("Calibri", "I", os.path.join(font_dir, "calibrii.ttf"), uni=True)
-#             self.add_font("Calibri", "BI", os.path.join(font_dir, "calibriz.ttf"), uni=True)
-#             self.default_font = "Calibri"
-#         except:
-#             self.default_font = "Helvetica"
-
-#         self.set_font(self.default_font, "", 8)
-#         self.set_left_margin(10)
-#         self.set_right_margin(15)
-        
-#         # Store logo file path for use in header
-#         self.logo_file = None
-
-#     def header(self):
-#         # Add logo on every page (including second page)
-#         if self.logo_file and self.page_no() >= 1:  # Show logo on all pages
-#             try:
-#                 self.image(self.logo_file, x=165, y=2.5, w=35)
-#             except Exception as e:
-#                 # You can add a warning here if needed, but don't show in header
-#                 pass
-        
-#         self.set_font(self.default_font, "B", 15)
-#         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
-#         self.ln(3)
-        
-#     def footer(self):
-#         # Position at 1.5 cm from bottom
-#         self.set_y(-15)
-        
-#         # Footer content
-#         self.set_font(self.default_font, "I", 10)
-#         self.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
-        
-#         self.set_font(self.default_font, "", 10)
-#         self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-        
-#         # Clickable contact info
-#         self.set_font(self.default_font, "U", 10)
-#         self.set_text_color(0, 0, 255)
-        
-#         email1 = "info@cminfotech.com"
-#         phone_number = "+91 873 391 5721"
-#         website = "www.cminfotech.com"
-        
-#         # Center the contact information
-#         contact_text = f"{email1} | {phone_number} | {website}"
-#         contact_width = self.get_string_width(contact_text)
-#         x_contact = (self.w - contact_width) / 2
-        
-#         self.set_x(x_contact)
-#         self.cell(self.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
-#         self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | "))
-#         self.cell(self.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
-#         self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | ") + self.get_string_width(phone_number) + self.get_string_width(" | "))
-#         self.cell(self.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
-        
-#         self.set_text_color(0, 0, 0)
-        
-#         # # Page number at the very bottom
-#         # self.set_y(-15)
-#         # self.set_font(self.default_font, "I", 8)
-#         # self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+        # # Page number at the very bottom
+        # self.set_y(-15)
+        # self.set_font(self.default_font, "I", 8)
+        # self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()

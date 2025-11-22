@@ -1440,7 +1440,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
 
     # Draw border for right signature box - using right height
-    pdf.set_xy(105, y_signature_start + 5)
+    pdf.set_xy(105, y_signature_start + 4)
     pdf.cell(96, right_signature_box_height, "", border="LRB")  # Empty cell with border
 
     # Set Y position to continue after both signature boxes (use the taller one)

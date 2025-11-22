@@ -1484,11 +1484,11 @@ class PO_PDF(FPDF):
                 # (self.logo_path, x=155, y=8, w=50)
                 # (self.logo_path, x=160, y=5.5, w=45,link=self.website_url)
                 # self.image(self.logo_path, x=150, y=10, w=40)
-            self.ln(5)
+            self.ln(4)
             # Title
             self.set_font(self.default_font, "BU", 15)
             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
-            self.ln(1)
+            self.ln(2)
 
             # PO info
             self.set_font(self.default_font, "", 12)

@@ -1387,7 +1387,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             # Add buyer logo at the top of the left box
             logo_width = 25
             logo_x = 10 + (95 - logo_width) / 2  # Center the logo horizontally
-            logo_y = pdf.get_y() + 5  # Small margin from top
+            logo_y = pdf.get_y() + 4  # Small margin from top
             
             # Add buyer company logo
             pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)

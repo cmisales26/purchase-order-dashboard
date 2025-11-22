@@ -1209,7 +1209,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     for i, item in enumerate(invoice_data["items"], start=1):
         # Check if we need a new page before adding each item
-        if pdf.get_y() + 25 > pdf.page_break_trigger:
+        if pdf.get_y() + 40 > pdf.page_break_trigger:
             pdf.add_page()
             # Re-add header for new page
             pdf.set_font(pdf.default_font, "B", 12)

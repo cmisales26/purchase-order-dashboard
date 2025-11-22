@@ -1039,10 +1039,10 @@ class PDF(FPDF):
         
         self.set_text_color(0, 0, 0)
         
-        # Page number at the very bottom
-        self.set_y(-15)
-        self.set_font(self.default_font, "I", 8)
-        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+        # # Page number at the very bottom
+        # self.set_y(-15)
+        # self.set_font(self.default_font, "I", 8)
+        # self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()

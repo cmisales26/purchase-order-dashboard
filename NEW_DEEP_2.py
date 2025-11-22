@@ -1201,7 +1201,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
         # Description cell (multi-line)
         pdf.set_xy(x_start + col_widths[0], y_start)
-        pdf.multi_cell(col_widths[1], line_height, item['description'], border=1, align="L")
+        pdf.multi_cell(col_widths[1], line_height, item['description'], border="LRT", align="L")
         y_after_desc = pdf.get_y()
         
         row_height = y_after_desc - y_start

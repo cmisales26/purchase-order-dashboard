@@ -1655,7 +1655,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.multi_cell(95, 5, "Ship To:")
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(95, 5, f"{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
-    pdf.set_y(start_y + 30)
+    # pdf.set_y(start_y + 30)
     pdf.ln(2)
 
     # GST NO:

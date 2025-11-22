@@ -1729,7 +1729,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.ln(2)
 
     # Authorization Section
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 5, "Prepared By")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)

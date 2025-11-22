@@ -1351,7 +1351,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Right cell (Declaration) with border
     pdf.set_xy(x_left + 95, y_before)
-    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
+    pdf.multi_cell(96, 3, invoice_data['declaration'], border=1)
     y_after_right = pdf.get_y()
     
     # Set Y to the maximum of both columns

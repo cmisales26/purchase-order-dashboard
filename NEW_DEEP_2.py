@@ -1619,11 +1619,11 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # Vendor Name (Bold)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.multi_cell(95, 5, sanitized_vendor_name)
+    pdf.multi_cell(90, 5, sanitized_vendor_name)
 
     # Vendor Address (Normal)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(95, 5, sanitized_vendor_address)
+    pdf.multi_cell(90, 5, sanitized_vendor_address)
 
     # Kind Attend: (Bold label + Normal value)
     pdf.set_font(pdf.default_font, "B", 12)

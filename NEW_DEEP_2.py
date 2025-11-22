@@ -1645,10 +1645,10 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # --- BILL TO (Left Side) ---
     # pdf.set_xy(10, start_y)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(95, 5, "Bill To:", ln=1)
+    pdf.cell(90, 5, "Bill To:", ln=1)
     pdf.set_font(pdf.default_font, "", 12)
     # pdf.set_x(10)
-    pdf.multi_cell(95, 5, f"{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    pdf.multi_cell(90, 5, f"{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
 
     # Get Y position after Bill To
     y_after_bill = pdf.get_y()
@@ -1656,10 +1656,10 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # --- SHIP TO (Right Side) ---
     pdf.set_xy(110, start_y)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(95, 5, "Ship To:", ln=1)
+    pdf.cell(90, 5, "Ship To:", ln=1)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.set_x(110)
-    pdf.multi_cell(95, 5, f"{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+    pdf.multi_cell(90, 5, f"{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
 
     # Get Y position after Ship To
     y_after_ship = pdf.get_y()

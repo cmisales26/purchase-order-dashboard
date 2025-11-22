@@ -1188,7 +1188,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Store logo file path in the PDF instance for use in header
     pdf.logo_file = logo_file
-    
+    pdf.invoice_data = invoice_data
     pdf.add_page()
 
     # --- Logo on top right --- (This will now be handled by header() on all pages)

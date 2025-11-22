@@ -1730,8 +1730,17 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # Authorization Section
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
-    pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
+    pdf.cell(45, 5, "Prepared By")
+    pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_prepared_by}")
+
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Authorized By")
+    pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_authorized_by}")
+    
 
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)

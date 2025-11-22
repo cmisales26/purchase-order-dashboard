@@ -1639,18 +1639,22 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     pdf.ln(5)
 
-    # Bill To:
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.write(5, "Bill To:\n")
-    pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(70, 5, f"{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    # Save current Y position
+    start_y = pdf.get_y()
 
-    # Ship To:
-    pdf.set_xy(175, pdf.get_y() - 25)
+    # --- BILL TO ---
+    pdf.set_xy(10, start_y)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.write(5, "Ship To:\n")
+    pdf.multi_cell(90, 5, "Bill To:")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+    pdf.multi_cell(90, 5, f"{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+
+    # --- SHIP TO ---
+    pdf.set_xy(110, start_y)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.multi_cell(90, 5, "Ship To:")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(90, 5, f"{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
 
     pdf.ln(2)
 

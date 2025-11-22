@@ -1806,7 +1806,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.cell(45, 5, "Contact")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"{sanitized_end_person} | {sanitized_end_mobile}")
+    pdf.multi_cell(0, 5, f"{sanitized_end_person}")
 
     # Email
     pdf.set_font(pdf.default_font, "B", 12)
@@ -1819,16 +1819,16 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # Authorization Section
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "Prepared By")
+    pdf.cell(45, 5, "Mobile NO:")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"{sanitized_prepared_by}")
+    pdf.multi_cell(0, 5, f"{sanitized_end_mobile}")
 
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "Authorized By")
-    pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"{sanitized_authorized_by}")
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # pdf.cell(45, 5, "Authorized By")
+    # pdf.cell(5, 4, ":")
+    # pdf.set_font(pdf.default_font, "", 12)
+    # pdf.multi_cell(0, 5, f"{sanitized_authorized_by}")
     
 
     # --- Footer (Company Name + Stamp) that floats) ---

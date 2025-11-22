@@ -1072,7 +1072,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Use multi_cell to wrap text to next line
     pdf.set_xy(153, pdf.get_y())  # Set position for the right cell
-    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="C")
+    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="L")
 
     # Supplier's reference
     pdf.set_x(105)
@@ -1165,7 +1165,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
-    pdf.ln(0.2)
+    pdf.ln(0.3)
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
     col_widths = [15, 80, 22, 23, 23, 28]

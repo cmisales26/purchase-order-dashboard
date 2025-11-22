@@ -1645,14 +1645,14 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # --- BILL TO (Left Side) ---
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(90, 5, "Bill To:", ln=1)
-    pdf.set_x(10)
+    # pdf.set_x(10)
 
     # Bill To - Company Name in Bold
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.multi_cell(90, 5, sanitized_bill_to_company)
 
     # Bill To - Address in Normal
-    pdf.set_x(10)
+    # pdf.set_x(10)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(90, 5, sanitized_bill_to_address)
 

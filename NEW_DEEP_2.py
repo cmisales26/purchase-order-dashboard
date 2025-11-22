@@ -1643,7 +1643,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     start_y = pdf.get_y()
 
     # --- BILL TO (Left Side) ---
-    pdf.set_xy(10, start_y)
+    # pdf.set_xy(10, start_y)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(95, 5, "Bill To:", ln=1)
     pdf.set_font(pdf.default_font, "", 12)

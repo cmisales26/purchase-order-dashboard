@@ -1008,10 +1008,9 @@ class PDF(FPDF):
         
     def footer(self):
         # Position at 1.5 cm from bottom
-        self.set_y(-15)
-        self.set_font(self.default_font, "I", 8)
-        # Page number
-        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+        self.set_y(-30)
+        
+        # Footer content
         self.set_font(self.default_font, "I", 10)
         self.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
         
@@ -1037,8 +1036,13 @@ class PDF(FPDF):
         self.cell(self.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
         self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | ") + self.get_string_width(phone_number) + self.get_string_width(" | "))
         self.cell(self.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
-
-
+        
+        self.set_text_color(0, 0, 0)
+        
+        # Page number at the very bottom
+        self.set_y(-15)
+        self.set_font(self.default_font, "I", 8)
+        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
 # --- Function to Create Invoice PDF ---
 def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="stamp.jpg"):
     pdf = PDF()
@@ -1445,37 +1449,37 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Set Y position to continue after both signature boxes (use the taller one)
     pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
     
-    # --- Professional Footer ---
-    pdf.set_y(-30)  # Position from bottom
+    # # --- Professional Footer ---
+    # pdf.set_y(-30)  # Position from bottom
     
-    # Footer content
-    pdf.set_font(pdf.default_font, "I", 10)
-    pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
+    # # Footer content
+    # pdf.set_font(pdf.default_font, "I", 10)
+    # pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
+    # pdf.set_font(pdf.default_font, "", 10)
+    # pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
     
-    # Clickable contact info
-    pdf.set_font(pdf.default_font, "U", 10)
-    pdf.set_text_color(0, 0, 255)
+    # # Clickable contact info
+    # pdf.set_font(pdf.default_font, "U", 10)
+    # pdf.set_text_color(0, 0, 255)
     
-    email1 = "info@cminfotech.com"
-    phone_number = "+91 873 391 5721"
-    website = "www.cminfotech.com"
+    # email1 = "info@cminfotech.com"
+    # phone_number = "+91 873 391 5721"
+    # website = "www.cminfotech.com"
     
-    # Center the contact information
-    contact_text = f"{email1} | {phone_number} | {website}"
-    contact_width = pdf.get_string_width(contact_text)
-    x_contact = (pdf.w - contact_width) / 2
+    # # Center the contact information
+    # contact_text = f"{email1} | {phone_number} | {website}"
+    # contact_width = pdf.get_string_width(contact_text)
+    # x_contact = (pdf.w - contact_width) / 2
     
-    pdf.set_x(x_contact)
-    pdf.cell(pdf.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
-    pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | "))
-    pdf.cell(pdf.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
-    pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | ") + pdf.get_string_width(phone_number) + pdf.get_string_width(" | "))
-    pdf.cell(pdf.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
+    # pdf.set_x(x_contact)
+    # pdf.cell(pdf.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
+    # pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | "))
+    # pdf.cell(pdf.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
+    # pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | ") + pdf.get_string_width(phone_number) + pdf.get_string_width(" | "))
+    # pdf.cell(pdf.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
     
-    pdf.set_text_color(0, 0, 0)
+    # pdf.set_text_color(0, 0, 0)
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes

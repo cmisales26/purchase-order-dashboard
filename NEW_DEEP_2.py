@@ -1488,7 +1488,7 @@ class PO_PDF(FPDF):
             # Title
             self.set_font(self.default_font, "BU", 15)
             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
-            self.ln(2)
+            self.ln(4)
 
             # PO info
             self.set_font(self.default_font, "", 12)

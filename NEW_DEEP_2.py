@@ -1597,27 +1597,81 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     sanitized_authorized_by = pdf.sanitize_text(po_data['authorized_by'])
     sanitized_company_name = pdf.sanitize_text(po_data['company_name'])
     
+    # # --- Vendor & Bill/Ship ---
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # pdf.section_title("To:")
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # pdf.multi_cell(95, 5, sanitized_vendor_name)
+    # pdf.set_font(pdf.default_font, "", 12)
+    # pdf.multi_cell(95, 5, f"{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
+    # pdf.ln(5)
+    # # pdf.set_xy(110, pdf.get_y() - 20)
+    # # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.multi_cell(70, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    # pdf.set_xy(125, pdf.get_y() - 25)
+    # pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+    # pdf.ln(2)
+    # pdf.multi_cell(0, 5, f"GST NO: {sanitized_gst_no}\nPAN NO: {sanitized_pan_no}\nMSME Registration No: {sanitized_msme_no}")
+    # pdf.ln(2)
     # --- Vendor & Bill/Ship ---
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.section_title("To:")
+
+    # Vendor Name (Bold)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.multi_cell(95, 5, sanitized_vendor_name)
+
+    # Vendor Address (Normal)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(95, 5, f"{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
+    pdf.multi_cell(95, 5, sanitized_vendor_address)
+
+    # Kind Attend: (Bold label + Normal value)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "Kind Attend: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(95, 5, sanitized_vendor_contact)
+
+    # Mobile: (Bold label + Normal value)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "Mobile: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(95, 5, sanitized_vendor_mobile)
+
     pdf.ln(5)
-    # pdf.set_xy(110, pdf.get_y() - 20)
+
+    # Bill To:
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.multi_cell(70, 5, f"Bill To: ")
+    pdf.write(5, "Bill To:\n")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(70, 5, f"{sanitized_bill_to_address}")
-    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.multi_cell(70, 5, f"{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+
+    # Ship To:
     pdf.set_xy(125, pdf.get_y() - 25)
-    pdf.multi_cell(0, 5, f"Ship To: ")
-    pdf.multi_cell(0, 5, f"{sanitized_ship_to_address}")
-    pdf.ln(2)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.multi_cell(0, 5, f"GST NO: ")
-    pdf.multi_cell(0, 5, f"{sanitized_gst_no}\nPAN NO: {sanitized_pan_no}\nMSME Registration No: {sanitized_msme_no}")
+    pdf.write(5, "Ship To:\n")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+
+    pdf.ln(2)
+
+    # GST NO:
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "GST NO: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, sanitized_gst_no)
+
+    # PAN NO:
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "PAN NO: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, sanitized_pan_no)
+
+    # MSME Registration No:
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "MSME Registration No: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, sanitized_msme_no)
+
     pdf.ln(2)
 
     # --- Products Table ---

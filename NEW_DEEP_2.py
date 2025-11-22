@@ -1815,7 +1815,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_email}")
 
-    pdf.ln(2)
+    # pdf.ln(2)
 
     # Authorization Section
     pdf.set_font(pdf.default_font, "B", 12)

@@ -1488,12 +1488,12 @@ class PO_PDF(FPDF):
             # Title
             self.set_font(self.default_font, "BU", 15)
             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
-            self.ln(4)
+            self.ln(1)
 
             # PO info
             self.set_font(self.default_font, "", 12)
             # PO Number (right aligned)
-            self.set_xy(140,30)
+            self.set_xy(150,30)
             self.multi_cell(60,4,
                             f"PO No: {self.sanitize_text(st.session_state.po_number)}\n"
                             f"Date: {self.sanitize_text(st.session_state.po_date)}")

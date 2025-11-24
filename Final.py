@@ -71,7 +71,7 @@ PRODUCT_CATALOG = {
 # Vendor Database - You can expand this with more vendors
 VENDOR_DATABASE = {
     "Arkance IN Pvt. Ltd.": {
-        "address": "One International Centre,,Unit-801-802, 8th Floor, Tower-1,Senapati Bapat Marg Dadar West, Prabhadevi,Lower Parel,Mumbai - 400013,State : Maharashtra",
+        "address": "One International Centre, Unit-801-802, 8th Floor, Tower-1, Senapati Bapat Marg Dadar West, Prabhadevi, Lower Parel, Mumbai - 400013, State : Maharashtra",
         "contact": "Ms/Mr",
         "mobile": "+91 9243493616",
         "gst_no": "27AAACA7149L1Z2",
@@ -87,7 +87,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-GJ-01-0117646"
     },
     "ITCG Solutions Pvt. Ltd.": {
-        "address": "301, Earth The Landmark,Opp. Satsang Party Plot,Sun Pharma Road,Baroda,Gujarat,390012,India",
+        "address": "301, Earth The Landmark, Opp. Satsang Party Plot, Sun Pharma Road, Baroda, Gujarat, 390012, India",
         "contact": "Ms/Mr",
         "mobile": "+91 4045678901",
         "gst_no": "36AABCA1234L1Z5",
@@ -95,7 +95,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-TS-01-7654321"
     },
     "Genesis Infoserve Pvt. Ltd.": {
-        "address": "A-204/205, Eversun CHSL., DLH Junction,Sahakar Nagar, J. P. Road, Andheri (W),Mumbai - 400 053",
+        "address": "A-204/205, Eversun CHSL., DLH Junction, Sahakar Nagar, J. P. Road, Andheri (W), Mumbai - 400 053",
         "contact": "Ms/Mr",
         "mobile": "022 62845600 / 022 26734433",
         "gst_no": "29AABCA5678L1Z9",
@@ -103,7 +103,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-KA-01-9876543"
     },
         "MicroGenesis CADSoft Pvt.Ltd.": {
-        "address": "2nd Floor, 202,, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai,, Thane, Maharashtra - 400601",
+        "address": "2nd Floor, 202, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai, Thane, Maharashtra - 400601",
         "contact": "Ms/Mr",
         "mobile": "022 - 62233873",
         "gst_no": "29AABCA5678L1Z9",
@@ -111,7 +111,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-KA-01-9876543"
     },
         "ACCELTY TECHSOLUTIONS LLP": {
-        "address": "603, Sai Plaza,Next To Sakinaka Telephone Exchange Andheri - Kurla Road,Mumbai - 400072",
+        "address": "603, Sai Plaza, Next To Sakinaka Telephone Exchange Andheri - Kurla Road, Mumbai - 400072",
         "contact": "Ms/Mr",
         "mobile": "+91 4045678901",
         "gst_no": "29AABCA5678L1Z9",
@@ -122,10 +122,10 @@ VENDOR_DATABASE = {
 
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
-    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"},
     "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721"},
     "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721"},
-    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"}
+    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"},
+    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"}
 }
 
 # --- Helper Functions for Vendor Management ---

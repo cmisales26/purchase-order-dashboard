@@ -2602,7 +2602,7 @@ def main():
             st.header("Terms & Authorization")
             col1, col2 = st.columns(2)
             with col1:
-                payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date", key="po_payment_terms_input")
+                payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
                 delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
                 delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
             with col2:

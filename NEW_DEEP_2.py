@@ -1421,7 +1421,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         y_after_left_signature = pdf.get_y()
 
     # Right signature box (Our Company)
-    pdf.set_xy(105, y_signature_start + 6)  # Position for right box (6 is the header height)
+    pdf.set_xy(105, y_signature_start + 5)  # Position for right box (6 is the header height)
     pdf.set_text_color(0, 0, 0)  # Black color for our content
 
     # Add stamp if available

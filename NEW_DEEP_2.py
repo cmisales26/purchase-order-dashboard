@@ -1310,8 +1310,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 12)
     
     # Main header
-    pdf.cell(34, 5, "HSN/SAN", border="LRT", align="C")
-    pdf.cell(34, 5, "Taxable Value", border="LRT", align="C")
+    pdf.cell(34, 10, "HSN/SAN", border="LRT", align="C")
+    pdf.cell(34, 10, "Taxable Value", border="LRT", align="C")
     pdf.cell(60, 5, "Central Tax", border=1, align="C")
     pdf.cell(63, 5, "State Tax", border=1, ln=True, align="C")
 

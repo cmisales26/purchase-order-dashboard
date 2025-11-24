@@ -1077,18 +1077,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_x(10)
         pdf.set_font(pdf.default_font, "B", 12)
         label_width = pdf.get_string_width(label) 
-        pdf.cell(label_width, 5, label, border="L", ln=0)
+        pdf.cell(label_width, 4, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "R" if i < len(vendor_lines) - 1 else "R"
-        pdf.cell(95 - label_width, 5, value, border=border, ln=1)
+        pdf.cell(95 - label_width, 4, value, border=border, ln=1)
 
     y_left_end = pdf.get_y()
 
     # --- Right Side (Invoice Details) ---
     pdf.set_xy(105, y_left_start)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 5, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="L")
-    pdf.cell(48, 5, invoice_data['invoice']['date'], border="R", ln=1, align="L")
+    pdf.cell(48, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="L")
+    pdf.cell(48, 8, invoice_data['invoice']['date'], border="R", ln=1, align="L")
 
     # Payment terms
     pdf.set_x(105)

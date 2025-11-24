@@ -1725,7 +1725,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.multi_cell(0, 5, sanitized_msme_no)
 
     pdf.ln(2)
-        # --- Products Table ---
+    # --- Products Table ---
     pdf.section_title("Products & Services")
     col_widths = [65, 22, 30, 25, 15, 22]
     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty.", "Total"]
@@ -1779,10 +1779,10 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.cell(col_widths[5], 6, f"{round_off:.2f}", border=1, align="R")
     pdf.ln()
 
-    # Grand Total Row (without paisa)
+    # Grand Total Row (with 2 decimal format)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(sum(col_widths[:-1]), 6, "Final Amount to be Paid", border=1, align="R")
-    pdf.cell(col_widths[5], 6, f"{rounded_total:.0f}", border=1, align="R")  # Using :.0f to remove decimal points
+    pdf.cell(col_widths[5], 6, f"{rounded_total:.2f}", border=1, align="R")  # Using :.2f for 31212.00 format
     pdf.ln(4)
     # # --- Products Table ---
     # # pdf.section_title("Products & Services")

@@ -1009,9 +1009,35 @@ class PDF(FPDF):
     def footer(self):
         # Position at 1.5 cm from bottom
         self.set_y(-15)
-        self.set_font(self.default_font, "I", 8)
-        # Page number
-        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+        
+        # Footer content
+        self.set_font(self.default_font, "I", 10)
+        self.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
+        
+        self.set_font(self.default_font, "", 10)
+        self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
+        
+        # Clickable contact info
+        self.set_font(self.default_font, "U", 10)
+        self.set_text_color(0, 0, 255)
+        
+        email1 = "info@cminfotech.com"
+        phone_number = "+91 873 391 5721"
+        website = "www.cminfotech.com"
+        
+        # Center the contact information
+        contact_text = f"{email1} | {phone_number} | {website}"
+        contact_width = self.get_string_width(contact_text)
+        x_contact = (self.w - contact_width) / 2
+        
+        self.set_x(x_contact)
+        self.cell(self.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
+        self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | "))
+        self.cell(self.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
+        self.set_x(x_contact + self.get_string_width(email1) + self.get_string_width(" | ") + self.get_string_width(phone_number) + self.get_string_width(" | "))
+        self.cell(self.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
+        
+        self.set_text_color(0, 0, 0)
 
 
 # --- Function to Create Invoice PDF ---
@@ -1072,7 +1098,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Use multi_cell to wrap text to next line
     pdf.set_xy(153, pdf.get_y())  # Set position for the right cell
-    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="C")
+    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="L")
 
     # Supplier's reference
     pdf.set_x(105)
@@ -1092,9 +1118,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === BUYER SECTION ===
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(95, 8, "Buyer", border="LT", ln=0)
-    pdf.cell(48, 8, "Buyer's Order No.", border=1, ln=0, align="L")
-    pdf.cell(48, 8, "Buyer's Order Date", border=1, ln=1, align="L")
+    pdf.cell(95, 6, "Buyer", border="LT", ln=0)
+    pdf.cell(48, 6, "Buyer's Order No.", border=1, ln=0, align="L")
+    pdf.cell(48, 6, "Buyer's Order Date", border=1, ln=1, align="L")
 
     y_buyer_start = pdf.get_y()
 
@@ -1118,7 +1144,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     for i, (label, value) in enumerate(buyer_lines):
         pdf.set_x(10)
         pdf.set_font(pdf.default_font, "B", 12)
-        label_width = pdf.get_string_width(label) + 1
+        label_width = pdf.get_string_width(label) + 2
         pdf.cell(label_width, 5, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "" if i < len(buyer_lines) - 1 else ""
@@ -1165,18 +1191,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
-
+    pdf.ln(0.3)
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
     col_widths = [15, 80, 22, 23, 23, 28]
     
     # Header row
-    pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
-    pdf.cell(col_widths[1], 6, "Description of Goods", border=1, align="C")
-    pdf.cell(col_widths[2], 6, "HSN/SAC", border=1, align="C")
-    pdf.cell(col_widths[3], 6, "Quantity", border=1, align="C")
-    pdf.cell(col_widths[4], 6, "Unit Rate", border=1, align="C")
-    pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
+    pdf.cell(col_widths[0], 5, "Sr. No.", border=1, align="C")
+    pdf.cell(col_widths[1], 5, "Description of Goods", border=1, align="C")
+    pdf.cell(col_widths[2], 5, "HSN/SAC", border=1, align="C")
+    pdf.cell(col_widths[3], 5, "Quantity", border=1, align="C")
+    pdf.cell(col_widths[4], 5, "Unit Rate", border=1, align="C")
+    pdf.cell(col_widths[5], 5, "Amount", border=1, ln=True, align="C")
 
     # --- Items ---
     pdf.set_font(pdf.default_font, "", 12)
@@ -1188,12 +1214,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             pdf.add_page()
             # Re-add header for new page
             pdf.set_font(pdf.default_font, "B", 12)
-            pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
-            pdf.cell(col_widths[1], 6, "Description of Goods", border=1, align="C")
-            pdf.cell(col_widths[2], 6, "HSN/SAC", border=1, align="C")
-            pdf.cell(col_widths[3], 6, "Quantity", border=1, align="C")
-            pdf.cell(col_widths[4], 6, "Unit Rate", border=1, align="C")
-            pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
+            pdf.cell(col_widths[0], 5, "Sr. No.", border=1, align="C")
+            pdf.cell(col_widths[1], 5, "Description of Goods", border=1, align="C")
+            pdf.cell(col_widths[2], 5, "HSN/SAC", border=1, align="C")
+            pdf.cell(col_widths[3], 5, "Quantity", border=1, align="C")
+            pdf.cell(col_widths[4], 5, "Unit Rate", border=1, align="C")
+            pdf.cell(col_widths[5], 5, "Amount", border=1, ln=True, align="C")
             pdf.set_font(pdf.default_font, "", 12)
             
         x_start = pdf.get_x()
@@ -1232,22 +1258,22 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Totals ---
     pdf.set_font(pdf.default_font, "B", 12)
     total_width = sum(col_widths[:5])
+    pdf.ln(0.2)
+    pdf.cell(total_width, 5, "Basic Amount", border=1, align="L")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
-    pdf.cell(total_width, 6, "Basic Amount", border=1, align="L")
-    pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(total_width, 5, "SGST @ 9%", border=1, align="L")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
     
-    pdf.cell(total_width, 6, "SGST @ 9%", border=1, align="L")
-    pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
-    
-    pdf.cell(total_width, 6, "CGST @ 9%", border=1, align="L")
-    pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(total_width, 5, "CGST @ 9%", border=1, align="L")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
 
-    pdf.cell(total_width, 6, "Final Amount to be Paid", border=1, align="L")
-    pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(total_width, 5, "Final Amount to be Paid", border=1, align="L")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
     
     # --- Amount in Words ---
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(191, 6, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
+    pdf.cell(191, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before tax summary
     if pdf.get_y() + 60 > pdf.page_break_trigger:
@@ -1257,18 +1283,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 12)
     
     # Main header
-    pdf.cell(34, 6, "HSN/SAN", border=1, align="C")
-    pdf.cell(34, 6, "Taxable Value", border=1, align="C")
-    pdf.cell(60, 6, "Central Tax", border=1, align="C")
-    pdf.cell(63, 6, "State Tax", border=1, ln=True, align="C")
+    pdf.cell(34, 5, "HSN/SAN", border=1, align="C")
+    pdf.cell(34, 5, "Taxable Value", border=1, align="C")
+    pdf.cell(60, 5, "Central Tax", border=1, align="C")
+    pdf.cell(63, 5, "State Tax", border=1, ln=True, align="C")
 
     # Sub-header
-    pdf.cell(34, 6, "", border="L", ln=False)
-    pdf.cell(34, 6, "", border="L", ln=False)
-    pdf.cell(30, 6, "Rate", border="L", align="C")
-    pdf.cell(30, 6, "Amount", border="LR", align="C")
-    pdf.cell(32, 6, "Rate", border="L", align="C")
-    pdf.cell(31, 6, "Amount", border="LR", ln=True, align="C")
+    pdf.cell(34, 5, "", border="L", ln=False)
+    pdf.cell(34, 5, "", border="L", ln=False)
+    pdf.cell(30, 5, "Rate", border="L", align="C")
+    pdf.cell(30, 5, "Amount", border="LR", align="C")
+    pdf.cell(32, 5, "Rate", border="L", align="C")
+    pdf.cell(31, 5, "Amount", border="LR", ln=True, align="C")
 
     pdf.set_font(pdf.default_font, "", 10)
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
@@ -1276,25 +1302,25 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     hsn_cgst = hsn_tax_value * 0.09
     
     # Data row
-    pdf.cell(34, 6, "997331", border=1, align="C")
-    pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(30, 6, "9%", border=1, align="C")
-    pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(32, 6, "9%", border=1, align="C")
-    pdf.cell(31, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(34, 5, "997331", border=1, align="C")
+    pdf.cell(34, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(30, 5, "9%", border=1, align="C")
+    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(32, 5, "9%", border=1, align="C")
+    pdf.cell(31, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
 
     # Total row
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(34, 6, "Total", border=1, align="C")
-    pdf.cell(34, 6, f"{hsn_tax_value:.2f}", border=1, align="C")
-    pdf.cell(30, 6, "", border=1, align="C")
-    pdf.cell(30, 6, f"{hsn_sgst:.2f}", border=1, align="C")
-    pdf.cell(32, 6, "", border=1, align="C")
-    pdf.cell(31, 6, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(34, 5, "Total", border=1, align="C")
+    pdf.cell(34, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(30, 5, "", border=1, align="C")
+    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(32, 5, "", border=1, align="C")
+    pdf.cell(31, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
     # Tax in words
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(191, 6, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    pdf.cell(191, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before footer content
     if pdf.get_y() + 80 > pdf.page_break_trigger:
@@ -1302,8 +1328,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Bank Details & Declaration (Side by Side) ---
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Company's Bank Details", ln=0, border=1)
-    pdf.cell(96, 6, "Declaration:", ln=1, border=1)
+    pdf.cell(95, 5, "Company's Bank Details", ln=0, border=1)
+    pdf.cell(96, 5, "Declaration:", ln=1, border=1)
 
     pdf.set_font(pdf.default_font, "", 10)
 
@@ -1320,12 +1346,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     x_left = pdf.get_x()
 
     # Left cell (Bank) with border
-    pdf.multi_cell(95, 6.22, bank_text, border=1)
+    pdf.multi_cell(95, 4, bank_text, border=1)
     y_after_left = pdf.get_y()
     
     # Right cell (Declaration) with border
     pdf.set_xy(x_left + 95, y_before)
-    pdf.multi_cell(96, 5, invoice_data['declaration'], border=1)
+    pdf.multi_cell(96, 3.2, invoice_data['declaration'], border=1)
     y_after_right = pdf.get_y()
     
     # Set Y to the maximum of both columns
@@ -1340,14 +1366,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Buyer's Company Signature (Blank box for future use)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Buyer's Company Signature", border="LR", ln=0, align="C")
+    pdf.cell(95, 5, "Buyer's Company Signature", border="LR", ln=0, align="C")
 
     # Right side - Our Company Signature
-    pdf.cell(96, 6, "For CM Infotech.", border="LR", ln=1, align="C")
+    pdf.cell(96, 5, "For CM Infotech.", border="LR", ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
-    left_signature_box_height = 35  # <-- Change this number for left box height only
-    right_signature_box_height = 35  # Keep this as is for right box
+    left_signature_box_height = 33  # <-- Change this number for left box height only
+    right_signature_box_height = 33  # Keep this as is for right box
 
     # Left signature box (Buyer - Blank)
     pdf.set_font(pdf.default_font, "I", 10)
@@ -1361,7 +1387,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             # Add buyer logo at the top of the left box
             logo_width = 25
             logo_x = 10 + (95 - logo_width) / 2  # Center the logo horizontally
-            logo_y = pdf.get_y() + 5  # Small margin from top
+            logo_y = pdf.get_y() + 4  # Small margin from top
             
             # Add buyer company logo
             pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
@@ -1395,7 +1421,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         y_after_left_signature = pdf.get_y()
 
     # Right signature box (Our Company)
-    pdf.set_xy(105, y_signature_start + 6)  # Position for right box (6 is the header height)
+    pdf.set_xy(105, y_signature_start + 5)  # Position for right box (6 is the header height)
     pdf.set_text_color(0, 0, 0)  # Black color for our content
 
     # Add stamp if available
@@ -1421,36 +1447,36 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
     
     # --- Professional Footer ---
-    pdf.set_y(-30)  # Position from bottom
+    # pdf.set_y(-30)  # Position from bottom
     
-    # Footer content
-    pdf.set_font(pdf.default_font, "I", 10)
-    pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
+    # # Footer content
+    # pdf.set_font(pdf.default_font, "I", 10)
+    # pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
     
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
+    # pdf.set_font(pdf.default_font, "", 10)
+    # pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
     
-    # Clickable contact info
-    pdf.set_font(pdf.default_font, "U", 10)
-    pdf.set_text_color(0, 0, 255)
+    # # Clickable contact info
+    # pdf.set_font(pdf.default_font, "U", 10)
+    # pdf.set_text_color(0, 0, 255)
     
-    email1 = "info@cminfotech.com"
-    phone_number = "+91 873 391 5721"
-    website = "www.cminfotech.com"
+    # email1 = "info@cminfotech.com"
+    # phone_number = "+91 873 391 5721"
+    # website = "www.cminfotech.com"
     
-    # Center the contact information
-    contact_text = f"{email1} | {phone_number} | {website}"
-    contact_width = pdf.get_string_width(contact_text)
-    x_contact = (pdf.w - contact_width) / 2
+    # # Center the contact information
+    # contact_text = f"{email1} | {phone_number} | {website}"
+    # contact_width = pdf.get_string_width(contact_text)
+    # x_contact = (pdf.w - contact_width) / 2
     
-    pdf.set_x(x_contact)
-    pdf.cell(pdf.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
-    pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | "))
-    pdf.cell(pdf.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
-    pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | ") + pdf.get_string_width(phone_number) + pdf.get_string_width(" | "))
-    pdf.cell(pdf.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
+    # pdf.set_x(x_contact)
+    # pdf.cell(pdf.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
+    # pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | "))
+    # pdf.cell(pdf.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
+    # pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | ") + pdf.get_string_width(phone_number) + pdf.get_string_width(" | "))
+    # pdf.cell(pdf.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
     
-    pdf.set_text_color(0, 0, 0)
+    # pdf.set_text_color(0, 0, 0)
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
@@ -1493,7 +1519,7 @@ class PO_PDF(FPDF):
             # PO info
             self.set_font(self.default_font, "", 12)
             # PO Number (right aligned)
-            self.set_xy(140,30)
+            self.set_xy(140,33)
             self.multi_cell(60,4,
                             f"PO No: {self.sanitize_text(st.session_state.po_number)}\n"
                             f"Date: {self.sanitize_text(st.session_state.po_date)}")
@@ -1567,7 +1593,18 @@ class PO_PDF(FPDF):
 
     def sanitize_text(self, text):
         return text.encode('ascii', 'ignore').decode('ascii')
+def number_to_words(number):
+    """Convert number to words"""
+    try:
+        from num2words import num2words
+        return num2words(number, lang='en_IN').title() + " Rupees Only"
+    except ImportError:
+        # Simple fallback if num2words is not available
+        words = f"Rupees {number:,.2f} Only"
+        return words
 
+# If you don't have num2words installed, you can install it with:
+# pip install num2words
 def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf = PO_PDF()
     pdf.logo_path = logo_path
@@ -1597,24 +1634,112 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     sanitized_authorized_by = pdf.sanitize_text(po_data['authorized_by'])
     sanitized_company_name = pdf.sanitize_text(po_data['company_name'])
     
+    # # --- Vendor & Bill/Ship ---
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # pdf.section_title("To:")
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # pdf.multi_cell(95, 5, sanitized_vendor_name)
+    # pdf.set_font(pdf.default_font, "", 12)
+    # pdf.multi_cell(95, 5, f"{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
+    # pdf.ln(5)
+    # # pdf.set_xy(110, pdf.get_y() - 20)
+    # # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.multi_cell(70, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    # pdf.set_xy(125, pdf.get_y() - 25)
+    # pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+    # pdf.ln(2)
+    # pdf.multi_cell(0, 5, f"GST NO: {sanitized_gst_no}\nPAN NO: {sanitized_pan_no}\nMSME Registration No: {sanitized_msme_no}")
+    # pdf.ln(2)
     # --- Vendor & Bill/Ship ---
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.section_title("To:")
-    pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(95, 5, f"{sanitized_vendor_name}\n{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
-    pdf.ln(5)
-    # pdf.set_xy(110, pdf.get_y() - 20)
-    # pdf.set_font(pdf.default_font, "B", 10)
-    pdf.multi_cell(70, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
-    pdf.set_xy(125, pdf.get_y() - 25)
-    pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
-    pdf.ln(2)
-    pdf.multi_cell(0, 5, f"GST NO: {sanitized_gst_no}\nPAN NO: {sanitized_pan_no}\nMSME Registration No: {sanitized_msme_no}")
-    pdf.ln(2)
 
+    # Vendor Name (Bold)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.multi_cell(90, 5, sanitized_vendor_name)
+
+    # Vendor Address (Normal)
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(90, 5, sanitized_vendor_address)
+
+    # Kind Attend: (Bold label + Normal value)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "Kind Attend: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(95, 5, sanitized_vendor_contact)
+
+    # Mobile: (Bold label + Normal value)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "Mobile: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(95, 5, sanitized_vendor_mobile)
+
+    pdf.ln(5)
+
+    # Save current Y position
+    start_y = pdf.get_y()
+
+    # --- BILL TO (Left Side) ---
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(90, 5, "Bill To:", ln=1)
+    # pdf.set_x(10)
+
+    # Bill To - Company Name in Bold
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.multi_cell(90, 5, sanitized_bill_to_company)
+
+    # Bill To - Address in Normal
+    # pdf.set_x(10)
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(90, 5, sanitized_bill_to_address)
+
+    # Get Y position after Bill To
+    y_after_bill = pdf.get_y()
+
+    # --- SHIP TO (Right Side) ---
+    pdf.set_xy(110, start_y)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(90, 5, "Ship To:", ln=1)
+    pdf.set_x(110)
+
+    # Ship To - Company Name in Bold
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.multi_cell(90, 5, sanitized_ship_to_company)
+
+    # Ship To - Address in Normal
+    pdf.set_x(110)
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(90, 5, sanitized_ship_to_address)
+
+    # Get Y position after Ship To
+    y_after_ship = pdf.get_y()
+
+    # Set to the maximum Y position
+    pdf.set_y(max(y_after_bill, y_after_ship))
+    pdf.ln(2)
+    # GST NO:
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "GST NO: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, sanitized_gst_no)
+
+    # PAN NO:
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "PAN NO: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, sanitized_pan_no)
+
+    # MSME Registration No:
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.write(5, "MSME Registration No: ")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, sanitized_msme_no)
+
+    pdf.ln(2)
     # --- Products Table ---
     pdf.section_title("Products & Services")
     col_widths = [65, 22, 30, 25, 15, 22]
-    headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty", "Total"]
+    headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty.", "Total"]
     pdf.set_fill_color(220, 220, 220)
     pdf.set_font(pdf.default_font, "B", 12)
     for h, w in zip(headers, col_widths):
@@ -1623,6 +1748,26 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     pdf.set_font(pdf.default_font, "", 12)
     line_height = 5
+
+    # Calculate total from all products
+    products_total = 0
+    for p in po_data["products"]:
+        gst_amt = p["basic"] * p["gst_percent"] / 100
+        per_unit_price = p["basic"] + gst_amt
+        total = per_unit_price * p["qty"]
+        products_total += total
+
+    # Calculate round off to make final amount whole number
+    rounded_total = round(products_total)
+    round_off = rounded_total - products_total
+
+    # Update the grand_total and amount_words in po_data to reflect the rounded amount
+    po_data['grand_total'] = rounded_total
+    # You'll need to update the amount_words here based on the rounded_total
+    # If you have a function to convert number to words, use it here
+    # po_data['amount_words'] = number_to_words(rounded_total)
+
+    # Now display the products table
     for p in po_data["products"]:
         gst_amt = p["basic"] * p["gst_percent"] / 100
         per_unit_price = p["basic"] + gst_amt
@@ -1645,19 +1790,17 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
         pdf.cell(col_widths[5], row_height, f"{total:.2f}", border=1, align="R")
         pdf.ln(row_height)
 
-    # Grand Total Row
+    # Round Off Row
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(sum(col_widths[:-1]), 6, "Grand Total", border=1, align="R")
-    pdf.cell(col_widths[5], 6, f"{po_data['grand_total']:.2f}", border=1, align="R")
-    pdf.ln(4)
+    pdf.cell(sum(col_widths[:-1]), 6, "Round Off", border=1, align="R")
+    pdf.cell(col_widths[5], 6, f"{round_off:.2f}", border=1, align="R")
+    pdf.ln()
 
-    # --- Amount in Words ---
-    # pdf.ln(5)
-    # pdf.set_font(pdf.default_font, "B", 10)
-    # pdf.cell(0, 5, "Amount in Words:", ln=True)
-    # pdf.set_font(pdf.default_font, "", 10)
-    # pdf.multi_cell(0, 5, pdf.sanitize_text(po_data['amount_words']))
-    # pdf.ln(4)
+    # Grand Total Row (with 2 decimal format)
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(sum(col_widths[:-1]), 6, "Final Amount to be Paid", border=1, align="R")
+    pdf.cell(col_widths[5], 6, f"{rounded_total:.2f}", border=1, align="R")  # Using :.2f for 31212.00 format
+    pdf.ln(4)
 
     # --- Amount in Words ---
     pdf.ln(5)
@@ -1711,13 +1854,12 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_address}")
-
-    # Contact
+    # Authorization Section
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "Contact")
+    pdf.cell(45, 5, "Mobile No:")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"{sanitized_end_person} | {sanitized_end_mobile}")
+    pdf.multi_cell(0, 5, f"{sanitized_end_mobile}")
 
     # Email
     pdf.set_font(pdf.default_font, "B", 12)
@@ -1726,12 +1868,20 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_email}")
 
-    pdf.ln(2)
-
-    # Authorization Section
+    # Contact
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Contact")
+    pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(0, 5, f"Prepared By: {sanitized_prepared_by}", ln=1, border=0)
-    pdf.cell(0, 5, f"Authorized By: {sanitized_authorized_by}", ln=1, border=0)
+    pdf.multi_cell(0, 5, f"{sanitized_end_person}")
+
+    # pdf.ln(2)
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # pdf.cell(45, 5, "Authorized By")
+    # pdf.cell(5, 4, ":")
+    # pdf.set_font(pdf.default_font, "", 12)
+    # pdf.multi_cell(0, 5, f"{sanitized_authorized_by}")
+    
 
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)
@@ -2478,6 +2628,22 @@ def main():
                 st.warning("No company logo available. Please upload one in the sidebar.")
             
             if st.button("Generate PO", type="primary", key="po_generate_button"):
+                # Calculate total from all products
+                products_total = 0
+                for p in st.session_state.products:
+                    gst_amt = p["basic"] * p["gst_percent"] / 100
+                    per_unit_price = p["basic"] + gst_amt
+                    total = per_unit_price * p["qty"]
+                    products_total += total
+
+                # Calculate round off to make final amount whole number
+                rounded_total = round(products_total)
+                round_off = rounded_total - products_total
+
+                # Update grand_total and amount_words with rounded amount
+                grand_total = rounded_total
+                amount_words = number_to_words(rounded_total)  # Use your number to words function
+
                 po_data = {
                     "po_number": st.session_state.po_number,
                     "po_date": st.session_state.po_date,
@@ -2493,13 +2659,13 @@ def main():
                     "ship_to_company": ship_to_company,
                     "ship_to_address": ship_to_address,
                     "end_company": end_company,
-                    "end_address":end_address,
+                    "end_address": end_address,
                     "end_person": end_person,
                     "end_mobile": end_mobile,
                     "end_email": end_email,
                     "products": st.session_state.products,
-                    "grand_total": grand_total,
-                    "amount_words": amount_words,
+                    "grand_total": grand_total,  # Updated with rounded amount
+                    "amount_words": amount_words,  # Updated with words for rounded amount
                     "payment_terms": payment_terms,
                     "delivery_terms": delivery_terms,
                     "prepared_by": prepared_by,
@@ -2508,7 +2674,6 @@ def main():
                 }
 
                 pdf_bytes = create_po_pdf(po_data, logo_path)
-
                 # Store the last PO number for sequence tracking
                 st.session_state.last_po_number = st.session_state.po_number
                 

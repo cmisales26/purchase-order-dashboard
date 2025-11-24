@@ -1251,6 +1251,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
         pdf.set_xy(x_start, y_start + row_height)
 
+    # --- ADD SPACE AFTER PRODUCT TABLE AND BEFORE BASIC AMOUNT ---
+    pdf.ln(5)  # Add 5 units of space after the product table
+
     # Check if we need a new page before totals
     if pdf.get_y() + 60 > pdf.page_break_trigger:
         pdf.add_page()

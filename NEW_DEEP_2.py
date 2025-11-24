@@ -1727,7 +1727,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.ln(2)
 
     # --- Products Table ---
-    pdf.section_title("Products & Services")
+    # pdf.section_title("Products & Services")
     col_widths = [65, 22, 30, 25, 15, 22]
     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty.", "Total"]
     pdf.set_fill_color(220, 220, 220)

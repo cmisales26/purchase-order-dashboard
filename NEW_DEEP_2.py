@@ -1197,12 +1197,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     col_widths = [15, 80, 22, 23, 23, 28]
     
     # Header row
-    pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
-    pdf.cell(col_widths[1], 6, "Description of Goods", border=1, align="C")
-    pdf.cell(col_widths[2], 6, "HSN/SAC", border=1, align="C")
-    pdf.cell(col_widths[3], 6, "Quantity", border=1, align="C")
-    pdf.cell(col_widths[4], 6, "Unit Rate", border=1, align="C")
-    pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
+    pdf.cell(col_widths[0], 5, "Sr. No.", border=1, align="C")
+    pdf.cell(col_widths[1], 5, "Description of Goods", border=1, align="C")
+    pdf.cell(col_widths[2], 5, "HSN/SAC", border=1, align="C")
+    pdf.cell(col_widths[3], 5, "Quantity", border=1, align="C")
+    pdf.cell(col_widths[4], 5, "Unit Rate", border=1, align="C")
+    pdf.cell(col_widths[5], 5, "Amount", border=1, ln=True, align="C")
 
     # --- Items ---
     pdf.set_font(pdf.default_font, "", 12)
@@ -1214,12 +1214,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             pdf.add_page()
             # Re-add header for new page
             pdf.set_font(pdf.default_font, "B", 12)
-            pdf.cell(col_widths[0], 6, "Sr. No.", border=1, align="C")
-            pdf.cell(col_widths[1], 6, "Description of Goods", border=1, align="C")
-            pdf.cell(col_widths[2], 6, "HSN/SAC", border=1, align="C")
-            pdf.cell(col_widths[3], 6, "Quantity", border=1, align="C")
-            pdf.cell(col_widths[4], 6, "Unit Rate", border=1, align="C")
-            pdf.cell(col_widths[5], 6, "Amount", border=1, ln=True, align="C")
+            pdf.cell(col_widths[0], 5, "Sr. No.", border=1, align="C")
+            pdf.cell(col_widths[1], 5, "Description of Goods", border=1, align="C")
+            pdf.cell(col_widths[2], 5, "HSN/SAC", border=1, align="C")
+            pdf.cell(col_widths[3], 5, "Quantity", border=1, align="C")
+            pdf.cell(col_widths[4], 5, "Unit Rate", border=1, align="C")
+            pdf.cell(col_widths[5], 5, "Amount", border=1, ln=True, align="C")
             pdf.set_font(pdf.default_font, "", 12)
             
         x_start = pdf.get_x()
@@ -1259,21 +1259,21 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 12)
     total_width = sum(col_widths[:5])
     pdf.ln(0.2)
-    pdf.cell(total_width, 6, "Basic Amount", border=1, align="L")
-    pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(total_width, 5, "Basic Amount", border=1, align="L")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
     
-    pdf.cell(total_width, 6, "SGST @ 9%", border=1, align="L")
-    pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(total_width, 5, "SGST @ 9%", border=1, align="L")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
     
-    pdf.cell(total_width, 6, "CGST @ 9%", border=1, align="L")
-    pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(total_width, 5, "CGST @ 9%", border=1, align="L")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
 
-    pdf.cell(total_width, 6, "Final Amount to be Paid", border=1, align="L")
-    pdf.cell(col_widths[5], 6, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(total_width, 5, "Final Amount to be Paid", border=1, align="L")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
     
     # --- Amount in Words ---
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(191, 6, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
+    pdf.cell(191, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before tax summary
     if pdf.get_y() + 60 > pdf.page_break_trigger:

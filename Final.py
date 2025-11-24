@@ -86,6 +86,38 @@ VENDOR_DATABASE = {
         "pan_no": "AAACO3686M",
         "msme_no": "NAN"
     },
+        "SS Solutions": {
+        "address": "F-405, Mahadev Platinum, Near Yash Bungalow, Smruti Mandir, Ghodasar, Ahmedabad 380050, Gujarat India",
+        "contact": "Ms/Mr",
+        "mobile": "+91 90996 99389",
+        "gst_no": "24AMFPP5909G1Z0",
+        "pan_no": "NAN",
+        "msme_no": "NAN"
+    },
+        "Acero Consulting Engineers": {
+        "address": "B-49, Sector-48, Noida - 201303, Uttar Pradesh",
+        "contact": "Ms/Mr",
+        "mobile": "+91 92895-52452, +91 95011-25560",
+        "gst_no": "09AAKCA4712C2ZY",
+        "pan_no": "AAKCA4712C",
+        "msme_no": "NAN"
+    },
+        "Sopan Infotech Private Limited": {
+        "address": "2D, 2nd Floor, Dr. Mansukh Lal Tower, Opp. Dhiraj Sons, B/s vanita Vishram College, Athwagate, Surat Gujarat - 395001, India",
+        "contact": "Ms/Mr",
+        "mobile": "+91 9725554395",
+        "gst_no": "24ABGCS7981Q1ZD",
+        "pan_no": "NAN",
+        "msme_no": "NAN"
+    },
+        "Murari Software Solutions": {
+        "address": "8C Shimla Towers, Hill County Apts. Bachupally, Nizamet Rd. Hyderabad 500090, India",
+        "contact": "Ms/Mr",
+        "mobile": "+91 1234567891",
+        "gst_no": "36ABSPM0256H3ZE",
+        "pan_no": "ABSPM0256H",
+        "msme_no": "NAN"
+    },
     "DIVTECH IT SOLUTION PVT. LTD.": {
         "address": "Nr.kum kum party plot, TP 13, Chhani Jakatnaka, Vadodara -390024",
         "contact": "Ms/Mr",
@@ -1153,10 +1185,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_x(10)
         pdf.set_font(pdf.default_font, "B", 12)
         label_width = pdf.get_string_width(label) + 2
-        pdf.cell(label_width, 5, label, border="L", ln=0)
+        pdf.cell(label_width, 6, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "" if i < len(buyer_lines) - 1 else ""
-        pdf.cell(95 - label_width, 5, value, border=border, ln=1)
+        pdf.cell(95 - label_width, 6, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
     total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
@@ -1216,7 +1248,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "", 12)
     line_height = 5
 
+    # Store HSN/SAC codes for use in tax summary
+    hsn_codes = []
+    
     for i, item in enumerate(invoice_data["items"], start=1):
+        # Store HSN code for tax summary
+        hsn_codes.append(item['hsn'])
+        
         # Check if we need a new page before adding each item
         if pdf.get_y() + 25 > pdf.page_break_trigger:
             pdf.add_page()
@@ -1235,29 +1273,56 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
         # Description cell (multi-line)
         pdf.set_xy(x_start + col_widths[0], y_start)
-        pdf.multi_cell(col_widths[1], line_height, item['description'], border=1, align="L")
+        pdf.multi_cell(col_widths[1], line_height, item['description'], border="LRT", align="L")
         y_after_desc = pdf.get_y()
         
         row_height = y_after_desc - y_start
         
         # Other cells for the row
         pdf.set_xy(x_start, y_start)
-        pdf.multi_cell(col_widths[0], row_height, str(i), border=1, align="C")
+        pdf.multi_cell(col_widths[0], row_height, str(i), border="LRT", align="C")
         
         pdf.set_xy(x_start + col_widths[0] + col_widths[1], y_start)
-        pdf.multi_cell(col_widths[2], row_height, item['hsn'], border=1, align="C")
+        pdf.multi_cell(col_widths[2], row_height, item['hsn'], border="LRT", align="C")
         
         pdf.set_xy(x_start + sum(col_widths[:3]), y_start)
-        pdf.multi_cell(col_widths[3], row_height, str(item['quantity']), border=1, align="C")
+        pdf.multi_cell(col_widths[3], row_height, str(item['quantity']), border="LRT", align="C")
         
         pdf.set_xy(x_start + sum(col_widths[:4]), y_start)
-        pdf.multi_cell(col_widths[4], row_height, f"{item['unit_rate']:.2f}", border=1, align="R")
+        pdf.multi_cell(col_widths[4], row_height, f"{item['unit_rate']:.2f}", border="LRT", align="R")
         
         amount = item['quantity'] * item['unit_rate']
         pdf.set_xy(x_start + sum(col_widths[:-1]), y_start)
-        pdf.multi_cell(col_widths[5], row_height, f"{amount:.2f}", border=1, align="R")
+        pdf.multi_cell(col_widths[5], row_height, f"{amount:.2f}", border="LRT", align="R")
 
         pdf.set_xy(x_start, y_start + row_height)
+
+    # --- ADD EMPTY PRODUCT TABLE ROW FOR SPACE ---
+    x_start = pdf.get_x()
+    y_start = pdf.get_y()
+    
+    # Create an empty row with the same structure
+    empty_row_height = 15  # Height for the empty space row
+    
+    pdf.set_xy(x_start, y_start)
+    pdf.multi_cell(col_widths[0], empty_row_height, "", border="LRB", align="C")
+    
+    pdf.set_xy(x_start + col_widths[0], y_start)
+    pdf.multi_cell(col_widths[1], empty_row_height, "", border="LRB", align="C")
+    
+    pdf.set_xy(x_start + col_widths[0] + col_widths[1], y_start)
+    pdf.multi_cell(col_widths[2], empty_row_height, "", border="LRB", align="C")
+    
+    pdf.set_xy(x_start + sum(col_widths[:3]), y_start)
+    pdf.multi_cell(col_widths[3], empty_row_height, "", border="LRB", align="C")
+    
+    pdf.set_xy(x_start + sum(col_widths[:4]), y_start)
+    pdf.multi_cell(col_widths[4], empty_row_height, "", border="LRB", align="C")
+    
+    pdf.set_xy(x_start + sum(col_widths[:-1]), y_start)
+    pdf.multi_cell(col_widths[5], empty_row_height, "", border="LRB", align="C")
+    
+    pdf.set_xy(x_start, y_start + empty_row_height)
 
     # Check if we need a new page before totals
     if pdf.get_y() + 60 > pdf.page_break_trigger:
@@ -1291,26 +1356,31 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 12)
     
     # Main header
-    pdf.cell(34, 5, "HSN/SAN", border=1, align="C")
-    pdf.cell(34, 5, "Taxable Value", border=1, align="C")
+    pdf.cell(34, 10, "HSN/SAC", border="LRT", align="C")
+    pdf.cell(34, 10, "Taxable Value", border="LRT", align="C")
     pdf.cell(60, 5, "Central Tax", border=1, align="C")
     pdf.cell(63, 5, "State Tax", border=1, ln=True, align="C")
 
     # Sub-header
-    pdf.cell(34, 5, "", border="L", ln=False)
-    pdf.cell(34, 5, "", border="L", ln=False)
+    pdf.cell(34, 1, "", border="L", ln=False)
+    pdf.cell(34, 1, "", border="L", ln=False)
     pdf.cell(30, 5, "Rate", border="L", align="C")
     pdf.cell(30, 5, "Amount", border="LR", align="C")
     pdf.cell(32, 5, "Rate", border="L", align="C")
     pdf.cell(31, 5, "Amount", border="LR", ln=True, align="C")
 
     pdf.set_font(pdf.default_font, "", 10)
+    
+    # Get the HSN code from the first item (assuming all items have same HSN)
+    # If you have multiple HSN codes, you might want to aggregate them differently
+    primary_hsn = hsn_codes[0] if hsn_codes else ""
+    
     hsn_tax_value = sum(item['quantity'] * item['unit_rate'] for item in invoice_data["items"])
     hsn_sgst = hsn_tax_value * 0.09
     hsn_cgst = hsn_tax_value * 0.09
     
-    # Data row
-    pdf.cell(34, 5, "997331", border=1, align="C")
+    # Data row - using the actual HSN code from products
+    pdf.cell(34, 5, primary_hsn, border=1, align="C")
     pdf.cell(34, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
     pdf.cell(30, 5, "9%", border=1, align="C")
     pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
@@ -1366,10 +1436,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     max_y = max(y_after_left, y_after_right)
     pdf.set_y(max_y)
 
-# --- Signature Boxes (Side by Side) ---
-    # pdf.ln(2) 
-
-    # Save current Y position for signature boxes
+    # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()
 
     # Left side - Buyer's Company Signature (Blank box for future use)
@@ -1380,22 +1447,22 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(96, 6, "For CM Infotech.", border="LR", ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
-    left_signature_box_height = 33  # <-- Change this number for left box height only
-    right_signature_box_height = 33  # Keep this as is for right box
+    left_signature_box_height = 33
+    right_signature_box_height = 33
 
     # Left signature box (Buyer - Blank)
     pdf.set_font(pdf.default_font, "I", 10)
-    pdf.set_text_color(128, 128, 128)  # Gray color for placeholder text
+    pdf.set_text_color(128, 128, 128)
 
-        # Check if buyer logo is available
+    # Check if buyer logo is available
     buyer_logo_file = invoice_data.get('buyer', {}).get('logo_file')
 
     if buyer_logo_file:
         try:
             # Add buyer logo at the top of the left box
             logo_width = 25
-            logo_x = 10 + (95 - logo_width) / 2  # Center the logo horizontally
-            logo_y = pdf.get_y() + 4  # Small margin from top
+            logo_x = 10 + (95 - logo_width) / 2
+            logo_y = pdf.get_y() + 4
             
             # Add buyer company logo
             pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
@@ -1429,62 +1496,30 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         y_after_left_signature = pdf.get_y()
 
     # Right signature box (Our Company)
-    pdf.set_xy(105, y_signature_start + 5)  # Position for right box (6 is the header height)
-    pdf.set_text_color(0, 0, 0)  # Black color for our content
+    pdf.set_xy(105, y_signature_start + 5)
+    pdf.set_text_color(0, 0, 0)
 
     # Add stamp if available
     if stamp_file:
         try:
             stamp_width = 20
-            stamp_x = 105 + (96 - stamp_width) / 2  # Center the stamp in the right box
+            stamp_x = 105 + (96 - stamp_width) / 2
             stamp_y = pdf.get_y() + 2
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
 
-    # Position for the signature text in right box - using right height
+    # Position for the signature text in right box
     pdf.set_xy(105, y_signature_start + 6 + right_signature_box_height - 10)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
 
-    # Draw border for right signature box - using right height
+    # Draw border for right signature box
     pdf.set_xy(105, y_signature_start + 6)
-    pdf.cell(96, right_signature_box_height, "", border="LRB")  # Empty cell with border
+    pdf.cell(96, right_signature_box_height, "", border="LRB")
 
-    # Set Y position to continue after both signature boxes (use the taller one)
+    # Set Y position to continue after both signature boxes
     pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
-    
-    # --- Professional Footer ---
-    # pdf.set_y(-30)  # Position from bottom
-    
-    # # Footer content
-    # pdf.set_font(pdf.default_font, "I", 10)
-    # pdf.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
-    
-    # pdf.set_font(pdf.default_font, "", 10)
-    # pdf.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-    
-    # # Clickable contact info
-    # pdf.set_font(pdf.default_font, "U", 10)
-    # pdf.set_text_color(0, 0, 255)
-    
-    # email1 = "info@cminfotech.com"
-    # phone_number = "+91 873 391 5721"
-    # website = "www.cminfotech.com"
-    
-    # # Center the contact information
-    # contact_text = f"{email1} | {phone_number} | {website}"
-    # contact_width = pdf.get_string_width(contact_text)
-    # x_contact = (pdf.w - contact_width) / 2
-    
-    # pdf.set_x(x_contact)
-    # pdf.cell(pdf.get_string_width(email1), 4, email1, link=f"mailto:{email1}")
-    # pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | "))
-    # pdf.cell(pdf.get_string_width(phone_number), 4, phone_number, link=f"tel:{phone_number}")
-    # pdf.set_x(x_contact + pdf.get_string_width(email1) + pdf.get_string_width(" | ") + pdf.get_string_width(phone_number) + pdf.get_string_width(" | "))
-    # pdf.cell(pdf.get_string_width(website), 4, website, link="https://www.cminfotech.com/")
-    
-    # pdf.set_text_color(0, 0, 0)
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes

@@ -1316,8 +1316,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(63, 5, "State Tax", border=1, ln=True, align="C")
 
     # Sub-header
-    pdf.cell(34, 5, "", border="L", ln=False)
-    pdf.cell(34, 5, "", border="L", ln=False)
+    # pdf.cell(34, 5, "", border="L", ln=False)
+    # pdf.cell(34, 5, "", border="L", ln=False)
     pdf.cell(30, 5, "Rate", border="L", align="C")
     pdf.cell(30, 5, "Amount", border="LR", align="C")
     pdf.cell(32, 5, "Rate", border="L", align="C")

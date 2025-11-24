@@ -1090,15 +1090,16 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="L")
     pdf.cell(48, 8, invoice_data['invoice']['date'], border="R", ln=1, align="L")
 
-    # Payment terms
+    # Payment terms - NOW AS INPUT
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
 
-    # Use multi_cell to wrap text to next line
+    # Use multi_cell to wrap text to next line - NOW USING INPUT VALUE
+    payment_terms = invoice_data['invoice_details'].get('payment_terms', '100% Advance with Purchase')
     pdf.set_xy(153, pdf.get_y())  # Set position for the right cell
-    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="L")
+    pdf.multi_cell(48, 4, payment_terms, border="RT", align="L")
 
     # Supplier's reference
     pdf.set_x(105)
@@ -1178,12 +1179,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
-    # Row 3: Destination
+    # Row 3: Destination - NOW AS INPUT
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 6, "Destination", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
+    destination = invoice_data['invoice_details'].get('destination', 'Vadodara')
+    pdf.cell(48, 6, destination, border="RT", ln=1)
 
     # Row 4: Terms of delivery
     pdf.set_x(105)
@@ -1192,6 +1194,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
     pdf.ln(0.3)
+    
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
     col_widths = [15, 80, 22, 23, 23, 28]
@@ -2245,7 +2248,13 @@ def main():
             buyers_order_no = st.text_input("Buyer's Order No.", "Online")
             buyers_order_date = st.text_input("Buyer's Order Date", datetime.date.today().strftime("%d-%m-%Y"))
             dispatched_through = st.text_input("Dispatched Through", "Online")
+            
+            # NEW INPUT: Payment Terms
+            payment_terms = st.text_input("Mode/Terms of Payment", "100% Advance with Purchase")
+            
             terms_of_delivery = st.text_input("Terms of delivery", "Within Month")
+            
+            # NEW INPUT: Destination
             destination = st.text_input("Destination", "Vadodara")
             
             st.subheader("Seller Details")
@@ -2307,13 +2316,14 @@ def main():
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},
                     "Reference": {"Suppliers_Reference":Suppliers_Reference, "Other": Others_Reference},
                     "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
-                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},#'logo_file': 'path/to/buyer_logo.jpg' add this when you have to add the buyer logo
+                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
                     "invoice_details": {
                         "buyers_order_no": buyers_order_no,
                         "buyers_order_date": buyers_order_date,
                         "dispatched_through": dispatched_through,
+                        "payment_terms": payment_terms,  # NEW FIELD
                         "terms_of_delivery": terms_of_delivery,
-                        "destination": destination
+                        "destination": destination  # NEW FIELD
                     },
                     "items": items,
                     "totals": {
@@ -2337,13 +2347,6 @@ def main():
                     # This automatically increments and saves to file
                     next_sequence = get_next_invoice_sequence()
                     st.session_state.invoice_seq = next_sequence
-                # if invoice_auto_increment:
-                #     try:
-                #         next_sequence = get_next_sequence_number_invoice(invoice_no)
-                #         # Update the sequence in session state for next time
-                #         st.session_state.invoice_seq = next_sequence
-                #     except:
-                #         st.session_state.invoice_seq += 1
 
                 st.success("Invoice generated successfully!")
                 

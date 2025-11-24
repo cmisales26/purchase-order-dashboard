@@ -1793,13 +1793,13 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     # Round Off Row
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(sum(col_widths[:-1]), 5, "Round Off", border=1, align="R")
-    pdf.cell(col_widths[5], 6, f"{round_off:.2f}", border=1, align="R")
+    pdf.cell(col_widths[5], 5, f"{round_off:.2f}", border=1, align="R")
     pdf.ln()
 
     # Grand Total Row (with 2 decimal format)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(sum(col_widths[:-1]), 5, "Final Amount to be Paid", border=1, align="R")
-    pdf.cell(col_widths[5], 6, f"{rounded_total:.2f}", border=1, align="R")  # Using :.2f for 31212.00 format
+    pdf.cell(col_widths[5], 5, f"{rounded_total:.2f}", border=1, align="R")  # Using :.2f for 31212.00 format
     pdf.ln(4)
 
     # --- Amount in Words ---

@@ -1256,25 +1256,25 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     y_start = pdf.get_y()
     
     # Create an empty row with the same structure
-    empty_row_height = 8  # Height for the empty space row
+    empty_row_height = 15  # Height for the empty space row
     
     pdf.set_xy(x_start, y_start)
-    pdf.multi_cell(col_widths[0], empty_row_height, "", border=1, align="C")
+    pdf.multi_cell(col_widths[0], empty_row_height, "", border="LRB", align="C")
     
     pdf.set_xy(x_start + col_widths[0], y_start)
-    pdf.multi_cell(col_widths[1], empty_row_height, "", border=1, align="C")
+    pdf.multi_cell(col_widths[1], empty_row_height, "", border="LRB", align="C")
     
     pdf.set_xy(x_start + col_widths[0] + col_widths[1], y_start)
-    pdf.multi_cell(col_widths[2], empty_row_height, "", border=1, align="C")
+    pdf.multi_cell(col_widths[2], empty_row_height, "", border="LRB", align="C")
     
     pdf.set_xy(x_start + sum(col_widths[:3]), y_start)
-    pdf.multi_cell(col_widths[3], empty_row_height, "", border=1, align="C")
+    pdf.multi_cell(col_widths[3], empty_row_height, "", border="LRB", align="C")
     
     pdf.set_xy(x_start + sum(col_widths[:4]), y_start)
-    pdf.multi_cell(col_widths[4], empty_row_height, "", border=1, align="C")
+    pdf.multi_cell(col_widths[4], empty_row_height, "", border="LRB", align="C")
     
     pdf.set_xy(x_start + sum(col_widths[:-1]), y_start)
-    pdf.multi_cell(col_widths[5], empty_row_height, "", border=1, align="C")
+    pdf.multi_cell(col_widths[5], empty_row_height, "", border="LRB", align="C")
     
     pdf.set_xy(x_start, y_start + empty_row_height)
 

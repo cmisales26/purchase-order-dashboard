@@ -1763,6 +1763,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(sum(col_widths[:-1]), 6, "Round Off", border=1, align="R")
     pdf.cell(col_widths[5], 6, f"0", border=1, align="R")
+    pdf.ln()
     # Grand Total Row
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(sum(col_widths[:-1]), 6, "Final Amount to be Paid", border=1, align="R")

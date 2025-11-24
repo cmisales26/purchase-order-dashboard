@@ -78,6 +78,14 @@ VENDOR_DATABASE = {
         "pan_no": "AAACA7149L",
         "msme_no": "UDYAM-MH-01-1234567"
     },
+        "Tech Data Advanced Private Limited": {
+        "address": "A-301, 3RD FLOOR, SUPREME BUSINESS PARK, BEHIND LAKE CASTLE, HIRANANDANI GARDEN, POWAI MUMBAI 400076",
+        "contact": "Ms/Mr",
+        "mobile": "+91 9243493616",
+        "gst_no": "27AAACO3686M1ZX",
+        "pan_no": "AAACO3686M",
+        "msme_no": "NAN"
+    },
     "DIVTECH IT SOLUTION PVT. LTD.": {
         "address": "Nr.kum kum party plot, TP 13, Chhani Jakatnaka, Vadodara -390024",
         "contact": "Ms/Mr",

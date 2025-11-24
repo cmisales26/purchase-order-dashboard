@@ -1600,7 +1600,7 @@ def number_to_words(number):
         return num2words(number, lang='en_IN').title() + " Rupees Only"
     except ImportError:
         # Simple fallback if num2words is not available
-        words = f"Rupees {number:,.2f} Only"
+        words = f"Rupees {number:,.2f} Only/-"
         return words
 
 # If you don't have num2words installed, you can install it with:
@@ -1716,7 +1716,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # Set to the maximum Y position
     pdf.set_y(max(y_after_bill, y_after_ship))
-    pdf.ln(2)
+    # pdf.ln(2)
     # GST NO:
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.write(5, "GST NO: ")

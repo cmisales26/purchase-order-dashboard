@@ -1597,7 +1597,7 @@ def number_to_words(number):
     """Convert number to words"""
     try:
         from num2words import num2words
-        return num2words(number, lang='en_IN').title() + " Rupees Only"
+        return num2words(number, lang='en_IN').title() + " Rupees Only/-"
     except ImportError:
         # Simple fallback if num2words is not available
         words = f"Rupees {number:,.2f} Only/-"

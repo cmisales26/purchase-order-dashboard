@@ -1485,7 +1485,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 class PO_PDF(FPDF):
     def __init__(self):
         super().__init__()
-        self.set_auto_page_break(auto=False, margin=10)
+        self.set_auto_page_break(auto=True, margin=10)
         self.set_left_margin(15)
         self.set_right_margin(15)
         self.logo_path = os.path.join(os.path.dirname(__file__),"logo_final.jpg")
@@ -1819,7 +1819,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.cell(45, 5, "Taxes")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"As specified above")
+    pdf.multi_cell(0, 5, f"As Specified Above.")
 
     # Payment
     pdf.set_font(pdf.default_font, "B", 12)
@@ -2604,7 +2604,7 @@ def main():
             with col1:
                 payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date", key="po_payment_terms_input")
                 delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
-                delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days", key="po_delivery_terms_input")
+                delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
             with col2:
                 prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
                 authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")

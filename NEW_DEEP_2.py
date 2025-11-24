@@ -1098,7 +1098,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Use multi_cell to wrap text to next line
     pdf.set_xy(153, pdf.get_y())  # Set position for the right cell
-    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="L")
+    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="LRT", align="L")
 
     # Supplier's reference
     pdf.set_x(105)
@@ -1111,14 +1111,14 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Other's reference
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 5, "Other's Reference:", border="RTB", ln=0)
+    pdf.cell(48, 5, "Other's Reference:", border="LRTB", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     other_ref_value = invoice_data['Reference']['Other']
     pdf.cell(48, 5, other_ref_value, border="LRTB", ln=1)
 
     # === BUYER SECTION ===
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(95, 5, "Buyer", border="LT", ln=0)
+    pdf.cell(95, 4, "Buyer", border="LT", ln=0)
     pdf.cell(48, 5, "Buyer's Order No.", border=1, ln=0, align="L")
     pdf.cell(48, 5, "Buyer's Order Date", border=1, ln=1, align="L")
 

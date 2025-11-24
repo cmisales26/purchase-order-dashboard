@@ -1119,8 +1119,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # === BUYER SECTION ===
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(95, 3, "Buyer", border="LT", ln=0)
-    pdf.cell(48, 5, "Buyer's Order No.", border=1, ln=0, align="L")
-    pdf.cell(48, 5, "Buyer's Order Date", border=1, ln=1, align="L")
+    pdf.cell(48, 3, "Buyer's Order No.", border=1, ln=0, align="L")
+    pdf.cell(48, 3, "Buyer's Order Date", border=1, ln=1, align="L")
 
     y_buyer_start = pdf.get_y()
 

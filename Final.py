@@ -1884,7 +1884,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     
 
     # --- Footer (Company Name + Stamp) that floats) ---
-    pdf.ln(5)
+    pdf.ln(3)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
     stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")

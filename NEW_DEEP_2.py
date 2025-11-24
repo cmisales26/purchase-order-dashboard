@@ -1750,6 +1750,12 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     rounded_total = round(products_total)
     round_off = rounded_total - products_total
 
+    # Update the grand_total and amount_words in po_data to reflect the rounded amount
+    po_data['grand_total'] = rounded_total
+    # You'll need to update the amount_words here based on the rounded_total
+    # If you have a function to convert number to words, use it here
+    # po_data['amount_words'] = number_to_words(rounded_total)
+
     # Now display the products table
     for p in po_data["products"]:
         gst_amt = p["basic"] * p["gst_percent"] / 100
@@ -1784,57 +1790,6 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.cell(sum(col_widths[:-1]), 6, "Final Amount to be Paid", border=1, align="R")
     pdf.cell(col_widths[5], 6, f"{rounded_total:.2f}", border=1, align="R")  # Using :.2f for 31212.00 format
     pdf.ln(4)
-    # # --- Products Table ---
-    # # pdf.section_title("Products & Services")
-    # col_widths = [65, 22, 30, 25, 15, 22]
-    # headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty.", "Total"]
-    # pdf.set_fill_color(220, 220, 220)
-    # pdf.set_font(pdf.default_font, "B", 12)
-    # for h, w in zip(headers, col_widths):
-    #     pdf.cell(w, 6, pdf.sanitize_text(h), border=1, align="C", fill=True)
-    # pdf.ln()
-
-    # pdf.set_font(pdf.default_font, "", 12)
-    # line_height = 5
-    # for p in po_data["products"]:
-    #     gst_amt = p["basic"] * p["gst_percent"] / 100
-    #     per_unit_price = p["basic"] + gst_amt
-    #     total = per_unit_price * p["qty"]
-    #     name = pdf.sanitize_text(p["name"])
-
-    #     num_lines = pdf.multi_cell(col_widths[0], line_height, name, border=0, split_only=True)
-    #     max_lines = max(len(num_lines), 1)
-    #     row_height = line_height * max_lines
-
-    #     x_start = pdf.get_x()
-    #     y_start = pdf.get_y()
-
-    #     pdf.multi_cell(col_widths[0], line_height, name, border=1)
-    #     pdf.set_xy(x_start + col_widths[0], y_start)
-    #     pdf.cell(col_widths[1], row_height, f"{p['basic']:.2f}", border=1, align="R")
-    #     pdf.cell(col_widths[2], row_height, f"{gst_amt:.2f}", border=1, align="R")
-    #     pdf.cell(col_widths[3], row_height, f"{per_unit_price:.2f}", border=1, align="R")
-    #     pdf.cell(col_widths[4], row_height, f"{p['qty']:.2f}", border=1, align="C")
-    #     pdf.cell(col_widths[5], row_height, f"{total:.2f}", border=1, align="R")
-    #     pdf.ln(row_height)
-    
-    # pdf.set_font(pdf.default_font, "B", 12)
-    # pdf.cell(sum(col_widths[:-1]), 6, "Round Off", border=1, align="R")
-    # pdf.cell(col_widths[5], 6, f"0", border=1, align="R")
-    # pdf.ln()
-    # # Grand Total Row
-    # pdf.set_font(pdf.default_font, "B", 12)
-    # pdf.cell(sum(col_widths[:-1]), 6, "Final Amount to be Paid", border=1, align="R")
-    # pdf.cell(col_widths[5], 6, f"{po_data['grand_total']:.2f}", border=1, align="R")
-    # pdf.ln(4)
-
-    # --- Amount in Words ---
-    # pdf.ln(5)
-    # pdf.set_font(pdf.default_font, "B", 10)
-    # pdf.cell(0, 5, "Amount in Words:", ln=True)
-    # pdf.set_font(pdf.default_font, "", 10)
-    # pdf.multi_cell(0, 5, pdf.sanitize_text(po_data['amount_words']))
-    # pdf.ln(4)
 
     # --- Amount in Words ---
     pdf.ln(5)

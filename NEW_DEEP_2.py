@@ -1093,7 +1093,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Payment terms
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
+    pdf.cell(48, 5, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
 
     # Use multi_cell to wrap text to next line
@@ -1103,18 +1103,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Supplier's reference
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 8, "Supplier's Reference:", border="LRT", ln=0)
+    pdf.cell(48, 5, "Supplier's Reference:", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     other_ref_value = invoice_data['Reference']['Suppliers_Reference']
-    pdf.cell(48, 8, other_ref_value, border="LRTB", ln=1)
+    pdf.cell(48, 5, other_ref_value, border="LRTB", ln=1)
 
     # Other's reference
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 8, "Other's Reference:", border="RTB", ln=0)
+    pdf.cell(48, 5, "Other's Reference:", border="RTB", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     other_ref_value = invoice_data['Reference']['Other']
-    pdf.cell(48, 8, other_ref_value, border="LRTB", ln=1)
+    pdf.cell(48, 5, other_ref_value, border="LRTB", ln=1)
 
     # === BUYER SECTION ===
     pdf.set_font(pdf.default_font, "B", 12)

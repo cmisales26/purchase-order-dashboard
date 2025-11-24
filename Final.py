@@ -1485,7 +1485,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 class PO_PDF(FPDF):
     def __init__(self):
         super().__init__()
-        self.set_auto_page_break(auto=True, margin=10)
+        self.set_auto_page_break(auto=False, margin=10)
         self.set_left_margin(15)
         self.set_right_margin(15)
         self.logo_path = os.path.join(os.path.dirname(__file__),"logo_final.jpg")

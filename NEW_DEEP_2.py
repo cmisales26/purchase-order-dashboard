@@ -71,7 +71,7 @@ PRODUCT_CATALOG = {
 # Vendor Database - You can expand this with more vendors
 VENDOR_DATABASE = {
     "Arkance IN Pvt. Ltd.": {
-        "address": "One International Centre,,Unit-801-802, 8th Floor, Tower-1,Senapati Bapat Marg Dadar West, Prabhadevi,Lower Parel,Mumbai - 400013,State : Maharashtra",
+        "address": "One International Centre, Unit-801-802, 8th Floor, Tower-1, Senapati Bapat Marg Dadar West, Prabhadevi, Lower Parel,Mumbai - 400013,State : Maharashtra",
         "contact": "Ms/Mr",
         "mobile": "+91 9243493616",
         "gst_no": "27AAACA7149L1Z2",
@@ -87,7 +87,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-GJ-01-0117646"
     },
     "ITCG Solutions Pvt. Ltd.": {
-        "address": "301, Earth The Landmark,Opp. Satsang Party Plot,Sun Pharma Road,Baroda,Gujarat,390012,India",
+        "address": "301, Earth The Landmark, Opp. Satsang Party Plot, Sun Pharma Road, Baroda,Gujarat, 390012,India",
         "contact": "Ms/Mr",
         "mobile": "+91 4045678901",
         "gst_no": "36AABCA1234L1Z5",
@@ -103,7 +103,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-KA-01-9876543"
     },
         "MicroGenesis CADSoft Pvt.Ltd.": {
-        "address": "2nd Floor, 202,, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai,, Thane, Maharashtra - 400601",
+        "address": "2nd Floor, 202, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai, Thane, Maharashtra - 400601",
         "contact": "Ms/Mr",
         "mobile": "022 - 62233873",
         "gst_no": "29AABCA5678L1Z9",
@@ -111,7 +111,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-KA-01-9876543"
     },
         "ACCELTY TECHSOLUTIONS LLP": {
-        "address": "603, Sai Plaza,Next To Sakinaka Telephone Exchange Andheri - Kurla Road,Mumbai - 400072",
+        "address": "603, Sai Plaza, Next To Sakinaka Telephone Exchange Andheri - Kurla Road,Mumbai - 400072",
         "contact": "Ms/Mr",
         "mobile": "+91 4045678901",
         "gst_no": "29AABCA5678L1Z9",
@@ -122,10 +122,10 @@ VENDOR_DATABASE = {
 
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
-    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"},
     "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721"},
     "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721"},
-    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"}
+    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"},
+    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"}
 }
 
 # --- Helper Functions for Vendor Management ---
@@ -1346,7 +1346,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     x_left = pdf.get_x()
 
     # Left cell (Bank) with border
-    pdf.multi_cell(95, 4, bank_text, border=1)
+    pdf.multi_cell(95, 5, bank_text, border=1)
     y_after_left = pdf.get_y()
     
     # Right cell (Declaration) with border
@@ -1372,7 +1372,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(96, 5, "For CM Infotech.", border="LR", ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
-    left_signature_box_height = 33  # <-- Change this number for left box height only
+    left_signature_box_height = 34  # <-- Change this number for left box height only
     right_signature_box_height = 33  # Keep this as is for right box
 
     # Left signature box (Buyer - Blank)

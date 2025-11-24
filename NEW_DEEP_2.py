@@ -2617,37 +2617,52 @@ def main():
                 st.warning("No company logo available. Please upload one in the sidebar.")
             
             if st.button("Generate PO", type="primary", key="po_generate_button"):
-                po_data = {
-                    "po_number": st.session_state.po_number,
-                    "po_date": st.session_state.po_date,
-                    "vendor_name": vendor_name,
-                    "vendor_address": vendor_address,
-                    "vendor_contact": vendor_contact,
-                    "vendor_mobile": vendor_mobile,
-                    "gst_no": gst_no,
-                    "pan_no": pan_no,
-                    "msme_no": msme_no,
-                    "bill_to_company": bill_to_company,
-                    "bill_to_address": bill_to_address,
-                    "ship_to_company": ship_to_company,
-                    "ship_to_address": ship_to_address,
-                    "end_company": end_company,
-                    "end_address":end_address,
-                    "end_person": end_person,
-                    "end_mobile": end_mobile,
-                    "end_email": end_email,
-                    "products": st.session_state.products,
-                    "grand_total": grand_total,
-                    "amount_words": amount_words,
-                    "payment_terms": payment_terms,
-                    "delivery_terms": delivery_terms,
-                    "prepared_by": prepared_by,
-                    "authorized_by": authorized_by,
-                    "company_name": st.session_state.company_name
-                }
+                    # Calculate total from all products
+                    products_total = 0
+                    for p in st.session_state.products:
+                        gst_amt = p["basic"] * p["gst_percent"] / 100
+                        per_unit_price = p["basic"] + gst_amt
+                        total = per_unit_price * p["qty"]
+                        products_total += total
 
-                pdf_bytes = create_po_pdf(po_data, logo_path)
+                    # Calculate round off to make final amount whole number
+                    rounded_total = round(products_total)
+                    round_off = rounded_total - products_total
 
+                    # Update grand_total and amount_words with rounded amount
+                    grand_total = rounded_total
+                    amount_words = number_to_words(rounded_total)  # Use your number to words function
+
+                    po_data = {
+                        "po_number": st.session_state.po_number,
+                        "po_date": st.session_state.po_date,
+                        "vendor_name": vendor_name,
+                        "vendor_address": vendor_address,
+                        "vendor_contact": vendor_contact,
+                        "vendor_mobile": vendor_mobile,
+                        "gst_no": gst_no,
+                        "pan_no": pan_no,
+                        "msme_no": msme_no,
+                        "bill_to_company": bill_to_company,
+                        "bill_to_address": bill_to_address,
+                        "ship_to_company": ship_to_company,
+                        "ship_to_address": ship_to_address,
+                        "end_company": end_company,
+                        "end_address": end_address,
+                        "end_person": end_person,
+                        "end_mobile": end_mobile,
+                        "end_email": end_email,
+                        "products": st.session_state.products,
+                        "grand_total": grand_total,  # Updated with rounded amount
+                        "amount_words": amount_words,  # Updated with words for rounded amount
+                        "payment_terms": payment_terms,
+                        "delivery_terms": delivery_terms,
+                        "prepared_by": prepared_by,
+                        "authorized_by": authorized_by,
+                        "company_name": st.session_state.company_name
+                    }
+
+                    pdf_bytes = create_po_pdf(po_data, logo_path)
                 # Store the last PO number for sequence tracking
                 st.session_state.last_po_number = st.session_state.po_number
                 

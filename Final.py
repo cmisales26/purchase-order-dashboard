@@ -1354,12 +1354,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     x_left = pdf.get_x()
 
     # Left cell (Bank) with border
-    pdf.multi_cell(95, 4, bank_text, border=1)
+    pdf.multi_cell(95, 5, bank_text, border=1)
     y_after_left = pdf.get_y()
     
     # Right cell (Declaration) with border
     pdf.set_xy(x_left + 95, y_before)
-    pdf.multi_cell(96, 3.2, invoice_data['declaration'], border=1)
+    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
     y_after_right = pdf.get_y()
     
     # Set Y to the maximum of both columns
@@ -1374,10 +1374,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Buyer's Company Signature (Blank box for future use)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 5, "Buyer's Company Signature", border="LR", ln=0, align="C")
+    pdf.cell(95, 6, "Buyer's Company Signature", border="LR", ln=0, align="C")
 
     # Right side - Our Company Signature
-    pdf.cell(96, 5, "For CM Infotech.", border="LR", ln=1, align="C")
+    pdf.cell(96, 6, "For CM Infotech.", border="LR", ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
     left_signature_box_height = 33  # <-- Change this number for left box height only

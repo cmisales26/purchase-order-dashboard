@@ -1835,7 +1835,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_delivery_terms}")
 
-    pdf.ln()
+    pdf.ln(1)
 
     # --- End User ---
     pdf.section_title("End User Details")

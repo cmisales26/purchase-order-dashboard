@@ -2318,13 +2318,76 @@ def main():
             st.subheader("Products")
             items = []
             num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
+            
+            # Define common product descriptions for dropdown
+            product_options = {
+                "Autodesk BIM Collaborate Pro": "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription",
+                "Autodesk AutoCAD": "Autodesk AutoCAD - Single-user\nCLOUD Commercial New Annual Subscription",
+                "Autodesk Revit": "Autodesk Revit - Single-user\nCLOUD Commercial New Annual Subscription",
+                "Autodesk Civil 3D": "Autodesk Civil 3D - Single-user\nCLOUD Commercial New Annual Subscription",
+                "Autodesk Fusion 360": "Autodesk Fusion 360 - Single-user\nCLOUD Commercial New Annual Subscription",
+                "Microsoft Office 365": "Microsoft Office 365 Business Premium\nAnnual Subscription",
+                "Adobe Creative Cloud": "Adobe Creative Cloud All Apps\nAnnual Subscription",
+                "Custom Product": ""  # Empty for custom entry
+            }
+            
             for i in range(num_items):
                 with st.expander(f"Product {i+1}"):
-                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
+                    # Product selection dropdown
+                    selected_product = st.selectbox(
+                        f"Select Product {i+1}",
+                        options=list(product_options.keys()),
+                        key=f"product_select_{i}"
+                    )
+                    
+                    # Text area for product description with pre-filled value from dropdown
+                    if selected_product == "Custom Product":
+                        # For custom product, show empty text area
+                        desc = st.text_area(
+                            f"Product Description {i+1}",
+                            placeholder="Enter custom product description...",
+                            key=f"invoice_desc_{i}"
+                        )
+                    else:
+                        # For pre-defined products, show text area with pre-filled value
+                        base_description = product_options[selected_product]
+                        desc = st.text_area(
+                            f"Product Description {i+1}",
+                            value=base_description,
+                            key=f"invoice_desc_{i}"
+                        )
+                    
+                    # Additional details section
+                    st.subheader(f"Additional Details for Product {i+1}")
+                    col_detail1, col_detail2 = st.columns(2)
+                    
+                    with col_detail1:
+                        serial_no = st.text_input(f"Serial No. {i+1}", "", key=f"serial_{i}")
+                        contract_no = st.text_input(f"Contract No. {i+1}", "", key=f"contract_{i}")
+                    
+                    with col_detail2:
+                        end_date = st.text_input(f"End Date {i+1}", "", key=f"end_date_{i}")
+                    
+                    # Combine all details into final description
+                    final_description = desc
+                    if serial_no:
+                        final_description += f"\nSerial #: {serial_no}"
+                    if contract_no:
+                        final_description += f"\nContract #: {contract_no}"
+                    if end_date:
+                        final_description += f"\nEnd Date: {end_date}"
+                    
+                    # Other product details
                     hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
                     qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00, key=f"invoice_rate_{i}")
-                    items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
+                    
+                    items.append({
+                        "description": final_description, 
+                        "hsn": hsn, 
+                        "quantity": qty, 
+                        "unit_rate": rate
+                    })
 
             st.subheader("Declaration")
             declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")

@@ -1333,7 +1333,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "", 12)
     # Write the value part in normal font and complete the border
     value_part = invoice_data['totals']['amount_in_words']
-    remaining_width = 190 - pdf.get_string_width(label_part)
+    remaining_width = 189.5 - pdf.get_string_width(label_part)
     pdf.cell(remaining_width, 5, value_part, border="TR", ln=True)
 
     # Check if we need a new page before tax summary

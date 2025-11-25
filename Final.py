@@ -1320,6 +1320,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     pdf.cell(total_width, 5, "CGST @ 9%", border=1, align="L")
     pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
+    # Add Round Off row if needed
+    round_off = invoice_data['totals']['final_amount'] - (invoice_data['totals']['basic_amount'] + invoice_data['totals']['sgst'] + invoice_data['totals']['cgst'])
+    if round_off != 0:
+        pdf.cell(total_width, 5, "Round Off", border=1, align="L")
+        pdf.cell(col_widths[5], 5, f"{round_off:.2f}", border=1, ln=True, align="R")
 
     pdf.cell(total_width, 5, "Final Amount to be Paid", border=1, align="L")
     pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")

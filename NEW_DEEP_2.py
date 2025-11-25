@@ -1098,8 +1098,25 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Use multi_cell to wrap text to next line - NOW USING INPUT VALUE
     payment_terms = invoice_data['invoice_details'].get('payment_terms', '100% Advance with Purchase')
-    pdf.set_xy(153, pdf.get_y())  # Set position for the right cell
-    pdf.cell(48, 8, payment_terms, border="LRT", align="L", ln=1)
+
+    # Get current Y position before adding the cell
+    y_before = pdf.get_y()
+
+    # Set position and draw the payment terms cell
+    pdf.set_xy(153, y_before)
+    pdf.multi_cell(48, 4, payment_terms, border="LRT", align="L")
+
+    # Get Y position after adding the cell
+    y_after = pdf.get_y()
+
+    # Calculate the actual height of the content
+    actual_height = y_after - y_before
+
+    # If the actual height is less than 8mm, add an empty cell to make up the difference
+    if actual_height < 8:
+        remaining_height = 8 - actual_height
+        pdf.set_xy(153, y_after)
+        pdf.cell(48, remaining_height, "", border="LRT", ln=True)
 
     # Supplier's reference
     pdf.set_x(105)

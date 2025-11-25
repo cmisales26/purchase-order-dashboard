@@ -1320,21 +1320,30 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     pdf.cell(total_width, 5, "CGST @ 9%", border=1, align="L")
     pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
+    # Add Round Off row if needed
+    round_off = invoice_data['totals']['final_amount'] - (invoice_data['totals']['basic_amount'] + invoice_data['totals']['sgst'] + invoice_data['totals']['cgst'])
+    if round_off != 0:
+        pdf.cell(total_width, 5, "Round Off", border=1, align="L")
+        pdf.cell(col_widths[5], 5, f"{round_off:.2f}", border=1, ln=True, align="R")
 
     pdf.cell(total_width, 5, "Final Amount to be Paid", border=1, align="L")
     pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
     
     # --- Amount in Words ---
-    pdf.set_font(pdf.default_font, "B", 12)
-    # Write just the label part in bold
-    label_part = "Amount Chargeable (in words): "
-    pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
+    # First set the position and draw the border
+    pdf.cell(191, 5, "", border=1, ln=True)
 
+    # Now go back and write the text with mixed formatting
+    pdf.set_y(pdf.get_y() - 5)  # Move back up to the same line
+    pdf.set_x(10)  # Starting X position
+
+    # Write bold label
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(pdf.get_string_width("Amount Chargeable (in words): "), 5, "Amount Chargeable (in words): ", ln=0)
+
+    # Write normal value
     pdf.set_font(pdf.default_font, "", 12)
-    # Write the value part in normal font and complete the border
-    value_part = invoice_data['totals']['amount_in_words']
-    remaining_width = 189.7 - pdf.get_string_width(label_part)
-    pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
+    pdf.cell(0, 5, invoice_data['totals']['amount_in_words'], ln=True)
 
     # Check if we need a new page before tax summary
     if pdf.get_y() + 60 > pdf.page_break_trigger:
@@ -1640,10 +1649,10 @@ def number_to_words(number):
     """Convert number to words"""
     try:
         from num2words import num2words
-        return num2words(number, lang='en_IN').title() + " Rupees Only"
+        return num2words(number, lang='en_IN').title() + " Rupees Only/-"
     except ImportError:
         # Simple fallback if num2words is not available
-        words = f"Rupees {number:,.2f} Only"
+        words = f"Rupees {number:,.2f} Only/-"
         return words
 
 # If you don't have num2words installed, you can install it with:
@@ -2323,7 +2332,8 @@ def main():
                     desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
                     hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
                     qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
-                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00, key=f"invoice_rate_{i}")
+                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, 36500.00, key=f"invoice_rate_{i}")
+                    rate = round(rate, 2)
                     items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
 
             st.subheader("Declaration")
@@ -2340,14 +2350,44 @@ def main():
                 st.warning("⚠ No company stamp available")
             
             st.subheader("Invoice Preview & Download")
+
             if st.button("Generate Invoice", key="generate_invoice_button"):
-                basic_amount = sum(item['quantity'] * item['unit_rate'] for item in items)
-                sgst = basic_amount * 0.09
-                cgst = basic_amount * 0.09
-                final_amount = basic_amount + sgst + cgst
+                # Calculate amounts with proper rounding like in PO generator
+                basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
+                sgst = round(basic_amount * 0.09, 2)
+                cgst = round(basic_amount * 0.09, 2)
+                final_amount_unrounded = basic_amount + sgst + cgst
                 
-                amount_in_words = num2words(final_amount, to="cardinal").title() + " Only/-"
-                tax_in_words = num2words(sgst + cgst, to="cardinal").title()+" Only/-"
+                # ROUND TO WHOLE NUMBER LIKE PO GENERATOR
+                final_amount = round(final_amount_unrounded)
+                round_off = final_amount - final_amount_unrounded
+                
+                # Display calculated amounts for verification
+                st.info(f"**Calculated Amounts:** Basic: ₹{basic_amount:.2f}, SGST: ₹{sgst:.2f}, CGST: ₹{cgst:.2f}, Final: ₹{final_amount:.2f}")
+                if round_off != 0:
+                    st.info(f"**Round Off:** ₹{round_off:.2f}")
+                
+                # Convert to words with proper Indian currency format
+                def convert_to_indian_currency(amount):
+                    """Convert amount to Indian currency words format"""
+                    try:
+                        # Split into rupees and paise
+                        rupees = int(amount)
+                        paise = round((amount - rupees) * 100)
+                        
+                        rupees_text = num2words(rupees, to='cardinal', lang='en_IN').title()
+                        
+                        if paise > 0:
+                            paise_text = num2words(paise, to='cardinal', lang='en_IN').title()
+                            return f"{rupees_text} Rupees And {paise_text} Paise Only/-"
+                        else:
+                            return f"{rupees_text} Rupees Only/-"
+                            
+                    except Exception as e:
+                        return f"Amount: ₹{amount:.2f}"
+
+                amount_in_words = convert_to_indian_currency(final_amount)
+                tax_in_words = convert_to_indian_currency(round(sgst + cgst, 2))
 
                 invoice_data = {
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},
@@ -2358,9 +2398,9 @@ def main():
                         "buyers_order_no": buyers_order_no,
                         "buyers_order_date": buyers_order_date,
                         "dispatched_through": dispatched_through,
-                        "payment_terms": payment_terms,  # NEW FIELD
+                        "payment_terms": payment_terms,
                         "terms_of_delivery": terms_of_delivery,
-                        "destination": destination  # NEW FIELD
+                        "destination": destination
                     },
                     "items": items,
                     "totals": {

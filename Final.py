@@ -2323,11 +2323,12 @@ def main():
             items = []
             num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
             for i in range(num_items):
-                with st.expander(f"Product {i+1}"):
+                with st.expander(f"Product {i+1}", expanded=True):
                     desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
                     hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
                     qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, 36500.00, key=f"invoice_rate_{i}")
+                    rate = round(rate, 2)
                     items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
 
             st.subheader("Declaration")
@@ -2344,45 +2345,38 @@ def main():
                 st.warning("⚠ No company stamp available")
             
             st.subheader("Invoice Preview & Download")
-            
+
             if st.button("Generate Invoice", key="generate_invoice_button"):
-                basic_amount = sum(item['quantity'] * item['unit_rate'] for item in items)
-                sgst = basic_amount * 0.09
-                cgst = basic_amount * 0.09
-                final_amount = basic_amount + sgst + cgst
+                # Calculate amounts with proper rounding like in PO generator
+                basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
+                sgst = round(basic_amount * 0.09, 2)
+                cgst = round(basic_amount * 0.09, 2)
+                final_amount = round(basic_amount + sgst + cgst, 2)
                 
-                # FIX: Round the amounts to 2 decimal places to avoid floating-point precision issues
-                basic_amount = round(basic_amount, 2)
-                sgst = round(sgst, 2)
-                cgst = round(cgst, 2)
-                final_amount = round(final_amount, 2)
+                # Display calculated amounts for verification
+                st.info(f"**Calculated Amounts:** Basic: ₹{basic_amount:.2f}, SGST: ₹{sgst:.2f}, CGST: ₹{cgst:.2f}, Final: ₹{final_amount:.2f}")
                 
-                # FIX: Convert the rounded final_amount to words
-                try:
-                    # Convert the integer part and decimal part separately
-                    amount_int = int(final_amount)
-                    amount_decimal = round((final_amount - amount_int) * 100)
-                    
-                    if amount_decimal > 0:
-                        amount_in_words = num2words(amount_int, to='cardinal').title() + " Rupees and " + num2words(amount_decimal, to='cardinal').title() + " Paise Only"
-                    else:
-                        amount_in_words = num2words(amount_int, to='cardinal').title() + " Rupees Only"
-                except:
-                    # Fallback if there's any error in conversion
-                    amount_in_words = "Amount in words conversion failed"
-                
-                # FIX: Similarly for tax amount
-                total_tax = sgst + cgst
-                try:
-                    tax_int = int(total_tax)
-                    tax_decimal = round((total_tax - tax_int) * 100)
-                    
-                    if tax_decimal > 0:
-                        tax_in_words = num2words(tax_int, to='cardinal').title() + " Rupees and " + num2words(tax_decimal, to='cardinal').title() + " Paise Only"
-                    else:
-                        tax_in_words = num2words(tax_int, to='cardinal').title() + " Rupees Only"
-                except:
-                    tax_in_words = "Tax amount in words conversion failed"
+                # Convert to words with proper Indian currency format
+                def convert_to_indian_currency(amount):
+                    """Convert amount to Indian currency words format"""
+                    try:
+                        # Split into rupees and paise
+                        rupees = int(amount)
+                        paise = round((amount - rupees) * 100)
+                        
+                        rupees_text = num2words(rupees, to='cardinal', lang='en_IN').title()
+                        
+                        if paise > 0:
+                            paise_text = num2words(paise, to='cardinal', lang='en_IN').title()
+                            return f"{rupees_text} Rupees And {paise_text} Paise Only"
+                        else:
+                            return f"{rupees_text} Rupees Only"
+                            
+                    except Exception as e:
+                        return f"Amount: ₹{amount:.2f}"
+
+                amount_in_words = convert_to_indian_currency(final_amount)
+                tax_in_words = convert_to_indian_currency(round(sgst + cgst, 2))
 
                 invoice_data = {
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},

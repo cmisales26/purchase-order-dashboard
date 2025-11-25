@@ -71,52 +71,12 @@ PRODUCT_CATALOG = {
 # Vendor Database - You can expand this with more vendors
 VENDOR_DATABASE = {
     "Arkance IN Pvt. Ltd.": {
-        "address": "One International Centre, Unit-801-802, 8th Floor, Tower-1, Senapati Bapat Marg Dadar West, Prabhadevi, Lower Parel, Mumbai - 400013, State : Maharashtra",
+        "address": "One International Centre, Unit-801-802, 8th Floor, Tower-1, Senapati Bapat Marg Dadar West, Prabhadevi, Lower Parel,Mumbai - 400013,State : Maharashtra",
         "contact": "Ms/Mr",
         "mobile": "+91 9243493616",
         "gst_no": "27AAACA7149L1Z2",
         "pan_no": "AAACA7149L",
         "msme_no": "UDYAM-MH-01-1234567"
-    },
-        "Tech Data Advanced Private Limited": {
-        "address": "A-301, 3RD FLOOR, SUPREME BUSINESS PARK, BEHIND LAKE CASTLE, HIRANANDANI GARDEN, POWAI MUMBAI 400076",
-        "contact": "Ms/Mr",
-        "mobile": "+91 9243493616",
-        "gst_no": "27AAACO3686M1ZX",
-        "pan_no": "AAACO3686M",
-        "msme_no": "NAN"
-    },
-        "SS Solutions": {
-        "address": "F-405, Mahadev Platinum, Near Yash Bungalow, Smruti Mandir, Ghodasar, Ahmedabad 380050, Gujarat India",
-        "contact": "Ms/Mr",
-        "mobile": "+91 90996 99389",
-        "gst_no": "24AMFPP5909G1Z0",
-        "pan_no": "NAN",
-        "msme_no": "NAN"
-    },
-        "Acero Consulting Engineers": {
-        "address": "B-49, Sector-48, Noida - 201303, Uttar Pradesh",
-        "contact": "Ms/Mr",
-        "mobile": "+91 92895-52452, +91 95011-25560",
-        "gst_no": "09AAKCA4712C2ZY",
-        "pan_no": "AAKCA4712C",
-        "msme_no": "NAN"
-    },
-        "Sopan Infotech Private Limited": {
-        "address": "2D, 2nd Floor, Dr. Mansukh Lal Tower, Opp. Dhiraj Sons, B/s vanita Vishram College, Athwagate, Surat Gujarat - 395001, India",
-        "contact": "Ms/Mr",
-        "mobile": "+91 9725554395",
-        "gst_no": "24ABGCS7981Q1ZD",
-        "pan_no": "NAN",
-        "msme_no": "NAN"
-    },
-        "Murari Software Solutions": {
-        "address": "8C Shimla Towers, Hill County Apts. Bachupally, Nizamet Rd. Hyderabad 500090, India",
-        "contact": "Ms/Mr",
-        "mobile": "+91 1234567891",
-        "gst_no": "36ABSPM0256H3ZE",
-        "pan_no": "ABSPM0256H",
-        "msme_no": "NAN"
     },
     "DIVTECH IT SOLUTION PVT. LTD.": {
         "address": "Nr.kum kum party plot, TP 13, Chhani Jakatnaka, Vadodara -390024",
@@ -127,7 +87,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-GJ-01-0117646"
     },
     "ITCG Solutions Pvt. Ltd.": {
-        "address": "301, Earth The Landmark, Opp. Satsang Party Plot, Sun Pharma Road, Baroda, Gujarat, 390012, India",
+        "address": "301, Earth The Landmark, Opp. Satsang Party Plot, Sun Pharma Road, Baroda,Gujarat, 390012,India",
         "contact": "Ms/Mr",
         "mobile": "+91 4045678901",
         "gst_no": "36AABCA1234L1Z5",
@@ -135,7 +95,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-TS-01-7654321"
     },
     "Genesis Infoserve Pvt. Ltd.": {
-        "address": "A-204/205, Eversun CHSL., DLH Junction, Sahakar Nagar, J. P. Road, Andheri (W), Mumbai - 400 053",
+        "address": "A-204/205, Eversun CHSL., DLH Junction,Sahakar Nagar, J. P. Road, Andheri (W),Mumbai - 400 053",
         "contact": "Ms/Mr",
         "mobile": "022 62845600 / 022 26734433",
         "gst_no": "29AABCA5678L1Z9",
@@ -151,7 +111,7 @@ VENDOR_DATABASE = {
         "msme_no": "UDYAM-KA-01-9876543"
     },
         "ACCELTY TECHSOLUTIONS LLP": {
-        "address": "603, Sai Plaza, Next To Sakinaka Telephone Exchange Andheri - Kurla Road, Mumbai - 400072",
+        "address": "603, Sai Plaza, Next To Sakinaka Telephone Exchange Andheri - Kurla Road,Mumbai - 400072",
         "contact": "Ms/Mr",
         "mobile": "+91 4045678901",
         "gst_no": "29AABCA5678L1Z9",
@@ -1130,15 +1090,33 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 8, invoice_data['invoice']['invoice_no'], border="LR", ln=0, align="L")
     pdf.cell(48, 8, invoice_data['invoice']['date'], border="R", ln=1, align="L")
 
-    # Payment terms
+    # Payment terms - NOW AS INPUT
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 8, "Mode/Terms of Payment:", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
 
-    # Use multi_cell to wrap text to next line
-    pdf.set_xy(153, pdf.get_y())  # Set position for the right cell
-    pdf.multi_cell(48, 4, "100% Advance with\nPurchase", border="RT", align="L")
+    # Use multi_cell to wrap text to next line - NOW USING INPUT VALUE
+    payment_terms = invoice_data['invoice_details'].get('payment_terms', '100% Advance with Purchase')
+
+    # Get current Y position before adding the cell
+    y_before = pdf.get_y()
+
+    # Set position and draw the payment terms cell
+    pdf.set_xy(153, y_before)
+    pdf.multi_cell(48, 4, payment_terms, border="LRT", align="L")
+
+    # Get Y position after adding the cell
+    y_after = pdf.get_y()
+
+    # Calculate the actual height of the content
+    actual_height = y_after - y_before
+
+    # If the actual height is less than 8mm, add an empty cell to make up the difference
+    if actual_height < 8:
+        remaining_height = 8 - actual_height
+        pdf.set_xy(153, y_after)
+        pdf.cell(48, remaining_height, "", border="LR", ln=True)
 
     # Supplier's reference
     pdf.set_x(105)
@@ -1151,7 +1129,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Other's reference
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 8, "Other's Reference:", border="RTB", ln=0)
+    pdf.cell(48, 8, "Other's Reference:", border="LRTB", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     other_ref_value = invoice_data['Reference']['Other']
     pdf.cell(48, 8, other_ref_value, border="LRTB", ln=1)
@@ -1218,12 +1196,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
-    # Row 3: Destination
+    # Row 3: Destination - NOW AS INPUT
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 6, "Destination", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 6, invoice_data['invoice_details']['destination'], border="RT", ln=1)
+    destination = invoice_data['invoice_details'].get('destination', 'Vadodara')
+    pdf.cell(48, 6, destination, border="RT", ln=1)
 
     # Row 4: Terms of delivery
     pdf.set_x(105)
@@ -1232,6 +1211,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
     pdf.ln(0.3)
+    
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
     col_widths = [15, 80, 22, 23, 23, 28]
@@ -1346,7 +1326,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # --- Amount in Words ---
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(191, 5, f"Amount Chargeable (in words): {invoice_data['totals']['amount_in_words']}", ln=True, border=1)
+    # Write just the label part in bold
+    label_part = "Amount Chargeable (in words): "
+    pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
+
+    pdf.set_font(pdf.default_font, "", 12)
+    # Write the value part in normal font and complete the border
+    value_part = invoice_data['totals']['amount_in_words']
+    remaining_width = 189.7 - pdf.get_string_width(label_part)
+    pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
 
     # Check if we need a new page before tax summary
     if pdf.get_y() + 60 > pdf.page_break_trigger:
@@ -1396,9 +1384,21 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(32, 5, "", border=1, align="C")
     pdf.cell(31, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
     
-    # Tax in words
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(191, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    # --- Amount in Words ---
+    pdf.set_font(pdf.default_font, "B", 12)
+    # Write just the label part in bold
+    label_part = "Tax Amount (in words): "
+    pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
+
+    pdf.set_font(pdf.default_font, "", 12)
+    # Write the value part in normal font and complete the border
+    value_part = invoice_data['totals']['tax_in_words']
+    remaining_width = 189.7 - pdf.get_string_width(label_part)
+    pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
+    
+    # # Tax in words
+    # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.cell(191, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before footer content
     if pdf.get_y() + 80 > pdf.page_break_trigger:
@@ -1553,7 +1553,7 @@ class PO_PDF(FPDF):
                 # (self.logo_path, x=155, y=8, w=50)
                 # (self.logo_path, x=160, y=5.5, w=45,link=self.website_url)
                 # self.image(self.logo_path, x=150, y=10, w=40)
-            self.ln(2)
+            self.ln(4)
             # Title
             self.set_font(self.default_font, "BU", 15)
             self.cell(0, 15, "PURCHASE ORDER", ln=True, align="C")
@@ -1640,10 +1640,10 @@ def number_to_words(number):
     """Convert number to words"""
     try:
         from num2words import num2words
-        return num2words(number, lang='en_IN').title() + " Rupees Only/-"
+        return num2words(number, lang='en_IN').title() + " Rupees Only"
     except ImportError:
         # Simple fallback if num2words is not available
-        words = f"Rupees {number:,.2f} Only/-"
+        words = f"Rupees {number:,.2f} Only"
         return words
 
 # If you don't have num2words installed, you can install it with:
@@ -1759,7 +1759,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # Set to the maximum Y position
     pdf.set_y(max(y_after_bill, y_after_ship))
-    # pdf.ln(2)
+    pdf.ln(2)
     # GST NO:
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.write(5, "GST NO: ")
@@ -1780,7 +1780,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     pdf.ln(2)
     # --- Products Table ---
-    # pdf.section_title("Products & Services")
+    pdf.section_title("Products & Services")
     col_widths = [65, 22, 30, 25, 15, 22]
     headers = ["Product", "Basic", "GST TAX @ 18%", "Per Unit Price", "Qty.", "Total"]
     pdf.set_fill_color(220, 220, 220)
@@ -1835,18 +1835,18 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
 
     # Round Off Row
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(sum(col_widths[:-1]), 5, "Round Off", border=1, align="R")
-    pdf.cell(col_widths[5], 5, f"{round_off:.2f}", border=1, align="R")
+    pdf.cell(sum(col_widths[:-1]), 6, "Round Off", border=1, align="R")
+    pdf.cell(col_widths[5], 6, f"{round_off:.2f}", border=1, align="R")
     pdf.ln()
 
     # Grand Total Row (with 2 decimal format)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(sum(col_widths[:-1]), 5, "Final Amount to be Paid", border=1, align="R")
-    pdf.cell(col_widths[5], 5, f"{rounded_total:.2f}", border=1, align="R")  # Using :.2f for 31212.00 format
+    pdf.cell(sum(col_widths[:-1]), 6, "Final Amount to be Paid", border=1, align="R")
+    pdf.cell(col_widths[5], 6, f"{rounded_total:.2f}", border=1, align="R")  # Using :.2f for 31212.00 format
     pdf.ln(4)
 
     # --- Amount in Words ---
-    pdf.ln(3)
+    pdf.ln(5)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 4, "Amount in Words")
     pdf.cell(5, 4, ":")
@@ -1862,7 +1862,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.cell(45, 5, "Taxes")
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"As Specified Above.")
+    pdf.multi_cell(0, 5, f"As specified above")
 
     # Payment
     pdf.set_font(pdf.default_font, "B", 12)
@@ -1878,7 +1878,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_delivery_terms}")
 
-    pdf.ln(1)
+    pdf.ln(2)
 
     # --- End User ---
     pdf.section_title("End User Details")
@@ -1927,7 +1927,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     
 
     # --- Footer (Company Name + Stamp) that floats) ---
-    pdf.ln(3)
+    pdf.ln(5)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(0, 5, f"For, {sanitized_company_name}", ln=True, border=0, align="L")
     stamp_path = os.path.join(os.path.dirname(__file__), "stamp.jpg")
@@ -2285,7 +2285,13 @@ def main():
             buyers_order_no = st.text_input("Buyer's Order No.", "Online")
             buyers_order_date = st.text_input("Buyer's Order Date", datetime.date.today().strftime("%d-%m-%Y"))
             dispatched_through = st.text_input("Dispatched Through", "Online")
+            
+            # NEW INPUT: Payment Terms
+            payment_terms = st.text_input("Mode/Terms of Payment", "100% Advance with Purchase")
+            
             terms_of_delivery = st.text_input("Terms of delivery", "Within Month")
+            
+            # NEW INPUT: Destination
             destination = st.text_input("Destination", "Vadodara")
             
             st.subheader("Seller Details")
@@ -2347,13 +2353,14 @@ def main():
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},
                     "Reference": {"Suppliers_Reference":Suppliers_Reference, "Other": Others_Reference},
                     "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
-                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},#'logo_file': 'path/to/buyer_logo.jpg' add this when you have to add the buyer logo
+                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
                     "invoice_details": {
                         "buyers_order_no": buyers_order_no,
                         "buyers_order_date": buyers_order_date,
                         "dispatched_through": dispatched_through,
+                        "payment_terms": payment_terms,  # NEW FIELD
                         "terms_of_delivery": terms_of_delivery,
-                        "destination": destination
+                        "destination": destination  # NEW FIELD
                     },
                     "items": items,
                     "totals": {
@@ -2377,13 +2384,6 @@ def main():
                     # This automatically increments and saves to file
                     next_sequence = get_next_invoice_sequence()
                     st.session_state.invoice_seq = next_sequence
-                # if invoice_auto_increment:
-                #     try:
-                #         next_sequence = get_next_sequence_number_invoice(invoice_no)
-                #         # Update the sequence in session state for next time
-                #         st.session_state.invoice_seq = next_sequence
-                #     except:
-                #         st.session_state.invoice_seq += 1
 
                 st.success("Invoice generated successfully!")
                 
@@ -2645,9 +2645,9 @@ def main():
             st.header("Terms & Authorization")
             col1, col2 = st.columns(2)
             with col1:
-                payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
+                payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date", key="po_payment_terms_input")
                 delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
-                delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
+                delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days", key="po_delivery_terms_input")
             with col2:
                 prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
                 authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")

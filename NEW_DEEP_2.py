@@ -2405,6 +2405,7 @@ def main():
                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00, key=f"invoice_rate_{i}")
                     
                     items.append({
+                        "product": st.session_state.product_selections[i],
                         "description": final_description, 
                         "hsn": hsn, 
                         "quantity": qty, 

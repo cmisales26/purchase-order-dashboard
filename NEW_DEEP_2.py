@@ -2331,44 +2331,49 @@ def main():
                 "Custom Product": ""  # Empty for custom entry
             }
             
+            # Initialize session state for products
+            if "product_selections" not in st.session_state:
+                st.session_state.product_selections = {}
+            if "product_descriptions" not in st.session_state:
+                st.session_state.product_descriptions = {}
+            
             for i in range(num_items):
                 with st.expander(f"Product {i+1}", expanded=True):
-                    # Initialize session state for product selection if not exists
-                    if f"selected_product_{i}" not in st.session_state:
-                        st.session_state[f"selected_product_{i}"] = "Autodesk BIM Collaborate Pro"
+                    # Initialize default values for this product
+                    if i not in st.session_state.product_selections:
+                        st.session_state.product_selections[i] = "Autodesk BIM Collaborate Pro"
+                        st.session_state.product_descriptions[i] = product_options["Autodesk BIM Collaborate Pro"]
                     
-                    if f"product_desc_{i}" not in st.session_state:
-                        st.session_state[f"product_desc_{i}"] = product_options["Autodesk BIM Collaborate Pro"]
+                    # Product selection dropdown with on_change callback
+                    def update_description(i=i):
+                        selected_product = st.session_state[f"product_select_{i}"]
+                        st.session_state.product_selections[i] = selected_product
+                        if selected_product != "Custom Product":
+                            st.session_state.product_descriptions[i] = product_options[selected_product]
+                        else:
+                            st.session_state.product_descriptions[i] = ""
                     
-                    # Product selection dropdown
                     selected_product = st.selectbox(
                         f"Select Product {i+1}",
                         options=list(product_options.keys()),
-                        index=list(product_options.keys()).index(st.session_state[f"selected_product_{i}"]),
-                        key=f"product_select_{i}"
+                        index=list(product_options.keys()).index(st.session_state.product_selections[i]),
+                        key=f"product_select_{i}",
+                        on_change=update_description
                     )
-                    
-                    # Update description when dropdown changes
-                    if selected_product != st.session_state[f"selected_product_{i}"]:
-                        st.session_state[f"selected_product_{i}"] = selected_product
-                        if selected_product != "Custom Product":
-                            st.session_state[f"product_desc_{i}"] = product_options[selected_product]
-                        else:
-                            st.session_state[f"product_desc_{i}"] = ""
                     
                     # Text area for product description - automatically populated from dropdown
                     desc = st.text_area(
                         f"Product Description {i+1}",
-                        value=st.session_state[f"product_desc_{i}"],
+                        value=st.session_state.product_descriptions[i],
                         key=f"invoice_desc_{i}"
                     )
                     
-                    # Update session state when user manually edits the text area
-                    if desc != st.session_state[f"product_desc_{i}"]:
-                        st.session_state[f"product_desc_{i}"] = desc
-                        # If the description doesn't match any predefined product, set to Custom Product
+                    # Update description in session state when manually edited
+                    if desc != st.session_state.product_descriptions[i]:
+                        st.session_state.product_descriptions[i] = desc
+                        # If description doesn't match any predefined product, switch to Custom Product
                         if desc not in product_options.values():
-                            st.session_state[f"selected_product_{i}"] = "Custom Product"
+                            st.session_state.product_selections[i] = "Custom Product"
                     
                     # Additional details section
                     st.subheader(f"Additional Details for Product {i+1}")
@@ -2382,7 +2387,7 @@ def main():
                         end_date = st.text_input(f"End Date {i+1}", "", key=f"end_date_{i}")
                     
                     # Combine all details into final description
-                    final_description = desc  # Start with the main description
+                    final_description = st.session_state.product_descriptions[i]  # Use the current description
                     if serial_no:
                         final_description += f"\nSerial #: {serial_no}"
                     if contract_no:
@@ -2406,6 +2411,7 @@ def main():
                         "unit_rate": rate
                     })
 
+            # Rest of your code remains the same...
             st.subheader("Declaration")
             declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
             

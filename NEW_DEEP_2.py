@@ -1328,7 +1328,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 12)
     # Write just the label part in bold
     label_part = "Amount Chargeable (in words): "
-    pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTR", ln=0)
+    pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LT", ln=0)
 
     pdf.set_font(pdf.default_font, "", 12)
     # Write the value part in normal font and complete the border

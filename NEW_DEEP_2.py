@@ -2338,43 +2338,38 @@ def main():
                 st.session_state.product_descriptions = {}
             
             for i in range(num_items):
+
                 with st.expander(f"Product {i+1}", expanded=True):
 
-                    # Initialize default values only once
+                    # Initialize session state variables only once
                     if f"product_select_{i}" not in st.session_state:
                         st.session_state[f"product_select_{i}"] = "Autodesk BIM Collaborate Pro"
-                        st.session_state.product_descriptions[i] = product_options["Autodesk BIM Collaborate Pro"]
+                        st.session_state[f"product_desc_{i}"] = product_options["Autodesk BIM Collaborate Pro"]
 
-                    # Callback to update description
-                    def update_description(i=i):
-                        selected = st.session_state[f"product_select_{i}"]
-                        if selected != "Custom Product":
-                            st.session_state.product_descriptions[i] = product_options[selected]
-                        else:
-                            st.session_state.product_descriptions[i] = ""
-
-                    # Product dropdown
-                    st.selectbox(
+                    # --- DROPDOWN ---
+                    current_selection = st.selectbox(
                         f"Select Product {i+1}",
                         list(product_options.keys()),
-                        key=f"product_select_{i}",
-                        on_change=update_description
+                        key=f"product_select_{i}"
                     )
 
-                    # Text area (pre-loaded from session state)
+                    # --- AUTO UPDATE DESCRIPTION WHEN DROPDOWN CHANGES ---
+                    if current_selection != "Custom Product":
+                        st.session_state[f"product_desc_{i}"] = product_options[current_selection]
+
+                    # --- TEXT AREA ---
                     desc = st.text_area(
                         f"Product Description {i+1}",
-                        value=st.session_state.product_descriptions[i],
+                        value=st.session_state[f"product_desc_{i}"],
                         key=f"invoice_desc_{i}"
                     )
 
-                    # If user manually edits description
-                    if desc != st.session_state.product_descriptions[i]:
-                        st.session_state.product_descriptions[i] = desc
-                        if desc not in product_options.values():
-                            st.session_state[f"product_select_{i}"] = "Custom Product"
+                    # If user manually edits description → switch to custom
+                    if desc != st.session_state[f"product_desc_{i}"]:
+                        st.session_state[f"product_desc_{i}"] = desc
+                        st.session_state[f"product_select_{i}"] = "Custom Product"
 
-                    # Additional details
+                    # --- EXTRA DETAILS ---
                     st.subheader(f"Additional Details for Product {i+1}")
                     col_detail1, col_detail2 = st.columns(2)
 
@@ -2386,7 +2381,7 @@ def main():
                         end_date = st.text_input(f"End Date {i+1}", "", key=f"end_date_{i}")
 
                     # Build final description
-                    final_description = st.session_state.product_descriptions[i]
+                    final_description = st.session_state[f"product_desc_{i}"]
                     if serial_no:
                         final_description += f"\nSerial #: {serial_no}"
                     if contract_no:
@@ -2397,7 +2392,6 @@ def main():
                     st.info("**Final Product Description:**")
                     st.text(final_description)
 
-                    # Other fields
                     hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
                     qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00, key=f"invoice_rate_{i}")

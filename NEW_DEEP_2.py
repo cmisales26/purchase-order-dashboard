@@ -1116,7 +1116,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if actual_height < 8:
         remaining_height = 8 - actual_height
         pdf.set_xy(153, y_after)
-        pdf.cell(48, remaining_height, "", border="LRT", ln=True)
+        pdf.cell(48, remaining_height, "", border="LR", ln=True)
 
     # Supplier's reference
     pdf.set_x(105)

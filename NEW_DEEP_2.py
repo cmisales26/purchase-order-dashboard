@@ -1104,7 +1104,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Set position and draw the payment terms cell
     pdf.set_xy(153, y_before)
-    pdf.multi_cell(48, 4, payment_terms, border="LRT", align="L")
+    pdf.multi_cell(48, 4, payment_terms, border="LRT")
 
     # Get Y position after adding the cell
     y_after = pdf.get_y()

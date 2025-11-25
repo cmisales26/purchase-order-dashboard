@@ -1649,10 +1649,10 @@ def number_to_words(number):
     """Convert number to words"""
     try:
         from num2words import num2words
-        return num2words(number, lang='en_IN').title() + " Rupees Only"
+        return num2words(number, lang='en_IN').title() + " Rupees Only/-"
     except ImportError:
         # Simple fallback if num2words is not available
-        words = f"Rupees {number:,.2f} Only"
+        words = f"Rupees {number:,.2f} Only/-"
         return words
 
 # If you don't have num2words installed, you can install it with:
@@ -2379,9 +2379,9 @@ def main():
                         
                         if paise > 0:
                             paise_text = num2words(paise, to='cardinal', lang='en_IN').title()
-                            return f"{rupees_text} Rupees And {paise_text} Paise Only"
+                            return f"{rupees_text} Rupees And {paise_text} Paise Only/-"
                         else:
-                            return f"{rupees_text} Rupees Only"
+                            return f"{rupees_text} Rupees Only/-"
                             
                     except Exception as e:
                         return f"Amount: ₹{amount:.2f}"

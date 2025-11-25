@@ -1334,7 +1334,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Write the value part in normal font and complete the border
     value_part = invoice_data['totals']['amount_in_words']
     remaining_width = 189.7 - pdf.get_string_width(label_part)
-    pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
+    pdf.cell(remaining_width, 5, value_part, border="TR", ln=True)
 
     # Check if we need a new page before tax summary
     if pdf.get_y() + 60 > pdf.page_break_trigger:
@@ -2304,116 +2304,28 @@ def main():
             st.subheader("Buyer Details")
             buyer_name = st.text_input(
                 "Buyer Name",
-                value=st.session_state.get("po_end_company", "Baldridge Pvt Ltd.")
+                value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
             )
             buyer_address = st.text_area(
                 "Buyer Address",
-                value=st.session_state.get("po_end_address", "406, Sakar East,...")
+                value=st.session_state.get("po_end_address","406, Sakar East,...")
             )
             buyer_gst = st.text_input(
                 "Buyer GST No.",
-                value=st.session_state.get("po_end_gst_no", "24AAHCB9")
+                value=st.session_state.get("po_end_gst_no","24AAHCB9")
             )
 
             st.subheader("Products")
             items = []
             num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
-
-            # Product list
-            product_options = {
-                "Autodesk BIM Collaborate Pro": "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription",
-                "Autodesk AutoCAD": "Autodesk AutoCAD - Single-user\nCLOUD Commercial New Annual Subscription",
-                "Autodesk Revit": "Autodesk Revit - Single-user\nCLOUD Commercial New Annual Subscription",
-                "Autodesk Civil 3D": "Autodesk Civil 3D - Single-user\nCLOUD Commercial New Annual Subscription",
-                "Autodesk Fusion 360": "Autodesk Fusion 360 - Single-user\nCLOUD Commercial New Annual Subscription",
-                "Microsoft Office 365": "Microsoft Office 365 Business Premium\nAnnual Subscription",
-                "Adobe Creative Cloud": "Adobe Creative Cloud All Apps\nAnnual Subscription",
-                "Custom Product": ""
-            }
-
-            # Initialize session state
-            if "product_selections" not in st.session_state:
-                st.session_state.product_selections = {}
-            if "product_descriptions" not in st.session_state:
-                st.session_state.product_descriptions = {}
-
             for i in range(num_items):
-                with st.expander(f"Product {i+1}", expanded=True):
-
-                    # Default selection
-                    if i not in st.session_state.product_selections:
-                        st.session_state.product_selections[i] = "Autodesk BIM Collaborate Pro"
-                        st.session_state.product_descriptions[i] = product_options["Autodesk BIM Collaborate Pro"]
-
-                    # Update description when product changes
-                    def update_description(i=i):
-                        product = st.session_state[f"product_select_{i}"]
-                        st.session_state.product_selections[i] = product
-                        st.session_state.product_descriptions[i] = (
-                            product_options[product] if product != "Custom Product" else ""
-                        )
-
-                    # Product dropdown
-                    selected_product = st.selectbox(
-                        f"Select Product {i+1}",
-                        options=list(product_options.keys()),
-                        index=list(product_options.keys()).index(st.session_state.product_selections[i]),
-                        key=f"product_select_{i}",
-                        on_change=update_description
-                    )
-
-                    # Product description (auto-filled or editable)
-                    desc = st.text_area(
-                        f"Product Description {i+1}",
-                        value=st.session_state.product_descriptions[i],
-                        key=f"invoice_desc_{i}"
-                    )
-
-                    # Manual update
-                    if desc != st.session_state.product_descriptions[i]:
-                        st.session_state.product_descriptions[i] = desc
-                        if desc not in product_options.values():
-                            st.session_state.product_selections[i] = "Custom Product"
-
-                    # Additional details
-                    st.subheader(f"Additional Details for Product {i+1}")
-                    col_detail1, col_detail2 = st.columns(2)
-
-                    with col_detail1:
-                        serial_no = st.text_input(f"Serial No. {i+1}", "", key=f"serial_{i}")
-                        contract_no = st.text_input(f"Contract No. {i+1}", "", key=f"contract_{i}")
-
-                    with col_detail2:
-                        end_date = st.text_input(f"End Date {i+1}", "", key=f"end_date_{i}")
-
-                    # Build final description
-                    final_description = st.session_state.product_descriptions[i]
-                    if serial_no:
-                        final_description += f"\nSerial #: {serial_no}"
-                    if contract_no:
-                        final_description += f"\nContract #: {contract_no}"
-                    if end_date:
-                        final_description += f"\nEnd Date: {end_date}"
-
-                    st.info("**Final Product Description:**")
-                    st.text(final_description)
-
-                    # HSN, Qty, Rate
+                with st.expander(f"Product {i+1}"):
+                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
                     hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
                     qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000.00, 36500.00, key=f"invoice_rate_{i}")
+                    items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
 
-                    # FINAL: store product + description + other details
-                    items.append({
-                        "product": st.session_state.product_selections[i],   # 🔥 product name included
-                        "description": final_description,
-                        "hsn": hsn,
-                        "quantity": qty,
-                        "unit_rate": rate
-                    })
-
-
-            # Rest of your code remains the same...
             st.subheader("Declaration")
             declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
             
@@ -2446,9 +2358,9 @@ def main():
                         "buyers_order_no": buyers_order_no,
                         "buyers_order_date": buyers_order_date,
                         "dispatched_through": dispatched_through,
-                        "payment_terms": payment_terms,
+                        "payment_terms": payment_terms,  # NEW FIELD
                         "terms_of_delivery": terms_of_delivery,
-                        "destination": destination
+                        "destination": destination  # NEW FIELD
                     },
                     "items": items,
                     "totals": {

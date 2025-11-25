@@ -2323,7 +2323,7 @@ def main():
             items = []
             num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
             for i in range(num_items):
-                with st.expander(f"Product {i+1}", expanded=True):
+                with st.expander(f"Product {i+1}"):
                     desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
                     hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
                     qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
@@ -2351,10 +2351,16 @@ def main():
                 basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
                 sgst = round(basic_amount * 0.09, 2)
                 cgst = round(basic_amount * 0.09, 2)
-                final_amount = round(basic_amount + sgst + cgst, 2)
+                final_amount_unrounded = basic_amount + sgst + cgst
+                
+                # ROUND TO WHOLE NUMBER LIKE PO GENERATOR
+                final_amount = round(final_amount_unrounded)
+                round_off = final_amount - final_amount_unrounded
                 
                 # Display calculated amounts for verification
                 st.info(f"**Calculated Amounts:** Basic: ₹{basic_amount:.2f}, SGST: ₹{sgst:.2f}, CGST: ₹{cgst:.2f}, Final: ₹{final_amount:.2f}")
+                if round_off != 0:
+                    st.info(f"**Round Off:** ₹{round_off:.2f}")
                 
                 # Convert to words with proper Indian currency format
                 def convert_to_indian_currency(amount):

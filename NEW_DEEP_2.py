@@ -292,6 +292,28 @@ def generate_quotation_number(sales_person, sequence_number):
     
     return f"CMI/{sales_person}/{quarter}/{current_date.strftime('%d-%m-%Y')}/{year_range}_{sequence}"
 
+# --- Add this function with other helper functions ---
+def calculate_quotation_totals(products):
+    """Calculate quotation totals with round-off like PO generator"""
+    products_total = 0
+    for p in products:
+        gst_amt = p["basic"] * p["gst_percent"] / 100
+        per_unit_price = p["basic"] + gst_amt
+        total = per_unit_price * p["qty"]
+        products_total += total
+
+    # Calculate round off to make final amount whole number (like PO)
+    rounded_total = round(products_total)
+    round_off = rounded_total - products_total
+    
+    return {
+        "total_base": sum(p["basic"] * p["qty"] for p in products),
+        "total_gst": sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in products),
+        "grand_total_unrounded": products_total,
+        "grand_total": rounded_total,
+        "round_off": round_off
+    }
+
 def get_next_sequence_number(quotation_number):
     """Extract and increment sequence number from quotation number"""
     try:
@@ -681,15 +703,15 @@ def add_page_two_commercials(pdf, data):
 
     # Table Rows
     pdf.set_font(pdf.default_font, "", 12)
-    grand_total = 0.0
+    grand_total_unrounded = 0.0
     
     for product in data["products"]:
         basic_price = product["basic"]
         qty = product["qty"]
-        gst_amount = basic_price * 0.18
+        gst_amount = basic_price * (product.get("gst_percent", 18.0) / 100)
         per_unit_price = basic_price + gst_amount
         total = per_unit_price * qty
-        grand_total += total
+        grand_total_unrounded += total
         
         # Get current position
         start_y = pdf.get_y()
@@ -731,7 +753,15 @@ def add_page_two_commercials(pdf, data):
             pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
             pdf.ln()
 
-    # Grand Total Row - FIXED ALIGNMENT
+    # Round Off Row (NEW - like PO)
+    round_off = data.get('round_off', 0.0)
+    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.cell(sum(col_widths[:-1]), 7, "Round Off", border=1, align="R")
+    pdf.cell(col_widths[5], 7, f"{round_off:,.2f}", border=1, align="R")
+    pdf.ln()
+
+    # Grand Total Row - FIXED ALIGNMENT (using rounded total)
+    grand_total = data.get('grand_total', grand_total_unrounded)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
@@ -3019,17 +3049,18 @@ def main():
         st.info(f"**Sales Person:** {current_sales_person_info['name']} ({sales_person}) - {current_sales_person_info['email']}")
         
         # Calculate totals
-        total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
-        total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.quotation_products)
-        grand_total = total_base + total_gst
+        # Calculate totals with round-off (like PO)
+        totals = calculate_quotation_totals(st.session_state.quotation_products)
         
-        col3, col4, col5 = st.columns(3)
+        col3, col4, col5, col6 = st.columns(4)
         with col3:
-            st.metric("Total Base Amount", f"₹{total_base:,.2f}")
+            st.metric("Total Base Amount", f"₹{totals['total_base']:,.2f}")
         with col4:
-            st.metric("Total GST (18%)", f"₹{total_gst:,.2f}")
+            st.metric("Total GST", f"₹{totals['total_gst']:,.2f}")
         with col5:
-            st.metric("Grand Total", f"₹{grand_total:,.2f}")
+            st.metric("Round Off", f"₹{totals['round_off']:,.2f}")
+        with col6:
+            st.metric("Grand Total", f"₹{totals['grand_total']:,.2f}")
         
         # Use global images
         st.subheader("Company Branding")
@@ -3046,6 +3077,11 @@ def main():
             if not st.session_state.quotation_products:
                 st.error("Please add at least one product to generate the quotation.")
             else:
+                # Use rounded total for quotation (like PO)
+                totals = calculate_quotation_totals(st.session_state.quotation_products)
+                grand_total = totals['grand_total']
+                amount_words = number_to_words(grand_total)
+
                 quotation_data = {
                     "quotation_number": st.session_state.quotation_number,
                     "quotation_date": today.strftime("%d-%m-%Y"),
@@ -3056,7 +3092,9 @@ def main():
                     "vendor_mobile": vendor_mobile,
                     "products": st.session_state.quotation_products,
                     "price_validity": price_validity,
-                    "grand_total": grand_total,
+                    "grand_total": grand_total,  # Use rounded total
+                    "round_off": totals['round_off'],  # Include round off for display
+                    "amount_words": amount_words,  # Words for rounded amount
                     "subject": subject_line,
                     "intro_paragraph": intro_paragraphs_1,
                     "product_name": selected_product if selected_product else "Software",   

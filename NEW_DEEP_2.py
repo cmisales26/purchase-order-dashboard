@@ -2994,9 +2994,11 @@ def main():
                     help="Enter the main title that will appear below annexure"
                 )
             
-            # Product selection from catalog
-            selected_product = st.selectbox("Select from Product Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="quote_product_select")
-            if st.button("➕ Add Selected Product", key="add_selected_quote"):
+            # --- SAME PRODUCT SELECTION LOGIC AS PO ---
+            st.subheader("Add Products")
+            selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="quote_product_select_catalog")
+            
+            if st.button("➕ Add Selected Product", key="quote_add_selected_product"):
                 if selected_product:
                     details = PRODUCT_CATALOG[selected_product]
                     st.session_state.quotation_products.append({
@@ -3007,41 +3009,20 @@ def main():
                     })
                     st.success(f"{selected_product} added!")
             
-            # Custom product addition
-            with st.expander("➕ Add Custom Product"):
-                custom_name = st.text_input("Product Name", key="quote_custom_name")
-                custom_basic = st.number_input("Basic Price (₹)", min_value=0.0, value=0.0, format="%.2f", key="quote_custom_basic")
-                custom_gst = st.number_input("GST %", min_value=0.0, max_value=100.0, value=18.0, format="%.1f", key="quote_custom_gst")
-                custom_qty = st.number_input("Quantity", min_value=1.0, value=1.0, format="%.0f", key="quote_custom_qty")
-                
-                if st.button("Add Custom Product", key="add_custom_quote"):
-                    if custom_name:
-                        st.session_state.quotation_products.append({
-                            "name": custom_name,
-                            "basic": custom_basic,
-                            "gst_percent": custom_gst,
-                            "qty": custom_qty,
-                        })
-                        st.success(f"Custom product '{custom_name}' added!")
-            
-            # Display current products
+            if st.button("➕ Add Empty Product", key="quote_add_empty_product"):
+                st.session_state.quotation_products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+
+            # Display current products with EDITABLE fields (same as PO)
             st.subheader("Current Products")
-            if not st.session_state.quotation_products:
-                st.info("No products added yet.")
-            else:
-                for i, product in enumerate(st.session_state.quotation_products):
-                    with st.expander(f"Product {i+1}: {product['name']}", expanded=True):
-                        col_a, col_b, col_c = st.columns([3, 1, 1])
-                        with col_a:
-                            st.text_input("Name", product["name"], key=f"quote_name_{i}", disabled=True)
-                        with col_b:
-                            st.number_input("Basic Price", value=product["basic"], format="%.2f", key=f"quote_basic_{i}", disabled=True)
-                        with col_c:
-                            st.number_input("Qty", value=product["qty"], format="%.0f", key=f"quote_qty_{i}", disabled=True)
-                        
-                        if st.button("Remove", key=f"quote_remove_{i}"):
-                            st.session_state.quotation_products.pop(i)
-                            st.rerun()
+            for i, p in enumerate(st.session_state.quotation_products):
+                with st.expander(f"Product {i+1}: {p['name']}", expanded=i == 0):
+                    st.session_state.quotation_products[i]["name"] = st.text_input("Name", p["name"], key=f"quote_name_{i}")
+                    st.session_state.quotation_products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"quote_basic_{i}")
+                    st.session_state.quotation_products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"quote_gst_{i}")
+                    st.session_state.quotation_products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"quote_qty_{i}")
+                    if st.button("Remove", key=f"quote_remove_{i}"):
+                        st.session_state.quotation_products.pop(i)
+                        st.rerun()
         
         # Preview and Generate Section
         st.header("Preview & Generate Quotation")
@@ -3054,15 +3035,19 @@ def main():
         # Calculate totals with round-off (like PO)
         totals = calculate_quotation_totals(st.session_state.quotation_products)
         
-        col3, col4, col5, col6 = st.columns(4)
+        # Preview and totals calculation (same as PO)
+        total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
+        total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.quotation_products)
+        grand_total = total_base + total_gst
+        amount_words = num2words(grand_total, to="currency", currency="INR").title()
+        
+        col3, col4, col5 = st.columns(3)
         with col3:
-            st.metric("Total Base Amount", f"₹{totals['total_base']:,.2f}")
+            st.metric("Total Base Amount", f"₹{total_base:,.2f}")
         with col4:
-            st.metric("Total GST", f"₹{totals['total_gst']:,.2f}")
+            st.metric("Total GST", f"₹{total_gst:,.2f}")
         with col5:
-            st.metric("Round Off", f"₹{totals['round_off']:,.2f}")
-        with col6:
-            st.metric("Grand Total", f"₹{totals['grand_total']:,.2f}")
+            st.metric("Grand Total", f"₹{grand_total:,.2f}")
         
         # Use global images
         st.subheader("Company Branding")
@@ -3075,35 +3060,46 @@ def main():
         if not stamp_path:
             st.warning("⚠ No company stamp available")
         
-        if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
-            if not st.session_state.quotation_products:
-                st.error("Please add at least one product to generate the quotation.")
-            else:
-                # Use rounded total for quotation (like PO)
-                totals = calculate_quotation_totals(st.session_state.quotation_products)
-                grand_total = totals['grand_total']
-                amount_words = number_to_words(grand_total)
+            if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
+                if not st.session_state.quotation_products:
+                    st.error("Please add at least one product to generate the quotation.")
+                else:
+                    # Calculate total from all products (same as PO logic)
+                    products_total = 0
+                    for p in st.session_state.quotation_products:
+                        gst_amt = p["basic"] * p["gst_percent"] / 100
+                        per_unit_price = p["basic"] + gst_amt
+                        total = per_unit_price * p["qty"]
+                        products_total += total
 
-                quotation_data = {
-                    "quotation_number": st.session_state.quotation_number,
-                    "quotation_date": today.strftime("%d-%m-%Y"),
-                    "vendor_name": vendor_name,
-                    "vendor_address": vendor_address,
-                    "vendor_email": vendor_email,
-                    "vendor_contact": vendor_contact,
-                    "vendor_mobile": vendor_mobile,
-                    "products": st.session_state.quotation_products,
-                    "price_validity": price_validity,
-                    "grand_total": grand_total,  # Use rounded total
-                    "round_off": totals['round_off'],  # Include round off for display
-                    "amount_words": amount_words,  # Words for rounded amount
-                    "subject": subject_line,
-                    "intro_paragraph": intro_paragraphs_1,
-                    "product_name": selected_product if selected_product else "Software",   
-                    "sales_person_code": sales_person,  
-                    "annexure_text": annexure_text,  
-                    "quotation_title": quotation_title
-                }
+                    # Calculate round off to make final amount whole number (same as PO)
+                    rounded_total = round(products_total)
+                    round_off = rounded_total - products_total
+
+                    # Update grand_total and amount_words with rounded amount
+                    grand_total = rounded_total
+                    amount_words = number_to_words(rounded_total)
+
+                    quotation_data = {
+                        "quotation_number": st.session_state.quotation_number,
+                        "quotation_date": today.strftime("%d-%m-%Y"),
+                        "vendor_name": vendor_name,
+                        "vendor_address": vendor_address,
+                        "vendor_email": vendor_email,
+                        "vendor_contact": vendor_contact,
+                        "vendor_mobile": vendor_mobile,
+                        "products": st.session_state.quotation_products,
+                        "price_validity": price_validity,
+                        "grand_total": grand_total,  # Updated with rounded amount
+                        "round_off": round_off,  # Include round off for display
+                        "amount_words": amount_words,  # Words for rounded amount
+                        "subject": subject_line,
+                        "intro_paragraph": intro_paragraphs_1,
+                        "product_name": selected_product if selected_product else "Software",   
+                        "sales_person_code": sales_person,  
+                        "annexure_text": annexure_text,  
+                        "quotation_title": quotation_title
+                    }
                 
                 try:
                     pdf_bytes = create_quotation_pdf(quotation_data, logo_path, stamp_path)

@@ -763,7 +763,7 @@ def add_page_two_commercials(pdf, data):
     # Grand Total Row - FIXED ALIGNMENT (using rounded total)
     grand_total = data.get('grand_total', grand_total_unrounded)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(sum(col_widths[:-1]), 7, "Grand Total", border=1, align="R")
+    pdf.cell(sum(col_widths[:-1]), 7, "Final Amount to be Paid ", border=1, align="R")
     pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
     pdf.ln(15)
 

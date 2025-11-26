@@ -771,6 +771,7 @@ def add_page_two_commercials(pdf, data):
     pdf.set_font(pdf.default_font, "", 9)
 
     # Terms & Conditions with ALL terms in bold
+    price_validity = data.get('price_validity', '10 days from Quotation date')
     terms = [
         ("1. Above charges are Inclusive of GST.", ""),
         ("2. Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.", ""),
@@ -778,7 +779,7 @@ def add_page_two_commercials(pdf, data):
         ("4. ELD licenses are paper licenses that do not contain media.", ""),
         ("5. An Internet connection is required to access cloud services.", ""),
         ("6. Training will be charged at extra cost depending on no. of participants.", ""),
-        ("7. Price Validity: ", "10 days from Quotation date"),
+        ("7. Price Validity: ", price_validity),
         ("8. Payment: ", "100% Advance along with purchase order"),
         ("9. Delivery period: ", "1-2 Weeks from the date of Purchase Order"),
         ("10. Support: ","Includes 12 months of technical support and software updates from OEM."),
@@ -2962,7 +2963,7 @@ def main():
                                         key="quote_vendor_mobile")
 
             st.header("Quotation Details")
-            price_validity = st.text_input("Price Validity", "September 29, 2025", key="quote_price_validity")
+            price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")
             subject_line = st.text_input("Subject", "Proposal for Adobe Commercial Software License", key="quote_subject")
             intro_paragraphs_1 = st.text_area("Introduction Paragraph",
             """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization. """,

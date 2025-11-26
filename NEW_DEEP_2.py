@@ -3060,46 +3060,46 @@ def main():
         if not stamp_path:
             st.warning("⚠ No company stamp available")
         
-            if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
-                if not st.session_state.quotation_products:
-                    st.error("Please add at least one product to generate the quotation.")
-                else:
-                    # Calculate total from all products (same as PO logic)
-                    products_total = 0
-                    for p in st.session_state.quotation_products:
-                        gst_amt = p["basic"] * p["gst_percent"] / 100
-                        per_unit_price = p["basic"] + gst_amt
-                        total = per_unit_price * p["qty"]
-                        products_total += total
+        if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
+            if not st.session_state.quotation_products:
+                st.error("Please add at least one product to generate the quotation.")
+            else:
+                # Calculate total from all products (same as PO logic)
+                products_total = 0
+                for p in st.session_state.quotation_products:
+                    gst_amt = p["basic"] * p["gst_percent"] / 100
+                    per_unit_price = p["basic"] + gst_amt
+                    total = per_unit_price * p["qty"]
+                    products_total += total
 
-                    # Calculate round off to make final amount whole number (same as PO)
-                    rounded_total = round(products_total)
-                    round_off = rounded_total - products_total
+                # Calculate round off to make final amount whole number (same as PO)
+                rounded_total = round(products_total)
+                round_off = rounded_total - products_total
 
-                    # Update grand_total and amount_words with rounded amount
-                    grand_total = rounded_total
-                    amount_words = number_to_words(rounded_total)
+                # Update grand_total and amount_words with rounded amount
+                grand_total = rounded_total
+                amount_words = number_to_words(rounded_total)
 
-                    quotation_data = {
-                        "quotation_number": st.session_state.quotation_number,
-                        "quotation_date": today.strftime("%d-%m-%Y"),
-                        "vendor_name": vendor_name,
-                        "vendor_address": vendor_address,
-                        "vendor_email": vendor_email,
-                        "vendor_contact": vendor_contact,
-                        "vendor_mobile": vendor_mobile,
-                        "products": st.session_state.quotation_products,
-                        "price_validity": price_validity,
-                        "grand_total": grand_total,  # Updated with rounded amount
-                        "round_off": round_off,  # Include round off for display
-                        "amount_words": amount_words,  # Words for rounded amount
-                        "subject": subject_line,
-                        "intro_paragraph": intro_paragraphs_1,
-                        "product_name": selected_product if selected_product else "Software",   
-                        "sales_person_code": sales_person,  
-                        "annexure_text": annexure_text,  
-                        "quotation_title": quotation_title
-                    }
+                quotation_data = {
+                    "quotation_number": st.session_state.quotation_number,
+                    "quotation_date": today.strftime("%d-%m-%Y"),
+                    "vendor_name": vendor_name,
+                    "vendor_address": vendor_address,
+                    "vendor_email": vendor_email,
+                    "vendor_contact": vendor_contact,
+                    "vendor_mobile": vendor_mobile,
+                    "products": st.session_state.quotation_products,
+                    "price_validity": price_validity,
+                    "grand_total": grand_total,  # Updated with rounded amount
+                    "round_off": round_off,  # Include round off for display
+                    "amount_words": amount_words,  # Words for rounded amount
+                    "subject": subject_line,
+                    "intro_paragraph": intro_paragraphs_1,
+                    "product_name": selected_product if selected_product else "Software",   
+                    "sales_person_code": sales_person,  
+                    "annexure_text": annexure_text,  
+                    "quotation_title": quotation_title
+                }
                 
                 try:
                     pdf_bytes = create_quotation_pdf(quotation_data, logo_path, stamp_path)

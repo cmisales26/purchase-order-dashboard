@@ -120,6 +120,34 @@ VENDOR_DATABASE = {
     }
 }
 
+
+
+# End User Database - You can expand this with more end users
+END_USER_DATABASE = {
+    "Baldridge & Associates Pvt Ltd.": {
+        "address": "406 Sakar East, Vadodara 390009",
+        "contact": "Mr. Dev",
+        "mobile": "1234567891",
+        "email": "info@company.com",
+        "gst_no": "24AAHCB9"
+    },
+    "Creation Studio": {
+        "address": "Al-Habtula Apartment, Swk Society, Sid, Dah, Guja 389",
+        "contact": "Mr. Musta", 
+        "mobile": "+91 9876543210",
+        "email": "info@dreamcreationstudio.com",
+        "gst_no": "24AABCU9603R1ZN"
+    },
+    "Base Engineering": {
+        "address": "406, Sakar East, Behind Big Bazaar, Alkapuri, Vadodara - 390007",
+        "contact": "Mr. Dhaval Mistry",
+        "mobile": "9898791813", 
+        "email": "dmistry@baseengr.com",
+        "gst_no": "24AAIFB7147L1ZH"
+    }
+}
+
+
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
     "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721"},
@@ -144,6 +172,23 @@ def update_vendor_fields(selected_vendor):
         st.session_state.po_gst_no = vendor_data.get("gst_no", "")
         st.session_state.po_pan_no = vendor_data.get("pan_no", "")
         st.session_state.po_msme_no = vendor_data.get("msme_no", "")
+
+# --- Helper Functions for End User Management ---
+def get_enduser_dropdown_options():
+    """Get end user names for dropdown"""
+    return ["Select End User"] + list(END_USER_DATABASE.keys())
+
+def update_enduser_fields(selected_enduser):
+    """Update session state with end user details when end user is selected"""
+    if selected_enduser and selected_enduser != "Select End User":
+        enduser_data = END_USER_DATABASE.get(selected_enduser, {})
+        st.session_state.po_end_company = selected_enduser
+        st.session_state.po_end_address = enduser_data.get("address", "")
+        st.session_state.po_end_person = enduser_data.get("contact", "")
+        st.session_state.po_end_mobile = enduser_data.get("mobile", "")
+        st.session_state.po_end_email = enduser_data.get("email", "")
+        st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
+
 
 # --- Helper Functions for Quotation and PO ---
 def get_current_quarter():
@@ -2343,13 +2388,28 @@ def main():
 
         with col2:
             st.subheader("Buyer Details")
+            
+            # End User Dropdown for Invoice
+            selected_enduser_invoice = st.selectbox(
+                "Select Buyer", 
+                options=get_enduser_dropdown_options(),
+                key="enduser_dropdown_invoice"
+            )
+            
+            # Update buyer fields when dropdown selection changes
+            if selected_enduser_invoice and selected_enduser_invoice != "Select End User":
+                enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
+                st.session_state.po_end_company = selected_enduser_invoice
+                st.session_state.po_end_address = enduser_data.get("address", "")
+                st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
+            
             buyer_name = st.text_input(
                 "Buyer Name",
-                value = st.session_state.get("po_end_company","Baldridge Pvt Ltd.")
+                value = st.session_state.get("po_end_company","Baldridge & Associates Pvt Ltd.")
             )
             buyer_address = st.text_area(
                 "Buyer Address",
-                value=st.session_state.get("po_end_address","406, Sakar East,...")
+                value=st.session_state.get("po_end_address","406 Sakar East, Vadodara 390009")
             )
             buyer_gst = st.text_input(
                 "Buyer GST No.",
@@ -2622,6 +2682,18 @@ def main():
                 )
                 
                 st.subheader("End User Details")
+                
+                # End User Dropdown
+                selected_enduser = st.selectbox(
+                    "Select End User", 
+                    options=get_enduser_dropdown_options(),
+                    key="enduser_dropdown_po"
+                )
+                
+                # Update end user fields when dropdown selection changes
+                if selected_enduser and selected_enduser != "Select End User":
+                    update_enduser_fields(selected_enduser)
+                
                 end_company = st.text_input(
                     "End User Company",
                     value=st.session_state.get("po_end_company", "Baldridge & Associates Pvt Ltd."),
@@ -2647,6 +2719,8 @@ def main():
                     value=st.session_state.get("po_end_email", "info@company.com"),
                     key="po_end_email"
                 )
+
+
             with col2:
                 st.subheader("Company & Tax Details")
                 bill_to_company = st.text_input(
@@ -2962,6 +3036,7 @@ def main():
             vendor_mobile = st.text_input("Mobile", 
                                         value=st.session_state.get("quote_vendor_mobile", "+91 9876543210"), 
                                         key="quote_vendor_mobile")
+            
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")

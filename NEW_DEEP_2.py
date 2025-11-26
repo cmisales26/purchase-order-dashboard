@@ -1938,6 +1938,14 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_address}")
     # Authorization Section
+
+    # Contact
+    pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(45, 5, "Contact")
+    pdf.cell(5, 4, ":")
+    pdf.set_font(pdf.default_font, "", 12)
+    pdf.multi_cell(0, 5, f"{sanitized_end_person}")
+
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(45, 5, "Mobile No:")
     pdf.cell(5, 4, ":")
@@ -1950,13 +1958,6 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_email}")
-
-    # Contact
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "Contact")
-    pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, f"{sanitized_end_person}")
 
     # pdf.ln(2)
     # pdf.set_font(pdf.default_font, "B", 12)
@@ -2716,9 +2717,9 @@ def main():
             st.header("Terms & Authorization")
             col1, col2 = st.columns(2)
             with col1:
-                payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date", key="po_payment_terms_input")
+                payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
                 delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
-                delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days", key="po_delivery_terms_input")
+                delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
             with col2:
                 prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
                 authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")

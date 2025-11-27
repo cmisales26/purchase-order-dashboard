@@ -1373,7 +1373,7 @@ def add_page_one_intro(pdf, data):
     pdf.set_font(pdf.default_font, "", 12)
     
     # Address handling
-    pdf.multi_cell(0, 4, pdf.sanitize_text(data['vendor_address']))
+    pdf.multi_cell(5, 4, pdf.sanitize_text(data['vendor_address']))
     
     pdf.ln(3)
     

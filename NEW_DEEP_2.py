@@ -3817,14 +3817,11 @@ def main():
                     mime="application/pdf"
                 )
                 
-    # --- Tab 3: Tax Invoice Generator ---
+        # --- Tab 3: Tax Invoice Generator ---
+        # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
-        
-        # DEBUG: Show current session state
-        st.sidebar.subheader("🔍 Debug - Invoice Session State")
-        st.sidebar.write(f"invoice_buyer_company: {st.session_state.get('invoice_buyer_company', 'NOT SET')}")
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
@@ -3832,7 +3829,7 @@ def main():
         # Invoice Settings in sidebar for this tab
         st.sidebar.header("Invoice Settings")
         
-        # Sales Person Selection for Invoice - SEPARATE FROM QUOTATION/PO
+        # Sales Person Selection for Invoice
         invoice_sales_person = st.sidebar.selectbox("Select Sales Person", 
                                             options=list(SALES_PERSON_MAPPING.keys()), 
                                             format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
@@ -3841,7 +3838,7 @@ def main():
         # Get current sales person info
         current_sales_person_info = SALES_PERSON_MAPPING.get(invoice_sales_person, SALES_PERSON_MAPPING['SD'])
         
-        # Generate invoice number based on selected sales person - SEPARATE LOGIC
+        # Generate invoice number
         def get_invoice_number():
             if st.session_state.last_invoice_number:
                 try:
@@ -3867,7 +3864,7 @@ def main():
             st.session_state.current_invoice_quarter = current_quarter
             st.session_state.invoice_number = get_invoice_number()
         
-        # Display current sales person info - SEPARATE FROM OTHER TABS
+        # Display current sales person info
         st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
         st.sidebar.info(f"**Current Quarter:** {current_quarter}")
         
@@ -3879,7 +3876,7 @@ def main():
         except:
             st.sidebar.warning("Could not parse invoice number")
         
-        # Editable invoice number - SEPARATE EDITOR
+        # Editable invoice number
         st.sidebar.subheader("Invoice Number Editor")
         
         # Parse current invoice number for editing
@@ -3958,67 +3955,48 @@ def main():
         with col2:
             st.subheader("Buyer Details")
             
-            # DEBUG: Show what's happening
-            st.write("### 🔍 Debug Info:")
-            st.write(f"Current session state - Company: {st.session_state.get('invoice_buyer_company', 'NOT SET')}")
-            
-            # Get dropdown options
-            enduser_options = get_enduser_dropdown_options()
-            st.write(f"Dropdown options: {enduser_options}")
-            
-            # Find current index for dropdown
-            current_company = st.session_state.get('invoice_buyer_company', 'Baldridge & Associates Pvt Ltd.')
-            current_index = 0
-            if current_company in enduser_options:
-                current_index = enduser_options.index(current_company)
-            st.write(f"Current index in dropdown: {current_index}")
-            
-            # End User Dropdown for Invoice - FIXED VERSION
+            # SIMPLE DROPDOWN LIKE QUOTATION TAB
             selected_enduser_invoice = st.selectbox(
                 "Select Buyer", 
-                options=enduser_options,
-                index=current_index,
-                key="enduser_dropdown_invoice_unique"
+                options=get_enduser_dropdown_options(),
+                key="enduser_dropdown_invoice"
             )
             
-            st.write(f"Selected from dropdown: {selected_enduser_invoice}")
-            
-            # Update buyer fields when dropdown selection changes
+            # UPDATE BUYER FIELDS WHEN DROPDOWN SELECTION CHANGES - SIMPLE LIKE QUOTATION
             if selected_enduser_invoice and selected_enduser_invoice != "Select End User":
-                st.write(f"🔄 Updating session state with: {selected_enduser_invoice}")
                 enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
                 st.session_state.invoice_buyer_company = selected_enduser_invoice
                 st.session_state.invoice_buyer_address = enduser_data.get("address", "")
                 st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
             
-            # Use the updated session state values in the text inputs
+            # USE SESSION STATE VALUES IN TEXT INPUTS - SIMPLE LIKE QUOTATION
             buyer_name = st.text_input(
                 "Buyer Name",
-                value=st.session_state.invoice_buyer_company,
-                key="invoice_buyer_name_input_unique"
+                value=st.session_state.get("invoice_buyer_company", "Baldridge & Associates Pvt Ltd."),
+                key="invoice_buyer_name_input"
             )
             
             buyer_address = st.text_area(
                 "Buyer Address",
-                value=st.session_state.invoice_buyer_address,
-                key="invoice_buyer_address_input_unique"
+                value=st.session_state.get("invoice_buyer_address", "406 Sakar East, Vadodara 390009"),
+                key="invoice_buyer_address_input"
             )
             
             buyer_gst = st.text_input(
                 "Buyer GST No.",
-                value=st.session_state.invoice_buyer_gst,
-                key="invoice_buyer_gst_input_unique"
+                value=st.session_state.get("invoice_buyer_gst", "24AAHCB9"),
+                key="invoice_buyer_gst_input"
             )
 
             st.subheader("Products")
             items = []
-            num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items_unique")
+            num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
             for i in range(num_items):
                 with st.expander(f"Product {i+1}"):
-                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}_unique")
-                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}_unique")
-                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}_unique")
-                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, 36500.00, key=f"invoice_rate_{i}_unique")
+                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
+                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
+                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
+                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, 36500.00, key=f"invoice_rate_{i}")
                     rate = round(rate, 2)
                     items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
 
@@ -4037,7 +4015,7 @@ def main():
             
             st.subheader("Invoice Preview & Download")
 
-            if st.button("Generate Invoice", key="generate_invoice_button_unique"):
+            if st.button("Generate Invoice", key="generate_invoice_button"):
                 # Calculate amounts with proper rounding like in PO generator
                 basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
                 sgst = round(basic_amount * 0.09, 2)
@@ -4117,7 +4095,7 @@ def main():
                     data=pdf_file,
                     file_name=f"Invoice_{invoice_no.replace('/', '_')}.pdf",
                     mime="application/pdf",
-                    key="invoice_download_button_unique")
+                    key="invoice_download_button")
                                 
     # Clean up temporary files
     for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_stamp.jpg"]:

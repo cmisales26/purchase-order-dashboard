@@ -3973,25 +3973,24 @@ def main():
                 st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
             
             # USE SESSION STATE VALUES IN TEXT INPUTS - SIMPLE LIKE QUOTATION
-            # UPDATE TEXT INPUT FIELDS TO USE END USER DATA INSTEAD OF VENDOR DATA
-            vendor_name = st.text_input("Company Name", 
-                                    value=st.session_state.get("quote_end_company", "Baldridge & Associates Pvt Ltd."), 
-                                    key="quote_end_company")
-            vendor_address = st.text_area("Company Address", 
-                                        value=st.session_state.get("quote_end_address", "406 Sakar East, Vadodara 390009"), 
-                                        key="quote_end_address")
-            vendor_email = st.text_input("Email", 
-                                    value=st.session_state.get("quote_end_email", "info@company.com"), 
-                                    key="quote_end_email")
-            vendor_contact = st.text_input("Contact Person (Kind Attention)", 
-                                        value=st.session_state.get("quote_end_person", "Mr. Dev"), 
-                                        key="quote_end_person")
-            vendor_mobile = st.text_input("Mobile", 
-                                        value=st.session_state.get("quote_end_mobile", "1234567891"), 
-                                        key="quote_end_mobile")
-            vendor_gst = st.text_input("GST No (Optional)", 
-                                        value=st.session_state.get("quote_end_gst_no", ""), 
-                                        key="quote_end_gst_no")
+            buyer_name = st.text_input(
+                "Buyer Name",
+                value=st.session_state.get("invoice_buyer_company", "Baldridge & Associates Pvt Ltd."),
+                key="invoice_buyer_company"
+            )
+            
+            buyer_address = st.text_area(
+                "Buyer Address",
+                value=st.session_state.get("invoice_buyer_address", "406 Sakar East, Vadodara 390009"),
+                key="invoice_buyer_address"
+            )
+            
+            buyer_gst = st.text_input(
+                "Buyer GST No.",
+                value=st.session_state.get("invoice_buyer_gst", "24AAHCB9"),
+                key="invoice_buyer_gst"
+            )
+
             st.subheader("Products")
             items = []
             num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
@@ -4060,8 +4059,8 @@ def main():
                 invoice_data = {
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},
                     "Reference": {"Suppliers_Reference": Suppliers_Reference, "Other": Others_Reference},
-                    "buyer": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
-                    # "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
+                    "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
+                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
                     "invoice_details": {
                         "buyers_order_no": buyers_order_no,
                         "buyers_order_date": buyers_order_date,

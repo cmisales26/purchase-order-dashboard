@@ -401,7 +401,6 @@ def get_po_sequence_stats():
         pass
     return {}
 
-
 def parse_po_number(po_number):
     """Parse PO number to extract components"""
     try:

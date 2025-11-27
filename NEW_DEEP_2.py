@@ -335,7 +335,48 @@ def reset_po_sequence(quarter=None, sales_person=None):
     except Exception as e:
         print(f"Error resetting sequence: {e}")
         return False
+    
+def initialize_simple_sequences():
+    """Initialize simple counter files with existing sequences"""
+    sequences = {
+        "CP": 15,  # Your current CP sequence
+        "SD": 8,   # Your current SD sequence
+        "HP": 3,   # Your current HP sequence
+        "KP": 2    # Your current KP sequence
+    }
+    
+    for sales_person, seq in sequences.items():
+        filename = f"po_counter_{sales_person}.txt"
+        try:
+            with open(filename, 'w') as f:
+                f.write(str(seq))
+            print(f"Initialized {sales_person} with sequence {seq}")
+        except Exception as e:
+            print(f"Error initializing {sales_person}: {e}")
 
+def get_next_po_sequence_simple(sales_person="CP"):
+    """Simple counter starting from existing sequences"""
+    filename = f"po_counter_{sales_person}.txt"
+    
+    try:
+        if os.path.exists(filename):
+            with open(filename, 'r') as f:
+                current = int(f.read().strip())
+        else:
+            # Initialize with default if file doesn't exist
+            defaults = {"CP": 15, "SD": 8, "HP": 3, "KP": 2}
+            current = defaults.get(sales_person, 0)
+        
+        next_seq = current + 1
+        
+        with open(filename, 'w') as f:
+            f.write(str(next_seq))
+        
+        return next_seq
+        
+    except Exception as e:
+        print(f"Error in simple counter: {e}")
+        return 1
 
 def parse_po_number(po_number):
     """Parse PO number to extract components"""

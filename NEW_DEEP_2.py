@@ -2332,8 +2332,8 @@ def main():
     if "company_name" not in st.session_state:
         st.session_state.company_name = "CM Infotech"
     if "po_number" not in st.session_state:
-        next_sequence = get_next_po_sequence(po_sales_person)  # Use the selected sales person
-        st.session_state.po_number = generate_po_number(po_sales_person, next_sequence)
+        next_sequence = get_next_po_sequence("CP")  # Use the selected sales person
+        st.session_state.po_number = generate_po_number("CP", next_sequence)
     if "po_date" not in st.session_state:
         st.session_state.po_date = datetime.date.today().strftime("%d-%m-%Y")
     if "last_po_number" not in st.session_state:

@@ -2255,9 +2255,9 @@ def main():
         st.info("Vendor & End User details auto-filled from Excel ✅")
 
     # Create tabs for different document types
-    tab1, tab2, tab3 = st.tabs(["Tax Invoice Generator", "Purchase Order Generator", "Quotation Generator"])
+    tab1, tab2, tab3 = st.tabs(["Quotation Generator", "Tax Invoice Generator", "Purchase Order Generator"])
 
-    # --- Tab 3: Quotation Generator ---
+    # --- Tab 1: Quotation Generator ---
     with tab3:
         st.header("📑 Adobe Software Quotation Generator")
         

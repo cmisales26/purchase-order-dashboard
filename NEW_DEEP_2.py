@@ -203,41 +203,138 @@ def get_current_quarter():
     else:
         return "Q4"
 
-import os
+# Enhanced PO sequence counter with quarter-based tracking
+import json
+import datetime
 
-# Simple file-based counter for PO sequence
-PO_COUNTER_FILE = "po_counter.txt"
+PO_COUNTER_FILE = "po_counter.json"
 
-def get_next_po_sequence():
-    """Simple file-based PO sequence counter"""
+def get_next_po_sequence(sales_person="CP"):
+    """Enhanced PO sequence counter with quarter and sales person tracking"""
+    current_date = datetime.datetime.now()
+    current_quarter = get_current_quarter()
+    current_year = str(current_date.year)
+    
     try:
-        # Read current number from file
+        # Read current counter data
         if os.path.exists(PO_COUNTER_FILE):
             with open(PO_COUNTER_FILE, 'r') as f:
+                counter_data = json.load(f)
+        else:
+            counter_data = {}
+        
+        # Initialize quarter data if not exists
+        quarter_key = f"{current_year}_{current_quarter}"
+        if quarter_key not in counter_data:
+            counter_data[quarter_key] = {}
+        
+        # Initialize sales person data if not exists
+        if sales_person not in counter_data[quarter_key]:
+            counter_data[quarter_key][sales_person] = 0
+        
+        # Increment sequence
+        next_seq = counter_data[quarter_key][sales_person] + 1
+        counter_data[quarter_key][sales_person] = next_seq
+        
+        # Save updated data
+        with open(PO_COUNTER_FILE, 'w') as f:
+            json.dump(counter_data, f, indent=2)
+        
+        return next_seq
+        
+    except Exception as e:
+        # Fallback to simple file-based counter
+        print(f"Error in enhanced counter: {e}")
+        return get_next_po_sequence_fallback(sales_person)
+
+def get_next_po_sequence_fallback(sales_person="CP"):
+    """Fallback simple counter"""
+    try:
+        filename = f"po_counter_{sales_person}.txt"
+        if os.path.exists(filename):
+            with open(filename, 'r') as f:
                 current = int(f.read().strip())
         else:
             current = 0
+        
+        next_seq = current + 1
+        
+        with open(filename, 'w') as f:
+            f.write(str(next_seq))
+        
+        return next_seq
     except:
-        current = 0
-    
-    # Increment
-    next_seq = current + 1
-    
-    # Save the new number back to file
-    with open(PO_COUNTER_FILE, 'w') as f:
-        f.write(str(next_seq))
-    
-    return next_seq
+        return 1
 
-def get_current_po_sequence():
+def get_current_po_sequence(sales_person="CP"):
     """Get current PO sequence without incrementing"""
     try:
         if os.path.exists(PO_COUNTER_FILE):
             with open(PO_COUNTER_FILE, 'r') as f:
+                counter_data = json.load(f)
+            
+            current_date = datetime.datetime.now()
+            current_quarter = get_current_quarter()
+            current_year = str(current_date.year)
+            quarter_key = f"{current_year}_{current_quarter}"
+            
+            if (quarter_key in counter_data and 
+                sales_person in counter_data[quarter_key]):
+                return counter_data[quarter_key][sales_person]
+    except:
+        pass
+    
+    # Fallback
+    try:
+        filename = f"po_counter_{sales_person}.txt"
+        if os.path.exists(filename):
+            with open(filename, 'r') as f:
                 return int(f.read().strip())
     except:
         pass
-    return 1
+    
+    return 0  # Return 0 instead of 1 to indicate no sequence started
+
+def get_po_sequence_stats():
+    """Get statistics about PO sequences"""
+    try:
+        if os.path.exists(PO_COUNTER_FILE):
+            with open(PO_COUNTER_FILE, 'r') as f:
+                counter_data = json.load(f)
+            return counter_data
+    except:
+        pass
+    return {}
+
+def reset_po_sequence(quarter=None, sales_person=None):
+    """Reset PO sequence for specific quarter and/or sales person"""
+    try:
+        if os.path.exists(PO_COUNTER_FILE):
+            with open(PO_COUNTER_FILE, 'r') as f:
+                counter_data = json.load(f)
+        else:
+            counter_data = {}
+        
+        if quarter and sales_person:
+            # Reset specific sales person in specific quarter
+            if quarter in counter_data and sales_person in counter_data[quarter]:
+                counter_data[quarter][sales_person] = 0
+        elif quarter:
+            # Reset entire quarter
+            counter_data[quarter] = {}
+        elif sales_person:
+            # Reset sales person across all quarters
+            for quarter_key in counter_data:
+                if sales_person in counter_data[quarter_key]:
+                    counter_data[quarter_key][sales_person] = 0
+        
+        with open(PO_COUNTER_FILE, 'w') as f:
+            json.dump(counter_data, f, indent=2)
+        
+        return True
+    except Exception as e:
+        print(f"Error resetting sequence: {e}")
+        return False
 
 
 def parse_po_number(po_number):

@@ -3973,7 +3973,7 @@ def main():
             buyer_name = st.text_input(
                 "Buyer Name",
                 value=st.session_state.get("invoice_buyer_company", "Baldridge & Associates Pvt Ltd."),
-                key="invoice_buyer_name"
+                key="invoice_buyer_company"
             )
             
             buyer_address = st.text_area(

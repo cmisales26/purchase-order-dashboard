@@ -486,7 +486,7 @@ class QUOTATION_PDF(FPDF):
 
     def footer(self):
         # Position from bottom (same as invoice)
-        self.set_y(-15)
+        self.set_y(-12)
         
         # Horizontal line
         # self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
@@ -1073,14 +1073,14 @@ class PDF(FPDF):
         # Add logo on every page (including second page)
         if self.logo_file and self.page_no() >= 1:  # Show logo on all pages
             try:
-                self.image(self.logo_file, x=165, y=2.5, w=35)
+                self.image(self.logo_file, x=155, y=8, w=50)
             except Exception as e:
                 # You can add a warning here if needed, but don't show in header
                 pass
-        
+        self.ln(9)
         self.set_font(self.default_font, "B", 15)
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
-        self.ln(3)
+        self.ln(5)
         
     def footer(self):
         # Position at 1.5 cm from bottom
@@ -1636,7 +1636,7 @@ class PO_PDF(FPDF):
             # Logo (if available)
             self.ln(1)
             if self.logo_path and os.path.exists(self.logo_path):
-                self.image(self.logo_path, x=155, y=5.5, w=45,link=self.website_url)
+                self.image(self.logo_path, x=155, y=8, w=50,link=self.website_url)
                 # (self.logo_path, x=155, y=8, w=50)
                 # (self.logo_path, x=160, y=5.5, w=45,link=self.website_url)
                 # self.image(self.logo_path, x=150, y=10, w=40)
@@ -1660,7 +1660,7 @@ class PO_PDF(FPDF):
 
     def footer(self):
         # Position from bottom (same as invoice)
-        self.set_y(-15)
+        self.set_y(-12)
         
         # Horizontal line
         # self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())

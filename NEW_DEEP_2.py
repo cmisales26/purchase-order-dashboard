@@ -486,7 +486,7 @@ class QUOTATION_PDF(FPDF):
 
     def footer(self):
         # Position from bottom (same as invoice)
-        self.set_y(-15)
+        self.set_y(-12)
         
         # Horizontal line
         # self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())

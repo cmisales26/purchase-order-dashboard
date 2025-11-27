@@ -3055,8 +3055,8 @@ def main():
     if "current_invoice_quarter" not in st.session_state:
         st.session_state.current_invoice_quarter = get_current_quarter()
     # Initialize invoice buyer session states (INDEPENDENT from PO)
-    if "invoice_buyer_name" not in st.session_state:
-        st.session_state.invoice_buyer_name = "Baldridge & Associates Pvt Ltd."
+    if "invoice_buyer_company" not in st.session_state:
+        st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
     if "invoice_buyer_address" not in st.session_state:
         st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
     if "invoice_buyer_gst" not in st.session_state:

@@ -1334,7 +1334,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         
         row_height = y_after_desc - y_start
         
-        # Other cells for the row
+        # Other cells for the row WITH COMMA FORMATTING
         pdf.set_xy(x_start, y_start)
         pdf.multi_cell(col_widths[0], row_height, str(i), border="LRT", align="C")
         
@@ -1345,11 +1345,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.multi_cell(col_widths[3], row_height, str(item['quantity']), border="LRT", align="C")
         
         pdf.set_xy(x_start + sum(col_widths[:4]), y_start)
-        pdf.multi_cell(col_widths[4], row_height, f"{item['unit_rate']:.2f}", border="LRT", align="R")
+        pdf.multi_cell(col_widths[4], row_height, f"{item['unit_rate']:,.2f}", border="LRT", align="R")  # Added comma formatting
         
         amount = item['quantity'] * item['unit_rate']
         pdf.set_xy(x_start + sum(col_widths[:-1]), y_start)
-        pdf.multi_cell(col_widths[5], row_height, f"{amount:.2f}", border="LRT", align="R")
+        pdf.multi_cell(col_widths[5], row_height, f"{amount:,.2f}", border="LRT", align="R")  # Added comma formatting
 
         pdf.set_xy(x_start, y_start + row_height)
 
@@ -1384,26 +1384,28 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if pdf.get_y() + 60 > pdf.page_break_trigger:
         pdf.add_page()
 
-    # --- Totals ---
+# --- Totals WITH COMMA FORMATTING ---
     pdf.set_font(pdf.default_font, "B", 12)
     total_width = sum(col_widths[:5])
     pdf.ln(0.2)
     pdf.cell(total_width, 5, "Basic Amount", border=1, align="L")
-    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['basic_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['basic_amount']:,.2f}", border=1, ln=True, align="R")  # Added comma formatting
     
     pdf.cell(total_width, 5, "SGST @ 9%", border=1, align="L")
-    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['sgst']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['sgst']:,.2f}", border=1, ln=True, align="R")  # Added comma formatting
     
     pdf.cell(total_width, 5, "CGST @ 9%", border=1, align="L")
-    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['cgst']:.2f}", border=1, ln=True, align="R")
-    # Add Round Off row if needed
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['cgst']:,.2f}", border=1, ln=True, align="R")  # Added comma formatting
+    
+    # Add Round Off row if needed WITH COMMA FORMATTING
     round_off = invoice_data['totals']['final_amount'] - (invoice_data['totals']['basic_amount'] + invoice_data['totals']['sgst'] + invoice_data['totals']['cgst'])
     if round_off != 0:
         pdf.cell(total_width, 5, "Round Off", border=1, align="L")
-        pdf.cell(col_widths[5], 5, f"{round_off:.2f}", border=1, ln=True, align="R")
+        pdf.cell(col_widths[5], 5, f"{round_off:,.2f}", border=1, ln=True, align="R")  # Added comma formatting
 
     pdf.cell(total_width, 5, "Final Amount to be Paid", border=1, align="L")
-    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['final_amount']:.2f}", border=1, ln=True, align="R")
+    pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['final_amount']:,.2f}", border=1, ln=True, align="R")  # Added comma formatting
+    
     
     # --- Amount in Words ---
     # First set the position and draw the border

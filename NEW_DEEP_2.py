@@ -3011,17 +3011,9 @@ def main():
         st.session_state.quotation_products = []
     if "last_quotation_number" not in st.session_state:
         st.session_state.last_quotation_number = ""
-    # if "quotation_seq" not in st.session_state:
-    #     st.session_state.quotation_seq = 1
-    # if "quotation_products" not in st.session_state:
-    #     st.session_state.quotation_products = []
-    # if "last_quotation_number" not in st.session_state:
-    #     st.session_state.last_quotation_number = ""
     if "po_seq" not in st.session_state:
         # Load from file instead of starting from 1
         st.session_state.po_seq = get_current_po_sequence()
-    # if "po_seq" not in st.session_state:
-    #     st.session_state.po_seq = 1
     if "products" not in st.session_state:
         st.session_state.products = []
     if "company_name" not in st.session_state:
@@ -3041,13 +3033,10 @@ def main():
     if "current_po_quarter" not in st.session_state:
         st.session_state.current_po_quarter = get_current_quarter()
 
-
     if "invoice_seq" not in st.session_state:
         # Load from file instead of starting from 1
         st.session_state.invoice_seq = get_current_invoice_sequence()
     # NEW: Invoice session state
-    if "invoice_seq" not in st.session_state:
-        st.session_state.invoice_seq = 1
     if "invoice_number" not in st.session_state:
         st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
     if "last_invoice_number" not in st.session_state:
@@ -3272,6 +3261,7 @@ def main():
                 st.session_state.quote_end_mobile = enduser_data.get("mobile", "")
                 st.session_state.quote_end_email = enduser_data.get("email", "")
                 st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
+                st.rerun()
             
             # UPDATE TEXT INPUT FIELDS TO USE END USER DATA INSTEAD OF VENDOR DATA
             vendor_name = st.text_input("Company Name", 
@@ -3444,13 +3434,6 @@ def main():
                         # This automatically increments and saves to file
                         next_sequence = get_next_quotation_sequence()
                         st.session_state.quotation_seq = next_sequence
-                    # if quotation_auto_increment:
-                    #     try:
-                    #         next_sequence = get_next_sequence_number(st.session_state.quotation_number)
-                    #         # Update the sequence in session state for next time
-                    #         st.session_state.quotation_seq = next_sequence
-                    #     except:
-                    #         st.session_state.quotation_seq += 1
                     
                     st.success("✅ Quotation generated successfully!")
                     st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
@@ -3600,6 +3583,7 @@ def main():
                 # Update vendor fields when dropdown selection changes
                 if selected_vendor and selected_vendor != "Select Vendor":
                     update_vendor_fields(selected_vendor)
+                    st.rerun()
                 
                 st.subheader("Vendor Details")
                 vendor_name = st.text_input(
@@ -3635,6 +3619,7 @@ def main():
                 # Update end user fields when dropdown selection changes
                 if selected_enduser and selected_enduser != "Select End User":
                     update_enduser_fields(selected_enduser)
+                    st.rerun()
                 
                 end_company = st.text_input(
                     "End User Company",
@@ -3813,13 +3798,6 @@ def main():
                     # This automatically increments and saves to file
                     next_sequence = get_next_po_sequence()
                     st.session_state.po_seq = next_sequence
-                # if po_auto_increment:
-                #     try:
-                #         next_sequence = get_next_sequence_number_po(st.session_state.po_number)
-                #         # Update the sequence in session state for next time
-                #         st.session_state.po_seq = next_sequence
-                #     except:
-                #         st.session_state.po_seq += 1
 
                 st.success("Purchase Order generated!")
                 st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
@@ -3830,10 +3808,7 @@ def main():
                     file_name=f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
                     mime="application/pdf"
                 )
-    # --- Tab 3: Tax Invoice Generator ---
-    # --- Tab 3: Tax Invoice Generator ---
-        # --- Tab 3: Tax Invoice Generator ---
-        # --- Tab 3: Tax Invoice Generator ---
+                
     # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
@@ -3976,7 +3951,7 @@ def main():
         with col2:
             st.subheader("Buyer Details")
             
-            # COMPLETELY SEPARATE session state for invoice buyer details - USE CONSISTENT NAMES
+            # COMPLETELY SEPARATE session state for invoice buyer details
             if "invoice_buyer_company" not in st.session_state:
                 st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
             if "invoice_buyer_address" not in st.session_state:
@@ -3997,7 +3972,7 @@ def main():
                 st.session_state.invoice_buyer_company = selected_enduser_invoice
                 st.session_state.invoice_buyer_address = enduser_data.get("address", "")
                 st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
-                st.rerun()  # Add this to force refresh after dropdown selection
+                st.rerun()  # Force refresh after dropdown selection
             
             # Use the updated session state values in the text inputs
             buyer_name = st.text_input(

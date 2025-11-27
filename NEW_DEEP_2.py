@@ -915,6 +915,90 @@ END_USER_DATABASE = {
         "email": "studioblackbrick1@gmail.com",
         "gst_no": "NOT APPLICABLE"
     },
+    "Acme Computing Services ": {
+        "address": "TDX No. 1&2, 12-vadi, Nr. Gau-Shala Gate, Opp. Old ST Bus Stand, Adipur (Dist. Kachchh) State: GUJARAT - 370205",
+        "contact": "Mr. Nitesh Punjani", 
+        "mobile": "+91 9426218218",
+        "email": "info@acmecomputing.net ",
+        "gst_no": "24AHHPP4426B1ZP"
+    },
+    "Dimore Build Mart Private Limited": {
+        "address": "Plot No. 023, Kerala GIDC, Sarkhej Bavla Highway, Opp. Arvee Denim Spinning UNIT 2, Swastik Industrial Estate, Ahmedabad - 382220",
+        "contact": "Mr. Nishad Soni", 
+        "mobile": "+91 7069001542",
+        "email": "it@dimore.co.in",
+        "gst_no": "24AAHCD3085C1ZZ"
+    },
+    "KRISHANT ELECTRICAL PANELS": {
+        "address": "50, Swetayan Industrial Park, Near V-Trans Transport Kathawada, GIDC, Ahmedabad 382430",
+        "contact": "Mr. Shailesh Gohil", 
+        "mobile": "+91 83203 84869",
+        "email": "1906krishantelectricals@gmail.com",
+        "gst_no": "24BFWPG4463B1ZH"
+    },
+    "Rudra Computer": {
+        "address": "2, Trikammukhi Ni Chali, Khokhara Village, Anand Chowk, Ahmedabad 380008",
+        "contact": "Mr. Rakesh", 
+        "mobile": "+91 99781 18200",
+        "email": "rudra1331@gmail.com",
+        "gst_no": "24APUPP6495H1Z2"
+    },
+    "SFERABLU": {
+        "address": "5/b, Jain Society, Ellisbridge, Ahmedabad",
+        "contact": "Mr. Naman Shah", 
+        "mobile": "+91 9825016458",
+        "email": "sferablu@gmail.com",
+        "gst_no": "24AMWPS1765J1ZB"
+    },
+    "Techno Engineers": {
+        "address": "57/1/P, GIDC Phase I, Narmada Nagar, Bharuch 392015",
+        "contact": "Mr. Narendra Singh Thakur", 
+        "mobile": "+91 81286 99680",
+        "email": "technical@technoeng.in",
+        "gst_no": "24AADFT4432C1ZO"
+    },
+    "True Value Nirman Private Limited": {
+        "address": "True Value House , Opp. Sundarvan Bus Stop , Near Isro , Satellite , Ahmedabad-380015",
+        "contact": "Mr. Pranav Shah", 
+        "mobile": "+91 9727735737",
+        "email": "pranav.truevalue@gmail.com",
+        "gst_no": "24AAECM4005A3Z9"
+    },
+    "ASI Technology Private Limited": {
+        "address": "D-72, Suryam Industrial Park, Nikol,Ahmedabad-382350",
+        "contact": "Mr. Ravi Patel", 
+        "mobile": "+91 8460612341",
+        "email": "asi@asitechnology.in",
+        "gst_no": "24AAXCA5281B1ZM"
+    },
+    "Divine Engitech": {
+        "address": "A/160/4, New Ritanagar, Sureliya Estate Road, Rabaricoloni Cross Road, Amraiwadi, Ahmedabad - 380026 ",
+        "contact": "Mr. DilipVichhaniya", 
+        "mobile": "+91 90338 85409",
+        "email": "dilip@divineengitech.com",
+        "gst_no": "24AAUFD6775H1ZV"
+    },
+    "Dynamic Control Systems": {
+        "address": "AL-535/1, Road No. 45, Near Post Office, GIDC, Odhav, Ahmedabad-382415",
+        "contact": "Mr. Rajesh Patel", 
+        "mobile": "+91 90997 11999",
+        "email": "info@dynamicpanel.com",
+        "gst_no": "24ACZPP4197J1ZO"
+    },
+    "NEXT GEN POWER CONTROLS": {
+        "address": "8, Rashmi Growth Hub Ind. Estate, Opp. Vijay Sales Showroom, Nr. Shivkunj Exortica, S.P. Ring Road, Odhav, Ahmedabad ‐ 382415",
+        "contact": "Mr. Sanjay Patel", 
+        "mobile": "+91 917301 8114",
+        "email": "nextgen.panel@gmail.com",
+        "gst_no": "24BXGPP8440K1Z3"
+    },
+    "NEXT GEN POWER CONTROLS": {
+        "address": "8, Rashmi Growth Hub Ind. Estate, Opp. Vijay Sales Showroom, Nr. Shivkunj Exortica, S.P. Ring Road, Odhav, Ahmedabad ‐ 382415",
+        "contact": "Mr. Sanjay Patel", 
+        "mobile": "+91 917301 8114",
+        "email": "nextgen.panel@gmail.com",
+        "gst_no": "24BXGPP8440K1Z3"
+    },
     "Base Engineering": {
         "address": "406, Sakar East, Behind Big Bazaar, Alkapuri, Vadodara - 390007",
         "contact": "Mr. Dhaval Mistry",
@@ -3741,6 +3825,7 @@ def main():
                     mime="application/pdf"
                 )
     # --- Tab 3: Tax Invoice Generator ---
+    # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
         
@@ -3867,31 +3952,41 @@ def main():
         with col2:
             st.subheader("Buyer Details")
             
-            # End User Dropdown for Invoice
+            # End User Dropdown for Invoice - FIXED: Use callback function
             selected_enduser_invoice = st.selectbox(
                 "Select Buyer", 
                 options=get_enduser_dropdown_options(),
                 key="enduser_dropdown_invoice"
             )
             
-            # Update buyer fields when dropdown selection changes
-            if selected_enduser_invoice and selected_enduser_invoice != "Select End User":
-                enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
-                st.session_state.po_end_company = selected_enduser_invoice
-                st.session_state.po_end_address = enduser_data.get("address", "")
-                st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
+            # Use a button to update the fields instead of automatic update
+            if st.button("Load Buyer Details", key="load_buyer_details"):
+                if selected_enduser_invoice and selected_enduser_invoice != "Select End User":
+                    enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
+                    st.session_state.po_end_company = selected_enduser_invoice
+                    st.session_state.po_end_address = enduser_data.get("address", "")
+                    st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
+                    st.success("Buyer details loaded!")
+            
+            # Initialize buyer fields with session state or defaults
+            buyer_name_default = st.session_state.get("po_end_company", "Baldridge & Associates Pvt Ltd.")
+            buyer_address_default = st.session_state.get("po_end_address", "406 Sakar East, Vadodara 390009")
+            buyer_gst_default = st.session_state.get("po_end_gst_no", "24AAHCB9")
             
             buyer_name = st.text_input(
                 "Buyer Name",
-                value = st.session_state.get("po_end_company","Baldridge & Associates Pvt Ltd.")
+                value=buyer_name_default,
+                key="buyer_name_input"
             )
             buyer_address = st.text_area(
                 "Buyer Address",
-                value=st.session_state.get("po_end_address","406 Sakar East, Vadodara 390009")
+                value=buyer_address_default,
+                key="buyer_address_input"
             )
             buyer_gst = st.text_input(
                 "Buyer GST No.",
-                value=st.session_state.get("po_end_gst_no","24AAHCB9")
+                value=buyer_gst_default,
+                key="buyer_gst_input"
             )
 
             st.subheader("Products")

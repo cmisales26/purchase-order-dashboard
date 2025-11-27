@@ -208,198 +208,62 @@ import json
 import datetime
 import os
 
-PO_COUNTER_FILE = "po_counter.json"
+# Simple PO sequence counter
+PO_COUNTER_FILE = "po_counter_simple.txt"
 
-def get_current_quarter():
-    """Get current quarter (Q1, Q2, Q3, Q4) based on current month"""
-    month = datetime.datetime.now().month
-    if month in [4, 5, 6]:
-        return "Q1"
-    elif month in [7, 8, 9]:
-        return "Q2"
-    elif month in [10, 11, 12]:
-        return "Q3"
-    else:
-        return "Q4"
-
-def get_previous_quarter():
-    """Get the previous quarter"""
-    current_quarter = get_current_quarter()
-    quarter_map = {"Q1": "Q4", "Q2": "Q1", "Q3": "Q2", "Q4": "Q3"}
-    return quarter_map.get(current_quarter, "Q1")
-
-def get_next_po_sequence_fallback(sales_person="CP"):
-    """Fallback simple counter"""
+def get_next_po_sequence(sales_person="CP"):
+    """Simple PO sequence counter per sales person"""
+    filename = f"po_counter_{sales_person}.txt"
+    
     try:
-        filename = f"po_counter_{sales_person}.txt"
+        # Read current number from file
         if os.path.exists(filename):
             with open(filename, 'r') as f:
                 current = int(f.read().strip())
         else:
-            # Initialize with defaults if file doesn't exist
+            # Start from these default sequences
             defaults = {"CP": 15, "SD": 8, "HP": 3, "KP": 2}
             current = defaults.get(sales_person, 0)
         
+        # Increment
         next_seq = current + 1
         
+        # Save the new number back to file
         with open(filename, 'w') as f:
             f.write(str(next_seq))
         
         return next_seq
-    except:
+        
+    except Exception as e:
+        # If anything fails, start from 1
+        print(f"Error in PO counter: {e}")
         return 1
-
-def initialize_po_sequences():
-    """Initialize the PO counter with your existing sequence numbers"""
-    initial_sequences = {
-        "2024_Q4": {
-            "CP": 15,  # Your current CP sequence
-            "SD": 8,   # Your current SD sequence  
-            "HP": 3,   # Your current HP sequence
-            "KP": 2    # Your current KP sequence
-        }
-    }
-    
-    try:
-        with open(PO_COUNTER_FILE, 'w') as f:
-            json.dump(initial_sequences, f, indent=2)
-        print("PO sequences initialized successfully!")
-        return initial_sequences
-    except Exception as e:
-        print(f"Error initializing sequences: {e}")
-        return None
-
-def get_next_po_sequence(sales_person="CP"):
-    """Enhanced PO sequence counter starting from existing sequences"""
-    current_date = datetime.datetime.now()
-    current_quarter = get_current_quarter()
-    current_year = str(current_date.year)
-    quarter_key = f"{current_year}_{current_quarter}"
-    
-    try:
-        # Read current counter data
-        if os.path.exists(PO_COUNTER_FILE):
-            with open(PO_COUNTER_FILE, 'r') as f:
-                counter_data = json.load(f)
-        else:
-            # Initialize with default sequences if file doesn't exist
-            counter_data = initialize_po_sequences() or {}
-        
-        # Initialize quarter data if not exists
-        if quarter_key not in counter_data:
-            # Check if we have data from previous quarter to continue from
-            previous_quarter = get_previous_quarter()
-            previous_year = current_year
-            if current_quarter == "Q1":  # If current is Q1, previous is Q4 of last year
-                previous_year = str(int(current_year) - 1)
-            previous_quarter_key = f"{previous_year}_{previous_quarter}"
-            
-            if previous_quarter_key in counter_data and sales_person in counter_data[previous_quarter_key]:
-                # Continue from previous quarter's sequence
-                counter_data[quarter_key] = {sales_person: counter_data[previous_quarter_key][sales_person]}
-            else:
-                # Start from existing sequence or 0
-                defaults = {"CP": 15, "SD": 8, "HP": 3, "KP": 2}
-                counter_data[quarter_key] = {sales_person: defaults.get(sales_person, 0)}
-        
-        # Initialize sales person data if not exists in current quarter
-        if sales_person not in counter_data[quarter_key]:
-            # Try to get from defaults or start from 0
-            defaults = {"CP": 15, "SD": 8, "HP": 3, "KP": 2}
-            counter_data[quarter_key][sales_person] = defaults.get(sales_person, 0)
-        
-        # Increment sequence
-        next_seq = counter_data[quarter_key][sales_person] + 1
-        counter_data[quarter_key][sales_person] = next_seq
-        
-        # Save updated data
-        with open(PO_COUNTER_FILE, 'w') as f:
-            json.dump(counter_data, f, indent=2)
-        
-        return next_seq
-        
-    except Exception as e:
-        # Fallback to simple file-based counter
-        print(f"Error in enhanced counter: {e}")
-        return get_next_po_sequence_fallback(sales_person)
 
 def get_current_po_sequence(sales_person="CP"):
     """Get current PO sequence without incrementing"""
-    try:
-        if os.path.exists(PO_COUNTER_FILE):
-            with open(PO_COUNTER_FILE, 'r') as f:
-                counter_data = json.load(f)
-            
-            current_date = datetime.datetime.now()
-            current_quarter = get_current_quarter()
-            current_year = str(current_date.year)
-            quarter_key = f"{current_year}_{current_quarter}"
-            
-            if (quarter_key in counter_data and 
-                sales_person in counter_data[quarter_key]):
-                return counter_data[quarter_key][sales_person]
-    except:
-        pass
+    filename = f"po_counter_{sales_person}.txt"
     
-    # Fallback
     try:
-        filename = f"po_counter_{sales_person}.txt"
         if os.path.exists(filename):
             with open(filename, 'r') as f:
                 return int(f.read().strip())
     except:
         pass
     
-    # Return default sequence
+    # Return default if file doesn't exist
     defaults = {"CP": 15, "SD": 8, "HP": 3, "KP": 2}
     return defaults.get(sales_person, 0)
 
-def update_po_sequence(sales_person, new_sequence, quarter=None):
-    """Manually update the PO sequence for a sales person"""
-    if quarter is None:
-        current_date = datetime.datetime.now()
-        quarter = get_current_quarter()
-        year = str(current_date.year)
-        quarter_key = f"{year}_{quarter}"
-    else:
-        quarter_key = quarter
+def reset_po_sequence(sales_person, new_sequence=1):
+    """Reset PO sequence for a sales person"""
+    filename = f"po_counter_{sales_person}.txt"
     
     try:
-        # Read current counter data
-        if os.path.exists(PO_COUNTER_FILE):
-            with open(PO_COUNTER_FILE, 'r') as f:
-                counter_data = json.load(f)
-        else:
-            counter_data = {}
-        
-        # Initialize quarter data if not exists
-        if quarter_key not in counter_data:
-            counter_data[quarter_key] = {}
-        
-        # Update sequence
-        counter_data[quarter_key][sales_person] = new_sequence
-        
-        # Save updated data
-        with open(PO_COUNTER_FILE, 'w') as f:
-            json.dump(counter_data, f, indent=2)
-        
-        print(f"Updated {sales_person} sequence to {new_sequence} for {quarter_key}")
+        with open(filename, 'w') as f:
+            f.write(str(new_sequence))
         return True
-        
-    except Exception as e:
-        print(f"Error updating sequence: {e}")
-        return False
-
-def get_po_sequence_stats():
-    """Get statistics about PO sequences"""
-    try:
-        if os.path.exists(PO_COUNTER_FILE):
-            with open(PO_COUNTER_FILE, 'r') as f:
-                counter_data = json.load(f)
-            return counter_data
     except:
-        pass
-    return {}
+        return False
 
 def parse_po_number(po_number):
     """Parse PO number to extract components"""
@@ -2803,39 +2667,42 @@ def main():
             st.sidebar.success("PO number reset to auto-generated")
             st.rerun()
         
-        # ========== ADD PO SEQUENCE MANAGEMENT HERE ==========
-        st.sidebar.header("🔢 PO Sequence Management")
+        # ========== SIMPLE PO SEQUENCE MANAGEMENT ==========
+        st.sidebar.header("🔢 Sequence Settings")
         
-        # Show current sequences
-        st.sidebar.subheader("Current Sequences")
-        stats = get_po_sequence_stats()
-        if stats:
-            for quarter, sales_persons in stats.items():
-                st.sidebar.write(f"**{quarter}:**")
-                for sp, seq in sales_persons.items():
-                    st.sidebar.write(f"  {sp}: {seq}")
-        else:
-            st.sidebar.info("No sequence data yet")
+        # Show current sequence for selected sales person
+        current_seq = get_current_po_sequence(po_sales_person)
+        st.sidebar.info(f"**{po_sales_person} Current Sequence:** {current_seq}")
         
-        # Initialize sequences button
-        if st.sidebar.button("Initialize PO Sequences"):
-            initialize_po_sequences()
-            st.sidebar.success("PO sequences initialized!")
-            st.rerun()
+        # Simple reset option
+        st.sidebar.subheader("Reset Sequence")
+        new_sequence = st.sidebar.number_input(
+            f"Set new sequence for {po_sales_person}", 
+            min_value=1, 
+            value=current_seq + 1,
+            key="reset_sequence_input"
+        )
         
-        # Manual sequence update
-        st.sidebar.subheader("Update Sequence")
+        if st.sidebar.button("Reset Sequence", key="reset_sequence_btn"):
+            if reset_po_sequence(po_sales_person, new_sequence):
+                st.sidebar.success(f"Reset {po_sales_person} sequence to {new_sequence}")
+                st.rerun()
+            else:
+                st.sidebar.error("Failed to reset sequence")
+        
+        # Quick reset buttons for common scenarios
+        st.sidebar.subheader("Quick Reset")
         col1, col2 = st.sidebar.columns(2)
         with col1:
-            update_sp = st.selectbox("Sales Person", list(SALES_PERSON_MAPPING.keys()), key="update_sp")
+            if st.button("Start New Quarter", key="new_quarter_btn"):
+                if reset_po_sequence(po_sales_person, 1):
+                    st.sidebar.success(f"Started new quarter for {po_sales_person} (sequence: 1)")
+                    st.rerun()
         with col2:
-            new_seq = st.number_input("New Sequence", min_value=0, value=0, key="new_seq")
-        
-        if st.sidebar.button("Update Sequence"):
-            if update_po_sequence(update_sp, new_seq):
-                st.sidebar.success(f"Updated {update_sp} to sequence {new_seq}")
-                st.rerun()
-        # ========== END OF PO SEQUENCE MANAGEMENT ==========
+            if st.button("Continue Last", key="continue_btn"):
+                # Just show current sequence - no reset needed
+                st.sidebar.info(f"Continuing from sequence {current_seq}")
+        # ========== END SIMPLE SEQUENCE MANAGEMENT ==========
         
         tab_vendor, tab_products, tab_terms, tab_preview = st.tabs(["Vendor Details", "Products", "Terms", "Preview & Generate"])
         

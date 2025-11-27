@@ -745,7 +745,7 @@ def add_page_two_commercials(pdf, data):
     for width, header in zip(col_widths, headers):
         pdf.cell(width, 6, header, border=1, align="C", fill=True)
     pdf.ln()
-
+    
     # Table Rows
     pdf.set_font(pdf.default_font, "", 12)
     grand_total_unrounded = 0.0
@@ -778,7 +778,7 @@ def add_page_two_commercials(pdf, data):
             pdf.multi_cell(col_widths[0], 6, desc, border=1)
             current_y = pdf.get_y()
             
-            # Set positions for other cells
+            # Set positions for other cells WITH COMMA FORMATTING
             pdf.set_xy(pdf.l_margin + col_widths[0], start_y)
             pdf.cell(col_widths[1], desc_height, f"{basic_price:,.2f}", border=1, align="R")
             pdf.cell(col_widths[2], desc_height, f"{gst_amount:,.2f}", border=1, align="R")
@@ -789,7 +789,7 @@ def add_page_two_commercials(pdf, data):
             # Move to next row
             pdf.set_y(current_y)
         else:
-            # Single line description
+            # Single line description WITH COMMA FORMATTING
             pdf.cell(col_widths[0], 6, desc, border=1)
             pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
             pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
@@ -798,14 +798,14 @@ def add_page_two_commercials(pdf, data):
             pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
             pdf.ln()
 
-    # Round Off Row (NEW - like PO)
+    # Round Off Row (NEW - like PO) WITH COMMA FORMATTING
     round_off = data.get('round_off', 0.0)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(sum(col_widths[:-1]), 7, "Round Off", border=1, align="R")
     pdf.cell(col_widths[5], 7, f"{round_off:,.2f}", border=1, align="R")
     pdf.ln()
 
-    # Grand Total Row - FIXED ALIGNMENT (using rounded total)
+    # Grand Total Row - WITH COMMA FORMATTING
     grand_total = data.get('grand_total', grand_total_unrounded)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(sum(col_widths[:-1]), 7, "Final Amount to be Paid", border=1, align="R")

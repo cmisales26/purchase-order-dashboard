@@ -3922,19 +3922,41 @@ def main():
         with col2:
             st.subheader("Buyer Details")
             
+            # Initialize invoice buyer session state if not exists
+            if "invoice_buyer_company" not in st.session_state:
+                st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
+            if "invoice_buyer_address" not in st.session_state:
+                st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
+            if "invoice_buyer_gst" not in st.session_state:
+                st.session_state.invoice_buyer_gst = "24AAHCB9"
+            
+            # Get current dropdown options
+            enduser_options = get_enduser_dropdown_options()
+            
+            # Find the index of current buyer in dropdown options
+            current_buyer_index = 0
+            if st.session_state.invoice_buyer_company in enduser_options:
+                current_buyer_index = enduser_options.index(st.session_state.invoice_buyer_company)
+            
             # End User Dropdown for Invoice - SEPARATE FROM PO
             selected_enduser_invoice = st.selectbox(
                 "Select Buyer", 
-                options=get_enduser_dropdown_options(),
+                options=enduser_options,
+                index=current_buyer_index,
                 key="enduser_dropdown_invoice"
             )
             
             # Update INVOICE-SPECIFIC buyer fields when dropdown selection changes
             if selected_enduser_invoice and selected_enduser_invoice != "Select End User":
                 enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
-                st.session_state.invoice_buyer_company = selected_enduser_invoice
-                st.session_state.invoice_buyer_address = enduser_data.get("address", "")
-                st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
+                # Only update if the selection actually changed
+                if (st.session_state.invoice_buyer_company != selected_enduser_invoice or
+                    st.session_state.invoice_buyer_address != enduser_data.get("address", "") or
+                    st.session_state.invoice_buyer_gst != enduser_data.get("gst_no", "")):
+                    
+                    st.session_state.invoice_buyer_company = selected_enduser_invoice
+                    st.session_state.invoice_buyer_address = enduser_data.get("address", "")
+                    st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
             
             # Use the updated session state values in the text inputs
             buyer_name = st.text_input(
@@ -3943,17 +3965,29 @@ def main():
                 key="invoice_buyer_name_input"
             )
             
+            # Update session state when user manually changes the buyer name
+            if buyer_name != st.session_state.invoice_buyer_company:
+                st.session_state.invoice_buyer_company = buyer_name
+            
             buyer_address = st.text_area(
                 "Buyer Address",
                 value=st.session_state.invoice_buyer_address,
                 key="invoice_buyer_address_input"
             )
             
+            # Update session state when user manually changes the buyer address
+            if buyer_address != st.session_state.invoice_buyer_address:
+                st.session_state.invoice_buyer_address = buyer_address
+            
             buyer_gst = st.text_input(
                 "Buyer GST No.",
                 value=st.session_state.invoice_buyer_gst,
                 key="invoice_buyer_gst_input"
             )
+            
+            # Update session state when user manually changes the buyer GST
+            if buyer_gst != st.session_state.invoice_buyer_gst:
+                st.session_state.invoice_buyer_gst = buyer_gst
 
             st.subheader("Products")
             items = []

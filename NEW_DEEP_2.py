@@ -3835,7 +3835,6 @@ def main():
         # --- Tab 3: Tax Invoice Generator ---
         # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
-    # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
         
@@ -3977,7 +3976,7 @@ def main():
         with col2:
             st.subheader("Buyer Details")
             
-            # SEPARATE session state for invoice buyer details
+            # COMPLETELY SEPARATE session state for invoice buyer details
             if "invoice_buyer_company" not in st.session_state:
                 st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
             if "invoice_buyer_address" not in st.session_state:

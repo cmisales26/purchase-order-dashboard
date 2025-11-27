@@ -203,67 +203,42 @@ def get_current_quarter():
     else:
         return "Q4"
 
-# Enhanced PO sequence counter with initialization from existing sequence
-import json
-import datetime
 import os
 
-# Simple PO sequence counter
-PO_COUNTER_FILE = "po_counter_simple.txt"
+# Simple file-based counter for PO sequence
+PO_COUNTER_FILE = "po_counter.txt"
 
-def get_next_po_sequence(sales_person="CP"):
-    """Simple PO sequence counter per sales person"""
-    filename = f"po_counter_{sales_person}.txt"
-    
+def get_next_po_sequence():
+    """Simple file-based PO sequence counter"""
     try:
         # Read current number from file
-        if os.path.exists(filename):
-            with open(filename, 'r') as f:
+        if os.path.exists(PO_COUNTER_FILE):
+            with open(PO_COUNTER_FILE, 'r') as f:
                 current = int(f.read().strip())
         else:
-            # Start from these default sequences
-            defaults = {"CP": 15, "SD": 8, "HP": 3, "KP": 2}
-            current = defaults.get(sales_person, 0)
-        
-        # Increment
-        next_seq = current + 1
-        
-        # Save the new number back to file
-        with open(filename, 'w') as f:
-            f.write(str(next_seq))
-        
-        return next_seq
-        
-    except Exception as e:
-        # If anything fails, start from 1
-        print(f"Error in PO counter: {e}")
-        return 1
-
-def get_current_po_sequence(sales_person="CP"):
-    """Get current PO sequence without incrementing"""
-    filename = f"po_counter_{sales_person}.txt"
+            current = 0
+    except:
+        current = 0
     
+    # Increment
+    next_seq = current + 1
+    
+    # Save the new number back to file
+    with open(PO_COUNTER_FILE, 'w') as f:
+        f.write(str(next_seq))
+    
+    return next_seq
+
+def get_current_po_sequence():
+    """Get current PO sequence without incrementing"""
     try:
-        if os.path.exists(filename):
-            with open(filename, 'r') as f:
+        if os.path.exists(PO_COUNTER_FILE):
+            with open(PO_COUNTER_FILE, 'r') as f:
                 return int(f.read().strip())
     except:
         pass
-    
-    # Return default if file doesn't exist
-    defaults = {"CP": 15, "SD": 8, "HP": 3, "KP": 2}
-    return defaults.get(sales_person, 0)
+    return 1
 
-def reset_po_sequence(sales_person, new_sequence=1):
-    """Reset PO sequence for a sales person"""
-    filename = f"po_counter_{sales_person}.txt"
-    
-    try:
-        with open(filename, 'w') as f:
-            f.write(str(new_sequence))
-        return True
-    except:
-        return False
 
 def parse_po_number(po_number):
     """Parse PO number to extract components"""
@@ -2196,8 +2171,7 @@ def main():
     if "company_name" not in st.session_state:
         st.session_state.company_name = "CM Infotech"
     if "po_number" not in st.session_state:
-        next_sequence = get_next_po_sequence("CP")  # Use the selected sales person
-        st.session_state.po_number = generate_po_number("CP", next_sequence)
+        st.session_state.po_number = generate_po_number("CP", st.session_state.po_seq)
     if "po_date" not in st.session_state:
         st.session_state.po_date = datetime.date.today().strftime("%d-%m-%Y")
     if "last_po_number" not in st.session_state:
@@ -2667,43 +2641,6 @@ def main():
             st.sidebar.success("PO number reset to auto-generated")
             st.rerun()
         
-        # ========== SIMPLE PO SEQUENCE MANAGEMENT ==========
-        st.sidebar.header("🔢 Sequence Settings")
-        
-        # Show current sequence for selected sales person
-        current_seq = get_current_po_sequence(po_sales_person)
-        st.sidebar.info(f"**{po_sales_person} Current Sequence:** {current_seq}")
-        
-        # Simple reset option
-        st.sidebar.subheader("Reset Sequence")
-        new_sequence = st.sidebar.number_input(
-            f"Set new sequence for {po_sales_person}", 
-            min_value=1, 
-            value=current_seq + 1,
-            key="reset_sequence_input"
-        )
-        
-        if st.sidebar.button("Reset Sequence", key="reset_sequence_btn"):
-            if reset_po_sequence(po_sales_person, new_sequence):
-                st.sidebar.success(f"Reset {po_sales_person} sequence to {new_sequence}")
-                st.rerun()
-            else:
-                st.sidebar.error("Failed to reset sequence")
-        
-        # Quick reset buttons for common scenarios
-        st.sidebar.subheader("Quick Reset")
-        col1, col2 = st.sidebar.columns(2)
-        with col1:
-            if st.button("Start New Quarter", key="new_quarter_btn"):
-                if reset_po_sequence(po_sales_person, 1):
-                    st.sidebar.success(f"Started new quarter for {po_sales_person} (sequence: 1)")
-                    st.rerun()
-        with col2:
-            if st.button("Continue Last", key="continue_btn"):
-                # Just show current sequence - no reset needed
-                st.sidebar.info(f"Continuing from sequence {current_seq}")
-        # ========== END SIMPLE SEQUENCE MANAGEMENT ==========
-        
         tab_vendor, tab_products, tab_terms, tab_preview = st.tabs(["Vendor Details", "Products", "Terms", "Preview & Generate"])
         
         with tab_vendor:
@@ -2926,16 +2863,21 @@ def main():
                 }
 
                 pdf_bytes = create_po_pdf(po_data, logo_path)
-                
                 # Store the last PO number for sequence tracking
                 st.session_state.last_po_number = st.session_state.po_number
                 
-                # Auto-increment for next PO using enhanced counter
+                # Auto-increment for next PO
                 if po_auto_increment:
-                    # This automatically increments using the enhanced counter
-                    next_sequence = get_next_po_sequence(po_sales_person)
-                    # Note: We don't need to manually update st.session_state.po_seq anymore
-                    # The enhanced counter handles this automatically
+                    # This automatically increments and saves to file
+                    next_sequence = get_next_po_sequence()
+                    st.session_state.po_seq = next_sequence
+                # if po_auto_increment:
+                #     try:
+                #         next_sequence = get_next_sequence_number_po(st.session_state.po_number)
+                #         # Update the sequence in session state for next time
+                #         st.session_state.po_seq = next_sequence
+                #     except:
+                #         st.session_state.po_seq += 1
 
                 st.success("Purchase Order generated!")
                 st.info(f"📧 Sales Person: {current_sales_person_info['name']}")

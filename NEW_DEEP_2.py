@@ -3835,8 +3835,6 @@ def main():
         # --- Tab 3: Tax Invoice Generator ---
         # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
-    # --- Tab 3: Tax Invoice Generator ---
-    # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
         
@@ -3978,7 +3976,7 @@ def main():
         with col2:
             st.subheader("Buyer Details")
             
-            # COMPLETELY SEPARATE session state for invoice buyer details
+            # COMPLETELY SEPARATE session state for invoice buyer details - USE CONSISTENT NAMES
             if "invoice_buyer_company" not in st.session_state:
                 st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
             if "invoice_buyer_address" not in st.session_state:
@@ -4000,8 +3998,7 @@ def main():
                 st.session_state.invoice_buyer_address = enduser_data.get("address", "")
                 st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
             
-            # Use the updated session state values in the text inputs - FIXED
-            # For Buyer Name, we need to handle the widget value properly
+            # Use the updated session state values in the text inputs - FIXED TO USE CONSISTENT NAMES
             buyer_name = st.text_input(
                 "Buyer Name",
                 value=st.session_state.invoice_buyer_company,

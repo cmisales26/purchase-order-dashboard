@@ -3833,6 +3833,7 @@ def main():
     # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
         # --- Tab 3: Tax Invoice Generator ---
+        # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
         
@@ -3940,44 +3941,39 @@ def main():
         with col2:
             st.subheader("Buyer Details")
             
-            # INDEPENDENT Buyer Dropdown for Invoice (similar to quotation)
+            # Buyer Dropdown for Invoice - SIMPLE SELECTION
             selected_buyer_invoice = st.selectbox(
                 "Select Buyer", 
                 options=get_enduser_dropdown_options(),
                 key="buyer_dropdown_invoice"
             )
             
-            # Initialize invoice buyer session state if not exists
-            if "invoice_buyer_name" not in st.session_state:
-                st.session_state.invoice_buyer_name = "Baldridge & Associates Pvt Ltd."
-            if "invoice_buyer_address" not in st.session_state:
-                st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
-            if "invoice_buyer_gst" not in st.session_state:
-                st.session_state.invoice_buyer_gst = "24AAHCB9"
+            # Get buyer data directly from selection
+            if selected_buyer_invoice and selected_buyer_invoice != "Select End User":
+                buyer_data = END_USER_DATABASE.get(selected_buyer_invoice, {})
+                buyer_name = selected_buyer_invoice
+                buyer_address = buyer_data.get("address", "")
+                buyer_gst = buyer_data.get("gst_no", "")
+            else:
+                # Default values
+                buyer_name = "Baldridge & Associates Pvt Ltd."
+                buyer_address = "406 Sakar East, Vadodara 390009"
+                buyer_gst = "24AAHCB9"
             
-            # Button to load buyer details - INDEPENDENT from PO
-            if st.button("📥 Load Buyer Details", key="load_buyer_invoice"):
-                if selected_buyer_invoice and selected_buyer_invoice != "Select End User":
-                    buyer_data = END_USER_DATABASE.get(selected_buyer_invoice, {})
-                    st.session_state.invoice_buyer_name = selected_buyer_invoice
-                    st.session_state.invoice_buyer_address = buyer_data.get("address", "")
-                    st.session_state.invoice_buyer_gst = buyer_data.get("gst_no", "")
-                    st.success("Buyer details loaded!")
-            
-            # Use INDEPENDENT invoice buyer session state
+            # Display the buyer details (read-only or editable as needed)
             buyer_name = st.text_input(
                 "Buyer Name",
-                value=st.session_state.invoice_buyer_name,
+                value=buyer_name,
                 key="buyer_name_input"
             )
             buyer_address = st.text_area(
                 "Buyer Address",
-                value=st.session_state.invoice_buyer_address,
+                value=buyer_address,
                 key="buyer_address_input"
             )
             buyer_gst = st.text_input(
                 "Buyer GST No.",
-                value=st.session_state.invoice_buyer_gst,
+                value=buyer_gst,
                 key="buyer_gst_input"
             )
 

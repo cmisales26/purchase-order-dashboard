@@ -3836,6 +3836,7 @@ def main():
         # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
+    # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
         
@@ -3999,22 +4000,37 @@ def main():
                 st.session_state.invoice_buyer_address = enduser_data.get("address", "")
                 st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
             
-            # Use the updated session state values in the text inputs
+            # Use the updated session state values in the text inputs - FIXED
+            # For Buyer Name, we need to handle the widget value properly
             buyer_name = st.text_input(
                 "Buyer Name",
                 value=st.session_state.invoice_buyer_company,
-                key="invoice_buyer_name"
+                key="invoice_buyer_name_input"
             )
+            
+            # Update session state when user manually changes the buyer name
+            if buyer_name != st.session_state.invoice_buyer_company:
+                st.session_state.invoice_buyer_company = buyer_name
+            
             buyer_address = st.text_area(
                 "Buyer Address",
                 value=st.session_state.invoice_buyer_address,
-                key="invoice_buyer_address"
+                key="invoice_buyer_address_input"
             )
+            
+            # Update session state when user manually changes the buyer address
+            if buyer_address != st.session_state.invoice_buyer_address:
+                st.session_state.invoice_buyer_address = buyer_address
+            
             buyer_gst = st.text_input(
                 "Buyer GST No.",
                 value=st.session_state.invoice_buyer_gst,
-                key="invoice_buyer_gst"
+                key="invoice_buyer_gst_input"
             )
+            
+            # Update session state when user manually changes the buyer GST
+            if buyer_gst != st.session_state.invoice_buyer_gst:
+                st.session_state.invoice_buyer_gst = buyer_gst
 
             st.subheader("Products")
             items = []

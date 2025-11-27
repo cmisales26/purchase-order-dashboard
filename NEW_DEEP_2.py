@@ -1077,10 +1077,10 @@ class PDF(FPDF):
             except Exception as e:
                 # You can add a warning here if needed, but don't show in header
                 pass
-        self.ln(3)
+        self.ln(7)
         self.set_font(self.default_font, "B", 15)
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
-        self.ln(5)
+        self.ln(9)
         
     def footer(self):
         # Position at 1.5 cm from bottom

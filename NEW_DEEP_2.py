@@ -1073,7 +1073,7 @@ class PDF(FPDF):
         # Add logo on every page (including second page)
         if self.logo_file and self.page_no() >= 1:  # Show logo on all pages
             try:
-                self.image(self.logo_file, x=165, y=2.5, w=50)
+                self.image(self.logo_file, x=155, y=2.5, w=50)
             except Exception as e:
                 # You can add a warning here if needed, but don't show in header
                 pass

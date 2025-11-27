@@ -2209,6 +2209,19 @@ def main():
         st.session_state.po_pan_no = "ANMPP4891R"
     if "po_msme_no" not in st.session_state:
         st.session_state.po_msme_no = "UDYAM-GJ-01-0117646"
+    if "quote_end_company" not in st.session_state:
+        st.session_state.quote_end_company = "Baldridge & Associates Pvt Ltd."
+    if "quote_end_address" not in st.session_state:
+        st.session_state.quote_end_address = "406 Sakar East, Vadodara 390009"
+    if "quote_end_person" not in st.session_state:
+        st.session_state.quote_end_person = "Mr. Dev"
+    if "quote_end_mobile" not in st.session_state:
+        st.session_state.quote_end_mobile = "1234567891"
+    if "quote_end_email" not in st.session_state:
+        st.session_state.quote_end_email = "info@company.com"
+    if "quote_end_gst_no" not in st.session_state:
+        st.session_state.quote_end_gst_no = "24AAHCB9"
+    
 
     # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
@@ -2376,35 +2389,44 @@ def main():
         with col1:
             st.header("Recipient Details")
             
-            # Vendor Dropdown for Quotation
-            selected_vendor_quote = st.selectbox(
+            # REPLACE VENDOR DROPDOWN WITH END USER DROPDOWN
+            selected_enduser_quote = st.selectbox(
                 "Select Company", 
-                options=get_vendor_dropdown_options(),
-                key="vendor_dropdown_quote"
+                options=get_enduser_dropdown_options(),
+                key="enduser_dropdown_quote"
             )
             
-            # Update vendor fields when dropdown selection changes for quotation
-            if selected_vendor_quote and selected_vendor_quote != "Select Vendor":
-                vendor_data = VENDOR_DATABASE.get(selected_vendor_quote, {})
-                st.session_state.quote_vendor_name = selected_vendor_quote
-                st.session_state.quote_vendor_address = vendor_data.get("address", "")
-                st.session_state.quote_vendor_contact = vendor_data.get("contact", "")
-                st.session_state.quote_vendor_mobile = vendor_data.get("mobile", "")
+            # UPDATE END USER FIELDS WHEN DROPDOWN SELECTION CHANGES FOR QUOTATION
+            if selected_enduser_quote and selected_enduser_quote != "Select End User":
+                enduser_data = END_USER_DATABASE.get(selected_enduser_quote, {})
+                st.session_state.quote_end_company = selected_enduser_quote
+                st.session_state.quote_end_address = enduser_data.get("address", "")
+                st.session_state.quote_end_person = enduser_data.get("contact", "")
+                st.session_state.quote_end_mobile = enduser_data.get("mobile", "")
+                st.session_state.quote_end_email = enduser_data.get("email", "")
+                st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
             
+            # UPDATE TEXT INPUT FIELDS TO USE END USER DATA INSTEAD OF VENDOR DATA
             vendor_name = st.text_input("Company Name", 
-                                      value=st.session_state.get("quote_vendor_name", "Creation Studio"), 
-                                      key="quote_vendor_name")
+                                    value=st.session_state.get("quote_end_company", "Baldridge & Associates Pvt Ltd."), 
+                                    key="quote_end_company")
             vendor_address = st.text_area("Company Address", 
-                                        value=st.session_state.get("quote_vendor_address", "Al-Habtula Apartment, Swk Society,\nSid, Dah, Guja 389"), 
-                                        key="quote_vendor_address")
-            vendor_email = st.text_input("Email", "info@dreamcreationstudio.com", key="quote_vendor_email")
+                                        value=st.session_state.get("quote_end_address", "406 Sakar East, Vadodara 390009"), 
+                                        key="quote_end_address")
+            vendor_email = st.text_input("Email", 
+                                    value=st.session_state.get("quote_end_email", "info@company.com"), 
+                                    key="quote_end_email")
             vendor_contact = st.text_input("Contact Person (Kind Attention)", 
-                                         value=st.session_state.get("quote_vendor_contact", "Mr. Musta"), 
-                                         key="quote_vendor_contact")
+                                        value=st.session_state.get("quote_end_person", "Mr. Dev"), 
+                                        key="quote_end_person")
             vendor_mobile = st.text_input("Mobile", 
-                                        value=st.session_state.get("quote_vendor_mobile", "+91 9876543210"), 
-                                        key="quote_vendor_mobile")
+                                        value=st.session_state.get("quote_end_mobile", "1234567891"), 
+                                        key="quote_end_mobile")
             
+            # You can also add GST field if needed
+            vendor_gst = st.text_input("GST No (Optional)", 
+                                    value=st.session_state.get("quote_end_gst_no", ""), 
+                                    key="quote_end_gst_no")
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")
@@ -2570,7 +2592,7 @@ def main():
                     st.download_button(
                         "⬇ Download Quotation PDF",
                         data=pdf_bytes,
-                        file_name=f"{st.session_state.quote_vendor_name}_{st.session_state.quotation_number.replace('/', '_')}.pdf",
+                        file_name=f"{vendor_name}_{st.session_state.quotation_number.replace('/', '_')}.pdf",
                         mime="application/pdf",
                         use_container_width=True
                     )

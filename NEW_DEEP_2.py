@@ -339,7 +339,7 @@ def reset_po_sequence(quarter=None, sales_person=None):
 def initialize_simple_sequences():
     """Initialize simple counter files with existing sequences"""
     sequences = {
-        "CP": 15,  # Your current CP sequence
+        "CP": 128,  # Your current CP sequence
         "SD": 8,   # Your current SD sequence
         "HP": 3,   # Your current HP sequence
         "KP": 2    # Your current KP sequence

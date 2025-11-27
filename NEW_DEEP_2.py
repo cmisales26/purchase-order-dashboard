@@ -3005,14 +3005,12 @@ def main():
 
     # --- Initialize Session State ---
     if "quotation_seq" not in st.session_state:
-        # Load from file instead of starting from 1
         st.session_state.quotation_seq = get_current_quotation_sequence()
     if "quotation_products" not in st.session_state:
         st.session_state.quotation_products = []
     if "last_quotation_number" not in st.session_state:
         st.session_state.last_quotation_number = ""
     if "po_seq" not in st.session_state:
-        # Load from file instead of starting from 1
         st.session_state.po_seq = get_current_po_sequence()
     if "products" not in st.session_state:
         st.session_state.products = []
@@ -3034,15 +3032,14 @@ def main():
         st.session_state.current_po_quarter = get_current_quarter()
 
     if "invoice_seq" not in st.session_state:
-        # Load from file instead of starting from 1
         st.session_state.invoice_seq = get_current_invoice_sequence()
-    # NEW: Invoice session state
     if "invoice_number" not in st.session_state:
         st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
     if "last_invoice_number" not in st.session_state:
         st.session_state.last_invoice_number = ""
     if "current_invoice_quarter" not in st.session_state:
         st.session_state.current_invoice_quarter = get_current_quarter()
+    
     # Initialize invoice buyer session states (INDEPENDENT from PO)
     if "invoice_buyer_company" not in st.session_state:
         st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
@@ -3050,6 +3047,7 @@ def main():
         st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
     if "invoice_buyer_gst" not in st.session_state:
         st.session_state.invoice_buyer_gst = "24AAHCB9"
+    
     # Initialize vendor session states
     if "po_vendor_name" not in st.session_state:
         st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
@@ -3077,7 +3075,6 @@ def main():
         st.session_state.quote_end_email = "info@company.com"
     if "quote_end_gst_no" not in st.session_state:
         st.session_state.quote_end_gst_no = "24AAHCB9"
-    
 
     # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
@@ -3145,23 +3142,18 @@ def main():
         
         # Generate quotation number based on selected sales person
         def get_quotation_number():
-            # Check if we need to increment sequence
             if st.session_state.last_quotation_number:
                 try:
                     last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
                     
                     if last_sales_person == sales_person and last_quarter == current_quarter:
-                        # Same sales person and same quarter, increment sequence
                         next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
                         return generate_quotation_number(sales_person, next_sequence)
                     else:
-                        # Different sales person or new quarter, start from sequence 1
                         return generate_quotation_number(sales_person, 1)
                 except:
-                    # If parsing fails, use current sequence
                     return generate_quotation_number(sales_person, st.session_state.quotation_seq)
             else:
-                # No previous quotation, start from current sequence
                 return generate_quotation_number(sales_person, st.session_state.quotation_seq)
         
         # Initialize or update quotation number when sales person changes
@@ -3199,7 +3191,6 @@ def main():
             col1, col2, col3, col4 = st.sidebar.columns([1, 2, 2, 1])
             
             with col1:
-                # Show current sales person (read-only)
                 st.text_input("Sales Person", value=current_sp, key="quote_sp_display", disabled=True)
             
             with col2:
@@ -3224,7 +3215,6 @@ def main():
                 
         except Exception as e:
             st.sidebar.error(f"Error parsing quotation number: {e}")
-            # Fallback to default
             st.session_state.quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
         
         # Display final quotation number
@@ -3261,7 +3251,6 @@ def main():
                 st.session_state.quote_end_mobile = enduser_data.get("mobile", "")
                 st.session_state.quote_end_email = enduser_data.get("email", "")
                 st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
-                st.rerun()
             
             # UPDATE TEXT INPUT FIELDS TO USE END USER DATA INSTEAD OF VENDOR DATA
             vendor_name = st.text_input("Company Name", 
@@ -3354,7 +3343,6 @@ def main():
         st.info(f"**Sales Person:** {current_sales_person_info['name']} ({sales_person}) - {current_sales_person_info['email']}")
         
         # Calculate totals
-        # Calculate totals with round-off (like PO)
         totals = calculate_quotation_totals(st.session_state.quotation_products)
         
         # Preview and totals calculation (same as PO)
@@ -3412,9 +3400,9 @@ def main():
                     "vendor_mobile": vendor_mobile,
                     "products": st.session_state.quotation_products,
                     "price_validity": price_validity,
-                    "grand_total": grand_total,  # Updated with rounded amount
-                    "round_off": round_off,  # Include round off for display
-                    "amount_words": amount_words,  # Words for rounded amount
+                    "grand_total": grand_total,
+                    "round_off": round_off,
+                    "amount_words": amount_words,
                     "subject": subject_line,
                     "intro_paragraph": intro_paragraphs_1,
                     "product_name": selected_product if selected_product else "Software",   
@@ -3431,7 +3419,6 @@ def main():
                     
                     # Auto-increment for next quotation
                     if quotation_auto_increment:
-                        # This automatically increments and saves to file
                         next_sequence = get_next_quotation_sequence()
                         st.session_state.quotation_seq = next_sequence
                     
@@ -3472,23 +3459,18 @@ def main():
         
         # Generate PO number based on selected sales person
         def get_po_number():
-            # Check if we need to increment sequence
             if st.session_state.last_po_number:
                 try:
                     last_prefix, last_sales_person, last_year, last_quarter, last_sequence = parse_po_number(st.session_state.last_po_number)
                     
                     if last_sales_person == po_sales_person and last_quarter == current_quarter:
-                        # Same sales person and same quarter, increment sequence
                         next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
                         return generate_po_number(po_sales_person, next_sequence)
                     else:
-                        # Different sales person or new quarter, start from sequence 1
                         return generate_po_number(po_sales_person, 1)
                 except:
-                    # If parsing fails, use current sequence
                     return generate_po_number(po_sales_person, st.session_state.po_seq)
             else:
-                # No previous PO, start from current sequence
                 return generate_po_number(po_sales_person, st.session_state.po_seq)
         
         # Initialize or update PO number when sales person changes
@@ -3526,7 +3508,6 @@ def main():
             col1, col2, col3, col4 = st.sidebar.columns([1, 2, 2, 1])
             
             with col1:
-                # Show current sales person (read-only)
                 st.text_input("Sales Person", value=current_sp, key="po_sp_display", disabled=True)
             
             with col2:
@@ -3551,7 +3532,6 @@ def main():
                 
         except Exception as e:
             st.sidebar.error(f"Error parsing PO number: {e}")
-            # Fallback to default
             st.session_state.po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
         
         # Display final PO number
@@ -3583,7 +3563,6 @@ def main():
                 # Update vendor fields when dropdown selection changes
                 if selected_vendor and selected_vendor != "Select Vendor":
                     update_vendor_fields(selected_vendor)
-                    st.rerun()
                 
                 st.subheader("Vendor Details")
                 vendor_name = st.text_input(
@@ -3619,7 +3598,6 @@ def main():
                 # Update end user fields when dropdown selection changes
                 if selected_enduser and selected_enduser != "Select End User":
                     update_enduser_fields(selected_enduser)
-                    st.rerun()
                 
                 end_company = st.text_input(
                     "End User Company",
@@ -3758,7 +3736,7 @@ def main():
 
                 # Update grand_total and amount_words with rounded amount
                 grand_total = rounded_total
-                amount_words = number_to_words(rounded_total)  # Use your number to words function
+                amount_words = number_to_words(rounded_total)
 
                 po_data = {
                     "po_number": st.session_state.po_number,
@@ -3780,8 +3758,8 @@ def main():
                     "end_mobile": end_mobile,
                     "end_email": end_email,
                     "products": st.session_state.products,
-                    "grand_total": grand_total,  # Updated with rounded amount
-                    "amount_words": amount_words,  # Updated with words for rounded amount
+                    "grand_total": grand_total,
+                    "amount_words": amount_words,
                     "payment_terms": payment_terms,
                     "delivery_terms": delivery_terms,
                     "prepared_by": prepared_by,
@@ -3795,7 +3773,6 @@ def main():
                 
                 # Auto-increment for next PO
                 if po_auto_increment:
-                    # This automatically increments and saves to file
                     next_sequence = get_next_po_sequence()
                     st.session_state.po_seq = next_sequence
 
@@ -3830,23 +3807,18 @@ def main():
         
         # Generate invoice number based on selected sales person - SEPARATE LOGIC
         def get_invoice_number():
-            # Check if we need to increment sequence
             if st.session_state.last_invoice_number:
                 try:
                     last_prefix, last_year_range, last_quarter, last_sequence = parse_invoice_number(st.session_state.last_invoice_number)
                     
                     if last_quarter == current_quarter:
-                        # Same quarter, increment sequence
                         next_sequence = get_next_sequence_number_invoice(st.session_state.last_invoice_number)
                         return generate_invoice_number(next_sequence)
                     else:
-                        # New quarter, start from sequence 1
                         return generate_invoice_number(1)
                 except:
-                    # If parsing fails, use current sequence
                     return generate_invoice_number(st.session_state.invoice_seq)
             else:
-                # No previous invoice, start from current sequence
                 return generate_invoice_number(st.session_state.invoice_seq)
         
         # Initialize or update invoice number when quarter changes
@@ -3903,7 +3875,6 @@ def main():
                 
         except Exception as e:
             st.sidebar.error(f"Error parsing invoice number: {e}")
-            # Fallback to default
             st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
         
         # Display final invoice number
@@ -3951,14 +3922,6 @@ def main():
         with col2:
             st.subheader("Buyer Details")
             
-            # COMPLETELY SEPARATE session state for invoice buyer details
-            if "invoice_buyer_company" not in st.session_state:
-                st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
-            if "invoice_buyer_address" not in st.session_state:
-                st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
-            if "invoice_buyer_gst" not in st.session_state:
-                st.session_state.invoice_buyer_gst = "24AAHCB9"
-            
             # End User Dropdown for Invoice - SEPARATE FROM PO
             selected_enduser_invoice = st.selectbox(
                 "Select Buyer", 
@@ -3972,7 +3935,6 @@ def main():
                 st.session_state.invoice_buyer_company = selected_enduser_invoice
                 st.session_state.invoice_buyer_address = enduser_data.get("address", "")
                 st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
-                st.rerun()  # Force refresh after dropdown selection
             
             # Use the updated session state values in the text inputs
             buyer_name = st.text_input(
@@ -3981,29 +3943,17 @@ def main():
                 key="invoice_buyer_name_input"
             )
             
-            # Update session state when user manually changes the buyer name
-            if buyer_name != st.session_state.invoice_buyer_company:
-                st.session_state.invoice_buyer_company = buyer_name
-            
             buyer_address = st.text_area(
                 "Buyer Address",
                 value=st.session_state.invoice_buyer_address,
                 key="invoice_buyer_address_input"
             )
             
-            # Update session state when user manually changes the buyer address
-            if buyer_address != st.session_state.invoice_buyer_address:
-                st.session_state.invoice_buyer_address = buyer_address
-            
             buyer_gst = st.text_input(
                 "Buyer GST No.",
                 value=st.session_state.invoice_buyer_gst,
                 key="invoice_buyer_gst_input"
             )
-            
-            # Update session state when user manually changes the buyer GST
-            if buyer_gst != st.session_state.invoice_buyer_gst:
-                st.session_state.invoice_buyer_gst = buyer_gst
 
             st.subheader("Products")
             items = []
@@ -4102,7 +4052,6 @@ def main():
                 
                 # Auto-increment for next invoice
                 if invoice_auto_increment:
-                    # This automatically increments and saves to file
                     next_sequence = get_next_invoice_sequence()
                     st.session_state.invoice_seq = next_sequence
 

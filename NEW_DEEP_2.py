@@ -2592,7 +2592,7 @@ def main():
                     st.download_button(
                         "⬇ Download Quotation PDF",
                         data=pdf_bytes,
-                        file_name=f"{st.session_state.quote_vendor_name}_{st.session_state.quotation_number.replace('/', '_')}.pdf",
+                        file_name=f"{vendor_name}_{st.session_state.quotation_number.replace('/', '_')}.pdf",
                         mime="application/pdf",
                         use_container_width=True
                     )

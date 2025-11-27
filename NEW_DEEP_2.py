@@ -3997,8 +3997,9 @@ def main():
                 st.session_state.invoice_buyer_company = selected_enduser_invoice
                 st.session_state.invoice_buyer_address = enduser_data.get("address", "")
                 st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
+                st.rerun()  # Add this to force refresh after dropdown selection
             
-            # Use the updated session state values in the text inputs - FIXED TO USE CONSISTENT NAMES
+            # Use the updated session state values in the text inputs
             buyer_name = st.text_input(
                 "Buyer Name",
                 value=st.session_state.invoice_buyer_company,

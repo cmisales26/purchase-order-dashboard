@@ -3835,6 +3835,7 @@ def main():
         # --- Tab 3: Tax Invoice Generator ---
         # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
+    # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
         
@@ -3998,6 +3999,7 @@ def main():
                 st.session_state.invoice_buyer_address = enduser_data.get("address", "")
                 st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
             
+            # Use the updated session state values in the text inputs
             buyer_name = st.text_input(
                 "Buyer Name",
                 value=st.session_state.invoice_buyer_company,

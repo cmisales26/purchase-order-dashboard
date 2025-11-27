@@ -3965,18 +3965,15 @@ def main():
             # UPDATE BUYER FIELDS WHEN DROPDOWN SELECTION CHANGES - SIMPLE LIKE QUOTATION
             if selected_enduser_invoice and selected_enduser_invoice != "Select End User":
                 enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
-                st.session_state.quote_end_company = selected_enduser_quote
-                st.session_state.quote_end_address = enduser_data.get("address", "")
-                st.session_state.quote_end_person = enduser_data.get("contact", "")
-                # st.session_state.quote_end_mobile = enduser_data.get("mobile", "")
-                # st.session_state.quote_end_email = enduser_data.get("email", "")
-                st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
+                st.session_state.invoice_buyer_company = selected_enduser_invoice
+                st.session_state.invoice_buyer_address = enduser_data.get("address", "")
+                st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
             
             # USE SESSION STATE VALUES IN TEXT INPUTS - SIMPLE LIKE QUOTATION
             buyer_name = st.text_input(
                 "Buyer Name",
                 value=st.session_state.get("invoice_buyer_company", "Baldridge & Associates Pvt Ltd."),
-                key="invoice_buyer_company"
+                key="invoice_buyer_name"
             )
             
             buyer_address = st.text_area(

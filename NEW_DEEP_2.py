@@ -3004,12 +3004,20 @@ def main():
         st.sidebar.error("Stamp: ❌ Not available")
 
     # --- Initialize Session State ---
+    # --- Initialize Session State ---
+# Quotation session states
     if "quotation_seq" not in st.session_state:
         st.session_state.quotation_seq = get_current_quotation_sequence()
     if "quotation_products" not in st.session_state:
         st.session_state.quotation_products = []
     if "last_quotation_number" not in st.session_state:
         st.session_state.last_quotation_number = ""
+    if "quotation_number" not in st.session_state:
+        st.session_state.quotation_number = generate_quotation_number("SD", st.session_state.quotation_seq)
+    if "current_quote_sales_person" not in st.session_state:
+        st.session_state.current_quote_sales_person = "SD"
+
+    # PO session states  
     if "po_seq" not in st.session_state:
         st.session_state.po_seq = get_current_po_sequence()
     if "products" not in st.session_state:
@@ -3022,15 +3030,12 @@ def main():
         st.session_state.po_date = datetime.date.today().strftime("%d-%m-%Y")
     if "last_po_number" not in st.session_state:
         st.session_state.last_po_number = ""
-    if "quotation_number" not in st.session_state:
-        st.session_state.quotation_number = generate_quotation_number("SD", st.session_state.quotation_seq)
-    if "current_quote_sales_person" not in st.session_state:
-        st.session_state.current_quote_sales_person = "SD"
     if "current_po_sales_person" not in st.session_state:
         st.session_state.current_po_sales_person = "CP"
     if "current_po_quarter" not in st.session_state:
         st.session_state.current_po_quarter = get_current_quarter()
 
+    # Invoice session states
     if "invoice_seq" not in st.session_state:
         st.session_state.invoice_seq = get_current_invoice_sequence()
     if "invoice_number" not in st.session_state:
@@ -3039,16 +3044,16 @@ def main():
         st.session_state.last_invoice_number = ""
     if "current_invoice_quarter" not in st.session_state:
         st.session_state.current_invoice_quarter = get_current_quarter()
-    
-    # Initialize invoice buyer session states (INDEPENDENT from PO)
+
+    # Invoice buyer session states - ADDED
     if "invoice_buyer_company" not in st.session_state:
         st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
     if "invoice_buyer_address" not in st.session_state:
         st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
     if "invoice_buyer_gst" not in st.session_state:
         st.session_state.invoice_buyer_gst = "24AAHCB9"
-    
-    # Initialize vendor session states
+
+    # Vendor session states
     if "po_vendor_name" not in st.session_state:
         st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
     if "po_vendor_address" not in st.session_state:
@@ -3063,6 +3068,8 @@ def main():
         st.session_state.po_pan_no = "ANMPP4891R"
     if "po_msme_no" not in st.session_state:
         st.session_state.po_msme_no = "UDYAM-GJ-01-0117646"
+
+    # Quotation end user session states
     if "quote_end_company" not in st.session_state:
         st.session_state.quote_end_company = "Baldridge & Associates Pvt Ltd."
     if "quote_end_address" not in st.session_state:
@@ -3075,6 +3082,30 @@ def main():
         st.session_state.quote_end_email = "info@company.com"
     if "quote_end_gst_no" not in st.session_state:
         st.session_state.quote_end_gst_no = "24AAHCB9"
+
+    # PO end user session states - ADDED
+    if "po_end_company" not in st.session_state:
+        st.session_state.po_end_company = "Baldridge & Associates Pvt Ltd."
+    if "po_end_address" not in st.session_state:
+        st.session_state.po_end_address = "406 Sakar East, Vadodara 390009"
+    if "po_end_person" not in st.session_state:
+        st.session_state.po_end_person = "Mr. Dev"
+    if "po_end_mobile" not in st.session_state:
+        st.session_state.po_end_mobile = "1234567891"
+    if "po_end_email" not in st.session_state:
+        st.session_state.po_end_email = "info@company.com"
+    if "po_end_gst_no" not in st.session_state:
+        st.session_state.po_end_gst_no = "24AAHCB9"
+
+    # PO bill to/ship to session states - ADDED
+    if "po_bill_to_company" not in st.session_state:
+        st.session_state.po_bill_to_company = "CM INFOTECH"
+    if "po_bill_to_address" not in st.session_state:
+        st.session_state.po_bill_to_address = "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"
+    if "po_ship_to_company" not in st.session_state:
+        st.session_state.po_ship_to_company = "CM INFOTECH"
+    if "po_ship_to_address" not in st.session_state:
+        st.session_state.po_ship_to_address = "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"
 
     # --- Upload Excel and Load Vendor/End User ---
     uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
@@ -3939,24 +3970,19 @@ def main():
                 current_buyer_index = enduser_options.index(st.session_state.invoice_buyer_company)
             
             # End User Dropdown for Invoice - SEPARATE FROM PO
+            # End User Dropdown for Invoice
             selected_enduser_invoice = st.selectbox(
                 "Select Buyer", 
-                options=enduser_options,
-                index=current_buyer_index,
+                options=get_enduser_dropdown_options(),
                 key="enduser_dropdown_invoice"
             )
             
-            # Update INVOICE-SPECIFIC buyer fields when dropdown selection changes
+            # Update buyer fields when dropdown selection changes
             if selected_enduser_invoice and selected_enduser_invoice != "Select End User":
                 enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
-                # Only update if the selection actually changed
-                if (st.session_state.invoice_buyer_company != selected_enduser_invoice or
-                    st.session_state.invoice_buyer_address != enduser_data.get("address", "") or
-                    st.session_state.invoice_buyer_gst != enduser_data.get("gst_no", "")):
-                    
-                    st.session_state.invoice_buyer_company = selected_enduser_invoice
-                    st.session_state.invoice_buyer_address = enduser_data.get("address", "")
-                    st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
+                st.session_state.invoice_buyer_company = selected_enduser_invoice
+                st.session_state.invoice_buyer_address = enduser_data.get("address", "")
+                st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
             
             # Use the updated session state values in the text inputs
             buyer_name = st.text_input(
@@ -3965,19 +3991,11 @@ def main():
                 key="invoice_buyer_name_input"
             )
             
-            # Update session state when user manually changes the buyer name
-            if buyer_name != st.session_state.invoice_buyer_company:
-                st.session_state.invoice_buyer_company = buyer_name
-            
             buyer_address = st.text_area(
                 "Buyer Address",
                 value=st.session_state.invoice_buyer_address,
                 key="invoice_buyer_address_input"
             )
-            
-            # Update session state when user manually changes the buyer address
-            if buyer_address != st.session_state.invoice_buyer_address:
-                st.session_state.invoice_buyer_address = buyer_address
             
             buyer_gst = st.text_input(
                 "Buyer GST No.",

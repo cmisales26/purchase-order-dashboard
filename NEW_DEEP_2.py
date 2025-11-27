@@ -2258,7 +2258,7 @@ def main():
     tab1, tab2, tab3 = st.tabs(["Quotation Generator", "Tax Invoice Generator", "Purchase Order Generator"])
 
     # --- Tab 1: Quotation Generator ---
-    with tab3:
+    with tab1:
         st.header("📑 Adobe Software Quotation Generator")
         
         today = datetime.date.today()
@@ -3205,7 +3205,7 @@ def main():
                     mime="application/pdf"
                 )
     # --- Tab 3: Tax Invoice Generator ---
-    with tab1:
+    with tab3:
         st.header("Tax Invoice Generator")
         
         today = datetime.date.today()

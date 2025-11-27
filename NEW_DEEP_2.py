@@ -1405,7 +1405,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     pdf.cell(total_width, 5, "Final Amount to be Paid", border=1, align="L")
     pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['final_amount']:,.2f}", border=1, ln=True, align="R")  # Added comma formatting
-    
+
     
     # --- Amount in Words ---
     # First set the position and draw the border
@@ -1454,22 +1454,22 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     hsn_sgst = hsn_tax_value * 0.09
     hsn_cgst = hsn_tax_value * 0.09
     
-    # Data row - using the actual HSN code from products
+    # Data row - using the actual HSN code from products WITH COMMA FORMATTING
     pdf.cell(34, 5, primary_hsn, border=1, align="C")
-    pdf.cell(34, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(34, 5, f"{hsn_tax_value:,.2f}", border=1, align="C")  # Added comma formatting
     pdf.cell(30, 5, "9%", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(30, 5, f"{hsn_sgst:,.2f}", border=1, align="C")  # Added comma formatting
     pdf.cell(32, 5, "9%", border=1, align="C")
-    pdf.cell(31, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(31, 5, f"{hsn_cgst:,.2f}", border=1, ln=True, align="C")  # Added comma formatting
 
-    # Total row
+    # Total row WITH COMMA FORMATTING
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(34, 5, "Total", border=1, align="C")
-    pdf.cell(34, 5, f"{hsn_tax_value:.2f}", border=1, align="C")
+    pdf.cell(34, 5, f"{hsn_tax_value:,.2f}", border=1, align="C")  # Added comma formatting
     pdf.cell(30, 5, "", border=1, align="C")
-    pdf.cell(30, 5, f"{hsn_sgst:.2f}", border=1, align="C")
+    pdf.cell(30, 5, f"{hsn_sgst:,.2f}", border=1, align="C")  # Added comma formatting
     pdf.cell(32, 5, "", border=1, align="C")
-    pdf.cell(31, 5, f"{hsn_cgst:.2f}", border=1, ln=True, align="C")
+    pdf.cell(31, 5, f"{hsn_cgst:,.2f}", border=1, ln=True, align="C")  # Added comma formatting
     
     # --- Amount in Words ---
     pdf.set_font(pdf.default_font, "B", 12)

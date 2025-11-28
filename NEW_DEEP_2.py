@@ -3052,6 +3052,13 @@ def main():
         st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
     if "invoice_buyer_gst" not in st.session_state:
         st.session_state.invoice_buyer_gst = "24AAHCB9"
+    if "invoice_buyer_mobile" not in st.session_state:
+        st.session_state.invoice_buyer_mobile = "98987 91813"
+    if "invoice_buyer_email" not in st.session_state:
+        st.session_state.invoice_buyer_email = "dmistry@baseengr.com"
+    
+                #     st.session_state.invoice_buyer_mobile = enduser_data.get("mobile", "")
+                # st.session_state.invoice_buyer_email = enduser_data.get("email", "")
 
     # Vendor session states
     if "po_vendor_name" not in st.session_state:

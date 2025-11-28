@@ -3967,6 +3967,8 @@ def main():
                 enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
                 st.session_state.invoice_buyer_company = selected_enduser_invoice
                 st.session_state.invoice_buyer_address = enduser_data.get("address", "")
+                st.session_state.invoice_buyer_mobile = enduser_data.get("mobile", "")
+                st.session_state.invoice_buyer_email = enduser_data.get("email", "")
                 st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
             
             # USE SESSION STATE VALUES IN TEXT INPUTS - SIMPLE LIKE QUOTATION
@@ -3981,7 +3983,17 @@ def main():
                 value=st.session_state.get("invoice_buyer_address", "406 Sakar East, Vadodara 390009"),
                 key="invoice_buyer_address"
             )
-            
+
+            buyer_mobile = st.text_input(
+                "Buyer mobile.",
+                value=st.session_state.get("invoice_buyer_mobile", "98987 91813"),
+                key="invoice_buyer_mobile"
+            )
+            buyer_email = st.text_input(
+                "Buyer email.",
+                value=st.session_state.get("invoice_buyer_email", "dmistry@baseengr.com"),
+                key="invoice_buyer_email"
+            )
             buyer_gst = st.text_input(
                 "Buyer GST No.",
                 value=st.session_state.get("invoice_buyer_gst", "24AAHCB9"),
@@ -4057,7 +4069,7 @@ def main():
                     "invoice": {"invoice_no": invoice_no, "date": invoice_date},
                     "Reference": {"Suppliers_Reference": Suppliers_Reference, "Other": Others_Reference},
                     "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
-                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst},
+                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst, "mobile":buyer_mobile, "email":buyer_email},
                     "invoice_details": {
                         "buyers_order_no": buyers_order_no,
                         "buyers_order_date": buyers_order_date,

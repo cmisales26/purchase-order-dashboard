@@ -2091,9 +2091,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer contact details
     buyer_lines = [
-        ("Email:", "dmistry@baseengr.com"),
-        ("Tel No.:", "98987 91813"),
+        ("Email:", invoice_data['buyer']['email']),
+        ("Mobile No:", invoice_data['buyer']['moile']),
         ("GST No.:", invoice_data['buyer']['gst']),
+        # "mobile":buyer_mobile, "email":buyer_email
     ]
     
     for i, (label, value) in enumerate(buyer_lines):

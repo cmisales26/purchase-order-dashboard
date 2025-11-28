@@ -131,13 +131,13 @@ END_USER_DATABASE = {
         "email": "dmistry@baseww.com",
         "gst_no": "24AAHCB9936E1ZL"
     },
-    "Creation Studio": {
-        "address": "Al-Habtula Apartment, Swk Society, Sid, Dah, Guja 389",
-        "contact": "Mr. Musta", 
-        "mobile": "+91 9876543210",
-        "email": "info@dreamcreationstudio.com",
-        "gst_no": "24AABCU9603R1ZN"
-    },
+    # "Creation Studio": {
+    #     "address": "Al-Habtula Apartment, Swk Society, Sid, Dah, Guja 389",
+    #     "contact": "Mr. Musta", 
+    #     "mobile": "+91 9876543210",
+    #     "email": "info@dreamcreationstudio.com",
+    #     "gst_no": "24AABCU9603R1ZN"
+    # },
     "Abhir Design": {
         "address": "109-110, 3rd floor, Western plaza, Nr. Bhulka bhavan school,Adajan, Surat",
         "contact": "Mr. Abhishek Ahir ", 

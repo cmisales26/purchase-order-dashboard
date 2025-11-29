@@ -1958,7 +1958,7 @@ class PDF(FPDF):
         self.ln(9)
         self.set_font(self.default_font, "B", 15)
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
-        # self.ln()
+        self.ln()
         
     def footer(self):
         # Position at 1.5 cm from bottom

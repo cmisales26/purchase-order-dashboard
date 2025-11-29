@@ -3058,7 +3058,7 @@ def main():
     if "invoice_seq" not in st.session_state:
         st.session_state.invoice_seq = get_current_invoice_sequence()
     if "invoice_number" not in st.session_state:
-        st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
+        st.session_state.invoice_number = generate_invoice_number("SD", st.session_state.invoice_seq)
     if "last_invoice_number" not in st.session_state:
         st.session_state.last_invoice_number = ""
     if "current_invoice_quarter" not in st.session_state:

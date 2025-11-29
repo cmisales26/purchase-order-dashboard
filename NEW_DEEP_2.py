@@ -2427,7 +2427,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Buyer's Company Signature (Blank box for future use)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Buyer's Company Signature", border="LR", ln=0, align="C")
+    pdf.cell(95, 6, "Buyer's Company Signature", border="LRT", ln=0, align="C")
 
     # Right side - Our Company Signature
     pdf.cell(96, 6, "For CM INFOTECH.", border="LR", ln=1, align="C")

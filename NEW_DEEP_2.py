@@ -2769,6 +2769,17 @@ def main():
                 )
 
 
+                st.header("Terms & Authorization")
+                col1, col2 = st.columns(2)
+                with col1:
+                    payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
+                    delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
+                    delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
+                with col2:
+                    prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
+                    authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
+
+
             with col2:
                 st.subheader("Company & Tax Details")
                 bill_to_company = st.text_input(
@@ -2807,46 +2818,74 @@ def main():
                     key="po_msme_no_input"
                 )
 
-        with tab_products:
-            st.header("Products")
-            selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
-            
-            if st.button("➕ Add Selected Product", key="po_add_selected_product"):
-                if selected_product:
-                    details = PRODUCT_CATALOG[selected_product]
-                    st.session_state.products.append({
-                        "name": selected_product,
-                        "basic": details["basic"],
-                        "gst_percent": details["gst_percent"],
-                        "qty": 1.0,
-                    })
-                    st.success(f"{selected_product} added!")
-            
-            if st.button("➕ Add Empty Product", key="po_add_empty_product"):
-                st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
 
-            for i, p in enumerate(st.session_state.products):
-                with st.expander(f"Product {i+1}: {p['name']}", expanded=i == 0):
-                    st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
-                    st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
-                    st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
-                    st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
-                    if st.button("Remove", key=f"po_remove_{i}"):
-                        st.session_state.products.pop(i)
-                        st.rerun()
+                st.header("Products")
+                selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
+                
+                if st.button("➕ Add Selected Product", key="po_add_selected_product"):
+                    if selected_product:
+                        details = PRODUCT_CATALOG[selected_product]
+                        st.session_state.products.append({
+                            "name": selected_product,
+                            "basic": details["basic"],
+                            "gst_percent": details["gst_percent"],
+                            "qty": 1.0,
+                        })
+                        st.success(f"{selected_product} added!")
+                
+                if st.button("➕ Add Empty Product", key="po_add_empty_product"):
+                    st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+
+                for i, p in enumerate(st.session_state.products):
+                    with st.expander(f"Product {i+1}: {p['name']}", expanded=i == 0):
+                        st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
+                        st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
+                        st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
+                        st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
+                        if st.button("Remove", key=f"po_remove_{i}"):
+                            st.session_state.products.pop(i)
+                            st.rerun()
+
+        # with tab_products:
+        #     st.header("Products")
+        #     selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
+            
+        #     if st.button("➕ Add Selected Product", key="po_add_selected_product"):
+        #         if selected_product:
+        #             details = PRODUCT_CATALOG[selected_product]
+        #             st.session_state.products.append({
+        #                 "name": selected_product,
+        #                 "basic": details["basic"],
+        #                 "gst_percent": details["gst_percent"],
+        #                 "qty": 1.0,
+        #             })
+        #             st.success(f"{selected_product} added!")
+            
+        #     if st.button("➕ Add Empty Product", key="po_add_empty_product"):
+        #         st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+
+        #     for i, p in enumerate(st.session_state.products):
+        #         with st.expander(f"Product {i+1}: {p['name']}", expanded=i == 0):
+        #             st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
+        #             st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
+        #             st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
+        #             st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
+        #             if st.button("Remove", key=f"po_remove_{i}"):
+        #                 st.session_state.products.pop(i)
+        #                 st.rerun()
                         
-        with tab_terms:
-            st.header("Terms & Authorization")
-            col1, col2 = st.columns(2)
-            with col1:
-                payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
-                delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
-                delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
-            with col2:
-                prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
-                authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
+        # with tab_terms:
+            # st.header("Terms & Authorization")
+            # col1, col2 = st.columns(2)
+            # with col1:
+            #     payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
+            #     delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
+            #     delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
+            # with col2:
+            #     prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
+            #     authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
         
-        with tab_preview:
+        # with tab_preview:
             st.header("Preview & Generate")
             
             # Show the current PO number prominently with sales person info

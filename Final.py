@@ -1005,13 +1005,6 @@ END_USER_DATABASE = {
         "mobile": "+91 9982525635",
         "email": "interior@utcrest.com",
         "gst_no": "NOT APPLICABLE"
-    },
-    "Base Engineering": {
-        "address": "406, Sakar East, Behind Big Bazaar, Alkapuri, Vadodara - 390007",
-        "contact": "Mr. Dhaval Mistry",
-        "mobile": "9898791813", 
-        "email": "dmistry@baseengr.com",
-        "gst_no": "24AAIFB7147L1ZH"
     }
 }
 

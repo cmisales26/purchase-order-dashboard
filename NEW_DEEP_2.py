@@ -2944,14 +2944,13 @@ def main():
     with tab3:
     # Display company logo instead of text header
         if global_logo_path and os.path.exists(global_logo_path):
-            col_logo, col_text = st.columns([1, 3])
+            col_logo, col_text = st.columns([1, 2])
             with col_logo:
                 st.image(global_logo_path, width=100)
             with col_text:
-                st.header("CM INFOTECH")
-                st.subheader("Tax Invoice Generator")
+                st.header("Tax Invoice Generator")
         else:
-            st.header("Tax Invoice Generator")
+            st.header("Tax Invoice Generator")   
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()

@@ -2766,9 +2766,47 @@ def main():
                 value=st.session_state.get("po_end_email", "info@company.com"),
                 key="po_end_email"
             )
-        
+            
+            # Products Section under End User
+            st.subheader("Products")
+            selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
+            
+            col_add1, col_add2 = st.columns(2)
+            with col_add1:
+                if st.button("➕ Add Selected Product", key="po_add_selected_product", use_container_width=True):
+                    if selected_product:
+                        details = PRODUCT_CATALOG[selected_product]
+                        st.session_state.products.append({
+                            "name": selected_product,
+                            "basic": details["basic"],
+                            "gst_percent": details["gst_percent"],
+                            "qty": 1.0,
+                        })
+                        st.success(f"{selected_product} added!")
+                        st.rerun()
+            with col_add2:
+                if st.button("➕ Add Empty Product", key="po_add_empty_product", use_container_width=True):
+                    st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+                    st.rerun()
+
+            # Display products
+            for i, p in enumerate(st.session_state.products):
+                with st.expander(f"Product {i+1}: {p['name']}", expanded=True):
+                    col_prod1, col_prod2, col_prod3, col_prod4 = st.columns([3, 2, 2, 1])
+                    with col_prod1:
+                        st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
+                    with col_prod2:
+                        st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
+                    with col_prod3:
+                        st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
+                    with col_prod4:
+                        st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
+                    if st.button("Remove", key=f"po_remove_{i}", use_container_width=True):
+                        st.session_state.products.pop(i)
+                        st.rerun()
+
         with col2:
-            st.subheader("Company & Products")
+            st.subheader("Company & Tax Details")
             
             # Company Details
             bill_to_company = st.text_input(
@@ -2815,132 +2853,90 @@ def main():
             prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
             authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
             
-            # Create two columns for the main layout
-            col1, col2 = st.columns(2)
+            # Preview & Generate Section under Terms & Authorization
+            st.subheader("Preview & Generate")
+            
+            # Show the current PO number prominently with sales person info
+            st.info(f"**PO Number:** {st.session_state.po_number}")
+            st.info(f"**Sales Person:** {current_sales_person_info['name']} ({po_sales_person}) - {current_sales_person_info['email']}")
+            
+            total_base = sum(p["basic"] * p["qty"] for p in st.session_state.products)
+            total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.products)
+            grand_total = total_base + total_gst
+            amount_words = num2words(grand_total, to="currency", currency="INR").title()
+            st.metric("Grand Total", f"₹{grand_total:,.2f}")
 
-            with col1:
-                # Products Section
-                st.subheader("Products")
-                selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
+            # Use global logo
+            logo_path = global_logo_path
+            if not logo_path:
+                st.warning("No company logo available. Please upload one in the sidebar.")
+            
+            if st.button("Generate PO", type="primary", key="po_generate_button", use_container_width=True):
+                # Calculate total from all products
+                products_total = 0
+                for p in st.session_state.products:
+                    gst_amt = p["basic"] * p["gst_percent"] / 100
+                    per_unit_price = p["basic"] + gst_amt
+                    total = per_unit_price * p["qty"]
+                    products_total += total
+
+                # Calculate round off to make final amount whole number
+                rounded_total = round(products_total)
+                round_off = rounded_total - products_total
+
+                # Update grand_total and amount_words with rounded amount
+                grand_total = rounded_total
+                amount_words = number_to_words(rounded_total)
+
+                po_data = {
+                    "po_number": st.session_state.po_number,
+                    "po_date": st.session_state.po_date,
+                    "vendor_name": vendor_name,
+                    "vendor_address": vendor_address,
+                    "vendor_contact": vendor_contact,
+                    "vendor_mobile": vendor_mobile,
+                    "gst_no": gst_no,
+                    "pan_no": pan_no,
+                    "msme_no": msme_no,
+                    "bill_to_company": bill_to_company,
+                    "bill_to_address": bill_to_address,
+                    "ship_to_company": ship_to_company,
+                    "ship_to_address": ship_to_address,
+                    "end_company": end_company,
+                    "end_address": end_address,
+                    "end_person": end_person,
+                    "end_mobile": end_mobile,
+                    "end_email": end_email,
+                    "products": st.session_state.products,
+                    "grand_total": grand_total,
+                    "amount_words": amount_words,
+                    "payment_terms": payment_terms,
+                    "delivery_terms": delivery_terms,
+                    "prepared_by": prepared_by,
+                    "authorized_by": authorized_by,
+                    "company_name": st.session_state.company_name
+                }
+
+                pdf_bytes = create_po_pdf(po_data, logo_path)
+                # Store the last PO number for sequence tracking
+                st.session_state.last_po_number = st.session_state.po_number
                 
-                col_add1, col_add2 = st.columns(2)
-                with col_add1:
-                    if st.button("➕ Add Selected Product", key="po_add_selected_product", use_container_width=True):
-                        if selected_product:
-                            details = PRODUCT_CATALOG[selected_product]
-                            st.session_state.products.append({
-                                "name": selected_product,
-                                "basic": details["basic"],
-                                "gst_percent": details["gst_percent"],
-                                "qty": 1.0,
-                            })
-                            st.success(f"{selected_product} added!")
-                            st.rerun()
-                with col_add2:
-                    if st.button("➕ Add Empty Product", key="po_add_empty_product", use_container_width=True):
-                        st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
-                        st.rerun()
+                # Auto-increment for next PO
+                if po_auto_increment:
+                    next_sequence = get_next_po_sequence()
+                    st.session_state.po_seq = next_sequence
 
-                # Display products
-                for i, p in enumerate(st.session_state.products):
-                    with st.expander(f"Product {i+1}: {p['name']}", expanded=True):
-                        col_prod1, col_prod2, col_prod3, col_prod4 = st.columns([3, 2, 2, 1])
-                        with col_prod1:
-                            st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
-                        with col_prod2:
-                            st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
-                        with col_prod3:
-                            st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
-                        with col_prod4:
-                            st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
-                        if st.button("Remove", key=f"po_remove_{i}", use_container_width=True):
-                            st.session_state.products.pop(i)
-                            st.rerun()
-
-            with col2:
-                # Preview & Generate Section
-                st.subheader("Preview & Generate")
+                st.success("Purchase Order generated!")
+                st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
                 
-                # Show the current PO number prominently with sales person info
-                st.info(f"**PO Number:** {st.session_state.po_number}")
-                st.info(f"**Sales Person:** {current_sales_person_info['name']} ({po_sales_person}) - {current_sales_person_info['email']}")
+                st.download_button(
+                    "⬇ Download Purchase Order",
+                    data=pdf_bytes,
+                    file_name=f"{end_company}_{st.session_state.po_number.replace('/', '_')}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True
+                )
                 
-                total_base = sum(p["basic"] * p["qty"] for p in st.session_state.products)
-                total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.products)
-                grand_total = total_base + total_gst
-                amount_words = num2words(grand_total, to="currency", currency="INR").title()
-                st.metric("Grand Total", f"₹{grand_total:,.2f}")
-
-                # Use global logo
-                logo_path = global_logo_path
-                if not logo_path:
-                    st.warning("No company logo available. Please upload one in the sidebar.")
-                
-                if st.button("Generate PO", type="primary", key="po_generate_button", use_container_width=True):
-                    # Calculate total from all products
-                    products_total = 0
-                    for p in st.session_state.products:
-                        gst_amt = p["basic"] * p["gst_percent"] / 100
-                        per_unit_price = p["basic"] + gst_amt
-                        total = per_unit_price * p["qty"]
-                        products_total += total
-
-                    # Calculate round off to make final amount whole number
-                    rounded_total = round(products_total)
-                    round_off = rounded_total - products_total
-
-                    # Update grand_total and amount_words with rounded amount
-                    grand_total = rounded_total
-                    amount_words = number_to_words(rounded_total)
-
-                    po_data = {
-                        "po_number": st.session_state.po_number,
-                        "po_date": st.session_state.po_date,
-                        "vendor_name": vendor_name,
-                        "vendor_address": vendor_address,
-                        "vendor_contact": vendor_contact,
-                        "vendor_mobile": vendor_mobile,
-                        "gst_no": gst_no,
-                        "pan_no": pan_no,
-                        "msme_no": msme_no,
-                        "bill_to_company": bill_to_company,
-                        "bill_to_address": bill_to_address,
-                        "ship_to_company": ship_to_company,
-                        "ship_to_address": ship_to_address,
-                        "end_company": end_company,
-                        "end_address": end_address,
-                        "end_person": end_person,
-                        "end_mobile": end_mobile,
-                        "end_email": end_email,
-                        "products": st.session_state.products,
-                        "grand_total": grand_total,
-                        "amount_words": amount_words,
-                        "payment_terms": payment_terms,
-                        "delivery_terms": delivery_terms,
-                        "prepared_by": prepared_by,
-                        "authorized_by": authorized_by,
-                        "company_name": st.session_state.company_name
-                    }
-
-                    pdf_bytes = create_po_pdf(po_data, logo_path)
-                    # Store the last PO number for sequence tracking
-                    st.session_state.last_po_number = st.session_state.po_number
-                    
-                    # Auto-increment for next PO
-                    if po_auto_increment:
-                        next_sequence = get_next_po_sequence()
-                        st.session_state.po_seq = next_sequence
-
-                    st.success("Purchase Order generated!")
-                    st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
-                    
-                    st.download_button(
-                        "⬇ Download Purchase Order",
-                        data=pdf_bytes,
-                        file_name=f"{end_company}_{st.session_state.po_number.replace('/', '_')}.pdf",
-                        mime="application/pdf",
-                        use_container_width=True
-                    )                
         # --- Tab 3: Tax Invoice Generator ---
         # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---

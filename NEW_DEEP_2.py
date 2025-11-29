@@ -1286,39 +1286,36 @@ def get_current_invoice_sequence():
 
 # --- Helper Functions for Invoice ---
 def parse_invoice_number(invoice_number):
-    """Parse invoice number to extract components"""
+    """Parse invoice number to extract components - SAME PATTERN AS PO/QUOTATION"""
     try:
         parts = invoice_number.split('/')
         if len(parts) >= 4:
             prefix = parts[0]  # CMI
-            year_range = parts[1]  # 25-26
-            quarter = parts[2]  # Q3
-            sequence = parts[3]  # 01, 02, etc.
-            return prefix, year_range, quarter, sequence
+            sales_person = parts[1]  # CP, SD, HP, KP
+            year_range = parts[2]  # 25-26
+            quarter_sequence = parts[3]  # Q3_01
+            quarter = quarter_sequence.split('_')[0]  # Q3
+            sequence = quarter_sequence.split('_')[1] if '_' in quarter_sequence else "01"  # 01, 02, etc.
+            return prefix, sales_person, year_range, quarter, sequence
     except:
         pass
-    return "CMI", f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}", get_current_quarter(), "001"
+    return "CMI", "SD", f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}", get_current_quarter(), "01"
 
-def generate_next_invoice_number():
-    """Generate complete invoice number with auto-increment"""
-    sequence_number = get_next_invoice_sequence()
-    return generate_invoice_number(sequence_number)
-
-def generate_invoice_number(sequence_number):
-    """Generate invoice number with current quarter and sequence"""
+def generate_invoice_number(sales_person, sequence_number):
+    """Generate invoice number with current quarter and sequence - SAME PATTERN AS PO"""
     current_date = datetime.datetime.now()
     quarter = get_current_quarter()
     year_range = f"{str(current_date.year)[2:]}-{str(current_date.year + 1)[2:]}"
-    sequence = f"{sequence_number:03d}"
+    sequence = f"{sequence_number:02d}"
     
-    return f"CMI/{year_range}/{quarter}/{sequence}"
+    return f"CMI/{sales_person}/{year_range}/{quarter}_{sequence}"
 
 def get_next_sequence_number_invoice(invoice_number):
-    """Extract and increment sequence number from invoice number"""
+    """Extract and increment sequence number from invoice number - SAME PATTERN AS PO"""
     try:
-        parts = invoice_number.split('/')
-        if len(parts) >= 4:
-            sequence = parts[3]
+        parts = invoice_number.split('_')
+        if len(parts) > 1:
+            sequence = parts[-1]
             return int(sequence) + 1
     except:
         pass
@@ -3849,16 +3846,17 @@ def main():
         # --- Tab 3: Tax Invoice Generator ---
         # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
+        # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
         
-        # Invoice Settings in sidebar for this tab
+        # Invoice Settings in sidebar for this tab - SAME AS PO/QUOTATION
         st.sidebar.header("Invoice Settings")
         
-        # Sales Person Selection for Invoice
+        # Sales Person Selection for Invoice - ADD THIS
         invoice_sales_person = st.sidebar.selectbox("Select Sales Person", 
                                             options=list(SALES_PERSON_MAPPING.keys()), 
                                             format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
@@ -3867,29 +3865,31 @@ def main():
         # Get current sales person info
         current_sales_person_info = SALES_PERSON_MAPPING.get(invoice_sales_person, SALES_PERSON_MAPPING['SD'])
         
-        # Generate invoice number
+        # Generate invoice number based on selected sales person - SAME LOGIC AS PO
         def get_invoice_number():
             if st.session_state.last_invoice_number:
                 try:
-                    last_prefix, last_year_range, last_quarter, last_sequence = parse_invoice_number(st.session_state.last_invoice_number)
+                    last_prefix, last_sales_person, last_year_range, last_quarter, last_sequence = parse_invoice_number(st.session_state.last_invoice_number)
                     
-                    if last_quarter == current_quarter:
+                    if last_sales_person == invoice_sales_person and last_quarter == current_quarter:
                         next_sequence = get_next_sequence_number_invoice(st.session_state.last_invoice_number)
-                        return generate_invoice_number(next_sequence)
+                        return generate_invoice_number(invoice_sales_person, next_sequence)
                     else:
-                        return generate_invoice_number(1)
+                        return generate_invoice_number(invoice_sales_person, 1)
                 except:
-                    return generate_invoice_number(st.session_state.invoice_seq)
+                    return generate_invoice_number(invoice_sales_person, st.session_state.invoice_seq)
             else:
-                return generate_invoice_number(st.session_state.invoice_seq)
+                return generate_invoice_number(invoice_sales_person, st.session_state.invoice_seq)
         
-        # Initialize or update invoice number when quarter changes
-        if "current_invoice_quarter" not in st.session_state:
-            st.session_state.current_invoice_quarter = current_quarter
+        # Initialize or update invoice number when sales person changes - SAME AS PO
+        if "current_invoice_sales_person" not in st.session_state:
+            st.session_state.current_invoice_sales_person = invoice_sales_person
             st.session_state.invoice_number = get_invoice_number()
         
-        # Update invoice number if quarter changes
-        if st.session_state.get('current_invoice_quarter', '') != current_quarter:
+        # Update invoice number if sales person changes or quarter changes - SAME AS PO
+        if (st.session_state.current_invoice_sales_person != invoice_sales_person or 
+            st.session_state.get('current_invoice_quarter', '') != current_quarter):
+            st.session_state.current_invoice_sales_person = invoice_sales_person
             st.session_state.current_invoice_quarter = current_quarter
             st.session_state.invoice_number = get_invoice_number()
         
@@ -3897,38 +3897,41 @@ def main():
         st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
         st.sidebar.info(f"**Current Quarter:** {current_quarter}")
         
-        # Show auto-generated breakdown
+        # Show auto-generated breakdown - UPDATED FOR NEW FORMAT
         try:
-            prefix, year_range, quarter, sequence = parse_invoice_number(st.session_state.invoice_number)
+            prefix, current_sp, year_range, quarter, sequence = parse_invoice_number(st.session_state.invoice_number)
             st.sidebar.success(f"**Auto-generated Invoice Number**")
-            st.sidebar.info(f"**Format:** {year_range}/{quarter}/{sequence}")
+            st.sidebar.info(f"**Format:** {current_sp}/{year_range}/{quarter}_{sequence}")
         except:
             st.sidebar.warning("Could not parse invoice number")
         
-        # Editable invoice number
+        # Editable invoice number - UPDATED FOR NEW FORMAT
         st.sidebar.subheader("Invoice Number Editor")
         
-        # Parse current invoice number for editing
+        # Parse current invoice number for editing - UPDATED
         try:
-            current_prefix, current_year_range, current_q, current_seq = parse_invoice_number(st.session_state.invoice_number)
+            current_prefix, current_sp, current_year_range, current_q, current_seq = parse_invoice_number(st.session_state.invoice_number)
             
-            # Create editable components
-            col1, col2, col3 = st.sidebar.columns([2, 2, 1])
+            # Create editable components - SAME AS PO
+            col1, col2, col3, col4 = st.sidebar.columns([1, 2, 2, 1])
             
             with col1:
-                new_year_range = st.text_input("Year Range", value=current_year_range, key="invoice_year_edit")
+                st.text_input("Sales Person", value=current_sp, key="invoice_sp_display", disabled=True)
             
             with col2:
-                new_quarter = st.text_input("Quarter", value=current_q, key="invoice_quarter_edit")
+                new_year_range = st.text_input("Year Range", value=current_year_range, key="invoice_year_edit")
             
             with col3:
+                new_quarter = st.text_input("Quarter", value=current_q, key="invoice_quarter_edit")
+            
+            with col4:
                 new_sequence = st.number_input("Sequence", 
                                             min_value=1, 
                                             value=int(current_seq), 
                                             step=1,
                                             key="invoice_seq_edit")
             
-            # Construct new invoice number
+            # Construct new invoice number using the SELECTED sales person - SAME AS PO
             new_invoice_number = f"CMI/{new_year_range}/{new_quarter}/{new_sequence:02d}"
             
             # Update if changed
@@ -3937,7 +3940,7 @@ def main():
                 
         except Exception as e:
             st.sidebar.error(f"Error parsing invoice number: {e}")
-            st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
+            st.session_state.invoice_number = generate_invoice_number(invoice_sales_person, st.session_state.invoice_seq)
         
         # Display final invoice number
         st.sidebar.code(st.session_state.invoice_number)
@@ -3951,6 +3954,7 @@ def main():
             st.sidebar.success("Invoice number reset to auto-generated")
             st.rerun()
 
+        # Rest of your invoice tab code remains the same...
         col1, col2 = st.columns([1,1])
         with col1:
             st.subheader("Invoice Details")
@@ -3959,7 +3963,9 @@ def main():
             st.info(f"**Invoice Number:** {st.session_state.invoice_number}")
             st.info(f"**Sales Person:** {current_sales_person_info['name']} ({invoice_sales_person}) - {current_sales_person_info['email']}")
             
+            # Use the session state invoice number
             invoice_no = st.text_input("Invoice No", st.session_state.invoice_number, key="invoice_number_input")
+            # Rest of your code...
             invoice_date = st.text_input("Invoice Date", datetime.date.today().strftime("%d-%m-%Y"))
             Suppliers_Reference = st.text_input("Supplier's Reference", "NA")
             Others_Reference = st.text_input("Other's Reference", "NA")
@@ -4057,8 +4063,8 @@ def main():
             st.subheader("Invoice Preview & Download")
 
             if st.button("Generate Invoice", key="generate_invoice_button"):
-                st.session_state.invoice_number = generate_next_invoice_number()
-                invoice_no = st.session_state.invoice_number
+                # st.session_state.invoice_number = generate_next_invoice_number()
+                # invoice_no = st.session_state.invoice_number
                 st.success(f"Generated Invoice: {invoice_no}")
                 # Calculate amounts with proper rounding like in PO generator
                 basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)

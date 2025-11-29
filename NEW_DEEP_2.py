@@ -12,8 +12,8 @@ import html as _html
 import requests  # Add this import for downloading from GitHub
 
 # GitHub Configuration - FIXED URLs
-LOGO_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/logo_final.jpg"
-STAMP_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/stamp.jpg"
+LOGO_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/logo_final.jp"
+STAMP_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/stamp.jp"
 
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {

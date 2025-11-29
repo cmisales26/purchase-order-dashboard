@@ -2689,140 +2689,139 @@ def main():
             st.sidebar.success("PO number reset to auto-generated")
             st.rerun()
         
-        tab_vendor, tab_products, tab_terms, tab_preview = st.tabs(["Vendor Details", "Products", "Terms", "Preview & Generate"])
+        # Single tab with two columns
+        col1, col2 = st.columns(2)
         
-        with tab_vendor:
-            col1, col2 = st.columns(2)
-            with col1:
-                st.subheader("Vendor Selection")
-                
-                # Vendor Dropdown
-                selected_vendor = st.selectbox(
-                    "Select Vendor", 
-                    options=get_vendor_dropdown_options(),
-                    key="vendor_dropdown_po"
-                )
-                
-                # Update vendor fields when dropdown selection changes
-                if selected_vendor and selected_vendor != "Select Vendor":
-                    update_vendor_fields(selected_vendor)
-                
-                st.subheader("Vendor Details")
-                vendor_name = st.text_input(
-                    "Vendor Name",
-                    value=st.session_state.get("po_vendor_name", "Arkance IN Pvt. Ltd."),
-                    key="po_vendor_name"
-                )
-                vendor_address = st.text_area(
-                    "Vendor Address",
-                    value=st.session_state.get("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1..."),
-                    key="po_vendor_address"
-                )
-                vendor_contact = st.text_input(
-                    "Contact Person",
-                    value=st.session_state.get("po_vendor_contact", "Ms/Mr"),
-                    key="po_vendor_contact"
-                )
-                vendor_mobile = st.text_input(
-                    "Mobile",
-                    value=st.session_state.get("po_vendor_mobile", "+91 1234567890"),
-                    key="po_vendor_mobile"
-                )
-                
-                st.subheader("End User Details")
-                
-                # End User Dropdown
-                selected_enduser = st.selectbox(
-                    "Select End User", 
-                    options=get_enduser_dropdown_options(),
-                    key="enduser_dropdown_po"
-                )
-                
-                # Update end user fields when dropdown selection changes
-                if selected_enduser and selected_enduser != "Select End User":
-                    update_enduser_fields(selected_enduser)
-                
-                end_company = st.text_input(
-                    "End User Company",
-                    value=st.session_state.get("po_end_company", "Baldridge & Associates Pvt Ltd."),
-                    key="po_end_company"
-                )
-                end_address = st.text_area(
-                    "End User Address",
-                    value=st.session_state.get("po_end_address", "406 Sakar East, Vadodara 390009"),
-                    key="po_end_address"
-                )
-                end_person = st.text_input(
-                    "End User Contact",
-                    value=st.session_state.get("po_end_person", "Mr. Dev"),
-                    key="po_end_person"
-                )
-                end_mobile = st.text_input(
-                    "End Mobile",
-                    value=str(st.session_state.get("po_end_mobile", "1234567891") or "").strip(),
-                    key="po_end_mobile"
-                )
-                end_email = st.text_input(
-                    "End User Email",
-                    value=st.session_state.get("po_end_email", "info@company.com"),
-                    key="po_end_email"
-                )
-
-
-                st.header("Terms & Authorization")
-                col1, col2 = st.columns(2)
-                with col1:
-                    payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
-                    delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
-                    delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
-                with col2:
-                    prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
-                    authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
-
-
-            with col2:
-                st.subheader("Company & Tax Details")
-                bill_to_company = st.text_input(
-                    "Bill To",
-                    value=safe_str_state("po_bill_to_company", "CM INFOTECH"),
-                    key="po_bill_to_company_input"
-                )
-                bill_to_address = st.text_area(
-                    "Bill To Address",
-                    value=safe_str_state("po_bill_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
-                    key="po_bill_to_address_input"
-                )
-                ship_to_company = st.text_input(
-                    "Ship To",
-                    value=safe_str_state("po_ship_to_company", "CM INFOTECH"),
-                    key="po_ship_to_company_input"
-                )
-                ship_to_address = st.text_area(
-                    "Ship To Address",
-                    value=safe_str_state("po_ship_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
-                    key="po_ship_to_address_input"
-                )
-                gst_no = st.text_input(
-                    "GST No",
-                    value=st.session_state.get("po_gst_no", "24ANMPP4891R1ZX"),
-                    key="po_gst_no_input"
-                )
-                pan_no = st.text_input(
-                    "PAN No",
-                    value=st.session_state.get("po_pan_no", "ANMPP4891R"),
-                    key="po_pan_no_input"
-                )
-                msme_no = st.text_input(
-                    "MSME No",
-                    value=st.session_state.get("po_msme_no", "UDYAM-GJ-01-0117646"),
-                    key="po_msme_no_input"
-                )
-
-
-                st.header("Products")
-                selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
-                
-                if st.button("➕ Add Selected Product", key="po_add_selected_product"):
+        with col1:
+            st.subheader("Vendor & End User Details")
+            
+            # Vendor Selection
+            selected_vendor = st.selectbox(
+                "Select Vendor", 
+                options=get_vendor_dropdown_options(),
+                key="vendor_dropdown_po"
+            )
+            
+            # Update vendor fields when dropdown selection changes
+            if selected_vendor and selected_vendor != "Select Vendor":
+                update_vendor_fields(selected_vendor)
+            
+            st.subheader("Vendor Details")
+            vendor_name = st.text_input(
+                "Vendor Name",
+                value=st.session_state.get("po_vendor_name", "Arkance IN Pvt. Ltd."),
+                key="po_vendor_name"
+            )
+            vendor_address = st.text_area(
+                "Vendor Address",
+                value=st.session_state.get("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1..."),
+                key="po_vendor_address"
+            )
+            vendor_contact = st.text_input(
+                "Contact Person",
+                value=st.session_state.get("po_vendor_contact", "Ms/Mr"),
+                key="po_vendor_contact"
+            )
+            vendor_mobile = st.text_input(
+                "Mobile",
+                value=st.session_state.get("po_vendor_mobile", "+91 1234567890"),
+                key="po_vendor_mobile"
+            )
+            
+            st.subheader("End User Details")
+            
+            # End User Dropdown
+            selected_enduser = st.selectbox(
+                "Select End User", 
+                options=get_enduser_dropdown_options(),
+                key="enduser_dropdown_po"
+            )
+            
+            # Update end user fields when dropdown selection changes
+            if selected_enduser and selected_enduser != "Select End User":
+                update_enduser_fields(selected_enduser)
+            
+            end_company = st.text_input(
+                "End User Company",
+                value=st.session_state.get("po_end_company", "Baldridge & Associates Pvt Ltd."),
+                key="po_end_company"
+            )
+            end_address = st.text_area(
+                "End User Address",
+                value=st.session_state.get("po_end_address", "406 Sakar East, Vadodara 390009"),
+                key="po_end_address"
+            )
+            end_person = st.text_input(
+                "End User Contact",
+                value=st.session_state.get("po_end_person", "Mr. Dev"),
+                key="po_end_person"
+            )
+            end_mobile = st.text_input(
+                "End Mobile",
+                value=str(st.session_state.get("po_end_mobile", "1234567891") or "").strip(),
+                key="po_end_mobile"
+            )
+            end_email = st.text_input(
+                "End User Email",
+                value=st.session_state.get("po_end_email", "info@company.com"),
+                key="po_end_email"
+            )
+        
+        with col2:
+            st.subheader("Company & Products")
+            
+            # Company Details
+            bill_to_company = st.text_input(
+                "Bill To",
+                value=safe_str_state("po_bill_to_company", "CM INFOTECH"),
+                key="po_bill_to_company_input"
+            )
+            bill_to_address = st.text_area(
+                "Bill To Address",
+                value=safe_str_state("po_bill_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
+                key="po_bill_to_address_input"
+            )
+            ship_to_company = st.text_input(
+                "Ship To",
+                value=safe_str_state("po_ship_to_company", "CM INFOTECH"),
+                key="po_ship_to_company_input"
+            )
+            ship_to_address = st.text_area(
+                "Ship To Address",
+                value=safe_str_state("po_ship_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
+                key="po_ship_to_address_input"
+            )
+            gst_no = st.text_input(
+                "GST No",
+                value=st.session_state.get("po_gst_no", "24ANMPP4891R1ZX"),
+                key="po_gst_no_input"
+            )
+            pan_no = st.text_input(
+                "PAN No",
+                value=st.session_state.get("po_pan_no", "ANMPP4891R"),
+                key="po_pan_no_input"
+            )
+            msme_no = st.text_input(
+                "MSME No",
+                value=st.session_state.get("po_msme_no", "UDYAM-GJ-01-0117646"),
+                key="po_msme_no_input"
+            )
+            
+            # Terms & Authorization
+            st.subheader("Terms & Authorization")
+            payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
+            delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
+            delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
+            prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
+            authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
+            
+            # Products Section
+            st.subheader("Products")
+            selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
+            
+            col_add1, col_add2 = st.columns(2)
+            with col_add1:
+                if st.button("➕ Add Selected Product", key="po_add_selected_product", use_container_width=True):
                     if selected_product:
                         details = PRODUCT_CATALOG[selected_product]
                         st.session_state.products.append({
@@ -2832,61 +2831,30 @@ def main():
                             "qty": 1.0,
                         })
                         st.success(f"{selected_product} added!")
-                
-                if st.button("➕ Add Empty Product", key="po_add_empty_product"):
+                        st.rerun()
+            with col_add2:
+                if st.button("➕ Add Empty Product", key="po_add_empty_product", use_container_width=True):
                     st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+                    st.rerun()
 
-                for i, p in enumerate(st.session_state.products):
-                    with st.expander(f"Product {i+1}: {p['name']}", expanded=i == 0):
+            # Display products
+            for i, p in enumerate(st.session_state.products):
+                with st.expander(f"Product {i+1}: {p['name']}", expanded=True):
+                    col_prod1, col_prod2, col_prod3, col_prod4 = st.columns([3, 2, 2, 1])
+                    with col_prod1:
                         st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
+                    with col_prod2:
                         st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
+                    with col_prod3:
                         st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
+                    with col_prod4:
                         st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
-                        if st.button("Remove", key=f"po_remove_{i}"):
-                            st.session_state.products.pop(i)
-                            st.rerun()
-
-        # with tab_products:
-        #     st.header("Products")
-        #     selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
+                    if st.button("Remove", key=f"po_remove_{i}", use_container_width=True):
+                        st.session_state.products.pop(i)
+                        st.rerun()
             
-        #     if st.button("➕ Add Selected Product", key="po_add_selected_product"):
-        #         if selected_product:
-        #             details = PRODUCT_CATALOG[selected_product]
-        #             st.session_state.products.append({
-        #                 "name": selected_product,
-        #                 "basic": details["basic"],
-        #                 "gst_percent": details["gst_percent"],
-        #                 "qty": 1.0,
-        #             })
-        #             st.success(f"{selected_product} added!")
-            
-        #     if st.button("➕ Add Empty Product", key="po_add_empty_product"):
-        #         st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
-
-        #     for i, p in enumerate(st.session_state.products):
-        #         with st.expander(f"Product {i+1}: {p['name']}", expanded=i == 0):
-        #             st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
-        #             st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
-        #             st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
-        #             st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
-        #             if st.button("Remove", key=f"po_remove_{i}"):
-        #                 st.session_state.products.pop(i)
-        #                 st.rerun()
-                        
-        # with tab_terms:
-            # st.header("Terms & Authorization")
-            # col1, col2 = st.columns(2)
-            # with col1:
-            #     payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
-            #     delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
-            #     delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
-            # with col2:
-            #     prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
-            #     authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
-        
-        # with tab_preview:
-            st.header("Preview & Generate")
+            # Preview & Generate Section
+            st.subheader("Preview & Generate")
             
             # Show the current PO number prominently with sales person info
             st.info(f"**PO Number:** {st.session_state.po_number}")
@@ -2903,7 +2871,7 @@ def main():
             if not logo_path:
                 st.warning("No company logo available. Please upload one in the sidebar.")
             
-            if st.button("Generate PO", type="primary", key="po_generate_button"):
+            if st.button("Generate PO", type="primary", key="po_generate_button", use_container_width=True):
                 # Calculate total from all products
                 products_total = 0
                 for p in st.session_state.products:
@@ -2965,7 +2933,8 @@ def main():
                     "⬇ Download Purchase Order",
                     data=pdf_bytes,
                     file_name=f"{end_company}_{st.session_state.po_number.replace('/', '_')}.pdf",
-                    mime="application/pdf"
+                    mime="application/pdf",
+                    use_container_width=True
                 )
                 
         # --- Tab 3: Tax Invoice Generator ---

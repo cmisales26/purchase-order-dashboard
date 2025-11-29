@@ -2268,7 +2268,11 @@ def main():
 
     # --- Tab 1: Quotation Generator ---
     with tab1:
-        st.header("📑 Quotation Generator")
+        if global_logo_path and os.path.exists(global_logo_path):
+            st.image(global_logo_path, width=150)
+            st.markdown("### Quotation Generator")
+        else:
+            st.header("Quotation Generator")  
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
@@ -2585,9 +2589,9 @@ def main():
     with tab2:
         if global_logo_path and os.path.exists(global_logo_path):
             st.image(global_logo_path, width=150)
-            st.markdown("### Tax Invoice Generator")
+            st.markdown("### Purchase Order Generator")
         else:
-            st.header("Tax Invoice Generator")  
+            st.header("Purchase Order Generator")  
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()

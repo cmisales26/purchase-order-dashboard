@@ -367,14 +367,16 @@ def parse_invoice_number(invoice_number):
         pass
     return "CMI", f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}", get_current_quarter(), "01"
 
-def generate_invoice_number(sequence_number):
-    """Generate invoice number - KEEP EXISTING FORMAT"""
-    current_date = datetime.datetime.now()
+def generate_invoice_number(sequence_number, buyer_name="Unknown Company"):
+    """Generate invoice number with new format including buyer name"""
+    current_date = datetime.date.today().strftime("%d-%m-%Y")
     quarter = get_current_quarter()
-    year_range = f"{str(current_date.year)[2:]}-{str(current_date.year + 1)[2:]}"
-    sequence = f"{sequence_number:02d}"
+    year_range = f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}"
     
-    return f"CMI/{year_range}/{quarter}/{sequence}"
+    # Remove spaces and special characters for filename safety
+    safe_buyer_name = "".join(c for c in buyer_name if c.isalnum())
+    
+    return f"{safe_buyer_name} {current_date} CMI_{year_range}_{quarter}_{sequence_number:02d}"
 
 def get_next_sequence_number_invoice(invoice_number):
     """Extract and increment sequence number from invoice number"""

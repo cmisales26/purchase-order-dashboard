@@ -2815,59 +2815,50 @@ def main():
             prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
             authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
             
-            # Products Section
-            st.subheader("Products")
-            selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
-
-            col_add1, col_add2 = st.columns(2)
-            with col_add1:
-                if st.button("➕ Add Selected Product", key="po_add_selected_product", use_container_width=True):
-                    if selected_product:
-                        details = PRODUCT_CATALOG[selected_product]
-                        st.session_state.products.append({
-                            "name": selected_product,
-                            "basic": details["basic"],
-                            "gst_percent": details["gst_percent"],
-                            "qty": 1.0,
-                        })
-                        st.success(f"{selected_product} added!")
-                        st.rerun()
-            with col_add2:
-                if st.button("➕ Add Empty Product", key="po_add_empty_product", use_container_width=True):
-                    st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
-                    st.rerun()
-
-            # Display products
-            for i, p in enumerate(st.session_state.products):
-                with st.expander(f"Product {i+1}: {p['name']}", expanded=True):
-                    col_prod1, col_prod2, col_prod3, col_prod4 = st.columns([3, 2, 2, 1])
-                    with col_prod1:
-                        st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
-                    with col_prod2:
-                        st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
-                    with col_prod3:
-                        st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
-                    with col_prod4:
-                        st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
-                    if st.button("Remove", key=f"po_remove_{i}", use_container_width=True):
-                        st.session_state.products.pop(i)
-                        st.rerun()
-
             # Create two columns for the main layout
-            col_left, col_right = st.columns(2)
+            col1, col2 = st.columns(2)
 
-            with col_left:
-                # Products section remains on the left
-                st.subheader("Products Summary")
-                if st.session_state.products:
-                    for i, p in enumerate(st.session_state.products):
-                        st.write(f"**{i+1}. {p['name']}**")
-                        st.write(f"   Qty: {p['qty']} | Basic: ₹{p['basic']:,.2f} | GST: {p['gst_percent']}%")
-                else:
-                    st.info("No products added yet")
+            with col1:
+                # Products Section
+                st.subheader("Products")
+                selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
+                
+                col_add1, col_add2 = st.columns(2)
+                with col_add1:
+                    if st.button("➕ Add Selected Product", key="po_add_selected_product", use_container_width=True):
+                        if selected_product:
+                            details = PRODUCT_CATALOG[selected_product]
+                            st.session_state.products.append({
+                                "name": selected_product,
+                                "basic": details["basic"],
+                                "gst_percent": details["gst_percent"],
+                                "qty": 1.0,
+                            })
+                            st.success(f"{selected_product} added!")
+                            st.rerun()
+                with col_add2:
+                    if st.button("➕ Add Empty Product", key="po_add_empty_product", use_container_width=True):
+                        st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+                        st.rerun()
 
-            with col_right:
-                # Preview & Generate Section moved to the right
+                # Display products
+                for i, p in enumerate(st.session_state.products):
+                    with st.expander(f"Product {i+1}: {p['name']}", expanded=True):
+                        col_prod1, col_prod2, col_prod3, col_prod4 = st.columns([3, 2, 2, 1])
+                        with col_prod1:
+                            st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
+                        with col_prod2:
+                            st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
+                        with col_prod3:
+                            st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
+                        with col_prod4:
+                            st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
+                        if st.button("Remove", key=f"po_remove_{i}", use_container_width=True):
+                            st.session_state.products.pop(i)
+                            st.rerun()
+
+            with col2:
+                # Preview & Generate Section
                 st.subheader("Preview & Generate")
                 
                 # Show the current PO number prominently with sales person info

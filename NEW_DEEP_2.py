@@ -2482,7 +2482,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             st.warning(f"Could not add stamp: {e}")
 
     # Position for the signature text in right box
-    pdf.set_xy(105, y_signature_start + 7 + right_signature_box_height - 10)
+    pdf.set_xy(105, y_signature_start + 8 + right_signature_box_height - 10)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
 

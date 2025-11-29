@@ -2474,7 +2474,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Add stamp if available
     if stamp_file:
         try:
-            stamp_width = 30
+            stamp_width = 25
             stamp_x = 105 + (96 - stamp_width) / 2
             stamp_y = pdf.get_y() + 2
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)

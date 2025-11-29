@@ -102,7 +102,7 @@ VENDOR_DATABASE = {
         "pan_no": "AABCA5678L",
         "msme_no": "UDYAM-KA-01-9876543"
     },
-        "MicroGenesis CADSoft Pvt.Ltd.": {
+    "MicroGenesis CADSoft Pvt.Ltd.": {
         "address": "2nd Floor, 202, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai, Thane, Maharashtra - 400601",
         "contact": "Ms/Mr",
         "mobile": "022 - 62233873",
@@ -110,7 +110,7 @@ VENDOR_DATABASE = {
         "pan_no": "AABCA5678L",
         "msme_no": "UDYAM-KA-01-9876543"
     },
-        "ACCELTY TECHSOLUTIONS LLP": {
+    "ACCELTY TECHSOLUTIONS LLP": {
         "address": "603, Sai Plaza, Next To Sakinaka Telephone Exchange Andheri - Kurla Road,Mumbai - 400072",
         "contact": "Ms/Mr",
         "mobile": "+91 4045678901",
@@ -2007,10 +2007,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Vendor details lines
     vendor_lines = [
-        ("GST No.:", invoice_data['vendor']['gst']),
-        ("MSME Registration No.:", invoice_data['vendor']['msme']),
-        ("E-Mail:", "cm.infotech2014@gmail.com"),
-        ("Mobile No.:", "8733915721"),
+        ("GST No. : ", invoice_data['vendor']['gst']),
+        ("MSME Registration No. : ", invoice_data['vendor']['msme']),
+        ("E-Mail : ", "cm.infotech2014@gmail.com"),
+        ("Mobile No. : ", "8733915721"),
     ]
     
     for i, (label, value) in enumerate(vendor_lines):
@@ -2094,15 +2094,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer contact details
     buyer_lines = [
-        ("Email:", invoice_data['buyer']['email']),
-        ("Mobile No:", invoice_data['buyer']['mobile']),
-        ("GST No.:", invoice_data['buyer']['gst']),
+        ("Email :",invoice_data['buyer']['email']),
+        ("Mobile No :",invoice_data['buyer']['mobile']),
+        ("GST No. :",invoice_data['buyer']['gst']),
     ]
     
     for i, (label, value) in enumerate(buyer_lines):
         pdf.set_x(10)
         pdf.set_font(pdf.default_font, "B", 12)
-        label_width = pdf.get_string_width(label) + 2
+        label_width = pdf.get_string_width(label) + 1
         pdf.cell(label_width, 6, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
         border = "R" if i < len(buyer_lines) - 1 else "R"
@@ -2432,7 +2432,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if buyer_logo_file:
         try:
             # Add buyer logo at the top of the left box
-            logo_width = 25
+            logo_width = 30
             logo_x = 10 + (95 - logo_width) / 2
             logo_y = pdf.get_y() + 4
             
@@ -2474,7 +2474,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Add stamp if available
     if stamp_file:
         try:
-            stamp_width = 20
+            stamp_width = 25
             stamp_x = 105 + (96 - stamp_width) / 2
             stamp_y = pdf.get_y() + 2
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
@@ -2482,7 +2482,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             st.warning(f"Could not add stamp: {e}")
 
     # Position for the signature text in right box
-    pdf.set_xy(105, y_signature_start + 6 + right_signature_box_height - 10)
+    pdf.set_xy(105, y_signature_start + 10 + right_signature_box_height - 10)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
 

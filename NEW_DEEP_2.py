@@ -2367,46 +2367,57 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if pdf.get_y() + 80 > pdf.page_break_trigger:
         pdf.add_page()
 
-    # --- Bank Details & Declaration (Side by Side - Clean Version) ---
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(95, 6, "Company's Bank Details", border="LTR", ln=0)
-    pdf.cell(96, 6, "Declaration", border="LTR", ln=1)
+    # --- Bank Details & Declaration (Side by Side) ---
+    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.cell(95, 5, "Company's Bank Details", ln=0, border=1)
+    pdf.cell(96, 5, "Declaration:", ln=1, border=1)
 
-    # Save positions
-    y_start = pdf.get_y()
+    # Save current Y position
+    y_before = pdf.get_y()
     x_left = pdf.get_x()
 
-    # Left column (Bank Details)
+    # --- Left column (Bank Details) ---
     bank_lines = [
-        ("Bank Name:", "IDFC FIRST"),
-        ("Branch:", "AHMEDABAD Shyamal Branch"),
-        ("Account No:", "88130420182"),
-        ("IFS Code:", "IDFB0040335")
+        ("Bank Name", "IDFC FIRST"),
+        ("Branch", "AHMEDABAD Shyamal Branch"),
+        ("Account No", "88130420182"),
+        ("IFS Code", "IDFB0040335")
     ]
     
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
+    
+    # Calculate maximum label width for alignment
+    max_label_width = 0
     for label, value in bank_lines:
-        pdf.set_x(x_left)
-        pdf.set_font(pdf.default_font, "B", 12)
-        label_width = pdf.get_string_width(label)
-        pdf.cell(label_width, 6, label, border="L", ln=0)
-        pdf.set_font(pdf.default_font, "", 12)
-        pdf.cell(95 - label_width, 6, value, border="R", ln=1)
-
-    y_left_end = pdf.get_y()
-
-    # Right column (Declaration)
-    pdf.set_xy(x_left + 95, y_start)
-    pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(96, 6, invoice_data['declaration'], border="R")
-
-    # Set Y to maximum height
-    max_y = max(y_left_end, pdf.get_y())
+        label_with_colon = label + " :"
+        label_width = pdf.get_string_width(label_with_colon)
+        if label_width > max_label_width:
+            max_label_width = label_width
+    
+    # Add some padding
+    max_label_width += 2
+    
+    # Draw bank details with aligned colons
+    current_y = y_before
+    for label, value in bank_lines:
+        pdf.set_xy(x_left, current_y)
+        pdf.set_font(pdf.default_font, "B", 10)
+        pdf.cell(max_label_width, 5, f"{label} :", border="L", ln=0)
+        pdf.set_font(pdf.default_font, "", 10)
+        pdf.cell(95 - max_label_width, 5, value, border="R", ln=1)
+        current_y += 5
+    
+    y_after_left = current_y
+    
+    # --- Right column (Declaration) ---
+    pdf.set_xy(x_left + 95, y_before)
+    pdf.set_font(pdf.default_font, "", 10)
+    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
+    y_after_right = pdf.get_y()
+    
+    # Set Y to the maximum of both columns
+    max_y = max(y_after_left, y_after_right)
     pdf.set_y(max_y)
-
-    # Bottom border
-    pdf.cell(95, 0, "", border="B", ln=0)
-    pdf.cell(96, 0, "", border="B", ln=1)
     
     # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()

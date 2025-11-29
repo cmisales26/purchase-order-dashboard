@@ -2397,7 +2397,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         # Set position for label
         pdf.set_xy(label_start_x, current_y)
         pdf.set_font(pdf.default_font, "B", 10)
-        pdf.cell(35, 5, label, border="L", ln=0)  # Fixed width for labels
+        pdf.cell(35, 5, label, border="", ln=0)  # Fixed width for labels
         
         # Set position for colon (same X for all lines)
         pdf.set_xy(colon_x, current_y)

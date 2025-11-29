@@ -2006,7 +2006,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === HEADER (Vendor + Invoice Details) ===
     pdf.set_font(pdf.default_font, "B", 13)
-    pdf.cell(95, 8, "CM Infotech.", border="LRT", ln=0)
+    pdf.cell(95, 8, "CM INFOTECH.", border="LRT", ln=0)
     pdf.cell(48, 8, "Invoice No.", border=1, ln=0, align="L")
     pdf.cell(48, 8, "Invoice Date", border=1, ln=1, align="L")
 
@@ -2407,7 +2407,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(95, 6, "Buyer's Company Signature", border="LR", ln=0, align="C")
 
     # Right side - Our Company Signature
-    pdf.cell(96, 6, "For CM Infotech.", border="LR", ln=1, align="C")
+    pdf.cell(96, 6, "For CM INFOTECH.", border="LR", ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
     left_signature_box_height = 33
@@ -3038,7 +3038,7 @@ def main():
     if "products" not in st.session_state:
         st.session_state.products = []
     if "company_name" not in st.session_state:
-        st.session_state.company_name = "CM Infotech"
+        st.session_state.company_name = "CM INFOTECH"
     if "po_number" not in st.session_state:
         st.session_state.po_number = generate_po_number("CP", st.session_state.po_seq)
     if "po_date" not in st.session_state:
@@ -3969,7 +3969,7 @@ def main():
             destination = st.text_input("Destination", "Vadodara")
             
             st.subheader("Seller Details")
-            vendor_name = st.text_input("Seller Name", "CM Infotech")
+            vendor_name = st.text_input("Seller Name", "CM INFOTECH")
             vendor_address = st.text_area("Seller Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
             vendor_gst = st.text_input("Seller GST No.", "24ANMPP4891R1ZX")
             vendor_msme = st.text_input("Seller MSME Registration No.", "UDYAM-GJ-01-0117646")
@@ -4140,7 +4140,7 @@ def main():
                 pass
     
     st.divider()
-    st.caption("© 2025 Document Generator - CM Infotech")
+    st.caption("© 2025 Document Generator - CM INFOTECH")
 
 if __name__ == "__main__":
     main()

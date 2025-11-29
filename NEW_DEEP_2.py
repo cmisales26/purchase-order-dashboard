@@ -2948,9 +2948,10 @@ def main():
             with col_logo:
                 st.image(global_logo_path, width=100)
             with col_text:
-                st.header("Tax Invoice Generator")
+                st.header("CM INFOTECH")
+                st.subheader("Tax Invoice Generator")
         else:
-            st.header("Tax Invoice Generator")   
+            st.header("Tax Invoice Generator")
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()

@@ -3244,7 +3244,7 @@ def main():
                 st.download_button(
                     "⬇ Download Invoice PDF",
                     data=pdf_file,
-                    file_name=f"{buyer_name} {invoice_date} {invoice_no.replace('/', '_')}.pdf",
+                    file_name=f"{buyer_name}_{invoice_date}_{invoice_no.replace('/', '_')}.pdf",
                     mime="application/pdf",
                     key="invoice_download_button")
                                 

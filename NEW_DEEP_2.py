@@ -124,8 +124,8 @@ VENDOR_DATABASE = {
 
 # End User Database - You can expand this with more end users
 END_USER_DATABASE = {
-    "Baldridge & Associates Structural Engineering Private Limited": {
-        "address": "406 Sakar East B/5 Gurunanak School, \n40mt Tarsali danteshwar Ring Road, Vadodara",
+    "Baldridge & Associates Structural \nEngineering Private Limited": {
+        "address": "406 Sakar East B/5 Gurunanak School, 40mt Tarsali danteshwar Ring Road, Vadodara",
         "contact": "Mr. Divyesh Mistry ",
         "mobile": "98987 91813",
         "email": "dmistry@baseww.com",

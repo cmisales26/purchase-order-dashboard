@@ -2268,7 +2268,11 @@ def main():
 
     # --- Tab 1: Quotation Generator ---
     with tab1:
-        st.header("📑 Quotation Generator")
+        if global_logo_path and os.path.exists(global_logo_path):
+            st.image(global_logo_path, width=150)
+            st.markdown("### Quotation Generator")
+        else:
+            st.header("Quotation Generator")  
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
@@ -2583,7 +2587,11 @@ def main():
                 
     # --- Tab 2: Purchase Order Generator ---
     with tab2:
-        st.header("📑 Purchase Order Generator")
+        if global_logo_path and os.path.exists(global_logo_path):
+            st.image(global_logo_path, width=150)
+            st.markdown("### Purchase Order Generator")
+        else:
+            st.header("Purchase Order Generator")  
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
@@ -2942,7 +2950,12 @@ def main():
     # --- Tab 3: Tax Invoice Generator ---
         # --- Tab 3: Tax Invoice Generator ---
     with tab3:
-        st.header("📑 Tax Invoice Generator")
+    # Display company logo instead of text header
+        if global_logo_path and os.path.exists(global_logo_path):
+            st.image(global_logo_path, width=150)
+            st.markdown("### Tax Invoice Generator")
+        else:
+            st.header("Tax Invoice Generator")  
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
@@ -3034,8 +3047,6 @@ def main():
             st.session_state.invoice_number = generate_invoice_number(next_sequence)
             st.sidebar.success(f"Invoice number reset to next sequence: {next_sequence}")
             st.rerun()
-
-        # Rest of your invoice tab code remains the same...
 
         # Rest of your invoice tab code remains the same...
         col1, col2 = st.columns([1,1])
@@ -3256,16 +3267,16 @@ def main():
                     mime="application/pdf",
                     key="invoice_download_button")
                                 
-    # Clean up temporary files
-    for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_stamp.jpg"]:
-        if os.path.exists(path):
-            try:
-                os.remove(path)
-            except:
-                pass
-    
-    st.divider()
-    st.caption("© 2025 Document Generator - CM INFOTECH")
+# Clean up temporary files
+for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_stamp.jpg"]:
+    if os.path.exists(path):
+        try:
+            os.remove(path)
+        except:
+            pass
+
+st.divider()
+st.caption("© 2025 Document Generator - CM INFOTECH")
 
 if __name__ == "__main__":
     main()

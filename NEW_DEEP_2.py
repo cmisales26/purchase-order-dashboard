@@ -2944,7 +2944,7 @@ def main():
     with tab3:
     # Display company logo instead of text header
         if global_logo_path and os.path.exists(global_logo_path):
-            col_logo, col_text = st.columns([1, 1])
+            col_logo, col_text = st.columns([1, 0])
             with col_logo:
                 st.image(global_logo_path, width=100)
             with col_text:

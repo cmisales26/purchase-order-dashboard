@@ -2386,25 +2386,28 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     pdf.set_font(pdf.default_font, "", 10)
     
-    # Calculate maximum label width for alignment
-    max_label_width = 0
-    for label, value in bank_lines:
-        label_with_colon = label + " :"
-        label_width = pdf.get_string_width(label_with_colon)
-        if label_width > max_label_width:
-            max_label_width = label_width
+    # Fixed positions for perfect alignment
+    label_start_x = x_left
+    colon_x = label_start_x + 40  # Fixed position for all colons
+    value_start_x = colon_x + 5   # Fixed position for values (after colon + space)
     
-    # Add some padding
-    max_label_width += 2
-    
-    # Draw bank details with aligned colons
+    # Draw bank details with perfectly aligned colons
     current_y = y_before
     for label, value in bank_lines:
-        pdf.set_xy(x_left, current_y)
+        # Set position for label
+        pdf.set_xy(label_start_x, current_y)
         pdf.set_font(pdf.default_font, "B", 10)
-        pdf.cell(max_label_width, 5, f"{label} :", border="L", ln=0)
+        pdf.cell(40, 5, label, border="L", ln=0)  # Fixed width for labels
+        
+        # Set position for colon (same X for all lines)
+        pdf.set_xy(colon_x, current_y)
+        pdf.cell(5, 5, ":", ln=0)  # Just the colon
+        
+        # Set position for value
+        pdf.set_xy(value_start_x, current_y)
         pdf.set_font(pdf.default_font, "", 10)
-        pdf.cell(95 - max_label_width, 5, value, border="R", ln=1)
+        pdf.cell(50, 5, value, border="R", ln=1)  # Remaining width for values
+        
         current_y += 5
     
     y_after_left = current_y

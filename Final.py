@@ -2432,7 +2432,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if buyer_logo_file:
         try:
             # Add buyer logo at the top of the left box
-            logo_width = 30
+            logo_width = 25
             logo_x = 10 + (95 - logo_width) / 2
             logo_y = pdf.get_y() + 4
             

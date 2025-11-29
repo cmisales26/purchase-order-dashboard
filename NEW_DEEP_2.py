@@ -2101,17 +2101,16 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer name and address
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.multi_cell(95, 5, invoice_data['buyer']['name'], border="LR")
+    pdf.cell(95, 5, invoice_data['buyer']['name'], border="LR", ln=1)
     
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="LR")
     
     # Buyer contact details
     buyer_lines = [
-        ("Email:",invoice_data['buyer']['email']),
-        ("Mobile No:",invoice_data['buyer']['mobile']),
-        ("GST No.:",invoice_data['buyer']['gst']),
-        # "mobile":buyer_mobile, "email":buyer_email
+        ("Email:", invoice_data['buyer']['email']),
+        ("Mobile No:", invoice_data['buyer']['mobile']),
+        ("GST No.:", invoice_data['buyer']['gst']),
     ]
     
     for i, (label, value) in enumerate(buyer_lines):
@@ -2120,29 +2119,18 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         label_width = pdf.get_string_width(label) + 2
         pdf.cell(label_width, 6, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
-        border = "" if i < len(buyer_lines) - 1 else ""
+        border = "R" if i < len(buyer_lines) - 1 else "R"
         pdf.cell(95 - label_width, 6, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
-    total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
 
     # --- Buyer Right Details ---
     pdf.set_xy(105, y_buyer_start)
     
     # Row 1: Buyer's Order No/Date
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="L")
-    pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="L")
-
-    # Calculate remaining height needed for address space
-    name_height = 5
-    contact_lines_height = 18
-    remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
-    
-    # Add empty space for address if needed
-    if remaining_height_for_address > 0:
-        pdf.set_x(105)
-        pdf.cell(96, remaining_height_for_address, "", border="R", ln=1)
+    pdf.cell(48, 6, invoice_data['invoice_details']['buyers_order_no'], border="LR", ln=0, align="L")
+    pdf.cell(48, 6, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1, align="L")
 
     # Row 2: Dispatched Through
     pdf.set_x(105)
@@ -2151,7 +2139,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
-    # Row 3: Destination - NOW AS INPUT
+    # Row 3: Destination
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(48, 6, "Destination", border="LRT", ln=0)
@@ -2165,6 +2153,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
+
+    # Set Y position to match the maximum height of both columns
+    max_y = max(y_buyer_left_end, pdf.get_y())
+    pdf.set_y(max_y)
+    
     pdf.ln(0.3)
     
     # --- Item Table Header ---

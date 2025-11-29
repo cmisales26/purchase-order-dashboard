@@ -1282,6 +1282,8 @@ def get_current_invoice_sequence():
         pass
     return 1
 
+
+
 # --- Helper Functions for Invoice ---
 def parse_invoice_number(invoice_number):
     """Parse invoice number to extract components"""
@@ -1295,14 +1297,19 @@ def parse_invoice_number(invoice_number):
             return prefix, year_range, quarter, sequence
     except:
         pass
-    return "CMI", f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}", get_current_quarter(), "01"
+    return "CMI", f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}", get_current_quarter(), "001"
+
+def generate_next_invoice_number():
+    """Generate complete invoice number with auto-increment"""
+    sequence_number = get_next_invoice_sequence()
+    return generate_invoice_number(sequence_number)
 
 def generate_invoice_number(sequence_number):
     """Generate invoice number with current quarter and sequence"""
     current_date = datetime.datetime.now()
     quarter = get_current_quarter()
     year_range = f"{str(current_date.year)[2:]}-{str(current_date.year + 1)[2:]}"
-    sequence = f"{sequence_number:02d}"
+    sequence = f"{sequence_number:03d}"
     
     return f"CMI/{year_range}/{quarter}/{sequence}"
 
@@ -4050,6 +4057,9 @@ def main():
             st.subheader("Invoice Preview & Download")
 
             if st.button("Generate Invoice", key="generate_invoice_button"):
+                st.session_state.invoice_number = generate_next_invoice_number()
+                invoice_no = st.session_state.invoice_number
+                st.success(f"Generated Invoice: {invoice_no}")
                 # Calculate amounts with proper rounding like in PO generator
                 basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
                 sgst = round(basic_amount * 0.09, 2)

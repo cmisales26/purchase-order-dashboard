@@ -124,20 +124,13 @@ VENDOR_DATABASE = {
 
 # End User Database - You can expand this with more end users
 END_USER_DATABASE = {
-    "Baldridge & Associates Structural Engineering Private Limited": {
+    "Baldridge & Associates Structural \nEngineering Private Limited": {
         "address": "406 Sakar East B/5 Gurunanak School, 40mt Tarsali danteshwar Ring Road, Vadodara",
         "contact": "Mr. Divyesh Mistry ",
-        "mobile": "98987 91813",
+        "mobile": "+91 98987 91813",
         "email": "dmistry@baseww.com",
         "gst_no": "24AAHCB9936E1ZL"
     },
-    # "Creation Studio": {
-    #     "address": "Al-Habtula Apartment, Swk Society, Sid, Dah, Guja 389",
-    #     "contact": "Mr. Musta", 
-    #     "mobile": "+91 9876543210",
-    #     "email": "info@dreamcreationstudio.com",
-    #     "gst_no": "24AABCU9603R1ZN"
-    # },
     "Abhir Design": {
         "address": "109-110, 3rd floor, Western plaza, Nr. Bhulka bhavan school,Adajan, Surat",
         "contact": "Mr. Abhishek Ahir ", 
@@ -561,7 +554,7 @@ END_USER_DATABASE = {
     "Anupam Architects": {
         "address": "108, Jal Darsan Tower, Near Multi Stories Building, Nanpura, Surat-395 001",
         "contact": "Mr. Hansal Lakdawala", 
-        "mobile": "9909005401, 91 261247294, 9925010203",
+        "mobile": "+91 9909005401, +91 261247294, +91 9925010203",
         "email": " anupamarchitects@yahoo.com",
         "gst_no": "NOT APPLICABLE"
     },

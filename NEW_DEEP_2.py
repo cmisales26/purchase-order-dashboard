@@ -2946,7 +2946,7 @@ def main():
         if global_logo_path and os.path.exists(global_logo_path):
             col_logo, col_text = st.columns([1, 2])
             with col_logo:
-                st.image(global_logo_path, width=500)
+                st.image(global_logo_path, width=300)
             with col_text:
                 st.header("Tax Invoice Generator")
         else:

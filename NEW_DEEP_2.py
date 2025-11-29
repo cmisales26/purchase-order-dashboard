@@ -4051,9 +4051,30 @@ def main():
             st.subheader("Invoice Preview & Download")
 
             if st.button("Generate Invoice", key="generate_invoice_button"):
-                # st.session_state.invoice_number = generate_next_invoice_number()
-                # invoice_no = st.session_state.invoice_number
-                st.success(f"Generated Invoice: {invoice_no}")
+                # Get the current invoice number from session state (which includes manual edits)
+                current_invoice_no = st.session_state.invoice_number
+                
+                # Parse the manually edited invoice number to get the sequence
+                try:
+                    prefix, year_range, quarter, sequence = parse_invoice_number(current_invoice_no)
+                    manual_sequence = int(sequence)
+                    
+                    # UPDATE THE COUNTER FILE to match the manual sequence
+                    with open(INVOICE_COUNTER_FILE, 'w') as f:
+                        f.write(str(manual_sequence))
+                    
+                    # Update session state to reflect the new sequence
+                    st.session_state.invoice_seq = manual_sequence
+                    
+                    st.success(f"✅ Invoice sequence updated to: {manual_sequence}")
+                    
+                except Exception as e:
+                    st.error(f"Error parsing invoice number: {e}")
+                
+                # Now use the manually edited invoice number
+                invoice_no = current_invoice_no
+                
+                # Rest of your invoice calculation code...
                 # Calculate amounts with proper rounding like in PO generator
                 basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
                 sgst = round(basic_amount * 0.09, 2)
@@ -4121,10 +4142,15 @@ def main():
                 # Store the last invoice number for sequence tracking
                 st.session_state.last_invoice_number = invoice_no
                 
-                # Auto-increment for next invoice
+                # Auto-increment for next invoice - BUT RESPECT MANUAL SEQUENCE
                 if invoice_auto_increment:
-                    next_sequence = get_next_invoice_sequence()
+                    # Get the next sequence based on the manually set sequence
+                    next_sequence = manual_sequence + 1
                     st.session_state.invoice_seq = next_sequence
+                    
+                    # Update the counter file for next time
+                    with open(INVOICE_COUNTER_FILE, 'w') as f:
+                        f.write(str(next_sequence))
 
                 st.success("Invoice generated successfully!")
                 

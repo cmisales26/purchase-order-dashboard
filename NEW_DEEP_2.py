@@ -2123,40 +2123,44 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.cell(95 - label_width, 6, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
+    total_left_height = y_buyer_left_end - y_left_buyer_start
 
     # --- Buyer Right Details ---
     pdf.set_xy(105, y_buyer_start)
     
+    # Calculate right side cell heights to match left side
+    num_right_rows = 4
+    right_cell_height = total_left_height / num_right_rows
+    
     # Row 1: Buyer's Order No/Date
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 6, invoice_data['invoice_details']['buyers_order_no'], border="LR", ln=0, align="L")
-    pdf.cell(48, 6, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1, align="L")
+    pdf.cell(48, right_cell_height, invoice_data['invoice_details']['buyers_order_no'], border="LR", ln=0, align="L")
+    pdf.cell(48, right_cell_height, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1, align="L")
 
     # Row 2: Dispatched Through
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 6, "Dispatched Through", border="LRT", ln=0)
+    pdf.cell(48, right_cell_height, "Dispatched Through", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
+    pdf.cell(48, right_cell_height, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
     # Row 3: Destination
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 6, "Destination", border="LRT", ln=0)
+    pdf.cell(48, right_cell_height, "Destination", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     destination = invoice_data['invoice_details'].get('destination', 'Vadodara')
-    pdf.cell(48, 6, destination, border="RT", ln=1)
+    pdf.cell(48, right_cell_height, destination, border="RT", ln=1)
 
     # Row 4: Terms of delivery
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
+    pdf.cell(48, right_cell_height, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
+    pdf.cell(48, right_cell_height, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
 
-    # Set Y position to match the maximum height of both columns
-    max_y = max(y_buyer_left_end, pdf.get_y())
-    pdf.set_y(max_y)
+    # Set Y position to continue from the maximum height
+    pdf.set_y(max(y_buyer_left_end, y_buyer_start + total_left_height))
     
     pdf.ln(0.3)
     

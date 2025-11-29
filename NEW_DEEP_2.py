@@ -2367,7 +2367,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if pdf.get_y() + 80 > pdf.page_break_trigger:
         pdf.add_page()
 
-    # --- Bank Details & Declaration (Side by Side) ---
+        # --- Bank Details & Declaration (Side by Side) ---
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(95, 5, "Company's Bank Details", ln=0, border=1)
     pdf.cell(96, 5, "Declaration:", ln=1, border=1)
@@ -2389,8 +2389,16 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Draw bank details (colons are already aligned in the strings)
     current_y = y_before
-    for line in bank_lines:
+    for i, line in enumerate(bank_lines):
         pdf.set_xy(x_left, current_y)
+        
+        # Determine border for this row
+        if i == len(bank_lines) - 1:  # Last row - add bottom border
+            border_left = "LB"
+            border_right = "RB"
+        else:  # Other rows - only left and right borders
+            border_left = "L"
+            border_right = "R"
         
         # Split at colon to apply different formatting
         if ":" in line:
@@ -2399,12 +2407,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             
             # Label part (bold)
             pdf.set_font(pdf.default_font, "B", 10)
-            pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="L", ln=0)
+            pdf.cell(pdf.get_string_width(label_part), 5, label_part, border=border_left, ln=0)
             
             # Value part (normal)
             pdf.set_font(pdf.default_font, "", 10)
             remaining_width = 95 - pdf.get_string_width(label_part)
-            pdf.cell(remaining_width, 5, value_part, border="R", ln=1)
+            pdf.cell(remaining_width, 5, value_part, border=border_right, ln=1)
         else:
             pdf.cell(95, 5, line, border="LR", ln=1)
         
@@ -2415,22 +2423,19 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Right column (Declaration) ---
     pdf.set_xy(x_left + 95, y_before)
     pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(96, 4, invoice_data['declaration'], border="LR")
+    pdf.multi_cell(96, 4, invoice_data['declaration'], border="LRT")  # Top border only
+    
+    # Add bottom border to declaration cell
+    declaration_height = pdf.get_y() - y_before
+    pdf.set_xy(x_left + 95, y_before + declaration_height)
+    pdf.cell(96, 0, "", border="B", ln=1)  # Just the bottom border
     
     y_after_right = pdf.get_y()
     
-    # Add bottom borders to both cells
+    # Set Y to the maximum of both columns
     max_y = max(y_after_left, y_after_right)
-    
-    # Left cell bottom border
-    pdf.set_xy(x_left, max_y)
-    pdf.cell(95, 0, "", border="B", ln=0)
-    
-    # Right cell bottom border  
-    pdf.cell(96, 0, "", border="B", ln=1)
-    
-    # Set Y position
     pdf.set_y(max_y)
+
     # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()
 

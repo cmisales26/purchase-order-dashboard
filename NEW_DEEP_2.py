@@ -2397,7 +2397,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         # Set position for label
         pdf.set_xy(label_start_x, current_y)
         pdf.set_font(pdf.default_font, "B", 10)
-        pdf.cell(40, 5, label, border="L", ln=0)  # Fixed width for labels
+        pdf.cell(40, 5, label, border=1, ln=0)  # Fixed width for labels
         
         # Set position for colon (same X for all lines)
         pdf.set_xy(colon_x, current_y)
@@ -2421,7 +2421,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Set Y to the maximum of both columns
     max_y = max(y_after_left, y_after_right)
     pdf.set_y(max_y)
-    
+
     # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()
 

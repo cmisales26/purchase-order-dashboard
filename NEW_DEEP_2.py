@@ -86,7 +86,7 @@ def load_json_data(filename, default_data=None):
         return default_data or {}
 
 # Load vendor and end user databases
-VENDOR_DATABASE = load_json_data('vendors.json')
+VENDOR_DATABASE = load_json_data('vendor.json')
 END_USER_DATABASE = load_json_data('endusers.json')
 
 

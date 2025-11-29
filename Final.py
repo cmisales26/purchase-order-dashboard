@@ -2583,7 +2583,7 @@ def main():
                 
     # --- Tab 2: Purchase Order Generator ---
     with tab2:
-        st.header("Purchase Order Generator")
+        st.header("📑 Purchase Order Generator")
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()
@@ -2942,7 +2942,7 @@ def main():
     # --- Tab 3: Tax Invoice Generator ---
         # --- Tab 3: Tax Invoice Generator ---
     with tab3:
-        st.header("Tax Invoice Generator")
+        st.header("📑 Tax Invoice Generator")
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()

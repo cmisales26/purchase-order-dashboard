@@ -102,7 +102,7 @@ VENDOR_DATABASE = {
         "pan_no": "AABCA5678L",
         "msme_no": "UDYAM-KA-01-9876543"
     },
-        "MicroGenesis CADSoft Pvt.Ltd.": {
+    "MicroGenesis CADSoft Pvt.Ltd.": {
         "address": "2nd Floor, 202, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai, Thane, Maharashtra - 400601",
         "contact": "Ms/Mr",
         "mobile": "022 - 62233873",
@@ -110,7 +110,7 @@ VENDOR_DATABASE = {
         "pan_no": "AABCA5678L",
         "msme_no": "UDYAM-KA-01-9876543"
     },
-        "ACCELTY TECHSOLUTIONS LLP": {
+    "ACCELTY TECHSOLUTIONS LLP": {
         "address": "603, Sai Plaza, Next To Sakinaka Telephone Exchange Andheri - Kurla Road,Mumbai - 400072",
         "contact": "Ms/Mr",
         "mobile": "+91 4045678901",
@@ -131,13 +131,6 @@ END_USER_DATABASE = {
         "email": "dmistry@baseww.com",
         "gst_no": "24AAHCB9936E1ZL"
     },
-    # "Creation Studio": {
-    #     "address": "Al-Habtula Apartment, Swk Society, Sid, Dah, Guja 389",
-    #     "contact": "Mr. Musta", 
-    #     "mobile": "+91 9876543210",
-    #     "email": "info@dreamcreationstudio.com",
-    #     "gst_no": "24AABCU9603R1ZN"
-    # },
     "Abhir Design": {
         "address": "109-110, 3rd floor, Western plaza, Nr. Bhulka bhavan school,Adajan, Surat",
         "contact": "Mr. Abhishek Ahir ", 

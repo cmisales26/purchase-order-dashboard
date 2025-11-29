@@ -2325,7 +2325,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(31, 5, f"{hsn_cgst:,.2f}", border=1, ln=True, align="C")  # Added comma formatting
 
     # Total row WITH COMMA FORMATTING
-    pdf.set_font(pdf.default_font, "B", 10)
+    pdf.set_font(pdf.default_font, "B", 12)
     pdf.cell(34, 5, "Total", border=1, align="C")
     pdf.cell(34, 5, f"{hsn_tax_value:,.2f}", border=1, align="C")  # Added comma formatting
     pdf.cell(30, 5, "", border=1, align="C")

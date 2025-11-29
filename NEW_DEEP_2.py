@@ -2377,36 +2377,36 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     x_left = pdf.get_x()
 
     # --- Left column (Bank Details) ---
+    # Pre-formatted strings with fixed spacing
     bank_lines = [
-        ("Bank Name", "IDFC FIRST"),
-        ("Branch", "AHMEDABAD Shyamal Branch"),
-        ("Account No", "88130420182"),
-        ("IFS Code", "IDFB0040335")
+        "Bank Name    : IDFC FIRST",
+        "Branch       : AHMEDABAD Shyamal Branch", 
+        "Account No   : 88130420182",
+        "IFS Code     : IDFB0040335"
     ]
     
     pdf.set_font(pdf.default_font, "", 10)
     
-    # Fixed positions for perfect alignment
-    label_start_x = x_left
-    colon_x = label_start_x + 40  # Fixed position for all colons
-    value_start_x = colon_x + 5   # Fixed position for values (after colon + space)
-    
-    # Draw bank details with perfectly aligned colons
+    # Draw bank details (colons are already aligned in the strings)
     current_y = y_before
-    for label, value in bank_lines:
-        # Set position for label
-        pdf.set_xy(label_start_x, current_y)
-        pdf.set_font(pdf.default_font, "B", 10)
-        pdf.cell(40, 5, label, border=1, ln=0)  # Fixed width for labels
+    for line in bank_lines:
+        pdf.set_xy(x_left, current_y)
         
-        # Set position for colon (same X for all lines)
-        pdf.set_xy(colon_x, current_y)
-        pdf.cell(5, 5, ":", ln=0)  # Just the colon
-        
-        # Set position for value
-        pdf.set_xy(value_start_x, current_y)
-        pdf.set_font(pdf.default_font, "", 10)
-        pdf.cell(50, 5, value, border="R", ln=1)  # Remaining width for values
+        # Split at colon to apply different formatting
+        if ":" in line:
+            label_part = line.split(":")[0] + ":"
+            value_part = line.split(":")[1]
+            
+            # Label part (bold)
+            pdf.set_font(pdf.default_font, "B", 10)
+            pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="L", ln=0)
+            
+            # Value part (normal)
+            pdf.set_font(pdf.default_font, "", 10)
+            remaining_width = 95 - pdf.get_string_width(label_part)
+            pdf.cell(remaining_width, 5, value_part, border="R", ln=1)
+        else:
+            pdf.cell(95, 5, line, border="LR", ln=1)
         
         current_y += 5
     
@@ -2415,13 +2415,22 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Right column (Declaration) ---
     pdf.set_xy(x_left + 95, y_before)
     pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
+    pdf.multi_cell(96, 4, invoice_data['declaration'], border="LR")
+    
     y_after_right = pdf.get_y()
     
-    # Set Y to the maximum of both columns
+    # Add bottom borders to both cells
     max_y = max(y_after_left, y_after_right)
+    
+    # Left cell bottom border
+    pdf.set_xy(x_left, max_y)
+    pdf.cell(95, 0, "", border="B", ln=0)
+    
+    # Right cell bottom border  
+    pdf.cell(96, 0, "", border="B", ln=1)
+    
+    # Set Y position
     pdf.set_y(max_y)
-
     # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()
 

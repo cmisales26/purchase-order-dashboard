@@ -367,16 +367,14 @@ def parse_invoice_number(invoice_number):
         pass
     return "CMI", f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}", get_current_quarter(), "01"
 
-def generate_invoice_number(sequence_number, buyer_name="Unknown Company"):
-    """Generate invoice number with new format including buyer name"""
-    current_date = datetime.date.today().strftime("%d-%m-%Y")
+def generate_invoice_number(sequence_number):
+    """Generate invoice number - KEEP EXISTING FORMAT"""
+    current_date = datetime.datetime.now()
     quarter = get_current_quarter()
-    year_range = f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}"
+    year_range = f"{str(current_date.year)[2:]}-{str(current_date.year + 1)[2:]}"
+    sequence = f"{sequence_number:02d}"
     
-    # Remove spaces and special characters for filename safety
-    safe_buyer_name = "".join(c for c in buyer_name if c.isalnum())
-    
-    return f"{safe_buyer_name} {current_date} CMI_{year_range}_{quarter}_{sequence_number:02d}"
+    return f"CMI/{year_range}/{quarter}/{sequence}"
 
 def get_next_sequence_number_invoice(invoice_number):
     """Extract and increment sequence number from invoice number"""
@@ -2981,78 +2979,31 @@ def main():
         except:
             st.sidebar.warning("Could not parse invoice number")
         
-        # Editable invoice number
+        # Editable invoice number - SIMPLER VERSION
         st.sidebar.subheader("Invoice Number Editor")
-
+        
         # Parse current invoice number for editing
         try:
-            # For the new format, we need to parse differently
-            current_invoice_parts = st.session_state.invoice_number.split(' ')
-            if len(current_invoice_parts) >= 4:
-                # Format: CompanyName Date CMI_YearRange_Quarter_Sequence
-                current_company_part = current_invoice_parts[0]
-                current_date_part = current_invoice_parts[1]
-                current_cmi_part = current_invoice_parts[2] + ' ' + current_invoice_parts[3] if len(current_invoice_parts) > 3 else current_invoice_parts[2]
-                
-                # Extract year_range, quarter, sequence from CMI part
-                cmi_parts = current_cmi_part.split('_')
-                if len(cmi_parts) >= 4:
-                    current_year_range = cmi_parts[1]
-                    current_quarter = cmi_parts[2]
-                    current_sequence = cmi_parts[3]
-                else:
-                    current_year_range = f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}"
-                    current_quarter = get_current_quarter()
-                    current_sequence = "01"
-            else:
-                # Fallback if format doesn't match
-                current_year_range = f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}"
-                current_quarter = get_current_quarter()
-                current_sequence = "01"
-                current_date_part = datetime.date.today().strftime("%d-%m-%Y")
-            
-            # Get current buyer name
-            current_buyer_name = st.session_state.get("invoice_buyer_company", "Unknown Company")
-            safe_buyer_name = "".join(c for c in current_buyer_name if c.isalnum())
+            current_prefix, current_year_range, current_q, current_seq = parse_invoice_number(st.session_state.invoice_number)
             
             # Create editable components
-            col1, col2, col3, col4 = st.sidebar.columns([2, 2, 2, 1])
+            col1, col2, col3 = st.sidebar.columns([2, 2, 1])
             
             with col1:
-                new_buyer_name = st.text_input("Buyer Name", value=current_buyer_name, key="invoice_buyer_edit")
-                safe_new_buyer_name = "".join(c for c in new_buyer_name if c.isalnum())
+                new_year_range = st.text_input("Year Range", value=current_year_range, key="invoice_year_edit")
             
             with col2:
-                new_date = st.text_input("Date", value=current_date_part, key="invoice_date_edit")
+                new_quarter = st.text_input("Quarter", value=current_q, key="invoice_quarter_edit")
             
             with col3:
-                new_year_range = st.text_input("Year Range", value=current_year_range, key="invoice_year_edit")
-                new_quarter = st.text_input("Quarter", value=current_quarter, key="invoice_quarter_edit")
-            
-            with col4:
                 new_sequence = st.number_input("Sequence", 
                                             min_value=1, 
-                                            value=int(current_sequence), 
+                                            value=int(current_seq), 
                                             step=1,
                                             key="invoice_seq_edit")
             
-            # Construct new invoice number with new format
-            new_invoice_number = f"{safe_new_buyer_name} {new_date} CMI_{new_year_range}_{new_quarter}_{new_sequence:02d}"
-            
-            # Update if changed
-            if new_invoice_number != st.session_state.invoice_number:
-                st.session_state.invoice_number = new_invoice_number
-                
-        except Exception as e:
-            st.sidebar.error(f"Error parsing invoice number: {e}")
-            # Fallback to default format
-            current_buyer_name = st.session_state.get("invoice_buyer_company", "Unknown Company")
-            safe_buyer_name = "".join(c for c in current_buyer_name if c.isalnum())
-            current_date = datetime.date.today().strftime("%d-%m-%Y")
-            current_year_range = f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}"
-            current_quarter = get_current_quarter()
-            
-            st.session_state.invoice_number = f"{safe_buyer_name} {current_date} CMI_{current_year_range}_{current_quarter}_{st.session_state.invoice_seq:02d}"
+            # Construct new invoice number
+            new_invoice_number = f"CMI/{new_year_range}/{new_quarter}/{new_sequence:02d}"
             
             # Update if changed
             if new_invoice_number != st.session_state.invoice_number:
@@ -3293,7 +3244,7 @@ def main():
                 st.download_button(
                     "⬇ Download Invoice PDF",
                     data=pdf_file,
-                    file_name=f"{invoice_no.replace('/', '_')}.pdf",
+                    file_name=f"Invoice_{invoice_no.replace('/', '_')}.pdf",
                     mime="application/pdf",
                     key="invoice_download_button")
                                 

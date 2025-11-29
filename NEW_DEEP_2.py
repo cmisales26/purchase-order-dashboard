@@ -12,8 +12,8 @@ import html as _html
 import requests  # Add this import for downloading from GitHub
 
 # GitHub Configuration - FIXED URLs
-LOGO_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/logo_final.jp"
-STAMP_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/stamp.jp"
+LOGO_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/logo_final.jpg"
+STAMP_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/stamp.jpg"
 
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {
@@ -2007,10 +2007,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Vendor details lines
     vendor_lines = [
-        ("GST No.:", invoice_data['vendor']['gst']),
-        ("MSME Registration No.:", invoice_data['vendor']['msme']),
-        ("E-Mail:", "cm.infotech2014@gmail.com"),
-        ("Mobile No.:", "8733915721"),
+        ("GST No. : ", invoice_data['vendor']['gst']),
+        ("MSME Registration No. : ", invoice_data['vendor']['msme']),
+        ("E-Mail : ", "cm.infotech2014@gmail.com"),
+        ("Mobile No. : ", "8733915721"),
     ]
     
     for i, (label, value) in enumerate(vendor_lines):
@@ -2432,7 +2432,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if buyer_logo_file:
         try:
             # Add buyer logo at the top of the left box
-            logo_width = 25
+            logo_width = 30
             logo_x = 10 + (95 - logo_width) / 2
             logo_y = pdf.get_y() + 4
             

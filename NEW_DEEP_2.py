@@ -2367,41 +2367,46 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if pdf.get_y() + 80 > pdf.page_break_trigger:
         pdf.add_page()
 
-    # --- Bank Details & Declaration ---
+    # --- Bank Details & Declaration (Side by Side - Clean Version) ---
     pdf.set_font(pdf.default_font, "B", 12)
+    pdf.cell(95, 6, "Company's Bank Details", border="LTR", ln=0)
+    pdf.cell(96, 6, "Declaration", border="LTR", ln=1)
+
+    # Save positions
+    y_start = pdf.get_y()
+    x_left = pdf.get_x()
+
+    # Left column (Bank Details)
+    bank_lines = [
+        ("Bank Name:", "IDFC FIRST"),
+        ("Branch:", "AHMEDABAD Shyamal Branch"),
+        ("Account No:", "88130420182"),
+        ("IFS Code:", "IDFB0040335")
+    ]
     
-    # Bank Details
-    pdf.cell(45, 5, "Bank Name")
-    pdf.cell(5, 4, ":")
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, "IDFC FIRST")
+    for label, value in bank_lines:
+        pdf.set_x(x_left)
+        pdf.set_font(pdf.default_font, "B", 12)
+        label_width = pdf.get_string_width(label)
+        pdf.cell(label_width, 6, label, border="L", ln=0)
+        pdf.set_font(pdf.default_font, "", 12)
+        pdf.cell(95 - label_width, 6, value, border="R", ln=1)
 
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "Branch")
-    pdf.cell(5, 4, ":")
+    y_left_end = pdf.get_y()
+
+    # Right column (Declaration)
+    pdf.set_xy(x_left + 95, y_start)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, "AHMEDABAD Shyamal Branch")
+    pdf.multi_cell(96, 6, invoice_data['declaration'], border="R")
 
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "Account No")
-    pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, "88130420182")
+    # Set Y to maximum height
+    max_y = max(y_left_end, pdf.get_y())
+    pdf.set_y(max_y)
 
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "IFS Code")
-    pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, "IDFB0040335")
-
-    pdf.ln(2)
-
-    # --- Declaration ---
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(45, 5, "Declaration")
-    pdf.cell(5, 4, ":")
-    pdf.set_font(pdf.default_font, "", 12)
-    pdf.multi_cell(0, 5, invoice_data['declaration'])
+    # Bottom border
+    pdf.cell(95, 0, "", border="B", ln=0)
+    pdf.cell(96, 0, "", border="B", ln=1)
     
     # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()

@@ -986,18 +986,32 @@ END_USER_DATABASE = {
         "gst_no": "24ACZPP4197J1ZO"
     },
     "NEXT GEN POWER CONTROLS": {
-        "address": "8, Rashmi Growth Hub Ind. Estate, Opp. Vijay Sales Showroom, Nr. Shivkunj Exortica, S.P. Ring Road, Odhav, Ahmedabad ‐ 382415",
+        "address": "8, Rashmi Growth Hub Ind. Estate, Opp. Vijay Sales Showroom, Nr. Shivkunj Exortica, S.P. Ring Road, Odhav, Ahmedabad - 382415",
         "contact": "Mr. Sanjay Patel", 
         "mobile": "+91 917301 8114",
         "email": "nextgen.panel@gmail.com",
         "gst_no": "24BXGPP8440K1Z3"
     },
-    "NEXT GEN POWER CONTROLS": {
-        "address": "8, Rashmi Growth Hub Ind. Estate, Opp. Vijay Sales Showroom, Nr. Shivkunj Exortica, S.P. Ring Road, Odhav, Ahmedabad ‐ 382415",
-        "contact": "Mr. Sanjay Patel", 
-        "mobile": "+91 917301 8114",
-        "email": "nextgen.panel@gmail.com",
-        "gst_no": "24BXGPP8440K1Z3"
+    "Pramukh Industries": {
+        "address": "304/6/2-B GIDC Industrial Estate Makarpura, Vadodara-390010",
+        "contact": "Mr. Harikrushna Patel", 
+        "mobile": "+91 99988 21194",
+        "email": "hpramukh@yahoo.co.in",
+        "gst_no": "24ADAPP0517C1ZA"
+    },
+    "Prayan Electrical And Automation Private Limited": {
+        "address": "Krishna Industrial Park, Plot No. 23, Mahakali Rd, Kubadthal, Gujarat 382433",
+        "contact": "Mr. Sandip Upadhyay", 
+        "mobile": "+91 8160946360",
+        "email": "info@prayanelectricals.com",
+        "gst_no": "24AAKCP8607R1ZN"
+    },
+    "UTCREST DESIGN": {
+        "address": "509,Shubh Universal, Opp. Vijay Laxmi Hall, Vesu, Surat, Gujarat 395007",
+        "contact": "Mr. Motilal Jangid", 
+        "mobile": "+91 9982525635",
+        "email": "interior@utcrest.com",
+        "gst_no": "NOT APPLICABLE"
     },
     "Base Engineering": {
         "address": "406, Sakar East, Behind Big Bazaar, Alkapuri, Vadodara - 390007",
@@ -4130,7 +4144,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-

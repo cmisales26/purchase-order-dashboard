@@ -3293,7 +3293,7 @@ def main():
                 st.download_button(
                     "⬇ Download Invoice PDF",
                     data=pdf_file,
-                    file_name=f"Invoice_{invoice_no.replace('/', '_')}.pdf",
+                    file_name=f"{invoice_no.replace('/', '_')}.pdf",
                     mime="application/pdf",
                     key="invoice_download_button")
                                 

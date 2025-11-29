@@ -1282,9 +1282,12 @@ def get_current_invoice_sequence():
         pass
     return 1
 
+
+
+# --- Helper Functions for Invoice ---
 # --- Helper Functions for Invoice ---
 def parse_invoice_number(invoice_number):
-    """Parse invoice number to extract components"""
+    """Parse invoice number to extract components - COMPATIBLE WITH EXISTING FORMAT"""
     try:
         parts = invoice_number.split('/')
         if len(parts) >= 4:
@@ -1298,7 +1301,7 @@ def parse_invoice_number(invoice_number):
     return "CMI", f"{str(datetime.datetime.now().year)[2:]}-{str(datetime.datetime.now().year + 1)[2:]}", get_current_quarter(), "01"
 
 def generate_invoice_number(sequence_number):
-    """Generate invoice number with current quarter and sequence"""
+    """Generate invoice number - KEEP EXISTING FORMAT"""
     current_date = datetime.datetime.now()
     quarter = get_current_quarter()
     year_range = f"{str(current_date.year)[2:]}-{str(current_date.year + 1)[2:]}"
@@ -1315,7 +1318,7 @@ def get_next_sequence_number_invoice(invoice_number):
             return int(sequence) + 1
     except:
         pass
-    return 1
+    return get_next_invoice_sequence()  # Use your existing counter
 
 # --- PDF Class for Two-Page Quotation (Matching Demo Format) ---
 class QUOTATION_PDF(FPDF):
@@ -1955,7 +1958,7 @@ class PDF(FPDF):
         self.ln(9)
         self.set_font(self.default_font, "B", 15)
         self.cell(0, 6, "TAX INVOICE", ln=True, align="C")
-        self.ln(5)
+        self.ln(1)
         
     def footer(self):
         # Position at 1.5 cm from bottom
@@ -2006,7 +2009,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # === HEADER (Vendor + Invoice Details) ===
     pdf.set_font(pdf.default_font, "B", 13)
-    pdf.cell(95, 8, "CM Infotech.", border="LRT", ln=0)
+    pdf.cell(95, 8, "CM INFOTECH.", border="LRT", ln=0)
     pdf.cell(48, 8, "Invoice No.", border=1, ln=0, align="L")
     pdf.cell(48, 8, "Invoice Date", border=1, ln=1, align="L")
 
@@ -2098,17 +2101,16 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # Buyer name and address
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(95, 5, invoice_data['buyer']['name'], border="LR", ln=1)
+    pdf.multi_cell(95, 5, invoice_data['buyer']['name'], border="LR")
     
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(95, 4, invoice_data['buyer']['address'], border="LR")
     
     # Buyer contact details
     buyer_lines = [
-        ("Email:",invoice_data['buyer']['email']),
-        ("Mobile No:",invoice_data['buyer']['mobile']),
-        ("GST No.:",invoice_data['buyer']['gst']),
-        # "mobile":buyer_mobile, "email":buyer_email
+        ("Email:", invoice_data['buyer']['email']),
+        ("Mobile No:", invoice_data['buyer']['mobile']),
+        ("GST No.:", invoice_data['buyer']['gst']),
     ]
     
     for i, (label, value) in enumerate(buyer_lines):
@@ -2117,59 +2119,57 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         label_width = pdf.get_string_width(label) + 2
         pdf.cell(label_width, 6, label, border="L", ln=0)
         pdf.set_font(pdf.default_font, "", 12)
-        border = "" if i < len(buyer_lines) - 1 else ""
+        border = "R" if i < len(buyer_lines) - 1 else "R"
         pdf.cell(95 - label_width, 6, value, border=border, ln=1)
 
     y_buyer_left_end = pdf.get_y()
-    total_left_buyer_height = y_buyer_left_end - y_left_buyer_start
+    total_left_height = y_buyer_left_end - y_left_buyer_start
 
     # --- Buyer Right Details ---
     pdf.set_xy(105, y_buyer_start)
     
+    # Calculate right side cell heights to match left side
+    num_right_rows = 4
+    right_cell_height = total_left_height / num_right_rows
+    
     # Row 1: Buyer's Order No/Date
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_no'], border="RB", ln=0, align="L")
-    pdf.cell(48, 4, invoice_data['invoice_details']['buyers_order_date'], border="RB", ln=1, align="L")
-
-    # Calculate remaining height needed for address space
-    name_height = 5
-    contact_lines_height = 18
-    remaining_height_for_address = total_left_buyer_height - name_height - contact_lines_height
-    
-    # Add empty space for address if needed
-    if remaining_height_for_address > 0:
-        pdf.set_x(105)
-        pdf.cell(96, remaining_height_for_address, "", border="R", ln=1)
+    pdf.cell(48, right_cell_height, invoice_data['invoice_details']['buyers_order_no'], border="LR", ln=0, align="L")
+    pdf.cell(48, right_cell_height, invoice_data['invoice_details']['buyers_order_date'], border="R", ln=1, align="L")
 
     # Row 2: Dispatched Through
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 6, "Dispatched Through", border="LRT", ln=0)
+    pdf.cell(48, right_cell_height, "Dispatched Through", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 6, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
+    pdf.cell(48, right_cell_height, invoice_data['invoice_details']['dispatched_through'], border="RT", ln=1)
 
-    # Row 3: Destination - NOW AS INPUT
+    # Row 3: Destination
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 6, "Destination", border="LRT", ln=0)
+    pdf.cell(48, right_cell_height, "Destination", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
     destination = invoice_data['invoice_details'].get('destination', 'Vadodara')
-    pdf.cell(48, 6, destination, border="RT", ln=1)
+    pdf.cell(48, right_cell_height, destination, border="RT", ln=1)
 
     # Row 4: Terms of delivery
     pdf.set_x(105)
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(48, 6, "Terms of delivery", border="LRT", ln=0)
+    pdf.cell(48, right_cell_height, "Terms of delivery", border="LRT", ln=0)
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(48, 6, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
+    pdf.cell(48, right_cell_height, invoice_data['invoice_details']['terms_of_delivery'], border="LRT", ln=1)
+
+    # Set Y position to continue from the maximum height
+    pdf.set_y(max(y_buyer_left_end, y_buyer_start + total_left_height))
+    
     pdf.ln(0.3)
     
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
-    col_widths = [15, 80, 22, 23, 23, 28]
+    col_widths = [13, 82, 22, 23, 23, 28]
     
     # Header row
-    pdf.cell(col_widths[0], 5, "Sr. No.", border=1, align="C")
+    pdf.cell(col_widths[0], 5, "Sr.No.", border=1, align="C")
     pdf.cell(col_widths[1], 5, "Description of Goods", border=1, align="C")
     pdf.cell(col_widths[2], 5, "HSN/SAC", border=1, align="C")
     pdf.cell(col_widths[3], 5, "Quantity", border=1, align="C")
@@ -2367,31 +2367,54 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if pdf.get_y() + 80 > pdf.page_break_trigger:
         pdf.add_page()
 
-    # --- Bank Details & Declaration (Side by Side) ---
+        # --- Bank Details & Declaration (Side by Side) ---
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(95, 5, "Company's Bank Details", ln=0, border=1)
     pdf.cell(96, 5, "Declaration:", ln=1, border=1)
-
-    pdf.set_font(pdf.default_font, "", 10)
-
-    # Left column (bank)
-    bank_text = (
-        "Bank Name : IDFC FIRST\n"
-        "Branch        : AHMEDABAD Shyamal Branch\n"
-        "Account No : 88130420182\n"
-        "IFS Code    : IDFB0040335"
-    )
 
     # Save current Y position
     y_before = pdf.get_y()
     x_left = pdf.get_x()
 
-    # Left cell (Bank) with border
-    pdf.multi_cell(95, 5, bank_text, border=1)
-    y_after_left = pdf.get_y()
+    # --- Left column (Bank Details) ---
+    bank_lines = [
+        ("Bank Name", "IDFC FIRST"),
+        ("Branch", "AHMEDABAD Shyamal Branch"),
+        ("Account No", "88130420182"),
+        ("IFS Code", "IDFB0040335")
+    ]
     
-    # Right cell (Declaration) with border
+    pdf.set_font(pdf.default_font, "", 10)
+    
+    # Fixed positions for perfect alignment
+    label_start_x = x_left
+    colon_x = label_start_x + 25  # Fixed position for all colons
+    value_start_x = colon_x + 5   # Fixed position for values (after colon + space)
+    
+    # Draw bank details with perfectly aligned colons
+    current_y = y_before
+    for label, value in bank_lines:
+        # Set position for label
+        pdf.set_xy(label_start_x, current_y)
+        pdf.set_font(pdf.default_font, "B", 10)
+        pdf.cell(25, 5, label, border="L", ln=0)  # Fixed width for labels
+        
+        # Set position for colon (same X for all lines)
+        pdf.set_xy(colon_x, current_y)
+        pdf.cell(5, 5, ":", ln=0)  # Just the colon
+        
+        # Set position for value
+        pdf.set_xy(value_start_x, current_y)
+        pdf.set_font(pdf.default_font, "", 10)
+        pdf.cell(50, 5, value, border="", ln=1)  # Remaining width for values
+        
+        current_y += 5
+    
+    y_after_left = current_y
+    
+    # --- Right column (Declaration) ---
     pdf.set_xy(x_left + 95, y_before)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
     y_after_right = pdf.get_y()
     
@@ -2404,10 +2427,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Buyer's Company Signature (Blank box for future use)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Buyer's Company Signature", border="LR", ln=0, align="C")
+    pdf.cell(95, 6, "Buyer's Company Signature", border="LRT", ln=0, align="C")
 
     # Right side - Our Company Signature
-    pdf.cell(96, 6, "For CM Infotech.", border="LR", ln=1, align="C")
+    pdf.cell(96, 6, "For CM INFOTECH.", border="LR", ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
     left_signature_box_height = 33
@@ -3038,7 +3061,7 @@ def main():
     if "products" not in st.session_state:
         st.session_state.products = []
     if "company_name" not in st.session_state:
-        st.session_state.company_name = "CM Infotech"
+        st.session_state.company_name = "CM INFOTECH"
     if "po_number" not in st.session_state:
         st.session_state.po_number = generate_po_number("CP", st.session_state.po_seq)
     if "po_date" not in st.session_state:
@@ -3842,6 +3865,7 @@ def main():
         # --- Tab 3: Tax Invoice Generator ---
         # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
+        # --- Tab 3: Tax Invoice Generator ---
     with tab3:
         st.header("Tax Invoice Generator")
         
@@ -3851,16 +3875,7 @@ def main():
         # Invoice Settings in sidebar for this tab
         st.sidebar.header("Invoice Settings")
         
-        # Sales Person Selection for Invoice
-        invoice_sales_person = st.sidebar.selectbox("Select Sales Person", 
-                                            options=list(SALES_PERSON_MAPPING.keys()), 
-                                            format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
-                                            key="invoice_sales_person_select")
-        
-        # Get current sales person info
-        current_sales_person_info = SALES_PERSON_MAPPING.get(invoice_sales_person, SALES_PERSON_MAPPING['SD'])
-        
-        # Generate invoice number
+        # Generate invoice number - SIMPLER LOGIC THAT WORKS WITH EXISTING COUNTER
         def get_invoice_number():
             if st.session_state.last_invoice_number:
                 try:
@@ -3886,8 +3901,7 @@ def main():
             st.session_state.current_invoice_quarter = current_quarter
             st.session_state.invoice_number = get_invoice_number()
         
-        # Display current sales person info
-        st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
+        # Display current quarter info
         st.sidebar.info(f"**Current Quarter:** {current_quarter}")
         
         # Show auto-generated breakdown
@@ -3898,7 +3912,7 @@ def main():
         except:
             st.sidebar.warning("Could not parse invoice number")
         
-        # Editable invoice number
+        # Editable invoice number - SIMPLER VERSION
         st.sidebar.subheader("Invoice Number Editor")
         
         # Parse current invoice number for editing
@@ -3938,21 +3952,28 @@ def main():
         invoice_auto_increment = st.sidebar.checkbox("Auto-increment Sequence", value=True, key="invoice_auto_increment")
         
         if st.sidebar.button("Reset to Auto-generate", use_container_width=True, key="invoice_reset_auto_generate"):
-            st.session_state.invoice_seq = 1
+            # DON'T reset the counter file - just use the next sequence
+            next_sequence = get_next_invoice_sequence()
+            st.session_state.invoice_seq = next_sequence
             st.session_state.last_invoice_number = ""
-            st.session_state.invoice_number = get_invoice_number()
-            st.sidebar.success("Invoice number reset to auto-generated")
+            st.session_state.invoice_number = generate_invoice_number(next_sequence)
+            st.sidebar.success(f"Invoice number reset to next sequence: {next_sequence}")
             st.rerun()
 
+        # Rest of your invoice tab code remains the same...
+
+        # Rest of your invoice tab code remains the same...
         col1, col2 = st.columns([1,1])
         with col1:
             st.subheader("Invoice Details")
             
             # Show the current invoice number prominently with sales person info
             st.info(f"**Invoice Number:** {st.session_state.invoice_number}")
-            st.info(f"**Sales Person:** {current_sales_person_info['name']} ({invoice_sales_person}) - {current_sales_person_info['email']}")
+            # st.info(f"**Sales Person:** {current_sales_person_info['name']} ({invoice_sales_person}) - {current_sales_person_info['email']}")
             
+            # Use the session state invoice number
             invoice_no = st.text_input("Invoice No", st.session_state.invoice_number, key="invoice_number_input")
+            # Rest of your code...
             invoice_date = st.text_input("Invoice Date", datetime.date.today().strftime("%d-%m-%Y"))
             Suppliers_Reference = st.text_input("Supplier's Reference", "NA")
             Others_Reference = st.text_input("Other's Reference", "NA")
@@ -3969,7 +3990,7 @@ def main():
             destination = st.text_input("Destination", "Vadodara")
             
             st.subheader("Seller Details")
-            vendor_name = st.text_input("Seller Name", "CM Infotech")
+            vendor_name = st.text_input("Seller Name", "CM INFOTECH")
             vendor_address = st.text_area("Seller Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
             vendor_gst = st.text_input("Seller GST No.", "24ANMPP4891R1ZX")
             vendor_msme = st.text_input("Seller MSME Registration No.", "UDYAM-GJ-01-0117646")
@@ -4050,6 +4071,30 @@ def main():
             st.subheader("Invoice Preview & Download")
 
             if st.button("Generate Invoice", key="generate_invoice_button"):
+                # Get the current invoice number from session state (which includes manual edits)
+                current_invoice_no = st.session_state.invoice_number
+                
+                # Parse the manually edited invoice number to get the sequence
+                try:
+                    prefix, year_range, quarter, sequence = parse_invoice_number(current_invoice_no)
+                    manual_sequence = int(sequence)
+                    
+                    # UPDATE THE COUNTER FILE to match the manual sequence
+                    with open(INVOICE_COUNTER_FILE, 'w') as f:
+                        f.write(str(manual_sequence))
+                    
+                    # Update session state to reflect the new sequence
+                    st.session_state.invoice_seq = manual_sequence
+                    
+                    st.success(f"✅ Invoice sequence updated to: {manual_sequence}")
+                    
+                except Exception as e:
+                    st.error(f"Error parsing invoice number: {e}")
+                
+                # Now use the manually edited invoice number
+                invoice_no = current_invoice_no
+                
+                # Rest of your invoice calculation code...
                 # Calculate amounts with proper rounding like in PO generator
                 basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
                 sgst = round(basic_amount * 0.09, 2)
@@ -4117,10 +4162,15 @@ def main():
                 # Store the last invoice number for sequence tracking
                 st.session_state.last_invoice_number = invoice_no
                 
-                # Auto-increment for next invoice
+                # Auto-increment for next invoice - BUT RESPECT MANUAL SEQUENCE
                 if invoice_auto_increment:
-                    next_sequence = get_next_invoice_sequence()
+                    # Get the next sequence based on the manually set sequence
+                    next_sequence = manual_sequence + 1
                     st.session_state.invoice_seq = next_sequence
+                    
+                    # Update the counter file for next time
+                    with open(INVOICE_COUNTER_FILE, 'w') as f:
+                        f.write(str(next_sequence))
 
                 st.success("Invoice generated successfully!")
                 
@@ -4140,7 +4190,7 @@ def main():
                 pass
     
     st.divider()
-    st.caption("© 2025 Document Generator - CM Infotech")
+    st.caption("© 2025 Document Generator - CM INFOTECH")
 
 if __name__ == "__main__":
     main()

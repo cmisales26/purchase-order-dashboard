@@ -2166,10 +2166,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     # --- Item Table Header ---
     pdf.set_font(pdf.default_font, "B", 12)
-    col_widths = [15, 80, 22, 23, 23, 28]
+    col_widths = [13, 82, 22, 23, 23, 28]
     
     # Header row
-    pdf.cell(col_widths[0], 5, "Sr. No.", border=1, align="C")
+    pdf.cell(col_widths[0], 5, "Sr.No.", border=1, align="C")
     pdf.cell(col_widths[1], 5, "Description of Goods", border=1, align="C")
     pdf.cell(col_widths[2], 5, "HSN/SAC", border=1, align="C")
     pdf.cell(col_widths[3], 5, "Quantity", border=1, align="C")

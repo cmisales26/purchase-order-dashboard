@@ -2583,7 +2583,11 @@ def main():
                 
     # --- Tab 2: Purchase Order Generator ---
     with tab2:
-        st.header("📑 Purchase Order Generator")
+        if global_logo_path and os.path.exists(global_logo_path):
+            st.image(global_logo_path, width=150)
+            st.markdown("### Tax Invoice Generator")
+        else:
+            st.header("Tax Invoice Generator")  
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()

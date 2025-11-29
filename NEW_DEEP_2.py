@@ -2925,7 +2925,7 @@ def main():
                 st.download_button(
                     "⬇ Download Purchase Order",
                     data=pdf_bytes,
-                    file_name=f"PO_{st.session_state.po_number.replace('/', '_')}.pdf",
+                    file_name=f"{end_company}_{st.session_state.po_number.replace('/', '_')}.pdf",
                     mime="application/pdf"
                 )
                 

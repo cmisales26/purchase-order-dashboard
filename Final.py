@@ -2268,7 +2268,7 @@ def main():
 
     # --- Tab 1: Quotation Generator ---
     with tab1:
-        st.header("📑 Adobe Software Quotation Generator")
+        st.header("📑 Quotation Generator")
         
         today = datetime.date.today()
         current_quarter = get_current_quarter()

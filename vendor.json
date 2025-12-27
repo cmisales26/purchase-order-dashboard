@@ -1,80 +1,79 @@
 {
-    "Arkance IN Private Limited": {
-        "address": "One International Centre, Unit-801-802, 8th Floor, Tower-1, Senapati Bapat Marg Dadar West, Prabhadevi, Lower Parel, Mumbai - 400013, Maharashtra",
-        "contact": "Mr Krunal Shah",
-        "mobile": "+91 9137503205",
-        "email": "krunal.shah@arkance.world",
-        "gst_no": "27AAACK8290K1Z3"
-    },
-    "ACCELTY TECHSOLUTIONS LLP": {
-        "address": "603, Sai Plaza, Next To Sakinaka Telephone Exchange, Andheri - Kurla Road, Mumbai - 400072",
-        "contact": "Mr. Vishal Bhavsar",
-        "mobile": "+91 7400454023",
-        "email": "vishal@accelty.in",
-        "gst_no": "27ABQFA2542L1Z4"
-    },
-    "Tech Data Advanced Private Limited": {
-        "address": "A-301, 3rd Floor, Supreme Business Park, Behind Lake Castle, Hiranandani Garden, Powai Mumbai 400076",
-        "contact": "Mr. Deepak Khaterkar",
-        "mobile": "+91 7974088703",
-        "email": "deepak.khaterkar@techdata.com",
-        "gst_no": "27AAACO3686M1ZX"
-    },
-    "SS Solutions": {
-        "address": "F-405, Mahadev Platinum, Near Yash Bungalow, Smruti Mandir, Ghodasar,, Ahmedabad 380050, Gujarat India\n",
-        "contact": "Mr. Sagar Parikh",
-        "mobile": "+91 9099699389",
-        "email": "sagar@sssolu.in",
-        "gst_no": "24AMFPP5909G1Z0"
-    },
-    "Murari Software Solutions": {
-        "address": "8C Shimla Towers, Hill County Apts. Bachupally, Nizamet Road, Hyderabad 500090, India",
-        "contact": "Ms Tulasi Raparthi",
-        "mobile": "+91 7032473871",
-        "email": "sales@progecadindia.com",
-        "gst_no": "36ABSPM0256H3ZE"
-    },
-    "Sopan Infotech Private Limited": {
-        "address": "2D, 2nd Floor, Dr. Mansukh Lal Tower, Opp. Dhiraj Sons, B/s Vanita Vishram Collage, Athwagate, Surat - 395001",
-        "contact": "Mr. Mahek Mistry",
-        "mobile": "+91 9725554395",
-        "email": "mahek.mistry@sopaninfotech.com",
-        "gst_no": "24ABGCS7981Q1ZD"
-    },
-    "ITCG Solutions Private Limited": {
-        "address": "301, Earth The Landmark, Opp. Satsang Party Plot, Sun Pharma Road, Baroda, Gujarat - 390012",
-        "contact": "Mr. Dharmendra Pandya",
-        "mobile": "+91 8140099963",
-        "email": "pandya@itcgindia.com",
-        "gst_no": "24AACCI2679G1ZL"
-    },
-    "Acero Consulting Engineers": {
-        "address": "B-49, Sector-48, Noida - 201303, Uttar Pradesh",
-        "contact": "Mr. Peshal Goel ",
-        "mobile": "+91 9289552452",
-        "email": "p.goel@acero.in",
-        "gst_no": "09AAKCA4712C2ZY"
-    },
-    "DIVTECH IT SOLUTION PRIVATE LIMITED": {
-        "address": "435, Fortune Gateway, Near Kum Kum Party Plot, TP 13, Chhani Jakatnaka, Vadodara -390024",
-        "contact": "Mr. Jayendra Morabiya",
-        "mobile": "+91 9313158878",
-        "email": "accounts@displ.in",
-        "gst_no": "24AAICD5663M1Z9"
-    },
-    "Genesis Infoserve Private Limited": {
-        "address": "A-204/205, Eversun CHSL., DLH Junction, Sahakar Nagar, J. P. Road, Andheri (W), Mumbai - 400 053",
-        "contact": "Mr. Vivek Tripathi",
-        "mobile": "+91 9594349479",
-        "email": "accounts@genesisinfoserve.com",
-        "gst_no": "27AABCG2422J1ZU"
-    },
-    "MicroGenesis CADSoft Private Limited": {
-        "address": "2nd Floor, 202, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai, Thane, Maharashtra - 400601",
-        "contact": "Ms Kavita Girkar",
-        "mobile": "+91 8828206059",
-        "email": "kavita.girkar@mgenindia.com",
-        "gst_no": "27AABCM1454C1ZX"
-    }
-
+  "Arkance IN Private Limited": {
+    "address": "One International Centre, Unit-801-802, 8th Floor, Tower-1, Senapati Bapat Marg Dadar West, Prabhadevi, Lower Parel, Mumbai - 400013, Maharashtra",
+    "contact": "Mr Krunal Shah",
+    "mobile": "+91 9137503205",
+    "email": "krunal.shah@arkance.world",
+    "gst_no": "27AAACK8290K1Z3"
+  },
+  "ACCELTY TECHSOLUTIONS LLP": {
+    "address": "603, Sai Plaza, Next To Sakinaka Telephone Exchange, Andheri - Kurla Road, Mumbai - 400072",
+    "contact": "Mr. Vishal Bhavsar",
+    "mobile": "+91 7400454023",
+    "email": "vishal@accelty.in",
+    "gst_no": "27ABQFA2542L1Z4"
+  },
+  "Tech Data Advanced Private Limited": {
+    "address": "A-301, 3rd Floor, Supreme Business Park, Behind Lake Castle, Hiranandani Garden, Powai Mumbai 400076",
+    "contact": "Mr. Deepak Khaterkar",
+    "mobile": "+91 7974088703",
+    "email": "deepak.khaterkar@techdata.com   ",
+    "gst_no": "27AAACO3686M1ZX"
+  },
+  "SS Solutions": {
+    "address": "F-405, Mahadev Platinum, Near Yash Bungalow, Smruti Mandir, Ghodasar,, Ahmedabad 380050, Gujarat India\n",
+    "contact": "Mr. Sagar Parikh",
+    "mobile": "+91 9099699389",
+    "email": "sagar@sssolu.in",
+    "gst_no": "24AMFPP5909G1Z0"
+  },
+  "Murari Software Solutions": {
+    "address": "8C Shimla Towers, Hill County Apts. Bachupally, Nizamet Road, Hyderabad 500090, India",
+    "contact": "Ms Tulasi Raparthi",
+    "mobile": "+91 7032473871",
+    "email": "sales@progecadindia.com",
+    "gst_no": "36ABSPM0256H3ZE"
+  },
+  "Sopan Infotech Private Limited": {
+    "address": "2D, 2nd Floor, Dr. Mansukh Lal Tower, Opp. Dhiraj Sons, B/s Vanita Vishram Collage, Athwagate, Surat - 395001",
+    "contact": "Mr. Mahek Mistry",
+    "mobile": "+91 9725554395",
+    "email": "mahek.mistry@sopaninfotech.com",
+    "gst_no": "24ABGCS7981Q1ZD"
+  },
+  "ITCG Solutions Private Limited": {
+    "address": "301, Earth The Landmark, Opp. Satsang Party Plot, Sun Pharma Road, Baroda, Gujarat - 390012",
+    "contact": "Mr. Dharmendra Pandya",
+    "mobile": "+91 8140099963",
+    "email": "pandya@itcgindia.com",
+    "gst_no": "24AACCI2679G1ZL"
+  },
+  "Acero Consulting Engineers": {
+    "address": "B-49, Sector-48, Noida - 201303, Uttar Pradesh",
+    "contact": "Mr. Peshal Goel ",
+    "mobile": "+91 9289552452",
+    "email": "p.goel@acero.in",
+    "gst_no": "09AAKCA4712C2ZY"
+  },
+  "DIVTECH IT SOLUTION PRIVATE LIMITED": {
+    "address": "435, Fortune Gateway, Near Kum Kum Party Plot, TP 13, Chhani Jakatnaka, Vadodara -390024",
+    "contact": "Mr. Jayendra Morabiya",
+    "mobile": "+91 9313158878",
+    "email": "accounts@displ.in",
+    "gst_no": "24AAICD5663M1Z9"
+  },
+  "Genesis Infoserve Private Limited": {
+    "address": "A-204/205, Eversun CHSL., DLH Junction, Sahakar Nagar, J. P. Road, Andheri (W), Mumbai - 400 053",
+    "contact": "Mr. Vivek Tripathi",
+    "mobile": "+91 9594349479",
+    "email": "accounts@genesisinfoserve.com",
+    "gst_no": "27AABCG2422J1ZU"
+  },
+  "MicroGenesis CADSoft Private Limited": {
+    "address": "2nd Floor, 202, Bangashree Tower Co-Operative Housing Society, Daji Ramachandra Road, Charai, Thane, Maharashtra - 400601",
+    "contact": "Ms Kavita Girkar",
+    "mobile": "+91 8828206059",
+    "email": "kavita.girkar@mgenindia.com",
+    "gst_no": "27AABCM1454C1ZX"
+  }
 }

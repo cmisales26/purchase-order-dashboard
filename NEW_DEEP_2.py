@@ -16,6 +16,8 @@ import requests  # Add this import for downloading from GitHub
 LOGO_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/logo_final.jpg"
 STAMP_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/stamp.jpg"
 
+import time
+
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {
     "GstarCAD STDANDARD 2026 Perpetual": {"basic": 34777.0, "gst_percent": 18.0},
@@ -69,26 +71,42 @@ PRODUCT_CATALOG = {
     "Siemens NX": {"basic": 65000.0, "gst_percent": 18.0},
 }
 
-# Load data from JSON files
+# Load data from JSON files with BETTER CACHE CONTROL
+@st.cache_data(ttl=1)  # Cache for only 1 second - updates immediately
 def load_json_data(filename, default_data=None):
-    """Load data from JSON file with error handling"""
+    """Load data from JSON file with BETTER caching and error handling"""
     try:
-        with open(filename, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        # Add timestamp to force cache refresh
+        timestamp = time.time()
+        
+        # Get the absolute path to ensure we're reading the right file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, filename)
+        
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        return data
+        
     except FileNotFoundError:
-        st.warning(f"⚠️ {filename} not found. Using empty database.")
+        st.sidebar.warning(f"⚠️ {filename} not found. Using empty database.")
         return default_data or {}
     except json.JSONDecodeError as e:
-        st.error(f"❌ Error reading {filename}: {e}. Using empty database.")
+        st.sidebar.error(f"❌ Error reading {filename}: {e}. Using empty database.")
         return default_data or {}
     except Exception as e:
-        st.error(f"❌ Unexpected error reading {filename}: {e}. Using empty database.")
+        st.sidebar.error(f"❌ Unexpected error reading {filename}: {e}. Using empty database.")
         return default_data or {}
 
 # Load vendor and end user databases
 VENDOR_DATABASE = load_json_data('vendor.json')
 END_USER_DATABASE = load_json_data('endusers.json')
 
+# Debug: Print what's loaded
+print("=" * 50)
+print(f"DEBUG: Loaded {len(VENDOR_DATABASE)} vendors from vendor.json")
+print(f"DEBUG: Loaded {len(END_USER_DATABASE)} end users from endusers.json")
+print("=" * 50)
 
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
@@ -101,7 +119,12 @@ SALES_PERSON_MAPPING = {
 # --- Helper Functions for Vendor Management ---
 def get_vendor_dropdown_options():
     """Get vendor names for dropdown"""
-    return ["Select Vendor"] + list(VENDOR_DATABASE.keys())
+    try:
+        vendor_count = len(VENDOR_DATABASE)
+        return ["Select Vendor"] + list(VENDOR_DATABASE.keys())
+    except Exception as e:
+        st.sidebar.error(f"Error getting vendor options: {e}")
+        return ["Select Vendor"]
 
 def update_vendor_fields(selected_vendor):
     """Update session state with vendor details when vendor is selected"""
@@ -2108,6 +2131,39 @@ def main():
     else:
         st.sidebar.error("Stamp: ❌ Not available")
 
+    # Add Data Debug Section
+    st.sidebar.header("🔄 Data Debug")
+    
+    # Force refresh button
+    if st.sidebar.button("🔄 Force Refresh All Data", key="force_refresh_all"):
+        st.cache_data.clear()
+        st.sidebar.success("✅ All caches cleared! Data will reload.")
+        st.rerun()
+    
+    # Check data files button
+    if st.sidebar.button("📊 Check Data Files"):
+        try:
+            # Check vendor.json
+            with open('vendor.json', 'r', encoding='utf-8') as f:
+                vendor_data = json.load(f)
+            st.sidebar.success(f"✅ vendor.json: {len(vendor_data)} vendors")
+            if vendor_data:
+                first_vendor = list(vendor_data.keys())[0]
+                st.sidebar.info(f"First vendor: {first_vendor}")
+        except Exception as e:
+            st.sidebar.error(f"❌ vendor.json error: {e}")
+        
+        try:
+            # Check endusers.json
+            with open('endusers.json', 'r', encoding='utf-8') as f:
+                enduser_data = json.load(f)
+            st.sidebar.success(f"✅ endusers.json: {len(enduser_data)} end users")
+            if enduser_data:
+                first_enduser = list(enduser_data.keys())[0]
+                st.sidebar.info(f"First end user: {first_enduser}")
+        except Exception as e:
+            st.sidebar.error(f"❌ endusers.json error: {e}")
+
     # --- Initialize Session State ---
     # --- Initialize Session State ---
 # Quotation session states
@@ -2697,22 +2753,41 @@ def main():
             st.sidebar.success("PO number reset to auto-generated")
             st.rerun()
         
+        # Add Force Refresh Vendor Data button in PO tab sidebar
+        if st.sidebar.button("🔄 Force Refresh Vendor Data", key="force_refresh_vendor_po"):
+            st.cache_data.clear()
+            st.sidebar.success("✅ Vendor data cache cleared!")
+            st.rerun()
+        
         # Single tab with two columns
         col1, col2 = st.columns(2)
         
         with col1:
             st.subheader("Vendor & End User Details")
             
-            # Vendor Selection
+            # Vendor Selection - SHOW DEBUG INFO
+            vendor_options = get_vendor_dropdown_options()
+            st.sidebar.info(f"Vendor dropdown options: {len(vendor_options)} items")
+            
             selected_vendor = st.selectbox(
                 "Select Vendor", 
-                options=get_vendor_dropdown_options(),
+                options=vendor_options,
                 key="vendor_dropdown_po"
             )
             
-            # Update vendor fields when dropdown selection changes
+            # UPDATE VENDOR FIELDS WHEN DROPDOWN SELECTION CHANGES
             if selected_vendor and selected_vendor != "Select Vendor":
-                update_vendor_fields(selected_vendor)
+                vendor_data = VENDOR_DATABASE.get(selected_vendor, {})
+                st.sidebar.info(f"Selected vendor: {selected_vendor}")
+                st.sidebar.info(f"Vendor data: {vendor_data}")
+                
+                st.session_state.po_vendor_name = selected_vendor
+                st.session_state.po_vendor_address = vendor_data.get("address", "")
+                st.session_state.po_vendor_contact = vendor_data.get("contact", "")
+                st.session_state.po_vendor_mobile = vendor_data.get("mobile", "")
+                st.session_state.po_gst_no = vendor_data.get("gst_no", "")
+                st.session_state.po_pan_no = vendor_data.get("pan_no", "")
+                st.session_state.po_msme_no = vendor_data.get("msme_no", "")
             
             st.subheader("Vendor Details")
             vendor_name = st.text_input(
@@ -2747,7 +2822,13 @@ def main():
             
             # Update end user fields when dropdown selection changes
             if selected_enduser and selected_enduser != "Select End User":
-                update_enduser_fields(selected_enduser)
+                enduser_data = END_USER_DATABASE.get(selected_enduser, {})
+                st.session_state.po_end_company = selected_enduser
+                st.session_state.po_end_address = enduser_data.get("address", "")
+                st.session_state.po_end_person = enduser_data.get("contact", "")
+                st.session_state.po_end_mobile = enduser_data.get("mobile", "")
+                st.session_state.po_end_email = enduser_data.get("email", "")
+                st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
             
             end_company = st.text_input(
                 "End User Company",
@@ -2945,12 +3026,9 @@ def main():
                     use_container_width=True
                 )
                 
-        # --- Tab 3: Tax Invoice Generator ---
-        # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
-        # --- Tab 3: Tax Invoice Generator ---
     with tab3:
-    # Display company logo instead of text header
+        # Display company logo instead of text header
         if global_logo_path and os.path.exists(global_logo_path):
             st.image(global_logo_path, width=150)
             st.markdown("### Tax Invoice Generator")

@@ -1522,7 +1522,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     max_y = max(y_after_left, y_after_right)
     pdf.set_y(max_y)
 
-        # --- Signature Boxes (Side by Side) ---
+    # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()
 
     # Left side - Declaration box
@@ -1536,26 +1536,41 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     left_box_height = 33
     right_signature_box_height = 33
 
-    # Left box - Declaration terms
+    # Left box - Declaration terms (formatted in multiple lines)
     pdf.set_font(pdf.default_font, "", 8)  # Smaller font to fit all text
     pdf.set_text_color(0, 0, 0)
 
-    # Declaration text (formatted as in your requirement)
-    declaration_text = """IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY
-    BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE
-    OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU
-    ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT
-    AGAINST THIS INVOICE"""
+    # Declaration text formatted exactly as you want it
+    declaration_lines = [
+        "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY",
+        "BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE",
+        "OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU",
+        "ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT",
+        "AGAINST THIS INVOICE"
+    ]
 
-    # Position for declaration text (centered vertically)
-    text_y = y_signature_start + 10
-    pdf.set_xy(10, text_y)
+    # Calculate starting position for centered text
+    box_top_y = y_signature_start + 6
+    box_center_y = box_top_y + (left_box_height / 2)
+    total_text_height = len(declaration_lines) * 4  # 4 units per line
+    text_start_y = box_center_y - (total_text_height / 2)
 
-    # Use multi_cell for automatic line breaks
-    pdf.multi_cell(95, 4, declaration_text, border="LRB", align="C")
+    # Draw each line centered in the box
+    current_y = text_start_y
+    for line in declaration_lines:
+        pdf.set_xy(10, current_y)
+        # Calculate X position to center the text
+        line_width = pdf.get_string_width(line)
+        x_position = 10 + (95 - line_width) / 2
+        pdf.set_x(x_position)
+        pdf.cell(line_width, 4, line, ln=1)
+        current_y += 4
 
-    # Get Y position after left box
-    y_after_left_box = pdf.get_y()
+    # Draw border for left box
+    pdf.set_xy(10, box_top_y)
+    pdf.cell(95, left_box_height, "", border="LRB")
+
+    y_after_left_box = box_top_y + left_box_height
 
     # Right signature box (Our Company)
     # Reset to top of right box
@@ -1573,18 +1588,21 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             st.warning(f"Could not add stamp: {e}")
 
     # Position for the signature text in right box
-    signature_y = y_signature_start + 10 + right_signature_box_height - 10
-    pdf.set_xy(105, signature_y)
+    # Calculate centered position for signature
+    signature_box_top = y_signature_start + 6
+    signature_box_center = signature_box_top + (right_signature_box_height / 2)
+    signature_text_y = signature_box_center + 8  # Position below center
+
+    pdf.set_xy(105, signature_text_y)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
 
     # Draw border for right signature box
-    pdf.set_xy(105, y_signature_start + 6)
+    pdf.set_xy(105, signature_box_top)
     pdf.cell(96, right_signature_box_height, "", border="LRB")
 
-    # Adjust Y position if left box is taller
-    current_y = max(y_after_left_box, y_signature_start + 6 + right_signature_box_height)
-    pdf.set_y(current_y)
+    # Set Y position to continue after both boxes
+    pdf.set_y(max(y_after_left_box, signature_box_top + right_signature_box_height))
 
     # Add space before jurisdiction text
     pdf.ln(6)

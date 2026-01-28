@@ -1461,8 +1461,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # # Check if we need a new page before footer content
     # if pdf.get_y() + 80 > pdf.page_break_trigger:
     #     pdf.add_page()
-
-            # --- Amount in Words ---
+    # --- Amount in Words ---
     pdf.set_font(pdf.default_font, "B", 12)
     label_part = "Tax Amount (in words): "
     pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
@@ -1473,22 +1472,71 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
 
     # --- Declaration Box ---
+    # Calculate available width for the declaration box (189.7 total width)
+    total_width = 189.7
+
     # First, write "Declaration:" in bold
     pdf.set_font(pdf.default_font, "B", 12)
     declaration_label = "Declaration:"
-    pdf.cell(pdf.get_string_width(declaration_label), 5, declaration_label, border="LTB", ln=0)
+    label_width = pdf.get_string_width(declaration_label)
+    pdf.cell(label_width, 5, declaration_label, border="LTB", ln=0)
 
-    # Then write the rest of the text in normal font
-    pdf.set_font(pdf.default_font, "", 12)
+    # Calculate remaining width for the text
+    available_width = total_width - label_width
     declaration_text = " IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE"
 
-    # Calculate remaining width for the normal text
-    remaining_width_declaration = 189.7 - pdf.get_string_width(declaration_label)
-    pdf.cell(remaining_width_declaration, 5, declaration_text, border="TRB", ln=True)
+    # Wrap the declaration text to fit in available width
+    pdf.set_font(pdf.default_font, "", 12)
+    words = declaration_text.split()
+    lines = []
+    current_line = ""
+
+    for word in words:
+        # Test if adding this word exceeds the available width
+        test_line = current_line + word + " "
+        if pdf.get_string_width(test_line) <= available_width:
+            current_line = test_line
+        else:
+            # Add the current line to lines and start a new line
+            lines.append(current_line)
+            current_line = word + " "
+
+    # Add the last line
+    if current_line:
+        lines.append(current_line)
+
+    # Draw the wrapped text
+    for i, line in enumerate(lines):
+        # Get the width of this line
+        line_width = pdf.get_string_width(line)
+        
+        if i == 0:
+            # First line - has top border from the label
+            pdf.cell(line_width, 5, line, border="TR", ln=0)
+            # Fill remaining space with top border
+            fill_width = available_width - line_width
+            pdf.cell(fill_width, 5, "", border="TR", ln=True)
+        else:
+            # Move to start of next line (under the "Declaration:" label)
+            pdf.set_x(pdf.l_margin + label_width)
+            
+            if i == len(lines) - 1:
+                # Last line - has bottom border
+                pdf.cell(line_width, 5, line, border="RB", ln=0)
+                # Fill remaining space with bottom border
+                fill_width = available_width - line_width
+                pdf.cell(fill_width, 5, "", border="RB", ln=True)
+            else:
+                # Middle lines - only right border
+                pdf.cell(line_width, 5, line, border="R", ln=0)
+                # Fill remaining space with right border
+                fill_width = available_width - line_width
+                pdf.cell(fill_width, 5, "", border="R", ln=True)
 
     # Check if we need a new page before footer content
     if pdf.get_y() + 80 > pdf.page_break_trigger:
         pdf.add_page()
+
 
         # --- Bank Details & Declaration (Side by Side) ---
     pdf.set_font(pdf.default_font, "B", 10)

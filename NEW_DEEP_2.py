@@ -1475,10 +1475,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
 
     # --- Declaration Box ---
+    # --- Declaration Box ---
     pdf.set_font(pdf.default_font, "B", 12)
-    # Write just the label part in bold
     label_part = "Declaration: IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE "
-
+    pdf.cell(189.7, 5, label_part, border="LRB", ln=True)
     # Check text width and wrap if needed
     max_width = 189.7  # Adjust based on your page width minus margins
     text_width = pdf.get_string_width(label_part)

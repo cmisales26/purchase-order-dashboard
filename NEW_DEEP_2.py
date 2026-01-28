@@ -1530,7 +1530,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(95, 6, "Buyer's Company Signature", border="LRT", ln=0, align="C")
 
     # Right side - Our Company Signature
-    pdf.cell(96, 6, "For CM INFOTECH.", border="LR", ln=1, align="C")
+    pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
 
     # Create the signature boxes with DIFFERENT heights
     left_signature_box_height = 33

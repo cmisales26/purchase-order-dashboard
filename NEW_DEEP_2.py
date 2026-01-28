@@ -1613,7 +1613,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Calculate spacing
     total_details_height = len(company_details) * 5  # 5 units per line
-    details_start_y = text_start_y + 2
+    details_start_y = text_start_y + 1
 
     # Draw company details
     current_y = details_start_y
@@ -1621,12 +1621,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_xy(105, current_y)
         
         # Use different font weights for different lines
-        if i == 0:  # "CM INFOTECH" - bold and larger
+        if i == 0: 
             pdf.set_font(pdf.default_font, "B", 11)
-        elif i == 2:  # "Authorized Signatory" - bold
-            pdf.set_font(pdf.default_font, "B", 10)
-        else:  # "Chirality" - normal
-            pdf.set_font(pdf.default_font, "", 10)
         
         pdf.cell(96, 5, detail, border=0, ln=0, align="C")
         current_y += 3

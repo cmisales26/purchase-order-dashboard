@@ -1469,6 +1469,17 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(95, 5, "Company's Bank Details", ln=1, border=1)
     # pdf.cell(96, 5, "Declaration:", ln=0, border=1)
 
+    # --- Right column (Declaration) ---
+    pdf.set_xy(x_left + 95, y_before)
+    pdf.set_font(pdf.default_font, "", 10)
+    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
+    y_after_right = pdf.get_y()
+    
+    # Set Y to the maximum of both columns
+    max_y = max(y_after_left, y_after_right)
+    pdf.set_y(max_y)
+
+
     # Save current Y position
     y_before = pdf.get_y()
     x_left = pdf.get_x()
@@ -1509,15 +1520,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     
     y_after_left = current_y
     
-    # --- Right column (Declaration) ---
-    pdf.set_xy(x_left + 95, y_before)
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
-    y_after_right = pdf.get_y()
+    # # --- Right column (Declaration) ---
+    # pdf.set_xy(x_left + 95, y_before)
+    # pdf.set_font(pdf.default_font, "", 10)
+    # pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
+    # y_after_right = pdf.get_y()
     
-    # Set Y to the maximum of both columns
-    max_y = max(y_after_left, y_after_right)
-    pdf.set_y(max_y)
+    # # Set Y to the maximum of both columns
+    # max_y = max(y_after_left, y_after_right)
+    # pdf.set_y(max_y)
 
     # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()

@@ -1537,7 +1537,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     right_signature_box_height = 33
 
     # Left box - Declaration terms (as one paragraph, left aligned)
-    pdf.set_font(pdf.default_font, "", 12)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.set_text_color(0, 0, 0)
 
     # Combine all terms into one paragraph
@@ -1548,7 +1548,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(95, left_box_height, "", border="LRB", ln=0)
 
     # Now write the text inside the box (left aligned)
-    text_x = 12  # Slightly indented from left border for better appearance
+    text_x = 10  # Slightly indented from left border for better appearance
     text_y = y_signature_start + 10  # Starting position for text
     line_height = 4
     max_width = 91  # Width available for text (95 - 4 for margins)

@@ -1527,7 +1527,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Declaration box
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Declaration:", border="LRT", ln=0, align="C")
+    pdf.cell(95, 6, "Terms:", border="LRTB", ln=0, align="L")
 
     # Right side - Our Company Signature
     pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
@@ -1542,11 +1542,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Declaration text formatted exactly as you want it
     declaration_lines = [
-        "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY",
-        "BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE",
-        "OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU",
-        "ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT",
-        "AGAINST THIS INVOICE"
+        "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'.",
+        "2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY.",
+        "3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMTANCES.",
+        "4. INTERESET WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME.",
+        "SIGNATURE______________"
     ]
 
     # Calculate starting position for centered text

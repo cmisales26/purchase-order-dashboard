@@ -1452,10 +1452,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     remaining_width = 189.7 - pdf.get_string_width(label_part)
     pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
 
-    pdf.set_font(pdf.default_font, "B", 12)
-    # Write just the label part in bold
-    label_part = "Declaration: IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE "
-    pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # # Write just the label part in bold
+    # label_part = "Declaration: IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE "
+    # pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
     
 
     # Check if we need a new page before footer content

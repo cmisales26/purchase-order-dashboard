@@ -1605,8 +1605,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Company details - properly centered and spaced
     company_details = [
-        "CM INFOTECH",
-        "Chirality",
         "Authorized Signatory"
     ]
 

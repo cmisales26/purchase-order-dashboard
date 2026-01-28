@@ -1056,6 +1056,9 @@ class PDF(FPDF):
         
         # Footer content
         self.set_font(self.default_font, "I", 10)
+        self.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
+
+        self.set_font(self.default_font, "I", 10)
         self.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
         
         self.set_font(self.default_font, "", 10)

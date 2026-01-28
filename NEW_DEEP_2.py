@@ -1466,7 +1466,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 10)
     # Declaration on LEFT, Bank Details on RIGHT
     pdf.cell(95, 5, "Declaration:", ln=0, border=1)  # Left column
-    pdf.cell(95, 5, "Company's Bank Details", ln=1, border=1)  # Right column
+    pdf.cell(96, 5, "Company's Bank Details", ln=1, border=1)  # Right column
 
     # Save current Y position
     y_before = pdf.get_y()

@@ -1522,66 +1522,43 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     max_y = max(y_after_left, y_after_right)
     pdf.set_y(max_y)
 
-    # --- Signature Boxes (Side by Side) ---
+        # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()
 
-    # Left side - Buyer's Company Signature (Blank box for future use)
+    # Left side - Declaration box
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Buyer's Company Signature", border="LRT", ln=0, align="C")
+    pdf.cell(95, 6, "Declaration:", border="LRT", ln=0, align="C")
 
     # Right side - Our Company Signature
     pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
 
-    # Create the signature boxes with DIFFERENT heights
-    left_signature_box_height = 33
+    # Create the boxes with heights
+    left_box_height = 33
     right_signature_box_height = 33
 
-    # Left signature box (Buyer - Blank)
-    pdf.set_font(pdf.default_font, "I", 10)
-    pdf.set_text_color(128, 128, 128)
+    # Left box - Declaration terms
+    pdf.set_font(pdf.default_font, "", 8)  # Smaller font to fit all text
+    pdf.set_text_color(0, 0, 0)
 
-    # Check if buyer logo is available
-    buyer_logo_file = invoice_data.get('buyer', {}).get('logo_file')
+    # Declaration text (formatted as in your requirement)
+    declaration_text = """IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY
+    BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE
+    OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU
+    ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT
+    AGAINST THIS INVOICE"""
 
-    if buyer_logo_file:
-        try:
-            # Add buyer logo at the top of the left box
-            logo_width = 25
-            logo_x = 10 + (95 - logo_width) / 2
-            logo_y = pdf.get_y() + 4
-            
-            # Add buyer company logo
-            pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
-            
-            # Add buyer company name below logo
-            pdf.set_xy(10, logo_y + logo_width + 2)
-            pdf.set_font(pdf.default_font, "B", 9)
-            pdf.cell(95, 4, invoice_data['buyer']['name'], border=0, ln=1, align="C")
-            
-            # Add signature line and text
-            pdf.set_xy(10, pdf.get_y() + 8)
-            pdf.set_font(pdf.default_font, "", 9)
-            pdf.cell(95, 4, "_________________________", border=0, ln=1, align="C")
-            pdf.cell(95, 4, "Authorized Signatory", border=0, ln=1, align="C")
-            
-            # Draw the border around everything
-            pdf.set_xy(10, y_signature_start + 6)
-            pdf.cell(95, left_signature_box_height, "", border="LRB")
-            
-            # Update Y position after left box
-            y_after_left_signature = y_signature_start + 6 + left_signature_box_height
-            
-        except Exception as e:
-            st.warning(f"Could not add buyer logo: {e}")
-            # Fallback without logo
-            pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
-            y_after_left_signature = pdf.get_y()
-    else:
-        # No buyer logo available, show original placeholder
-        pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
-        y_after_left_signature = pdf.get_y()
+    # Position for declaration text (centered vertically)
+    text_y = y_signature_start + 10
+    pdf.set_xy(10, text_y)
+
+    # Use multi_cell for automatic line breaks
+    pdf.multi_cell(95, 4, declaration_text, border="LRB", align="C")
+
+    # Get Y position after left box
+    y_after_left_box = pdf.get_y()
 
     # Right signature box (Our Company)
+    # Reset to top of right box
     pdf.set_xy(105, y_signature_start + 5)
     pdf.set_text_color(0, 0, 0)
 
@@ -1596,7 +1573,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
             st.warning(f"Could not add stamp: {e}")
 
     # Position for the signature text in right box
-    pdf.set_xy(105, y_signature_start + 10 + right_signature_box_height - 10)
+    signature_y = y_signature_start + 10 + right_signature_box_height - 10
+    pdf.set_xy(105, signature_y)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
 
@@ -1604,14 +1582,108 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(105, y_signature_start + 6)
     pdf.cell(96, right_signature_box_height, "", border="LRB")
 
-    # Set Y position to continue after both signature boxes
-    pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
+    # Adjust Y position if left box is taller
+    current_y = max(y_after_left_box, y_signature_start + 6 + right_signature_box_height)
+    pdf.set_y(current_y)
+
+    # Add space before jurisdiction text
     pdf.ln(6)
     pdf.set_font(pdf.default_font, "I", 10)
     pdf.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
+
+    # # --- Signature Boxes (Side by Side) ---
+    # y_signature_start = pdf.get_y()
+
+    # # Left side - Buyer's Company Signature (Blank box for future use)
+    # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.cell(95, 6, "Buyer's Company Signature", border="LRT", ln=0, align="C")
+
+    # # Right side - Our Company Signature
+    # pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
+
+    # # Create the signature boxes with DIFFERENT heights
+    # left_signature_box_height = 33
+    # right_signature_box_height = 33
+
+    # # Left signature box (Buyer - Blank)
+    # pdf.set_font(pdf.default_font, "I", 10)
+    # pdf.set_text_color(128, 128, 128)
+
+    # # Check if buyer logo is available
+    # buyer_logo_file = invoice_data.get('buyer', {}).get('logo_file')
+
+    # if buyer_logo_file:
+    #     try:
+    #         # Add buyer logo at the top of the left box
+    #         logo_width = 25
+    #         logo_x = 10 + (95 - logo_width) / 2
+    #         logo_y = pdf.get_y() + 4
+            
+    #         # Add buyer company logo
+    #         pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
+            
+    #         # Add buyer company name below logo
+    #         pdf.set_xy(10, logo_y + logo_width + 2)
+    #         pdf.set_font(pdf.default_font, "B", 9)
+    #         pdf.cell(95, 4, invoice_data['buyer']['name'], border=0, ln=1, align="C")
+            
+    #         # Add signature line and text
+    #         pdf.set_xy(10, pdf.get_y() + 8)
+    #         pdf.set_font(pdf.default_font, "", 9)
+    #         pdf.cell(95, 4, "_________________________", border=0, ln=1, align="C")
+    #         pdf.cell(95, 4, "Authorized Signatory", border=0, ln=1, align="C")
+            
+    #         # Draw the border around everything
+    #         pdf.set_xy(10, y_signature_start + 6)
+    #         pdf.cell(95, left_signature_box_height, "", border="LRB")
+            
+    #         # Update Y position after left box
+    #         y_after_left_signature = y_signature_start + 6 + left_signature_box_height
+            
+    #     except Exception as e:
+    #         st.warning(f"Could not add buyer logo: {e}")
+    #         # Fallback without logo
+    #         pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
+    #         y_after_left_signature = pdf.get_y()
+    # else:
+    #     # No buyer logo available, show original placeholder
+    #     pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
+    #     y_after_left_signature = pdf.get_y()
+
+    # # Right signature box (Our Company)
+    # pdf.set_xy(105, y_signature_start + 5)
+    # pdf.set_text_color(0, 0, 0)
+
+    # # Add stamp if available
+    # if stamp_file:
+    #     try:
+    #         stamp_width = 25
+    #         stamp_x = 105 + (96 - stamp_width) / 2
+    #         stamp_y = pdf.get_y() + 2
+    #         pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
+    #     except Exception as e:
+    #         st.warning(f"Could not add stamp: {e}")
+
+    # # Position for the signature text in right box
+    # pdf.set_xy(105, y_signature_start + 10 + right_signature_box_height - 10)
+    # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
+
+    # # Draw border for right signature box
+    # pdf.set_xy(105, y_signature_start + 6)
+    # pdf.cell(96, right_signature_box_height, "", border="LRB")
+
+    # # Set Y position to continue after both signature boxes
+    # pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
+    # pdf.ln(6)
+    # pdf.set_font(pdf.default_font, "I", 10)
+    # pdf.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
+
+    # pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
+    # return pdf_bytes
 
 # --- PDF Class ---
 class PO_PDF(FPDF):

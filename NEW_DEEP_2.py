@@ -1465,7 +1465,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Bank Details & Declaration (Side by Side) ---
     pdf.set_font(pdf.default_font, "B", 10)
     # Declaration on LEFT, Bank Details on RIGHT
-    pdf.cell(96, 5, "Declaration:", ln=0, border=1)  # Left column
+    pdf.cell(95, 5, "Declaration:", ln=0, border=1)  # Left column
     pdf.cell(95, 5, "Company's Bank Details", ln=1, border=1)  # Right column
 
     # Save current Y position
@@ -1475,12 +1475,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Left column (Declaration) ---
     pdf.set_xy(x_left, y_before)
     pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
+    pdf.multi_cell(95, 4, invoice_data['declaration'], border=1)
     y_after_left = pdf.get_y()
 
     # --- Right column (Bank Details) ---
     # Reset X position for right column
-    pdf.set_xy(x_left + 96, y_before)
+    pdf.set_xy(x_left + 95, y_before)
 
     # Bank details lines
     bank_lines = [

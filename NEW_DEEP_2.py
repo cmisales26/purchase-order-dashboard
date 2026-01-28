@@ -1527,9 +1527,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Declaration box
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Terms:", border="LRTB", ln=0, align="L")
+    pdf.cell(95, 6, "Declaration:", border="LRT", ln=0, align="C")
 
-    # Right side - Our Company Signature
+    # Right side - Our Company Signature box header
     pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
 
     # Create the boxes with heights
@@ -1537,7 +1537,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     right_signature_box_height = 33
 
     # Left box - Declaration terms (as one paragraph, left aligned)
-    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.set_text_color(0, 0, 0)
 
     # Combine all terms into one paragraph
@@ -1547,28 +1547,24 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_xy(10, y_signature_start + 6)
     pdf.cell(95, left_box_height, "", border="LRB", ln=0)
 
-    # Now write the text inside the box (left aligned)
-    text_x = 10  # Slightly indented from left border for better appearance
-    text_y = y_signature_start + 10  # Starting position for text
+    # Write declaration text (same as before)
+    text_x = 12
+    text_y = y_signature_start + 10
     line_height = 4
-    max_width = 91  # Width available for text (95 - 4 for margins)
+    max_width = 91
 
-    # Split text into lines that fit within the box width
     words = declaration_text.split()
     lines = []
     current_line = ""
 
     for word in words:
-        # Test if adding this word exceeds the max width
         test_line = current_line + " " + word if current_line else word
         if pdf.get_string_width(test_line) <= max_width:
             current_line = test_line
         else:
-            # Line is full, add to lines
             lines.append(current_line)
             current_line = word
 
-    # Add the last line
     if current_line:
         lines.append(current_line)
 
@@ -1581,31 +1577,67 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     current_y = text_start_y
     for line in lines:
         pdf.set_xy(text_x, current_y)
-        pdf.cell(max_width, line_height, line, ln=1, align="L")  # align="L" for left alignment
+        pdf.cell(max_width, line_height, line, ln=1, align="L")
         current_y += line_height
 
     y_after_left_box = box_top_y + left_box_height
 
-    # Right signature box (Our Company)
+    # Right signature box (Our Company) - FIXED LAYOUT
     # Draw border first
     pdf.set_xy(105, y_signature_start + 6)
     pdf.cell(96, right_signature_box_height, "", border="LRB")
 
-    # Add stamp if available
+    # Add stamp if available (at the top)
     if stamp_file:
         try:
             stamp_width = 25
             stamp_x = 105 + (96 - stamp_width) / 2
-            stamp_y = y_signature_start + 10  # Position from top of box
+            stamp_y = y_signature_start + 8  # Position near top
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
+            
+            # Adjust text position based on stamp
+            text_start_y = stamp_y + stamp_width + 2
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
+            text_start_y = y_signature_start + 12
+    else:
+        text_start_y = y_signature_start + 12
 
-    # Add signature text (centered in box)
-    signature_y = y_signature_start + 6 + (right_signature_box_height / 2) + 4
-    pdf.set_xy(105, signature_y)
+    # Company details - properly centered and spaced
+    company_details = [
+        "CM INFOTECH",
+        "Chirality",
+        "Authorized Signatory"
+    ]
+
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
+    pdf.set_text_color(0, 0, 0)
+
+    # Calculate spacing
+    total_details_height = len(company_details) * 5  # 5 units per line
+    details_start_y = text_start_y + 2
+
+    # Draw company details
+    current_y = details_start_y
+    for i, detail in enumerate(company_details):
+        pdf.set_xy(105, current_y)
+        
+        # Use different font weights for different lines
+        if i == 0:  # "CM INFOTECH" - bold and larger
+            pdf.set_font(pdf.default_font, "B", 11)
+        elif i == 2:  # "Authorized Signatory" - bold
+            pdf.set_font(pdf.default_font, "B", 10)
+        else:  # "Chirality" - normal
+            pdf.set_font(pdf.default_font, "", 10)
+        
+        pdf.cell(96, 5, detail, border=0, ln=0, align="C")
+        current_y += 5
+
+    # Optional: Add "MEDAS" if needed (smaller, at bottom)
+    if "MEDAS" in invoice_data.get('company_details', ''):
+        pdf.set_xy(105, current_y + 2)
+        pdf.set_font(pdf.default_font, "I", 8)
+        pdf.cell(96, 4, "MEDAS", border=0, ln=0, align="C")
 
     # Set Y position to continue after both boxes
     pdf.set_y(max(y_after_left_box, y_signature_start + 6 + right_signature_box_height))

@@ -1527,7 +1527,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Declaration box
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Declaration:", border="LRT", ln=0, align="C")
+    pdf.cell(95, 6, "Terms:", border="LRTB", ln=0, align="L")
 
     # Right side - Our Company Signature
     pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
@@ -1537,7 +1537,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     right_signature_box_height = 33
 
     # Left box - Declaration terms (as one paragraph, left aligned)
-    pdf.set_font(pdf.default_font, "", 8)
+    pdf.set_font(pdf.default_font, "", 12)
     pdf.set_text_color(0, 0, 0)
 
     # Combine all terms into one paragraph

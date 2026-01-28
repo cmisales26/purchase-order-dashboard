@@ -1536,22 +1536,19 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     left_box_height = 33
     right_signature_box_height = 33
 
-    # Left box - Declaration terms (as one paragraph)
-    pdf.set_font(pdf.default_font, "", 8)  # Smaller font to fit all text
+    # Left box - Declaration terms (as one paragraph, left aligned)
+    pdf.set_font(pdf.default_font, "", 8)
     pdf.set_text_color(0, 0, 0)
 
     # Combine all terms into one paragraph
     declaration_text = "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'. 2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY. 3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMTANCES. 4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME. SIGNATURE______________"
 
-    # Set position for left box
+    # Draw border for left box
     pdf.set_xy(10, y_signature_start + 6)
-
-    # Draw border for left box first
     pdf.cell(95, left_box_height, "", border="LRB", ln=0)
 
-    # Now write the text inside the box
-    # We need to write the text at the correct position
-    text_x = 12  # Slightly indented from left border
+    # Now write the text inside the box (left aligned)
+    text_x = 12  # Slightly indented from left border for better appearance
     text_y = y_signature_start + 10  # Starting position for text
     line_height = 4
     max_width = 91  # Width available for text (95 - 4 for margins)
@@ -1580,11 +1577,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     total_text_height = len(lines) * line_height
     text_start_y = box_top_y + (left_box_height - total_text_height) / 2
 
-    # Draw each line
+    # Draw each line (left aligned)
     current_y = text_start_y
     for line in lines:
         pdf.set_xy(text_x, current_y)
-        pdf.cell(max_width, line_height, line, ln=1, align="L")
+        pdf.cell(max_width, line_height, line, ln=1, align="L")  # align="L" for left alignment
         current_y += line_height
 
     y_after_left_box = box_top_y + left_box_height

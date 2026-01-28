@@ -1440,7 +1440,29 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(32, 5, "", border=1, align="C")
     pdf.cell(31, 5, f"{hsn_cgst:,.2f}", border=1, ln=True, align="C")  # Added comma formatting
     
-    # --- Amount in Words ---
+    # # --- Amount in Words ---
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # # Write just the label part in bold
+    # label_part = "Tax Amount (in words): "
+    # pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
+
+    # pdf.set_font(pdf.default_font, "", 12)
+    # # Write the value part in normal font and complete the border
+    # value_part = invoice_data['totals']['tax_in_words']
+    # remaining_width = 189.7 - pdf.get_string_width(label_part)
+    # pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
+
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # # Write just the label part in bold
+    # label_part = "Declaration: IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE "
+    # pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
+    
+
+    # # Check if we need a new page before footer content
+    # if pdf.get_y() + 80 > pdf.page_break_trigger:
+    #     pdf.add_page()
+
+        # --- Amount in Words ---
     pdf.set_font(pdf.default_font, "B", 12)
     # Write just the label part in bold
     label_part = "Tax Amount (in words): "
@@ -1452,14 +1474,43 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     remaining_width = 189.7 - pdf.get_string_width(label_part)
     pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
 
+    # --- Declaration Box ---
     pdf.set_font(pdf.default_font, "B", 12)
     # Write just the label part in bold
-    label_part = "Declaration: "
-    pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
-    
-    # # Tax in words
-    # pdf.set_font(pdf.default_font, "B", 10)
-    # pdf.cell(191, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
+    label_part = "Declaration: IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE "
+
+    # Check text width and wrap if needed
+    max_width = 189.7  # Adjust based on your page width minus margins
+    text_width = pdf.get_string_width(label_part)
+
+    if text_width > max_width:
+        # Text is too long, we need to wrap it
+        words = label_part.split(' ')
+        lines = []
+        current_line = ""
+        
+        for word in words:
+            test_line = current_line + word + " "
+            if pdf.get_string_width(test_line) <= max_width:
+                current_line = test_line
+            else:
+                lines.append(current_line)
+                current_line = word + " "
+        
+        if current_line:
+            lines.append(current_line)
+        
+        # Draw multi-line declaration
+        for i, line in enumerate(lines):
+            if i == 0:  # First line
+                pdf.cell(189.7, 5, line, border="LTB", ln=True)
+            elif i == len(lines) - 1:  # Last line
+                pdf.cell(189.7, 5, line, border="LRB", ln=True)
+            else:  # Middle lines
+                pdf.cell(189.7, 5, line, border="LR", ln=True)
+    else:
+        # Text fits in one line
+        pdf.cell(189.7, 5, label_part, border="LRB", ln=True)
 
     # Check if we need a new page before footer content
     if pdf.get_y() + 80 > pdf.page_break_trigger:

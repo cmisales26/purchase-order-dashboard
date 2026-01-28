@@ -1527,7 +1527,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Left side - Declaration box
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Terms:", border="LRTB", ln=0, align="L")
+    pdf.cell(95, 6, "Declaration:", border="LRT", ln=0, align="C")
 
     # Right side - Our Company Signature
     pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
@@ -1536,73 +1536,82 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     left_box_height = 33
     right_signature_box_height = 33
 
-    # Left box - Declaration terms (formatted in multiple lines)
+    # Left box - Declaration terms (as one paragraph)
     pdf.set_font(pdf.default_font, "", 8)  # Smaller font to fit all text
     pdf.set_text_color(0, 0, 0)
 
-    # Declaration text formatted exactly as you want it
-    declaration_lines = [
-        "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'.",
-        "2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY.",
-        "3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMTANCES.",
-        "4. INTERESET WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME.",
-        "SIGNATURE______________"
-    ]
+    # Combine all terms into one paragraph
+    declaration_text = "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'. 2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY. 3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMTANCES. 4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME. SIGNATURE______________"
 
-    # Calculate starting position for centered text
+    # Set position for left box
+    pdf.set_xy(10, y_signature_start + 6)
+
+    # Draw border for left box first
+    pdf.cell(95, left_box_height, "", border="LRB", ln=0)
+
+    # Now write the text inside the box
+    # We need to write the text at the correct position
+    text_x = 12  # Slightly indented from left border
+    text_y = y_signature_start + 10  # Starting position for text
+    line_height = 4
+    max_width = 91  # Width available for text (95 - 4 for margins)
+
+    # Split text into lines that fit within the box width
+    words = declaration_text.split()
+    lines = []
+    current_line = ""
+
+    for word in words:
+        # Test if adding this word exceeds the max width
+        test_line = current_line + " " + word if current_line else word
+        if pdf.get_string_width(test_line) <= max_width:
+            current_line = test_line
+        else:
+            # Line is full, add to lines
+            lines.append(current_line)
+            current_line = word
+
+    # Add the last line
+    if current_line:
+        lines.append(current_line)
+
+    # Calculate starting Y position to center text vertically
     box_top_y = y_signature_start + 6
-    box_center_y = box_top_y + (left_box_height / 2)
-    total_text_height = len(declaration_lines) * 4  # 4 units per line
-    text_start_y = box_center_y - (total_text_height / 2)
+    total_text_height = len(lines) * line_height
+    text_start_y = box_top_y + (left_box_height - total_text_height) / 2
 
-    # Draw each line centered in the box
+    # Draw each line
     current_y = text_start_y
-    for line in declaration_lines:
-        pdf.set_xy(10, current_y)
-        # Calculate X position to center the text
-        line_width = pdf.get_string_width(line)
-        x_position = 10 + (95 - line_width) / 2
-        pdf.set_x(x_position)
-        pdf.cell(line_width, 4, line, ln=1)
-        current_y += 4
-
-    # Draw border for left box
-    pdf.set_xy(10, box_top_y)
-    pdf.cell(95, left_box_height, "", border="LRB")
+    for line in lines:
+        pdf.set_xy(text_x, current_y)
+        pdf.cell(max_width, line_height, line, ln=1, align="L")
+        current_y += line_height
 
     y_after_left_box = box_top_y + left_box_height
 
     # Right signature box (Our Company)
-    # Reset to top of right box
-    pdf.set_xy(105, y_signature_start + 5)
-    pdf.set_text_color(0, 0, 0)
+    # Draw border first
+    pdf.set_xy(105, y_signature_start + 6)
+    pdf.cell(96, right_signature_box_height, "", border="LRB")
 
     # Add stamp if available
     if stamp_file:
         try:
             stamp_width = 25
             stamp_x = 105 + (96 - stamp_width) / 2
-            stamp_y = pdf.get_y() + 2
+            stamp_y = y_signature_start + 10  # Position from top of box
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
 
-    # Position for the signature text in right box
-    # Calculate centered position for signature
-    signature_box_top = y_signature_start + 6
-    signature_box_center = signature_box_top + (right_signature_box_height / 2)
-    signature_text_y = signature_box_center + 8  # Position below center
-
-    pdf.set_xy(105, signature_text_y)
+    # Add signature text (centered in box)
+    signature_y = y_signature_start + 6 + (right_signature_box_height / 2) + 4
+    pdf.set_xy(105, signature_y)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
 
-    # Draw border for right signature box
-    pdf.set_xy(105, signature_box_top)
-    pdf.cell(96, right_signature_box_height, "", border="LRB")
-
     # Set Y position to continue after both boxes
-    pdf.set_y(max(y_after_left_box, signature_box_top + right_signature_box_height))
+    pdf.set_y(max(y_after_left_box, y_signature_start + 6 + right_signature_box_height))
 
     # Add space before jurisdiction text
     pdf.ln(6)
@@ -1611,7 +1620,6 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
-
     # # --- Signature Boxes (Side by Side) ---
     # y_signature_start = pdf.get_y()
 

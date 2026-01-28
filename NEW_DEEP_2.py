@@ -1512,7 +1512,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         # Set position for value
         pdf.set_xy(value_start_x, current_y)
         pdf.set_font(pdf.default_font, "", 10)
-        pdf.cell(69, 5, value, border="R", ln=1)  # Add right border to values
+        pdf.cell(66, 5, value, border="R", ln=1)  # Add right border to values
         
         current_y += 5
 

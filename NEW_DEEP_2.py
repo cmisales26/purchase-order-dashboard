@@ -1613,7 +1613,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Calculate spacing
     total_details_height = len(company_details) * 5  # 5 units per line
-    details_start_y = text_start_y + 1
+    details_start_y = text_start_y 
 
     # Draw company details
     current_y = details_start_y

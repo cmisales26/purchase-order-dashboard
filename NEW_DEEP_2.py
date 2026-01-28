@@ -1480,7 +1480,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- Right column (Bank Details) ---
     # Reset X position for right column
-    pdf.set_xy(x_left + 96, y_before)
+    pdf.set_xy(x_left + 95, y_before)
 
     # Bank details lines
     bank_lines = [
@@ -1493,7 +1493,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "", 10)
 
     # Fixed positions for perfect alignment in right column
-    label_start_x = x_left + 96  # Start of right column
+    label_start_x = x_left + 95  # Start of right column
     colon_x = label_start_x + 25  # Fixed position for all colons
     value_start_x = colon_x + 5   # Fixed position for values (after colon + space)
 

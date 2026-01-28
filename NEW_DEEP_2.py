@@ -1633,7 +1633,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Optional: Add "MEDAS" if needed (smaller, at bottom)
     if "MEDAS" in invoice_data.get('company_details', ''):
-        pdf.set_xy(105, current_y + 2)
+        pdf.set_xy(105, current_y)
         pdf.set_font(pdf.default_font, "I", 8)
         pdf.cell(96, 4, "MEDAS", border=0, ln=0, align="C")
 

@@ -1052,7 +1052,7 @@ class PDF(FPDF):
         
     def footer(self):
         # Position at 1.5 cm from bottom
-        self.set_y(-15)
+        self.set_y(-10)
         
         # Footer content
         self.set_font(self.default_font, "I", 10)

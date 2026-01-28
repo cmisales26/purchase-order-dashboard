@@ -1462,50 +1462,48 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     if pdf.get_y() + 80 > pdf.page_break_trigger:
         pdf.add_page()
 
-        # --- Bank Details & Declaration (Side by Side) ---
+    # --- Bank Details & Declaration (Side by Side) ---
     pdf.set_font(pdf.default_font, "B", 10)
-    # pdf.cell(95, 5, "Company's Bank Details", ln=0, border=1)
-    pdf.cell(96, 5, "Declaration:", ln=0, border=1)
-    pdf.cell(95, 5, "Company's Bank Details", ln=1, border=1)
-    # pdf.cell(96, 5, "Declaration:", ln=0, border=1)
-
-    # --- Right column (Declaration) ---
-    pdf.set_xy(x_left + 95, y_before)
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
-    y_after_right = pdf.get_y()
-    
-    # Set Y to the maximum of both columns
-    max_y = max(y_after_left, y_after_right)
-    pdf.set_y(max_y)
-
+    # Declaration on LEFT, Bank Details on RIGHT
+    pdf.cell(96, 5, "Declaration:", ln=0, border=1)  # Left column
+    pdf.cell(95, 5, "Company's Bank Details", ln=1, border=1)  # Right column
 
     # Save current Y position
     y_before = pdf.get_y()
     x_left = pdf.get_x()
 
-    # --- Left column (Bank Details) ---
-    bank_lines = [
-        ("Bank Name", "IDFC FIRST"),
-        ("Branch", "AHMEDABAD Shyamal Branch"),
-        ("Account No", "88130420182"),
-        ("IFS Code", "IDFB0040335")
-    ]
-    
+    # --- Left column (Declaration) ---
+    pdf.set_xy(x_left, y_before)
     pdf.set_font(pdf.default_font, "", 10)
-    
-    # Fixed positions for perfect alignment
-    label_start_x = x_left
+    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
+    y_after_left = pdf.get_y()
+
+    # --- Right column (Bank Details) ---
+    # Reset X position for right column
+    pdf.set_xy(x_left + 96, y_before)
+
+    # Bank details lines
+    bank_lines = [
+        ("Bank Name", "IDF11C FIRST"),
+        ("Branch", "AHMEDAB11AD Shyamal Branch"),
+        ("Account No", "8813042018211"),
+        ("IFS Code", "IDFB004033511")
+    ]
+
+    pdf.set_font(pdf.default_font, "", 10)
+
+    # Fixed positions for perfect alignment in right column
+    label_start_x = x_left + 96  # Start of right column
     colon_x = label_start_x + 25  # Fixed position for all colons
     value_start_x = colon_x + 5   # Fixed position for values (after colon + space)
-    
+
     # Draw bank details with perfectly aligned colons
     current_y = y_before
     for label, value in bank_lines:
         # Set position for label
         pdf.set_xy(label_start_x, current_y)
         pdf.set_font(pdf.default_font, "B", 10)
-        pdf.cell(25, 5, label, border="L", ln=0)  # Fixed width for labels
+        pdf.cell(25, 5, label, border="L", ln=0)  # Fixed width for labels, left border
         
         # Set position for colon (same X for all lines)
         pdf.set_xy(colon_x, current_y)
@@ -1514,21 +1512,15 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         # Set position for value
         pdf.set_xy(value_start_x, current_y)
         pdf.set_font(pdf.default_font, "", 10)
-        pdf.cell(50, 5, value, border="", ln=1)  # Remaining width for values
+        pdf.cell(45, 5, value, border="R", ln=1)  # Add right border to values
         
         current_y += 5
-    
-    y_after_left = current_y
-    
-    # # --- Right column (Declaration) ---
-    # pdf.set_xy(x_left + 95, y_before)
-    # pdf.set_font(pdf.default_font, "", 10)
-    # pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
-    # y_after_right = pdf.get_y()
-    
-    # # Set Y to the maximum of both columns
-    # max_y = max(y_after_left, y_after_right)
-    # pdf.set_y(max_y)
+
+    y_after_right = current_y
+
+    # Set Y to the maximum of both columns
+    max_y = max(y_after_left, y_after_right)
+    pdf.set_y(max_y)
 
     # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()

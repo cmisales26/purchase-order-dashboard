@@ -1052,7 +1052,7 @@ class PDF(FPDF):
         
     def footer(self):
         # Position at 1.5 cm from bottom
-        self.set_y(-20)
+        self.set_y(-15)
         
         # Footer content
         # self.set_font(self.default_font, "I", 10)
@@ -1451,6 +1451,11 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     value_part = invoice_data['totals']['tax_in_words']
     remaining_width = 189.7 - pdf.get_string_width(label_part)
     pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
+
+    pdf.set_font(pdf.default_font, "B", 12)
+    # Write just the label part in bold
+    label_part = "Declaration: "
+    pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
     
     # # Tax in words
     # pdf.set_font(pdf.default_font, "B", 10)

@@ -1599,8 +1599,8 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Set Y position to continue after both signature boxes
     pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
-    
-    pdf.set_font(self.default_font, "I", 10)
+
+    pdf.set_font(pdf.default_font, "I", 10)
     pdf.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")

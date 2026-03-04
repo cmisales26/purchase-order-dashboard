@@ -1639,7 +1639,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_y(max(y_after_left_box, y_signature_start + 6 + right_signature_box_height))
 
     # Add space before jurisdiction text
-    pdf.ln(6)
+    pdf.ln(5)
     pdf.set_font(pdf.default_font, "I", 10)
     pdf.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
 

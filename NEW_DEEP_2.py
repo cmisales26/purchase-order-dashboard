@@ -1650,7 +1650,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # --- LEFT BOX - TERMS WITH PROPER WRAPPING ---
     # Draw border for left box
-    pdf.set_xy(10, y_signature_start + 6)
+    pdf.set_xy(10, y_signature_start + 3)
     pdf.cell(95, left_box_height, "", border="LRB", ln=0)
 
     # Terms as separate lines with wrapping

@@ -1378,29 +1378,60 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(col_widths[5], 5, f"{invoice_data['totals']['final_amount']:,.2f}", border=1, ln=True, align="R")  # Added comma formatting
 
     
-    # --- Amount in Words (Simplified with MultiCell) ---
-    # Save current position
-    current_x = pdf.get_x()
-    current_y = pdf.get_y()
-
-    # Draw the border box
+    # --- Amount in Words ---
+    # First set the position and draw the border
     pdf.cell(191, 5, "", border=1, ln=True)
 
-    # Go back to write content
-    pdf.set_xy(current_x, current_y)
+    # Now go back and write the text with mixed formatting
+    pdf.set_y(pdf.get_y() - 5)  # Move back up to the same line
+    pdf.set_x(10)  # Starting X position
 
     # Write bold label
     pdf.set_font(pdf.default_font, "B", 12)
     label = "Amount Chargeable (in words): "
-    pdf.cell(pdf.get_string_width(label), 5, label, ln=0)
+    label_width = pdf.get_string_width(label)
+    pdf.cell(label_width, 5, label, ln=0)
 
-    # Use MultiCell for the amount text (will auto-wrap)
-    pdf.set_font(pdf.default_font, "", 10)  # Slightly smaller font
-    pdf.set_x(current_x)  # Reset X to left margin
-    pdf.set_y(current_y + 5)  # Move to next line
+    # Check if amount text will fit in remaining space
+    remaining_width = 191 - label_width - 2  # Total width minus label width minus small margin
 
-    # MultiCell will handle wrapping automatically
-    pdf.multi_cell(191, 4, invoice_data['totals']['amount_in_words'], border=0, align='L')
+    # Write normal value - with wrapping if needed
+    pdf.set_font(pdf.default_font, "", 12)
+    amount_text = invoice_data['totals']['amount_in_words']
+    amount_width = pdf.get_string_width(amount_text)
+
+    if amount_width <= remaining_width:
+        # Amount fits in one line
+        pdf.cell(remaining_width, 5, amount_text, ln=True)
+    else:
+        # Amount doesn't fit - need to wrap to next line
+        # First, complete the current line with empty space
+        pdf.cell(remaining_width, 5, "", ln=True)
+        
+        # Move to next line for the amount text
+        pdf.set_x(10)  # Start from left margin
+        pdf.set_font(pdf.default_font, "", 10)  # Smaller font for wrapped text
+        
+        # Split the amount text into multiple lines
+        words = amount_text.split()
+        lines = []
+        current_line = ""
+        max_width = 191 - 4  # Available width minus margins
+        
+        for word in words:
+            test_line = current_line + " " + word if current_line else word
+            if pdf.get_string_width(test_line) <= max_width:
+                current_line = test_line
+            else:
+                lines.append(current_line)
+                current_line = word
+        
+        if current_line:
+            lines.append(current_line)
+        
+        # Draw each line
+        for line in lines:
+            pdf.cell(191, 5, line, ln=True, align="L")
 
     # Check if we need a new page before tax summary
     if pdf.get_y() + 60 > pdf.page_break_trigger:
@@ -1451,16 +1482,55 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.cell(31, 5, f"{hsn_cgst:,.2f}", border=1, ln=True, align="C")  # Added comma formatting
     
     # --- Amount in Words ---
+    # --- Tax Amount in Words ---
     pdf.set_font(pdf.default_font, "B", 12)
     # Write just the label part in bold
     label_part = "Tax Amount (in words): "
-    pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
+    label_width = pdf.get_string_width(label_part)
+    pdf.cell(label_width, 5, label_part, border="LTB", ln=0)
 
+    # Check if tax amount text will fit
     pdf.set_font(pdf.default_font, "", 12)
-    # Write the value part in normal font and complete the border
     value_part = invoice_data['totals']['tax_in_words']
-    remaining_width = 189.7 - pdf.get_string_width(label_part)
-    pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
+    remaining_width = 189.7 - label_width
+
+    value_width = pdf.get_string_width(value_part)
+
+    if value_width <= remaining_width:
+        # Amount fits in one line
+        pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
+    else:
+        # Amount doesn't fit - need to wrap
+        # Complete the current line with empty space
+        pdf.cell(remaining_width, 5, "", border="TRB", ln=True)
+        
+        # Move to next line and write the amount text
+        pdf.set_font(pdf.default_font, "", 10)  # Smaller font for wrapped text
+        
+        # Split into lines
+        words = value_part.split()
+        lines = []
+        current_line = ""
+        max_width = 189.7 - 4  # Available width minus margins
+        
+        for word in words:
+            test_line = current_line + " " + word if current_line else word
+            if pdf.get_string_width(test_line) <= max_width:
+                current_line = test_line
+            else:
+                lines.append(current_line)
+                current_line = word
+        
+        if current_line:
+            lines.append(current_line)
+        
+        # Draw each line with appropriate borders
+        for i, line in enumerate(lines):
+            pdf.set_x(10)  # Start from left margin
+            if i == 0:
+                pdf.cell(189.7, 5, line, border="LRB", ln=True, align="L")
+            else:
+                pdf.cell(189.7, 5, line, border="LRB", ln=True, align="L")
 
     # pdf.set_font(pdf.default_font, "B", 12)
     # # Write just the label part in bold

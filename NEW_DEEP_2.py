@@ -1648,9 +1648,10 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     left_box_height = 33
     right_signature_box_height = 33
 
-    # Left box - Terms (each term on its own line)
-    pdf.set_font(pdf.default_font, "", 9)
-    pdf.set_text_color(0, 0, 0)
+    # --- LEFT BOX - TERMS ---
+    # Draw border for left box
+    pdf.set_xy(10, y_signature_start + 6)
+    pdf.cell(95, left_box_height, "", border="LRB", ln=0)
 
     # Terms as separate lines
     terms_lines = [
@@ -1658,16 +1659,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         "2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY.",
         "3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMSTANCES.",
         "4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME.",
-        "SIGNATURE________________"
+        "SIGNATURE____________________"
     ]
 
-    # Draw border for left box
-    pdf.set_xy(10, y_signature_start + 6)
-    pdf.cell(95, left_box_height, "", border="LRB", ln=0)
-
-    # Write terms line by line (left aligned)
+    # Write terms in left box
     text_x = 12  # Slight indent from left border
-    line_height = 4
+    line_height = 4.5
     box_top_y = y_signature_start + 6
 
     # Calculate total text height
@@ -1678,44 +1675,59 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Draw each term on its own line
     current_y = text_start_y
-    for line in terms_lines:
+    for i, line in enumerate(terms_lines):
         pdf.set_xy(text_x, current_y)
-        pdf.cell(91, line_height, line, ln=1, align="L")
+        
+        # Different formatting for signature line
+        if i == len(terms_lines) - 1:
+            pdf.set_font(pdf.default_font, "B", 9)  # Bold for signature
+        else:
+            pdf.set_font(pdf.default_font, "", 9)
+        
+        pdf.cell(83, line_height, line, ln=1, align="L")
         current_y += line_height
 
     y_after_left_box = box_top_y + left_box_height
 
-    # Right signature box (Our Company) - FIXED LAYOUT
-    # Draw border first
+    # --- RIGHT BOX - COMPANY SIGNATURE ---
+    # Draw border for right box
     pdf.set_xy(105, y_signature_start + 6)
     pdf.cell(96, right_signature_box_height, "", border="LRB")
 
-    # Add stamp if available (at the top)
+    # Add stamp if available
     if stamp_file:
         try:
             stamp_width = 25
             stamp_x = 105 + (96 - stamp_width) / 2
-            stamp_y = y_signature_start + 8  # Position near top
+            stamp_y = y_signature_start + 10  # Position near top
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
-            text_start_y = stamp_y + stamp_width + 2
+            # Adjust text position based on stamp
+            text_start_y = stamp_y + stamp_width + 5
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
-            text_start_y = y_signature_start + 12
+            text_start_y = y_signature_start + 15
     else:
-        text_start_y = y_signature_start + 12
+        text_start_y = y_signature_start + 15
 
-    # Company details
-    company_details = ["Authorized Signatory"]
+    # Company signature details (VERTICALLY CENTERED)
+    box_center_y = y_signature_start + 6 + (right_signature_box_height / 2)
 
+    # For CM INFOTECH (centered)
     pdf.set_font(pdf.default_font, "B", 11)
     pdf.set_text_color(0, 0, 0)
+    pdf.set_xy(105, box_center_y - 8)
+    pdf.cell(96, 5, "For CM INFOTECH.", border=0, ln=0, align="C")
 
-    # Calculate position for signature (centered vertically in right box)
-    box_center_y = y_signature_start + 6 + (right_signature_box_height / 2)
-    signature_y = box_center_y - 2  # Slight adjustment
-
-    pdf.set_xy(105, signature_y)
+    # Authorized Signatory (centered, slightly below)
+    pdf.set_font(pdf.default_font, "", 10)
+    pdf.set_xy(105, box_center_y - 2)
     pdf.cell(96, 5, "Authorized Signatory", border=0, ln=0, align="C")
+
+    # Optional: Add MEDAS if needed
+    if "MEDAS" in invoice_data.get('company_details', ''):
+        pdf.set_font(pdf.default_font, "I", 8)
+        pdf.set_xy(105, box_center_y + 8)
+        pdf.cell(96, 4, "MEDAS", border=0, ln=0, align="C")
 
     # Set Y position to continue after both boxes
     pdf.set_y(max(y_after_left_box, y_signature_start + 6 + right_signature_box_height))

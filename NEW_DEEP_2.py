@@ -1388,11 +1388,50 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Write bold label
     pdf.set_font(pdf.default_font, "B", 12)
-    pdf.cell(pdf.get_string_width("Amount Chargeable (in words): "), 5, "Amount Chargeable (in words): ", ln=0)
+    label = "Amount Chargeable (in words): "
+    label_width = pdf.get_string_width(label)
+    pdf.cell(label_width, 5, label, ln=0)
 
-    # Write normal value
+    # Check if amount text will fit in remaining space
+    remaining_width = 191 - label_width - 2  # Total width minus label width minus small margin
+
+    # Write normal value - with wrapping if needed
     pdf.set_font(pdf.default_font, "", 12)
-    pdf.cell(0, 5, invoice_data['totals']['amount_in_words'], ln=True)
+    amount_text = invoice_data['totals']['amount_in_words']
+    amount_width = pdf.get_string_width(amount_text)
+
+    if amount_width <= remaining_width:
+        # Amount fits in one line
+        pdf.cell(remaining_width, 5, amount_text, ln=True)
+    else:
+        # Amount doesn't fit - need to wrap to next line
+        # First, complete the current line with empty space
+        pdf.cell(remaining_width, 5, "", ln=True)
+        
+        # Move to next line for the amount text
+        pdf.set_x(10)  # Start from left margin
+        pdf.set_font(pdf.default_font, "", 10)  # Smaller font for wrapped text
+        
+        # Split the amount text into multiple lines
+        words = amount_text.split()
+        lines = []
+        current_line = ""
+        max_width = 191 - 4  # Available width minus margins
+        
+        for word in words:
+            test_line = current_line + " " + word if current_line else word
+            if pdf.get_string_width(test_line) <= max_width:
+                current_line = test_line
+            else:
+                lines.append(current_line)
+                current_line = word
+        
+        if current_line:
+            lines.append(current_line)
+        
+        # Draw each line
+        for line in lines:
+            pdf.cell(191, 5, line, ln=True, align="L")
 
     # Check if we need a new page before tax summary
     if pdf.get_y() + 60 > pdf.page_break_trigger:

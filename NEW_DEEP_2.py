@@ -1506,7 +1506,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     value_part = invoice_data['totals']['tax_in_words']
 
     # Calculate available width
-    available_width = 195 - 3  # Total width minus margins
+    available_width = 195 - 4  # Total width minus margins
 
     # Try different font sizes to fit on one line
     fits_on_one_line = False

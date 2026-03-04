@@ -16,6 +16,8 @@ import requests  # Add this import for downloading from GitHub
 LOGO_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/logo_final.jpg"
 STAMP_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/stamp.jpg"
 
+import time
+
 # --- Global Data and Configuration ---
 PRODUCT_CATALOG = {
     "GstarCAD STDANDARD 2026 Perpetual": {"basic": 34777.0, "gst_percent": 18.0},
@@ -69,39 +71,60 @@ PRODUCT_CATALOG = {
     "Siemens NX": {"basic": 65000.0, "gst_percent": 18.0},
 }
 
-# Load data from JSON files
+# Load data from JSON files with BETTER CACHE CONTROL
+@st.cache_data(ttl=1)  # Cache for only 1 second - updates immediately
 def load_json_data(filename, default_data=None):
-    """Load data from JSON file with error handling"""
+    """Load data from JSON file with BETTER caching and error handling"""
     try:
-        with open(filename, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        # Add timestamp to force cache refresh
+        timestamp = time.time()
+        
+        # Get the absolute path to ensure we're reading the right file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, filename)
+        
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        return data
+        
     except FileNotFoundError:
-        st.warning(f"⚠️ {filename} not found. Using empty database.")
+        st.sidebar.warning(f"⚠️ {filename} not found. Using empty database.")
         return default_data or {}
     except json.JSONDecodeError as e:
-        st.error(f"❌ Error reading {filename}: {e}. Using empty database.")
+        st.sidebar.error(f"❌ Error reading {filename}: {e}. Using empty database.")
         return default_data or {}
     except Exception as e:
-        st.error(f"❌ Unexpected error reading {filename}: {e}. Using empty database.")
+        st.sidebar.error(f"❌ Unexpected error reading {filename}: {e}. Using empty database.")
         return default_data or {}
 
 # Load vendor and end user databases
 VENDOR_DATABASE = load_json_data('vendor.json')
 END_USER_DATABASE = load_json_data('endusers.json')
 
+# Debug: Print what's loaded
+print("=" * 50)
+print(f"DEBUG: Loaded {len(VENDOR_DATABASE)} vendors from vendor.json")
+print(f"DEBUG: Loaded {len(END_USER_DATABASE)} end users from endusers.json")
+print("=" * 50)
 
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
-    "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721"},
-    "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721"},
-    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"},
-    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"}
+    "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721","designation": "Founder"},
+    "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721","designation": "Inside Sales Executive"},
+    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721","designation": "Inside Sales Executive"},
+    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721","designation": "Inside Sales Executive"}
 }
 
 # --- Helper Functions for Vendor Management ---
 def get_vendor_dropdown_options():
     """Get vendor names for dropdown"""
-    return ["Select Vendor"] + list(VENDOR_DATABASE.keys())
+    try:
+        vendor_count = len(VENDOR_DATABASE)
+        return ["Select Vendor"] + list(VENDOR_DATABASE.keys())
+    except Exception as e:
+        st.sidebar.error(f"Error getting vendor options: {e}")
+        return ["Select Vendor"]
 
 def update_vendor_fields(selected_vendor):
     """Update session state with vendor details when vendor is selected"""
@@ -884,64 +907,66 @@ def add_page_two_commercials(pdf, data):
         
         bank_y = pdf.get_y()
 
-    # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
-    # Calculate position to place signature near bottom of the box
-    signature_start_y = y_start + box_height - signature_height - 15
-    
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.set_xy(x_start + col1_width + padding, signature_start_y)
-    pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
-    
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
-    
-    # --- Signature Block with Dynamic Sales Person ---
-    sales_person_code = data.get('sales_person_code', 'SD')
-    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-    
-    # Add stamp between "For CM INFOTECH" and sales person name
-    if data.get('stamp_path') and os.path.exists(data['stamp_path']):
-        try:
-            # Position stamp centered between "For CM INFOTECH" and sales person name
-            stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
-            stamp_x = x_start + col1_width + padding  # Center the stamp
-            pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
-            # Move cursor down after stamp
-            pdf.set_y(stamp_y + 20)  # Space for stamp + some padding
-        except:
-            pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
-    else:
-        pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
-    
-    pdf.set_font(pdf.default_font, "", 9)
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
-    
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
-    
-    # Clickable email in signature
-    pdf.set_font(pdf.default_font, "", 9)
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    label = "Email: "
-    pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    pdf.set_font(pdf.default_font, "U", 9)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
-             ln=True, link=f"mailto:{sales_person_info['email']}")
-    
-    # Clickable phone in signature
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font(pdf.default_font, "", 9)
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    label = "Mobile: "
-    pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    pdf.set_font(pdf.default_font, "U", 9)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
-             ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-    pdf.set_text_color(0, 0, 0)
+        # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
+        # Calculate position to place signature near bottom of the box
+        signature_start_y = y_start + box_height - signature_height - 15
+
+        pdf.set_font(pdf.default_font, "B", 10)
+        pdf.set_xy(x_start + col1_width + padding, signature_start_y)
+        pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
+
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
+
+        # --- Signature Block with Dynamic Sales Person ---
+        sales_person_code = data.get('sales_person_code', 'SD')
+        sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+
+        # Add stamp between "For CM INFOTECH" and sales person name
+        if data.get('stamp_path') and os.path.exists(data['stamp_path']):
+            try:
+                # Position stamp centered between "For CM INFOTECH" and sales person name
+                stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
+                stamp_x = x_start + col1_width + padding  # Center the stamp
+                pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
+                # Move cursor down after stamp
+                pdf.set_y(stamp_y + 20)  # Space for stamp + some padding
+            except:
+                pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
+        else:
+            pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
+
+        # Sales person name
+        pdf.set_font(pdf.default_font, "", 9)
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
+
+        # DYNAMIC DESIGNATION - Shows different designation based on sales person selected
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        pdf.cell(col2_width - 2*padding, 4, sales_person_info["designation"], ln=True)  # Changed from hardcoded "Inside Sales Executive"
+
+        # Clickable email in signature
+        pdf.set_font(pdf.default_font, "", 9)
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        label = "Email: "
+        pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+        pdf.set_font(pdf.default_font, "U", 9)
+        pdf.set_text_color(0, 0, 255)
+        pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
+                ln=True, link=f"mailto:{sales_person_info['email']}")
+
+        # Clickable phone in signature
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font(pdf.default_font, "", 9)
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        label = "Mobile: "
+        pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+        pdf.set_font(pdf.default_font, "U", 9)
+        pdf.set_text_color(0, 0, 255)
+        pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
+                ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+        pdf.set_text_color(0, 0, 0)
 
     # Move cursor below the box
     pdf.set_xy(x_start, y_start + box_height + 10)
@@ -1032,6 +1057,9 @@ class PDF(FPDF):
         self.set_y(-15)
         
         # Footer content
+        # self.set_font(self.default_font, "I", 10)
+        # self.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
+
         self.set_font(self.default_font, "I", 10)
         self.cell(0, 4, "This is a Computer Generated Invoice", ln=True, align="C")
         
@@ -1425,46 +1453,59 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     value_part = invoice_data['totals']['tax_in_words']
     remaining_width = 189.7 - pdf.get_string_width(label_part)
     pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
+
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # # Write just the label part in bold
+    # label_part = "Declaration: IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE "
+    # pdf.cell(pdf.get_string_width(label_part), 5, label_part, border="LTB", ln=0)
     
-    # # Tax in words
-    # pdf.set_font(pdf.default_font, "B", 10)
-    # pdf.cell(191, 5, f"Tax Amount (in words): {invoice_data['totals']['tax_in_words']}", ln=True, border=1)
 
     # Check if we need a new page before footer content
     if pdf.get_y() + 80 > pdf.page_break_trigger:
         pdf.add_page()
 
-        # --- Bank Details & Declaration (Side by Side) ---
+    # --- Bank Details & Declaration (Side by Side) ---
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 5, "Company's Bank Details", ln=0, border=1)
-    pdf.cell(96, 5, "Declaration:", ln=1, border=1)
+    # Declaration on LEFT, Bank Details on RIGHT
+    pdf.cell(95, 5, "Declaration:", ln=0, border=1)  # Left column
+    pdf.cell(96, 5, "Company's Bank Details", ln=1, border=1)  # Right column
 
     # Save current Y position
     y_before = pdf.get_y()
     x_left = pdf.get_x()
 
-    # --- Left column (Bank Details) ---
-    bank_lines = [
-        ("Bank Name", "IDFC FIRST"),
-        ("Branch", "AHMEDABAD Shyamal Branch"),
-        ("Account No", "88130420182"),
-        ("IFS Code", "IDFB0040335")
-    ]
-    
+    # --- Left column (Declaration) ---
+    pdf.set_xy(x_left, y_before)
     pdf.set_font(pdf.default_font, "", 10)
-    
-    # Fixed positions for perfect alignment
-    label_start_x = x_left
+    pdf.multi_cell(95, 4, invoice_data['declaration'], border=1)
+    y_after_left = pdf.get_y()
+
+    # --- Right column (Bank Details) ---
+    # Reset X position for right column
+    pdf.set_xy(x_left + 95, y_before)
+
+    # Bank details lines
+    bank_lines = [
+        ("Bank Name", "IDF11C FIRST"),
+        ("Branch", "AHMEDAB11AD Shyamal Branch"),
+        ("Account No", "8813042018211"),
+        ("IFS Code", "IDFB004033511")
+    ]
+
+    pdf.set_font(pdf.default_font, "", 10)
+
+    # Fixed positions for perfect alignment in right column
+    label_start_x = x_left + 95  # Start of right column
     colon_x = label_start_x + 25  # Fixed position for all colons
     value_start_x = colon_x + 5   # Fixed position for values (after colon + space)
-    
+
     # Draw bank details with perfectly aligned colons
     current_y = y_before
     for label, value in bank_lines:
         # Set position for label
         pdf.set_xy(label_start_x, current_y)
         pdf.set_font(pdf.default_font, "B", 10)
-        pdf.cell(25, 5, label, border="L", ln=0)  # Fixed width for labels
+        pdf.cell(25, 5, label, border="L", ln=0)  # Fixed width for labels, left border
         
         # Set position for colon (same X for all lines)
         pdf.set_xy(colon_x, current_y)
@@ -1473,18 +1514,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         # Set position for value
         pdf.set_xy(value_start_x, current_y)
         pdf.set_font(pdf.default_font, "", 10)
-        pdf.cell(50, 5, value, border="", ln=1)  # Remaining width for values
+        pdf.cell(66, 5, value, border="R", ln=1)  # Add right border to values
         
         current_y += 5
-    
-    y_after_left = current_y
-    
-    # --- Right column (Declaration) ---
-    pdf.set_xy(x_left + 95, y_before)
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.multi_cell(96, 4, invoice_data['declaration'], border=1)
-    y_after_right = pdf.get_y()
-    
+
+    y_after_right = current_y
+
     # Set Y to the maximum of both columns
     max_y = max(y_after_left, y_after_right)
     pdf.set_y(max_y)
@@ -1492,90 +1527,214 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()
 
-    # Left side - Buyer's Company Signature (Blank box for future use)
+    # Left side - Declaration box
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(95, 6, "Buyer's Company Signature", border="LRT", ln=0, align="C")
+    pdf.cell(95, 6, "Terms:", border="LRTB", ln=0, align="L")
 
-    # Right side - Our Company Signature
-    pdf.cell(96, 6, "For CM INFOTECH.", border="LR", ln=1, align="C")
+    # Right side - Our Company Signature box header
+    pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
 
-    # Create the signature boxes with DIFFERENT heights
-    left_signature_box_height = 33
+    # Create the boxes with heights
+    left_box_height = 33
     right_signature_box_height = 33
 
-    # Left signature box (Buyer - Blank)
-    pdf.set_font(pdf.default_font, "I", 10)
-    pdf.set_text_color(128, 128, 128)
-
-    # Check if buyer logo is available
-    buyer_logo_file = invoice_data.get('buyer', {}).get('logo_file')
-
-    if buyer_logo_file:
-        try:
-            # Add buyer logo at the top of the left box
-            logo_width = 25
-            logo_x = 10 + (95 - logo_width) / 2
-            logo_y = pdf.get_y() + 4
-            
-            # Add buyer company logo
-            pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
-            
-            # Add buyer company name below logo
-            pdf.set_xy(10, logo_y + logo_width + 2)
-            pdf.set_font(pdf.default_font, "B", 9)
-            pdf.cell(95, 4, invoice_data['buyer']['name'], border=0, ln=1, align="C")
-            
-            # Add signature line and text
-            pdf.set_xy(10, pdf.get_y() + 8)
-            pdf.set_font(pdf.default_font, "", 9)
-            pdf.cell(95, 4, "_________________________", border=0, ln=1, align="C")
-            pdf.cell(95, 4, "Authorized Signatory", border=0, ln=1, align="C")
-            
-            # Draw the border around everything
-            pdf.set_xy(10, y_signature_start + 6)
-            pdf.cell(95, left_signature_box_height, "", border="LRB")
-            
-            # Update Y position after left box
-            y_after_left_signature = y_signature_start + 6 + left_signature_box_height
-            
-        except Exception as e:
-            st.warning(f"Could not add buyer logo: {e}")
-            # Fallback without logo
-            pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
-            y_after_left_signature = pdf.get_y()
-    else:
-        # No buyer logo available, show original placeholder
-        pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
-        y_after_left_signature = pdf.get_y()
-
-    # Right signature box (Our Company)
-    pdf.set_xy(105, y_signature_start + 5)
+    # Left box - Declaration terms (as one paragraph, left aligned)
+    pdf.set_font(pdf.default_font, "", 10)
     pdf.set_text_color(0, 0, 0)
 
-    # Add stamp if available
+    # Combine all terms into one paragraph
+    declaration_text = "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'. 2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY. 3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMTANCES. 4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME. SIGNATURE______________"
+
+    # Draw border for left box
+    pdf.set_xy(10, y_signature_start + 6)
+    pdf.cell(95, left_box_height, "", border="LRB", ln=0)
+
+    # Write declaration text (same as before)
+    text_x = 10
+    text_y = y_signature_start + 10
+    line_height = 4
+    max_width = 91
+
+    words = declaration_text.split()
+    lines = []
+    current_line = ""
+
+    for word in words:
+        test_line = current_line + " " + word if current_line else word
+        if pdf.get_string_width(test_line) <= max_width:
+            current_line = test_line
+        else:
+            lines.append(current_line)
+            current_line = word
+
+    if current_line:
+        lines.append(current_line)
+
+    # Calculate starting Y position to center text vertically
+    box_top_y = y_signature_start + 6
+    total_text_height = len(lines) * line_height
+    text_start_y = box_top_y + (left_box_height - total_text_height) / 2
+
+    # Draw each line (left aligned)
+    current_y = text_start_y
+    for line in lines:
+        pdf.set_xy(text_x, current_y)
+        pdf.cell(max_width, line_height, line, ln=1, align="L")
+        current_y += line_height
+
+    y_after_left_box = box_top_y + left_box_height
+
+    # Right signature box (Our Company) - FIXED LAYOUT
+    # Draw border first
+    pdf.set_xy(105, y_signature_start + 6)
+    pdf.cell(96, right_signature_box_height, "", border="LRB")
+
+    # Add stamp if available (at the top)
     if stamp_file:
         try:
             stamp_width = 25
             stamp_x = 105 + (96 - stamp_width) / 2
-            stamp_y = pdf.get_y() + 2
+            stamp_y = y_signature_start + 8  # Position near top
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
+            
+            # Adjust text position based on stamp
+            text_start_y = stamp_y + stamp_width + 2
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
+            text_start_y = y_signature_start + 12
+    else:
+        text_start_y = y_signature_start + 12
 
-    # Position for the signature text in right box
-    pdf.set_xy(105, y_signature_start + 10 + right_signature_box_height - 10)
+    # Company details - properly centered and spaced
+    company_details = [
+        "Authorized Signatory"
+    ]
+
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
+    pdf.set_text_color(0, 0, 0)
 
-    # Draw border for right signature box
-    pdf.set_xy(105, y_signature_start + 6)
-    pdf.cell(96, right_signature_box_height, "", border="LRB")
+    # Calculate spacing
+    total_details_height = len(company_details) * 5  # 5 units per line
+    details_start_y = text_start_y - 1
 
-    # Set Y position to continue after both signature boxes
-    pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
+    # Draw company details
+    current_y = details_start_y
+    for i, detail in enumerate(company_details):
+        pdf.set_xy(105, current_y)
+        
+        # Use different font weights for different lines
+        if i == 0: 
+            pdf.set_font(pdf.default_font, "B", 11)
+        
+        pdf.cell(96, 5, detail, border=0, ln=0, align="C")
+        current_y += 3
+
+    # Optional: Add "MEDAS" if needed (smaller, at bottom)
+    if "MEDAS" in invoice_data.get('company_details', ''):
+        pdf.set_xy(105, current_y)
+        pdf.set_font(pdf.default_font, "I", 8)
+        pdf.cell(96, 4, "MEDAS", border=0, ln=0, align="C")
+
+    # Set Y position to continue after both boxes
+    pdf.set_y(max(y_after_left_box, y_signature_start + 6 + right_signature_box_height))
+
+    # Add space before jurisdiction text
+    pdf.ln(3)
+    pdf.set_font(pdf.default_font, "I", 10)
+    pdf.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
+    # # --- Signature Boxes (Side by Side) ---
+    # y_signature_start = pdf.get_y()
+
+    # # Left side - Buyer's Company Signature (Blank box for future use)
+    # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.cell(95, 6, "Buyer's Company Signature", border="LRT", ln=0, align="C")
+
+    # # Right side - Our Company Signature
+    # pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
+
+    # # Create the signature boxes with DIFFERENT heights
+    # left_signature_box_height = 33
+    # right_signature_box_height = 33
+
+    # # Left signature box (Buyer - Blank)
+    # pdf.set_font(pdf.default_font, "I", 10)
+    # pdf.set_text_color(128, 128, 128)
+
+    # # Check if buyer logo is available
+    # buyer_logo_file = invoice_data.get('buyer', {}).get('logo_file')
+
+    # if buyer_logo_file:
+    #     try:
+    #         # Add buyer logo at the top of the left box
+    #         logo_width = 25
+    #         logo_x = 10 + (95 - logo_width) / 2
+    #         logo_y = pdf.get_y() + 4
+            
+    #         # Add buyer company logo
+    #         pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
+            
+    #         # Add buyer company name below logo
+    #         pdf.set_xy(10, logo_y + logo_width + 2)
+    #         pdf.set_font(pdf.default_font, "B", 9)
+    #         pdf.cell(95, 4, invoice_data['buyer']['name'], border=0, ln=1, align="C")
+            
+    #         # Add signature line and text
+    #         pdf.set_xy(10, pdf.get_y() + 8)
+    #         pdf.set_font(pdf.default_font, "", 9)
+    #         pdf.cell(95, 4, "_________________________", border=0, ln=1, align="C")
+    #         pdf.cell(95, 4, "Authorized Signatory", border=0, ln=1, align="C")
+            
+    #         # Draw the border around everything
+    #         pdf.set_xy(10, y_signature_start + 6)
+    #         pdf.cell(95, left_signature_box_height, "", border="LRB")
+            
+    #         # Update Y position after left box
+    #         y_after_left_signature = y_signature_start + 6 + left_signature_box_height
+            
+    #     except Exception as e:
+    #         st.warning(f"Could not add buyer logo: {e}")
+    #         # Fallback without logo
+    #         pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
+    #         y_after_left_signature = pdf.get_y()
+    # else:
+    #     # No buyer logo available, show original placeholder
+    #     pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
+    #     y_after_left_signature = pdf.get_y()
+
+    # # Right signature box (Our Company)
+    # pdf.set_xy(105, y_signature_start + 5)
+    # pdf.set_text_color(0, 0, 0)
+
+    # # Add stamp if available
+    # if stamp_file:
+    #     try:
+    #         stamp_width = 25
+    #         stamp_x = 105 + (96 - stamp_width) / 2
+    #         stamp_y = pdf.get_y() + 2
+    #         pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
+    #     except Exception as e:
+    #         st.warning(f"Could not add stamp: {e}")
+
+    # # Position for the signature text in right box
+    # pdf.set_xy(105, y_signature_start + 10 + right_signature_box_height - 10)
+    # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
+
+    # # Draw border for right signature box
+    # pdf.set_xy(105, y_signature_start + 6)
+    # pdf.cell(96, right_signature_box_height, "", border="LRB")
+
+    # # Set Y position to continue after both signature boxes
+    # pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
+    # pdf.ln(6)
+    # pdf.set_font(pdf.default_font, "I", 10)
+    # pdf.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
+
+    # pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
+    # return pdf_bytes
 
 # --- PDF Class ---
 class PO_PDF(FPDF):
@@ -2107,6 +2266,39 @@ def main():
         st.sidebar.info("Stamp: ✅ Loaded")
     else:
         st.sidebar.error("Stamp: ❌ Not available")
+
+    # Add Data Debug Section
+    st.sidebar.header("🔄 Data Debug")
+    
+    # Force refresh button
+    if st.sidebar.button("🔄 Force Refresh All Data", key="force_refresh_all"):
+        st.cache_data.clear()
+        st.sidebar.success("✅ All caches cleared! Data will reload.")
+        st.rerun()
+    
+    # Check data files button
+    if st.sidebar.button("📊 Check Data Files"):
+        try:
+            # Check vendor.json
+            with open('vendor.json', 'r', encoding='utf-8') as f:
+                vendor_data = json.load(f)
+            st.sidebar.success(f"✅ vendor.json: {len(vendor_data)} vendors")
+            if vendor_data:
+                first_vendor = list(vendor_data.keys())[0]
+                st.sidebar.info(f"First vendor: {first_vendor}")
+        except Exception as e:
+            st.sidebar.error(f"❌ vendor.json error: {e}")
+        
+        try:
+            # Check endusers.json
+            with open('endusers.json', 'r', encoding='utf-8') as f:
+                enduser_data = json.load(f)
+            st.sidebar.success(f"✅ endusers.json: {len(enduser_data)} end users")
+            if enduser_data:
+                first_enduser = list(enduser_data.keys())[0]
+                st.sidebar.info(f"First end user: {first_enduser}")
+        except Exception as e:
+            st.sidebar.error(f"❌ endusers.json error: {e}")
 
     # --- Initialize Session State ---
     # --- Initialize Session State ---
@@ -2697,22 +2889,41 @@ def main():
             st.sidebar.success("PO number reset to auto-generated")
             st.rerun()
         
+        # Add Force Refresh Vendor Data button in PO tab sidebar
+        if st.sidebar.button("🔄 Force Refresh Vendor Data", key="force_refresh_vendor_po"):
+            st.cache_data.clear()
+            st.sidebar.success("✅ Vendor data cache cleared!")
+            st.rerun()
+        
         # Single tab with two columns
         col1, col2 = st.columns(2)
         
         with col1:
             st.subheader("Vendor & End User Details")
             
-            # Vendor Selection
+            # Vendor Selection - SHOW DEBUG INFO
+            vendor_options = get_vendor_dropdown_options()
+            st.sidebar.info(f"Vendor dropdown options: {len(vendor_options)} items")
+            
             selected_vendor = st.selectbox(
                 "Select Vendor", 
-                options=get_vendor_dropdown_options(),
+                options=vendor_options,
                 key="vendor_dropdown_po"
             )
             
-            # Update vendor fields when dropdown selection changes
+            # UPDATE VENDOR FIELDS WHEN DROPDOWN SELECTION CHANGES
             if selected_vendor and selected_vendor != "Select Vendor":
-                update_vendor_fields(selected_vendor)
+                vendor_data = VENDOR_DATABASE.get(selected_vendor, {})
+                st.sidebar.info(f"Selected vendor: {selected_vendor}")
+                st.sidebar.info(f"Vendor data: {vendor_data}")
+                
+                st.session_state.po_vendor_name = selected_vendor
+                st.session_state.po_vendor_address = vendor_data.get("address", "")
+                st.session_state.po_vendor_contact = vendor_data.get("contact", "")
+                st.session_state.po_vendor_mobile = vendor_data.get("mobile", "")
+                st.session_state.po_gst_no = vendor_data.get("gst_no", "")
+                st.session_state.po_pan_no = vendor_data.get("pan_no", "")
+                st.session_state.po_msme_no = vendor_data.get("msme_no", "")
             
             st.subheader("Vendor Details")
             vendor_name = st.text_input(
@@ -2747,7 +2958,13 @@ def main():
             
             # Update end user fields when dropdown selection changes
             if selected_enduser and selected_enduser != "Select End User":
-                update_enduser_fields(selected_enduser)
+                enduser_data = END_USER_DATABASE.get(selected_enduser, {})
+                st.session_state.po_end_company = selected_enduser
+                st.session_state.po_end_address = enduser_data.get("address", "")
+                st.session_state.po_end_person = enduser_data.get("contact", "")
+                st.session_state.po_end_mobile = enduser_data.get("mobile", "")
+                st.session_state.po_end_email = enduser_data.get("email", "")
+                st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
             
             end_company = st.text_input(
                 "End User Company",
@@ -2945,12 +3162,9 @@ def main():
                     use_container_width=True
                 )
                 
-        # --- Tab 3: Tax Invoice Generator ---
-        # --- Tab 3: Tax Invoice Generator ---
     # --- Tab 3: Tax Invoice Generator ---
-        # --- Tab 3: Tax Invoice Generator ---
     with tab3:
-    # Display company logo instead of text header
+        # Display company logo instead of text header
         if global_logo_path and os.path.exists(global_logo_path):
             st.image(global_logo_path, width=150)
             st.markdown("### Tax Invoice Generator")

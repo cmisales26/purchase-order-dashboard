@@ -1486,7 +1486,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Bank details lines
     bank_lines = [
-        ("Bank Name", "IDF11C FIRST"),
+        ("Bank Name", "IDFC FIRST BANK"),
         ("Branch", "AHMEDAB11AD Shyamal Branch"),
         ("Account No", "8813042018211"),
         ("IFS Code", "IDFB004033511")

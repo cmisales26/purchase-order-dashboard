@@ -1709,7 +1709,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     # Draw signature line
     x1 = text_x + label_width + 3
-    y1 = signature_y + 3
+    y1 = signature_y + 2
     x2 = x1 + (max_width - label_width - 4)
     pdf.line(x1, y1, x2, y1)
 

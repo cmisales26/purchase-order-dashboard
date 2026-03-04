@@ -1648,12 +1648,12 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     left_box_height = 33
     right_signature_box_height = 33
 
-    # --- LEFT BOX - TERMS (COMPLETE CODE) ---
+    # --- LEFT BOX - TERMS ONLY ---
     # Draw border for left box
     pdf.set_xy(10, y_signature_start + 6)
     pdf.cell(95, left_box_height, "", border="LRB", ln=0)
 
-    # Terms as separate lines (without signature in the list)
+    # Terms as separate lines
     terms_lines = [
         "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'.",
         "2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY.",
@@ -1662,7 +1662,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     ]
 
     # Write terms in left box
-    text_x = 12  # Slight indent from left border
+    text_x = 12  # Slight indent
     line_height = 4.5
     box_top_y = y_signature_start + 6
 
@@ -1672,7 +1672,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Calculate starting Y to center text vertically
     text_start_y = box_top_y + (left_box_height - total_text_height) / 2
 
-    # Draw each term on its own line
+    # Draw each term
     current_y = text_start_y
     for line in terms_lines:
         pdf.set_xy(text_x, current_y)
@@ -1683,21 +1683,16 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Draw signature line
     pdf.set_xy(text_x, current_y)
     pdf.set_font(pdf.default_font, "B", 9)
-    pdf.cell(30, line_height, "SIGNATURE:", ln=0, align="L")
-
-    # Draw the line for signature
-    pdf.set_x(text_x + 33)  # Position after "SIGNATURE:"
-    line_width = 50  # Length of the signature line
-
-    # Get current position for drawing the line
-    x1 = pdf.get_x()
-    y1 = current_y + 2  # Slightly below the text
-    x2 = x1 + line_width
+    label = "SIGNATURE:"
+    label_width = pdf.get_string_width(label)
+    pdf.cell(label_width, line_height, label, ln=0, align="L")
 
     # Draw the line
+    x1 = text_x + label_width + 2
+    y1 = current_y + 2
+    x2 = x1 + (83 - label_width - 4)  # Fill remaining space
     pdf.line(x1, y1, x2, y1)
 
-    # Update current Y position
     current_y += line_height
     y_after_left_box = box_top_y + left_box_height
 

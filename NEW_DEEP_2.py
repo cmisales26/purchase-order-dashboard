@@ -807,7 +807,7 @@ def add_page_two_commercials(pdf, data):
         ("Account Number", "88130420182"),
         ("IFSC Code", "IDFB0040335"),
         ("SWIFT Code", "IDFBINBBMUM"),
-        ("Bank Name", "IDFC FIRST"),
+        ("Bank Name", "IDFC FIRST BANK"),
         ("Branch", "AHMEDABAD - SHYAMAL BRANCH"),
         ("MSME", "UDYAM-GJ-01-0117646"),
         ("GSTIN", "24ANMPP4891R1ZX"),

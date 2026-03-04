@@ -1637,7 +1637,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # --- Signature Boxes (Side by Side) ---
     y_signature_start = pdf.get_y()
 
-    # Left side - Declaration box
+    # Left side - Terms box
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(95, 6, "Terms:", border="LRTB", ln=0, align="L")
 
@@ -1648,50 +1648,72 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     left_box_height = 33
     right_signature_box_height = 33
 
-    # Left box - Declaration terms (as one paragraph, left aligned)
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.set_text_color(0, 0, 0)
-
-    # Combine all terms into one paragraph
-    declaration_text = "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'. 2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY. 3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMTANCES. 4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME. SIGNATURE______________"
-
+    # --- LEFT BOX - TERMS WITH PROPER WRAPPING ---
     # Draw border for left box
     pdf.set_xy(10, y_signature_start + 6)
     pdf.cell(95, left_box_height, "", border="LRB", ln=0)
 
-    # Write declaration text (same as before)
-    text_x = 10
-    text_y = y_signature_start + 10
-    line_height = 4
-    max_width = 91
+    # Terms as separate lines with wrapping
+    terms = [
+        "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'.",
+        "2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY.",
+        "3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMSTANCES.",
+        "4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME.",
+    ]
 
-    words = declaration_text.split()
-    lines = []
-    current_line = ""
+    # Write terms in left box with wrapping
+    text_x = 10  # Slight indent
+    line_height = 3.5
+    box_top_y = y_signature_start + 3
+    max_width = 95  # Maximum width for text (95 - margins)
 
-    for word in words:
-        test_line = current_line + " " + word if current_line else word
-        if pdf.get_string_width(test_line) <= max_width:
-            current_line = test_line
-        else:
-            lines.append(current_line)
-            current_line = word
+    # First, wrap each term to fit within the box
+    wrapped_lines = []
+    for term in terms:
+        words = term.split()
+        current_line = ""
+        
+        for word in words:
+            test_line = current_line + " " + word if current_line else word
+            if pdf.get_string_width(test_line) <= max_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    wrapped_lines.append(current_line)
+                current_line = word
+        
+        if current_line:
+            wrapped_lines.append(current_line)
 
-    if current_line:
-        lines.append(current_line)
+    # Calculate total height needed for all wrapped lines
+    total_text_height = len(wrapped_lines) * line_height
 
-    # Calculate starting Y position to center text vertically
-    box_top_y = y_signature_start + 6
-    total_text_height = len(lines) * line_height
+    # Calculate starting Y to center text vertically
     text_start_y = box_top_y + (left_box_height - total_text_height) / 2
 
-    # Draw each line (left aligned)
+    # Draw each wrapped line
     current_y = text_start_y
-    for line in lines:
+    for line in wrapped_lines:
         pdf.set_xy(text_x, current_y)
+        pdf.set_font(pdf.default_font, "", 9)
         pdf.cell(max_width, line_height, line, ln=1, align="L")
         current_y += line_height
+    current_y += 1
+    # Add signature line at the bottom
+    signature_y = current_y
+    pdf.set_xy(text_x, signature_y)
+    pdf.set_font(pdf.default_font, "B", 9)
+    label = "SIGNATURE:"
+    label_width = pdf.get_string_width(label)
+    pdf.cell(label_width, line_height, label, ln=0, align="L")
 
+    # Draw signature line
+    x1 = text_x + label_width + 2
+    y1 = signature_y + 3
+    x2 = x1 + (max_width - label_width - 4)
+    pdf.line(x1, y1, x2, y1)
+
+    current_y += line_height
     y_after_left_box = box_top_y + left_box_height
 
     # Right signature box (Our Company) - FIXED LAYOUT

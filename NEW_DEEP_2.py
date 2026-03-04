@@ -110,10 +110,10 @@ print("=" * 50)
 
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
-    "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721"},
-    "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721"},
-    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721"},
-    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721"}
+    "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721","designation": "Founder"},
+    "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721","designation": "Inside Sales Executive"},
+    "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721","designation": "Inside Sales Executive"},
+    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721","designation": "Inside Sales Executive"}
 }
 
 # --- Helper Functions for Vendor Management ---
@@ -907,64 +907,66 @@ def add_page_two_commercials(pdf, data):
         
         bank_y = pdf.get_y()
 
-    # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
-    # Calculate position to place signature near bottom of the box
-    signature_start_y = y_start + box_height - signature_height - 15
-    
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.set_xy(x_start + col1_width + padding, signature_start_y)
-    pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
-    
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
-    
-    # --- Signature Block with Dynamic Sales Person ---
-    sales_person_code = data.get('sales_person_code', 'SD')
-    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
-    
-    # Add stamp between "For CM INFOTECH" and sales person name
-    if data.get('stamp_path') and os.path.exists(data['stamp_path']):
-        try:
-            # Position stamp centered between "For CM INFOTECH" and sales person name
-            stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
-            stamp_x = x_start + col1_width + padding  # Center the stamp
-            pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
-            # Move cursor down after stamp
-            pdf.set_y(stamp_y + 20)  # Space for stamp + some padding
-        except:
-            pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
-    else:
-        pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
-    
-    pdf.set_font(pdf.default_font, "", 9)
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
-    
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    pdf.cell(col2_width - 2*padding, 4, "Inside Sales Executive", ln=True)
-    
-    # Clickable email in signature
-    pdf.set_font(pdf.default_font, "", 9)
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    label = "Email: "
-    pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    pdf.set_font(pdf.default_font, "U", 9)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
-             ln=True, link=f"mailto:{sales_person_info['email']}")
-    
-    # Clickable phone in signature
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font(pdf.default_font, "", 9)
-    pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-    label = "Mobile: "
-    pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-    pdf.set_font(pdf.default_font, "U", 9)
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
-             ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-    pdf.set_text_color(0, 0, 0)
+        # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
+        # Calculate position to place signature near bottom of the box
+        signature_start_y = y_start + box_height - signature_height - 15
+
+        pdf.set_font(pdf.default_font, "B", 10)
+        pdf.set_xy(x_start + col1_width + padding, signature_start_y)
+        pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
+
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
+
+        # --- Signature Block with Dynamic Sales Person ---
+        sales_person_code = data.get('sales_person_code', 'SD')
+        sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+
+        # Add stamp between "For CM INFOTECH" and sales person name
+        if data.get('stamp_path') and os.path.exists(data['stamp_path']):
+            try:
+                # Position stamp centered between "For CM INFOTECH" and sales person name
+                stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
+                stamp_x = x_start + col1_width + padding  # Center the stamp
+                pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
+                # Move cursor down after stamp
+                pdf.set_y(stamp_y + 20)  # Space for stamp + some padding
+            except:
+                pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
+        else:
+            pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
+
+        # Sales person name
+        pdf.set_font(pdf.default_font, "", 9)
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
+
+        # DYNAMIC DESIGNATION - Shows different designation based on sales person selected
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        pdf.cell(col2_width - 2*padding, 4, sales_person_info["designation"], ln=True)  # Changed from hardcoded "Inside Sales Executive"
+
+        # Clickable email in signature
+        pdf.set_font(pdf.default_font, "", 9)
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        label = "Email: "
+        pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+        pdf.set_font(pdf.default_font, "U", 9)
+        pdf.set_text_color(0, 0, 255)
+        pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
+                ln=True, link=f"mailto:{sales_person_info['email']}")
+
+        # Clickable phone in signature
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font(pdf.default_font, "", 9)
+        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+        label = "Mobile: "
+        pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+        pdf.set_font(pdf.default_font, "U", 9)
+        pdf.set_text_color(0, 0, 255)
+        pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
+                ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+        pdf.set_text_color(0, 0, 0)
 
     # Move cursor below the box
     pdf.set_xy(x_start, y_start + box_height + 10)

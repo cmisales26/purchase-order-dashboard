@@ -1665,7 +1665,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     text_x = 12  # Slight indent
     line_height = 4
     box_top_y = y_signature_start + 6
-    max_width = 90  # Maximum width for text (95 - margins)
+    max_width = 95  # Maximum width for text (95 - margins)
 
     # First, wrap each term to fit within the box
     wrapped_lines = []

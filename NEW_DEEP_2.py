@@ -1648,94 +1648,123 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     left_box_height = 33
     right_signature_box_height = 33
 
-    # --- LEFT BOX - TERMS ONLY ---
+    # --- LEFT BOX - TERMS WITH PROPER WRAPPING ---
     # Draw border for left box
     pdf.set_xy(10, y_signature_start + 6)
     pdf.cell(95, left_box_height, "", border="LRB", ln=0)
 
-    # Terms as separate lines
-    terms_lines = [
+    # Terms as separate lines with wrapping
+    terms = [
         "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'.",
         "2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY.",
         "3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMSTANCES.",
         "4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME.",
     ]
 
-    # Write terms in left box
+    # Write terms in left box with wrapping
     text_x = 12  # Slight indent
-    line_height = 4.5
+    line_height = 4
     box_top_y = y_signature_start + 6
+    max_width = 83  # Maximum width for text (95 - margins)
 
-    # Calculate total text height (including signature line)
-    total_text_height = (len(terms_lines) + 1) * line_height
+    # First, wrap each term to fit within the box
+    wrapped_lines = []
+    for term in terms:
+        words = term.split()
+        current_line = ""
+        
+        for word in words:
+            test_line = current_line + " " + word if current_line else word
+            if pdf.get_string_width(test_line) <= max_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    wrapped_lines.append(current_line)
+                current_line = word
+        
+        if current_line:
+            wrapped_lines.append(current_line)
+
+    # Calculate total height needed for all wrapped lines
+    total_text_height = len(wrapped_lines) * line_height
 
     # Calculate starting Y to center text vertically
     text_start_y = box_top_y + (left_box_height - total_text_height) / 2
 
-    # Draw each term
+    # Draw each wrapped line
     current_y = text_start_y
-    for line in terms_lines:
+    for line in wrapped_lines:
         pdf.set_xy(text_x, current_y)
         pdf.set_font(pdf.default_font, "", 9)
-        pdf.cell(83, line_height, line, ln=1, align="L")
+        pdf.cell(max_width, line_height, line, ln=1, align="L")
         current_y += line_height
 
-    # Draw signature line
-    pdf.set_xy(text_x, current_y)
+    # Add signature line at the bottom
+    signature_y = current_y
+    pdf.set_xy(text_x, signature_y)
     pdf.set_font(pdf.default_font, "B", 9)
     label = "SIGNATURE:"
     label_width = pdf.get_string_width(label)
     pdf.cell(label_width, line_height, label, ln=0, align="L")
 
-    # Draw the line
+    # Draw signature line
     x1 = text_x + label_width + 2
-    y1 = current_y + 2
-    x2 = x1 + (83 - label_width - 4)  # Fill remaining space
+    y1 = signature_y + 2
+    x2 = x1 + (max_width - label_width - 4)
     pdf.line(x1, y1, x2, y1)
 
     current_y += line_height
     y_after_left_box = box_top_y + left_box_height
 
-    # --- RIGHT BOX - COMPANY SIGNATURE ONLY ---
-    # Draw border for right box
+    # Right signature box (Our Company) - FIXED LAYOUT
+    # Draw border first
     pdf.set_xy(105, y_signature_start + 6)
     pdf.cell(96, right_signature_box_height, "", border="LRB")
 
-    # Calculate center of right box
-    box_center_y = y_signature_start + 6 + (right_signature_box_height / 2)
-
-    # Add stamp if available (at top of right box)
+    # Add stamp if available (at the top)
     if stamp_file:
         try:
             stamp_width = 25
             stamp_x = 105 + (96 - stamp_width) / 2
-            stamp_y = y_signature_start + 8
+            stamp_y = y_signature_start + 8  # Position near top
             pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
             
-            # Position text below stamp
-            text_y = stamp_y + stamp_width + 5
+            # Adjust text position based on stamp
+            text_start_y = stamp_y + stamp_width + 2
         except Exception as e:
             st.warning(f"Could not add stamp: {e}")
-            text_y = box_center_y - 8
+            text_start_y = y_signature_start + 12
     else:
-        # If no stamp, center text vertically
-        text_y = box_center_y - 8
+        text_start_y = y_signature_start + 12
 
-    # "For CM INFOTECH." in right box
-    pdf.set_font(pdf.default_font, "B", 11)
+    # Company details - properly centered and spaced
+    company_details = [
+        "Authorized Signatory"
+    ]
+
+    pdf.set_font(pdf.default_font, "B", 10)
     pdf.set_text_color(0, 0, 0)
-    pdf.set_xy(105, text_y)
-    pdf.cell(96, 5, "For CM INFOTECH.", border=0, ln=0, align="C")
 
-    # "Authorized Signatory" in right box
-    pdf.set_font(pdf.default_font, "", 10)
-    pdf.set_xy(105, text_y + 6)
-    pdf.cell(96, 5, "Authorized Signatory", border=0, ln=0, align="C")
+    # Calculate spacing
+    total_details_height = len(company_details) * 5  # 5 units per line
+    details_start_y = text_start_y - 1
 
-    # Optional: Add MEDAS if needed
+    # Draw company details
+    current_y = details_start_y
+    for i, detail in enumerate(company_details):
+        pdf.set_xy(105, current_y)
+        
+        # Use different font weights for different lines
+        if i == 0: 
+            pdf.set_font(pdf.default_font, "B", 11)
+        
+        pdf.cell(96, 5, detail, border=0, ln=0, align="C")
+        current_y += 3
+
+    # Optional: Add "MEDAS" if needed (smaller, at bottom)
     if "MEDAS" in invoice_data.get('company_details', ''):
+        pdf.set_xy(105, current_y)
         pdf.set_font(pdf.default_font, "I", 8)
-        pdf.set_xy(105, text_y + 12)
         pdf.cell(96, 4, "MEDAS", border=0, ln=0, align="C")
 
     # Set Y position to continue after both boxes

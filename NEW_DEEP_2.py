@@ -1386,27 +1386,52 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_y(pdf.get_y() - 5)  # Move back up to the same line
     pdf.set_x(10)  # Starting X position
 
-    # Write bold label
-    pdf.set_font(pdf.default_font, "B", 12)
+    # Get the text
     label = "Amount Chargeable (in words): "
-    label_width = pdf.get_string_width(label)
-    pdf.cell(label_width, 5, label, ln=0)
-
-    # Write normal value - with wrapping if needed, but on same line
-    pdf.set_font(pdf.default_font, "", 12)
     amount_text = invoice_data['totals']['amount_in_words']
-    amount_width = pdf.get_string_width(amount_text)
-    remaining_width = 191 - label_width - 2  # Total width minus label width minus margin
+    total_text = label + amount_text
 
-    if amount_width <= remaining_width:
-        # Amount fits in one line - stay on same line
-        pdf.cell(remaining_width, 5, amount_text, ln=True)
-    else:
-        # Amount is too long - keep as much as possible on same line, wrap rest
-        # First, find how many characters fit on the first line
+    # Calculate available width
+    available_width = 191 - 4  # Total width minus margins
+
+    # Try different font sizes to fit on one line
+    fits_on_one_line = False
+    for font_size in [12, 11, 10, 9, 8]:
+        pdf.set_font(pdf.default_font, "B", font_size)
+        label_width = pdf.get_string_width(label)
+        
+        pdf.set_font(pdf.default_font, "", font_size)
+        amount_width = pdf.get_string_width(amount_text)
+        
+        total_width = label_width + amount_width
+        
+        if total_width <= available_width:
+            # This font size works
+            fits_on_one_line = True
+            
+            # Write label in bold
+            pdf.set_font(pdf.default_font, "B", font_size)
+            pdf.cell(label_width, 5, label, ln=0)
+            
+            # Write amount in normal font
+            pdf.set_font(pdf.default_font, "", font_size)
+            pdf.cell(amount_width, 5, amount_text, ln=True)
+            break
+
+    # If even size 8 doesn't fit, we need a different approach
+    if not fits_on_one_line:
+        # Use size 8 and let it wrap, but keep as much as possible on same line
+        pdf.set_font(pdf.default_font, "B", 8)
+        label_width = pdf.get_string_width(label)
+        pdf.cell(label_width, 5, label, ln=0)
+        
+        pdf.set_font(pdf.default_font, "", 8)
+        
+        # Find how much of the amount can fit on the same line
         words = amount_text.split()
         first_line = ""
         remaining_words = []
+        remaining_width = available_width - label_width
         
         for word in words:
             test_line = first_line + " " + word if first_line else word
@@ -1416,15 +1441,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
                 remaining_words = words[words.index(word):]
                 break
         
-        # Write the first part on the same line
-        pdf.cell(remaining_width, 5, first_line, ln=True)
+        # Write first part on same line
+        pdf.cell(pdf.get_string_width(first_line), 5, first_line, ln=True)
         
-        # Write remaining words on next lines
+        # Write remaining on next line
         if remaining_words:
-            remaining_text = " ".join(remaining_words)
-            pdf.set_x(10)  # Start from left margin
-            pdf.set_font(pdf.default_font, "", 10)  # Slightly smaller for wrapped text
-            pdf.multi_cell(191, 4, remaining_text, align='L')
+            pdf.set_x(10)
+            pdf.multi_cell(191, 4, " ".join(remaining_words), align='L')
 
     # Check if we need a new page before tax summary
     if pdf.get_y() + 60 > pdf.page_break_trigger:
@@ -1479,29 +1502,51 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     current_y = pdf.get_y()
     current_x = pdf.get_x()
 
-    # Write the label part in bold on the same line
-    pdf.set_font(pdf.default_font, "B", 12)
     label_part = "Tax Amount (in words): "
-    label_width = pdf.get_string_width(label_part)
-    pdf.cell(label_width, 5, label_part, border="LTB", ln=0)
-
-    # Calculate remaining width
-    remaining_width = 189.7 - label_width
-
-    # Write the value part - try to fit on same line
-    pdf.set_font(pdf.default_font, "", 12)
     value_part = invoice_data['totals']['tax_in_words']
-    value_width = pdf.get_string_width(value_part)
 
-    if value_width <= remaining_width:
-        # Fits on same line
-        pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
-    else:
-        # Too long - keep as much as possible on same line, wrap rest
-        # Split into words
+    # Calculate available width
+    available_width = 189.7 - 4  # Total width minus margins
+
+    # Try different font sizes to fit on one line
+    fits_on_one_line = False
+    for font_size in [12, 11, 10, 9, 8]:
+        pdf.set_font(pdf.default_font, "B", font_size)
+        label_width = pdf.get_string_width(label_part)
+        
+        pdf.set_font(pdf.default_font, "", font_size)
+        value_width = pdf.get_string_width(value_part)
+        
+        total_width = label_width + value_width
+        
+        if total_width <= available_width:
+            # This font size works
+            fits_on_one_line = True
+            
+            # Write label in bold
+            pdf.set_font(pdf.default_font, "B", font_size)
+            pdf.cell(label_width, 5, label_part, border="LTB", ln=0)
+            
+            # Write value in normal font on same line
+            pdf.set_font(pdf.default_font, "", font_size)
+            remaining_width = available_width - label_width
+            pdf.cell(remaining_width, 5, value_part, border="TRB", ln=True)
+            break
+
+    # If even size 8 doesn't fit
+    if not fits_on_one_line:
+        # Use size 8 and keep as much as possible on same line
+        pdf.set_font(pdf.default_font, "B", 8)
+        label_width = pdf.get_string_width(label_part)
+        pdf.cell(label_width, 5, label_part, border="LTB", ln=0)
+        
+        pdf.set_font(pdf.default_font, "", 8)
+        
+        # Find how much of the value can fit on the same line
         words = value_part.split()
         first_line = ""
         remaining_words = []
+        remaining_width = available_width - label_width
         
         for word in words:
             test_line = first_line + " " + word if first_line else word
@@ -1511,17 +1556,13 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
                 remaining_words = words[words.index(word):]
                 break
         
-        # Complete the current line with first part and border
-        pdf.cell(remaining_width, 5, first_line, border="TRB", ln=True)
+        # Write first part on same line
+        pdf.cell(pdf.get_string_width(first_line), 5, first_line, border="TRB", ln=True)
         
-        # Write remaining words with proper borders
+        # Write remaining on next line with proper borders
         if remaining_words:
-            remaining_text = " ".join(remaining_words)
-            pdf.set_x(current_x)  # Start from left margin
-            
-            # Use MultiCell for remaining text with borders
-            pdf.set_font(pdf.default_font, "", 10)  # Smaller font for wrapped text
-            pdf.multi_cell(189.7, 4, remaining_text, border="LRB", align='L')
+            pdf.set_x(current_x)
+            pdf.multi_cell(189.7, 4, " ".join(remaining_words), border="LRB", align='L')
 
     # pdf.set_font(pdf.default_font, "B", 12)
     # # Write just the label part in bold

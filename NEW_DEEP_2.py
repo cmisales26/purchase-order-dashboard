@@ -1698,7 +1698,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         pdf.set_font(pdf.default_font, "", 9)
         pdf.cell(max_width, line_height, line, ln=1, align="L")
         current_y += line_height
-
+    current_y += 5
     # Add signature line at the bottom
     signature_y = current_y
     pdf.set_xy(text_x, signature_y)

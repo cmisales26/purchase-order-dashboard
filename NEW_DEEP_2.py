@@ -1641,53 +1641,64 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(95, 6, "Terms:", border="LRTB", ln=0, align="L")
 
-    # Right side - Our Company Signature box header (KEEP EXACTLY AS BEFORE)
+    # Right side - Our Company Signature box header
     pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
 
     # Create the boxes with heights
     left_box_height = 33
     right_signature_box_height = 33
 
-    # --- LEFT BOX - TERMS (CHANGES ONLY HERE) ---
+    # --- LEFT BOX - TERMS (COMPLETE CODE) ---
     # Draw border for left box
     pdf.set_xy(10, y_signature_start + 6)
     pdf.cell(95, left_box_height, "", border="LRB", ln=0)
 
-    # Terms as separate lines - EACH ON ITS OWN LINE
+    # Terms as separate lines (without signature in the list)
     terms_lines = [
         "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'.",
         "2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY.",
         "3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMSTANCES.",
         "4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME.",
-        "SIGNATURE____________________"
     ]
 
-    # Write terms in left box - ONE LINE PER TERM
+    # Write terms in left box
     text_x = 12  # Slight indent from left border
     line_height = 4.5
     box_top_y = y_signature_start + 6
 
-    # Calculate total text height
-    total_text_height = len(terms_lines) * line_height
+    # Calculate total text height (including signature line)
+    total_text_height = (len(terms_lines) + 1) * line_height
 
     # Calculate starting Y to center text vertically
     text_start_y = box_top_y + (left_box_height - total_text_height) / 2
 
-    # Draw each term on its own line (NO WRAPPING)
+    # Draw each term on its own line
     current_y = text_start_y
-    for i, line in enumerate(terms_lines):
+    for line in terms_lines:
         pdf.set_xy(text_x, current_y)
-        
-        # Different formatting for signature line
-        if i == len(terms_lines) - 1:
-            pdf.set_font(pdf.default_font, "B", 9)  # Bold for signature
-        else:
-            pdf.set_font(pdf.default_font, "", 9)
-        
-        # Use cell instead of multi_cell to prevent wrapping
+        pdf.set_font(pdf.default_font, "", 9)
         pdf.cell(83, line_height, line, ln=1, align="L")
         current_y += line_height
 
+    # Draw signature line
+    pdf.set_xy(text_x, current_y)
+    pdf.set_font(pdf.default_font, "B", 9)
+    pdf.cell(30, line_height, "SIGNATURE:", ln=0, align="L")
+
+    # Draw the line for signature
+    pdf.set_x(text_x + 33)  # Position after "SIGNATURE:"
+    line_width = 50  # Length of the signature line
+
+    # Get current position for drawing the line
+    x1 = pdf.get_x()
+    y1 = current_y + 2  # Slightly below the text
+    x2 = x1 + line_width
+
+    # Draw the line
+    pdf.line(x1, y1, x2, y1)
+
+    # Update current Y position
+    current_y += line_height
     y_after_left_box = box_top_y + left_box_height
 
     # Right signature box (Our Company) - FIXED LAYOUT

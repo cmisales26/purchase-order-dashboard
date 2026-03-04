@@ -798,7 +798,7 @@ def add_page_two_commercials(pdf, data):
         ("10. Support: ","Includes 12 months of technical support and software updates from OEM."),
         ("11. Installation: ","Online"),
         ("12. Cheque to be issued on name of: ", '"CM INFOTECH"'),
-        ("13. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, \nJagatpur Village, Ahmedabad - 382481")
+        ("13. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village,\n Ahmedabad - 382481")
     ]
 
     # Bank Details

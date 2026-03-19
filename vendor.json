@@ -15,17 +15,10 @@
     },
     "Tech Data Advanced Private Limited": {
         "address": "A-301, 3rd Floor, Supreme Business Park, Behind Lake Castle, Hiranandani Garden, Powai Mumbai 400076",
-        "contact": "Mr. Deepak Khaterkar",
-        "mobile": "+91 7974088703",
-        "email": "deepak.khaterkar@techdata.com",
+        "contact": "Mr. Swapnil Dhule",
+        "mobile": "+91 9922329599",
+        "email": "swapnil.dhule@techdata.com",
         "gst_no": "27AAACO3686M1ZX"
-    },
-    "SS Solutions": {
-        "address": "F-405, Mahadev Platinum, Near Yash Bungalow, Smruti Mandir, Ghodasar,, Ahmedabad 380050, Gujarat India\n",
-        "contact": "Mr. Sagar Parikh",
-        "mobile": "+91 9099699389",
-        "email": "sagar@sssolu.in",
-        "gst_no": "24AMFPP5909G1Z0"
     },
     "Murari Software Solutions": {
         "address": "8C Shimla Towers, Hill County Apts. Bachupally, Nizamet Road, Hyderabad 500090, India",
@@ -75,5 +68,54 @@
         "mobile": "+91 8828206059",
         "email": "kavita.girkar@mgenindia.com",
         "gst_no": "27AABCM1454C1ZX"
+    },
+    "Netcomp Computer Systems": {
+    "address": "A/28, Circle B, Above Pakwan, Bodakdev, Ahmedabad-380054",
+    "contact": "Ms Parul Gohel",
+    "mobile": "+91 9924066099,9924166099",
+    "email": "tally@netcompgroup.com",
+    "gst_no": "24AACFN7243A1ZS"
+    },
+    "REEPRA INFOTECH": {
+        "address": "M/10, Fc-1, Jolly Shopping Point, Beside G-3 Show Room, Ghod Dod Road, Surat 395007",
+        "contact": "Ms Reena Desai",
+        "mobile": "+91 9824155886",
+        "email": "office@reeprainfotech.com",
+        "gst_no": "24AFUPD6830J1Z7"
+    },
+    "Neilsoft Limited": {
+        "address": "Pride Parmar Galaxy, 10/10+A, Sadhu Vaswani Chowk, Pune 411001",
+        "contact": "Mr. Mayuresh Mahajan",
+        "mobile": "+91 8425009945",
+        "email": "mayuresh.mahajan@neilsoft.com",
+        "gst_no": "27AAACN1300P1ZL"
+    },
+    "JSK Infosolutions": {
+        "address": "A-207, Foram Apartment, Near Vishwakarma Temple, Chandlodiya, Ahmedabad-382481, Gujarat",
+        "contact": "Mr. Sanjay H",
+        "mobile": "+91 8141763331",
+        "email": "sales.jskinfo@gmail.com; sales@jskinfo.com",
+        "gst_no": "24ANGPG2835G1ZB"
+    },
+    "TATVA SOFTECH INDIA PRIVATE LIMITED": {
+        "address": "4th floor, Office No. A/1-404, Palladium, Corporate Road, Opp. Divyabhaskar Near Orchid Wood, Makarba, Ahmedabad 380051\n",
+        "contact": "Mr. Sagar Parikh",
+        "mobile": "+91 9099699389",
+        "email": "info@tatvasoftechindia.com",
+        "gst_no": "24AAMCT0669B1ZG"
+    },
+    "Sagar Info Solutions": {
+        "address": "A74 Shivam Tower, Someshwara Row Houses-1, Opp. City Gold Theatre, Satellite, Ahmedabad 380015",
+        "contact": "Mr. Anurag",
+        "mobile": "+91 9327001176",
+        "email": "sisanurag@gmail.com",
+        "gst_no": "24AQCPS8775Q1ZT"
+    },
+    "Trident IT Technology": {
+        "address": "251, Exult Shoppers, Beside Siddhivinayak Temple, Vesu Main Road, Surat, Gujarat 395007",
+        "contact": "Ms. Dolly Patel",
+        "mobile": "+91 9016303207",
+        "email": "dolly@tridentittechnology.in",
+        "gst_no": "24DCQPP3407K1Z9"
     }
 }

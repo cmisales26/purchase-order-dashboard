@@ -3522,13 +3522,50 @@ def main():
             items = []
             num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
             for i in range(num_items):
-                with st.expander(f"Product {i+1}"):
-                    desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
+                with st.expander(f"Product {i+1}", expanded=True):
+                    # Product catalog dropdown
+                    product_options = ["-- Select from Catalog --"] + list(PRODUCT_CATALOG.keys())
+                    selected_inv_product = st.selectbox(
+                        f"Select Product {i+1}",
+                        options=product_options,
+                        key=f"invoice_product_select_{i}"
+                    )
+                    
+                    # Auto-fill product name and rate from catalog
+                    default_desc = "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription"
+                    default_rate = 36500.00
+                    
+                    if selected_inv_product and selected_inv_product != "-- Select from Catalog --":
+                        catalog_entry = PRODUCT_CATALOG.get(selected_inv_product, {})
+                        default_desc = selected_inv_product
+                        default_rate = catalog_entry.get("basic", 0.0)
+                    
+                    # Product description (auto-filled from catalog, editable)
+                    desc_name = st.text_area(f"Product Description {i+1}", default_desc, key=f"invoice_desc_{i}")
+                    
+                    # Serial, Contract, End Date fields
+                    col_s, col_c, col_e = st.columns(3)
+                    with col_s:
+                        serial_no = st.text_input(f"Serial #", "", key=f"invoice_serial_{i}", placeholder="e.g. 575-26831580")
+                    with col_c:
+                        contract_no = st.text_input(f"Contract #", "", key=f"invoice_contract_{i}", placeholder="e.g. 110004988191")
+                    with col_e:
+                        end_date = st.text_input(f"End Date", "", key=f"invoice_enddate_{i}", placeholder="e.g. 17/04/2026")
+                    
+                    # Build final description: product name + serial/contract/end date
+                    full_desc = desc_name
+                    if serial_no:
+                        full_desc += f"\nSerial #{serial_no}"
+                    if contract_no:
+                        full_desc += f"\nContract #{contract_no}"
+                    if end_date:
+                        full_desc += f"\nEnd Date: {end_date}"
+                    
                     hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
                     qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
-                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, 36500.00, key=f"invoice_rate_{i}")
+                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, default_rate, key=f"invoice_rate_{i}")
                     rate = round(rate, 2)
-                    items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
+                    items.append({"description": full_desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
 
             st.subheader("Declaration")
             declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")

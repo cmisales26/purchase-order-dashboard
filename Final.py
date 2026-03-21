@@ -1658,7 +1658,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'.",
         "2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY.",
         "3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMSTANCES.",
-        "4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME.",
+        "4. INTEREST WILL BE CHARGED @24% PER ANNUM IF PAYMENT IS NOT MADE WITHIN TIME.",
     ]
 
     # Write terms in left box with wrapping

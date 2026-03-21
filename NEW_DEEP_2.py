@@ -19,57 +19,7 @@ STAMP_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboa
 import time
 
 # --- Global Data and Configuration ---
-PRODUCT_CATALOG = {
-    "GstarCAD STDANDARD 2026 Perpetual": {"basic": 34777.0, "gst_percent": 18.0},
-    "GstarCAD STDANDARD 2026 One year upgrade": {"basic": 18303.0, "gst_percent": 18.0},
-    "GstarCAD STDANDARD 2026 Two year upgrade": {"basic": 18303.0, "gst_percent": 18.0},
-    "GstarCAD STDANDARD 2026 Three + year upgrade": {"basic": 22696.0, "gst_percent": 18.0},
-
-    "GstarCAD PROFESSIONAL 2026 Perpetual": {"basic": 46125.0, "gst_percent": 18.0},
-    "GstarCAD PROFESSIONAL 2026 One year upgrade": {"basic": 25625.0, "gst_percent": 18.0},
-    "GstarCAD PROFESSIONAL 2026 Two year upgrade": {"basic": 25625.0, "gst_percent": 18.0},
-    "GstarCAD PROFESSIONAL 2026 Three + year upgrade": {"basic": 30018.0, "gst_percent": 18.0},
-
-    "GstarCAD PLUS 2026 Perpetual": {"basic": 57107.0, "gst_percent": 18.0},
-    "GstarCAD PLUS 2026 One year upgrade": {"basic": 29286.0, "gst_percent": 18.0},
-    "GstarCAD PLUS 2026 Two year upgrade": {"basic": 32946.0, "gst_percent": 18.0},
-    "GstarCAD PLUS 2026 Three + year upgrade": {"basic": 41000.0, "gst_percent": 18.0},
-
-    "GstarCAD MECHANICAL 2025 Perpetual": {"basic": 92250.0, "gst_percent": 18.0},
-    "GstarCAD MECHANICAL 2025 One year upgrade": {"basic": 73214.0, "gst_percent": 18.0},
-    "GstarCAD MECHANICAL 2025 Two year upgrade": {"basic": 87857.0, "gst_percent": 18.0},
-    "GstarCAD MECHANICAL 2025 Three + year upgrade": {"basic": 105428.0, "gst_percent": 18.0},
-
-    "GstarCAD ARCHITECTURE 2021 Perpetual": {"basic": 92250.0, "gst_percent": 18.0},
-    "GstarCAD ARCHITECTURE 2021 One year upgrade": {"basic": 73214.0, "gst_percent": 18.0},
-    "GstarCAD ARCHITECTURE 2021 Two year upgrade": {"basic": 87857.0, "gst_percent": 18.0},
-    "GstarCAD ARCHITECTURE 2021 Three + year upgrade": {"basic": 105428.0, "gst_percent": 18.0},
-
-    "Archline.XP LT 2025 Perpetual": {"basic": 30450.0, "gst_percent": 18.0},
-    "Archline.XP LT Yearly Subscription": {"basic": 26617.0, "gst_percent": 18.0},
-
-    "Archline.XP Interior 2025 Perpetual": {"basic": 94500.0, "gst_percent": 18.0},
-    "Archline.XP Interior Yearly Subscription": {"basic": 70875.0, "gst_percent": 18.0},
-
-    "Archline.XP Professional 2025 Perpetual": {"basic": 126000.0, "gst_percent": 18.0},
-    "Archline.XP Professional Yearly Subscription": {"basic": 94500.0, "gst_percent": 18.0},
-
-    "Archline.XP MEP Module for LT 2025": {"basic": 30450.0, "gst_percent": 18.0},
-    "Archline.XP MEP Module Yearly Subscription": {"basic": 21000.0, "gst_percent": 18.0},
-
-    "Autodesk BIM Collaborate Pro - Single User Commercial Annual Subscription Renewal":{"basic":00.0,"gst_percent": 18.0},
-
-    "Creative cloud pro plus for Teams": {"basic": 114560.0, "gst_percent": 18.0},
-    "Creative cloud Pro for Teams": {"basic": 104560.0, "gst_percent": 18.0},
-    "Adobe Creative Cloud All Apps": {"basic": 95000.0, "gst_percent": 18.0},
-    "Adobe Acrobat Pro DC": {"basic": 25000.0, "gst_percent": 18.0},
-    "Adobe Substance 3D Collection": {"basic": 85000.0, "gst_percent": 18.0},
-    "Autodesk Commercial Software License": {"basic": 27500.0, "gst_percent": 18.0},
-    "Solidworks Premium": {"basic": 50000.0, "gst_percent": 18.0},
-    "Catia License": {"basic": 75000.0, "gst_percent": 18.0},
-    "Mastercam Module": {"basic": 30000.0, "gst_percent": 18.0},
-    "Siemens NX": {"basic": 65000.0, "gst_percent": 18.0},
-}
+# Product catalog is now loaded from products.json (same pattern as vendor.json and endusers.json)
 
 # Load data from JSON files with BETTER CACHE CONTROL
 @st.cache_data(ttl=1)  # Cache for only 1 second - updates immediately
@@ -98,14 +48,16 @@ def load_json_data(filename, default_data=None):
         st.sidebar.error(f"❌ Unexpected error reading {filename}: {e}. Using empty database.")
         return default_data or {}
 
-# Load vendor and end user databases
+# Load vendor, end user, and product databases
 VENDOR_DATABASE = load_json_data('vendor.json')
 END_USER_DATABASE = load_json_data('endusers.json')
+PRODUCT_CATALOG = load_json_data('products.json')
 
 # Debug: Print what's loaded
 print("=" * 50)
 print(f"DEBUG: Loaded {len(VENDOR_DATABASE)} vendors from vendor.json")
 print(f"DEBUG: Loaded {len(END_USER_DATABASE)} end users from endusers.json")
+print(f"DEBUG: Loaded {len(PRODUCT_CATALOG)} products from products.json")
 print("=" * 50)
 
 # Sales Person Mapping - ONLY ONE DEFINITION

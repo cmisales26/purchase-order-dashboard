@@ -1,15 +1,4 @@
 {
-    "Arkance IN Private Limited": {
-        "address": "One International Centre, Unit-801-802, 8th Floor, Tower-1, Senapati Bapat Marg Dadar West, Prabhadevi, Lower Parel, Mumbai - 400013, Maharashtra",
-        "contacts": [
-            {
-                "name": "Mr Krunal Shah",
-                "mobile": "+91 9137503205",
-                "email": "krunal.shah@arkance.world"
-            }
-        ],
-        "gst_no": "27AAACK8290K1Z3"
-    },
     "ACCELTY TECHSOLUTIONS LLP": {
         "address": "603, Sai Plaza, Next To Sakinaka Telephone Exchange, Andheri - Kurla Road, Mumbai - 400072",
         "contacts": [
@@ -116,11 +105,6 @@
                 "name": "Ms Parul Gohel",
                 "mobile": "+91 9924066099,9924166099",
                 "email": "tally@netcompgroup.com"
-            },
-            {
-                "name": "Mr XYZ",
-                "mobile": "+91 9924066099,9924166099",
-                "email": "xyz@netcompgroup.com"
             }
         ],
         "gst_no": "24AACFN7243A1ZS"
@@ -190,5 +174,21 @@
             }
         ],
         "gst_no": "24DCQPP3407K1Z9"
+    },
+    "Arkance IN Private Limited": {
+        "address": "One International Centre, Unit-801-802, 8th Floor, Tower-1, Senapati Bapat Marg Dadar West, Prabhadevi, Lower Parel, Mumbai - 400013, Maharashtra",
+        "contacts": [
+            {
+                "name": "Mr Krunal Shah",
+                "mobile": "+91 9137503205",
+                "email": "krunal.shah@arkance.world"
+            },
+            {
+                "name": "Ms Komal Desai",
+                "mobile": "+91 9319276166",
+                "email": "komal.desai@arkance.world"
+            }
+        ],
+        "gst_no": "27AAACK8290K1Z3"
     }
 }

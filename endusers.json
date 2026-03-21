@@ -1,1511 +1,2367 @@
 {
     "Baldridge & Associates Structural Engineering Private Limited": {
         "address": "406 Sakar East B/5 Gurunanak School, 40mt Tarsali danteshwar Ring Road, Vadodara",
-        "contact": "Mr. Divyesh Mistry ",
-        "mobile": "+91 98987 91813",
-        "email": "dmistry@baseww.com",
+        "contacts": [
+            {
+                "name": "Mr. Divyesh Mistry",
+                "mobile": "+91 98987 91813",
+                "email": "dmistry@baseww.com"
+            }
+        ],
         "gst_no": "24AAHCB9936E1ZL"
     },
     "Abhir Design": {
         "address": "109-110, 3rd floor, Western plaza, Nr. Bhulka bhavan school,Adajan, Surat",
-        "contact": "Mr. Abhishek Ahir ", 
-        "mobile": "+91 79844 12954",
-        "email": "abhirdesign@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Abhishek Ahir",
+                "mobile": "+91 79844 12954",
+                "email": "abhirdesign@gmail.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "AEC Chennai Private Limited ": {
         "address": "No.16, 3rd Floor, 16th Street, 3rd Main Road, Nanganallur,Chennai",
-        "contact": "Mr.  M Anand", 
-        "mobile": "+91 9840411705",
-        "email": "aecltd@aecchennai.com",
+        "contacts": [
+            {
+                "name": "Mr.  M Anand",
+                "mobile": "+91 9840411705",
+                "email": "aecltd@aecchennai.com"
+            }
+        ],
         "gst_no": "33AAXCA3635K1ZA"
     },
     "Artech Engineering Solutions": {
         "address": "Office 909, 910, Bsquare 2, Ambli Rd, Vikram Nagar, Ahmedabad, Gujarat 380058",
-        "contact": "Ms. Avni Sikka", 
-        "mobile": "+91 9723433295",
-        "email": "admin@artechengs.com",
+        "contacts": [
+            {
+                "name": "Ms. Avni Sikka",
+                "mobile": "+91 9723433295",
+                "email": "admin@artechengs.com"
+            }
+        ],
         "gst_no": "24AGXPJ8384R1Z3"
     },
     "EDEN Design Consultants": {
         "address": "1220, Sun Avenue One, Nr. Shreyas Foundation, Manekbaug Road, Ahmedabad",
-        "contact": "Mr. Sheel Shah ", 
-        "mobile": "+91 9909904905",
-        "email": "sheel.shah@edenconsultants.in",
+        "contacts": [
+            {
+                "name": "Mr. Sheel Shah",
+                "mobile": "+91 9909904905",
+                "email": "sheel.shah@edenconsultants.in"
+            }
+        ],
         "gst_no": "24CWEPS2125N2ZA"
     },
     "Falgun Engineering Enterprise": {
         "address": "14, Shayona Ind. Estate, Nr. Panchratna Estate, Near Ramol Bridge, Ramol Chokadi, Vatva, Ahmedabad.",
-        "contact": "Mr. Falgun ", 
-        "mobile": "+91 98798 32610",
-        "email": "info@falgunengineering.com",
+        "contacts": [
+            {
+                "name": "Mr. Falgun",
+                "mobile": "+91 98798 32610",
+                "email": "info@falgunengineering.com"
+            }
+        ],
         "gst_no": "24AFOPD1303E1Z6"
     },
     "Pankaj Dharkar & Associates": {
         "address": "1506-507, Venus Amadeus, Jodhpur Cross Road, Satellite, Ahmedabad - 380015",
-        "contact": "Ms. Gitanjali Dharkar ", 
-        "mobile": "79-26924713/14",
-        "email": "ahmedabad@pdamepconsultants.com",
+        "contacts": [
+            {
+                "name": "Ms. Gitanjali Dharkar",
+                "mobile": "79-26924713/14",
+                "email": "ahmedabad@pdamepconsultants.com"
+            }
+        ],
         "gst_no": "24AASPD3817C1Z1"
     },
     "Pankaj M Patel Consultants Private Limited": {
         "address": "303, Chakravarty Complex, Opp. Kiran Park Circle, Nawa Vadaj, Ahmedabad, Gujarat 380013",
-        "contact": "Mr. Pankaj Patel  ", 
-        "mobile": "+91 9825024024",
-        "email": "paai@pmpcplindia.com",
+        "contacts": [
+            {
+                "name": "Mr. Pankaj Patel",
+                "mobile": "+91 9825024024",
+                "email": "paai@pmpcplindia.com"
+            }
+        ],
         "gst_no": "24AAGCP8258E1ZB"
     },
     "Paradigm Engineering": {
         "address": "B808, Titanium Business Park, Opp Palladium, Prahladnagar,Ahmedabad",
-        "contact": "Mr. Parth Mandge ", 
-        "mobile": "+91 9725211464",
-        "email": "info@theparadigmengineering.com",
+        "contacts": [
+            {
+                "name": "Mr. Parth Mandge",
+                "mobile": "+91 9725211464",
+                "email": "info@theparadigmengineering.com"
+            }
+        ],
         "gst_no": "24ABAFP4967E1Z9"
     },
     "Parth Equipment Limited": {
         "address": "Plot no 4208/4209, GIDC, phase -4, Behind New Nirma,Vatva, Ahmedabad",
-        "contact": "Mr Arth Shah ", 
-        "mobile": "+91 94276 16352",
-        "email": "purchase@parthequipment.com",
+        "contacts": [
+            {
+                "name": "Mr Arth Shah",
+                "mobile": "+91 94276 16352",
+                "email": "purchase@parthequipment.com"
+            }
+        ],
         "gst_no": "24AAECP2939G1ZH"
     },
     "Shayona Consultant": {
         "address": "7th Floor, The Capital 2, 701/702, Science City Rd, Sola, Ahmedabad, Gujarat 380060",
-        "contact": "Mr Prashant Parmar ", 
-        "mobile": "+91 9825398519",
-        "email": "shayonaconsultant@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Prashant Parmar",
+                "mobile": "+91 9825398519",
+                "email": "shayonaconsultant@gmail.com"
+            }
+        ],
         "gst_no": "24ASJPP6439R1ZU"
     },
     "Shreeji Infotech": {
         "address": "FF6/A Sambhavi Complex, Opp. Kamal Appartment, Nr.Chanakyapuri Overbridge, Ghatalodia, Ahmedabad",
-        "contact": "Mr Lalit", 
-        "mobile": "+91 9879586899",
-        "email": "lalit@shreejiinfotech.in",
+        "contacts": [
+            {
+                "name": "Mr Lalit",
+                "mobile": "+91 9879586899",
+                "email": "lalit@shreejiinfotech.in"
+            }
+        ],
         "gst_no": "24AMLPP1118K1Z0"
     },
     "Stideck Technologies Private Limited": {
         "address": "514, Pramukh Square, Gandhinagar, Gujarat",
-        "contact": "Mr Ravi Patel ", 
-        "mobile": "+91 9925007200",
-        "email": "info@strideck.com",
+        "contacts": [
+            {
+                "name": "Mr Ravi Patel",
+                "mobile": "+91 9925007200",
+                "email": "info@strideck.com"
+            }
+        ],
         "gst_no": "24ABMCS6014J1Z7"
     },
     "MS PRABHAKAR B BHAGWAT": {
         "address": "One 42,South Tower, 501, 5th floor, B/h Ashok Vatika, Nr. Jayantilal Park BRTS,  Ambli - Bopal Road, Ahmedabad - 380054",
-        "contact": "Mr Chetan Gajjar", 
-        "mobile": "+91 9979961972",
-        "email": "pbb-ahm@landscapeindia.net",
+        "contacts": [
+            {
+                "name": "Mr Chetan Gajjar",
+                "mobile": "+91 9979961972",
+                "email": "pbb-ahm@landscapeindia.net"
+            }
+        ],
         "gst_no": "24AAJFM1692D1ZF"
     },
     "VIZ KINGDOME": {
         "address": "519, STC Spacelink, S. P. Ring Road, Ambli, Ahmedabad",
-        "contact": "Mr Kaushik Vadher", 
-        "mobile": "+91 9714554576",
-        "email": "info@vizkingdom.com",
+        "contacts": [
+            {
+                "name": "Mr Kaushik Vadher",
+                "mobile": "+91 9714554576",
+                "email": "info@vizkingdom.com"
+            }
+        ],
         "gst_no": "24AFGPV9879P1Z4"
     },
     "ARBIM Studdio Private Limited": {
         "address": "Office 1007, B square 2, Ambli Road, Vikram Nagar,Ahmedabad, Gujarat",
-        "contact": "Mr Rajan Sikka ", 
-        "mobile": "+91 97234 33296",
-        "email": "info@thearbstudio.com",
+        "contacts": [
+            {
+                "name": "Mr Rajan Sikka",
+                "mobile": "+91 97234 33296",
+                "email": "info@thearbstudio.com"
+            }
+        ],
         "gst_no": "24AAXCA3395G1Z9"
     },
     "Hire 4 Higher Consulting": {
         "address": "Olive Arcade, 302, 3rd floor, Opp. Samudra Annex, C G Road, Ahmedabad",
-        "contact": "Mr Shrijay Sheth ", 
-        "mobile": "+91 982 580 6008",
-        "email": "shrijay@hire4higherconsulting.com",
+        "contacts": [
+            {
+                "name": "Mr Shrijay Sheth",
+                "mobile": "+91 982 580 6008",
+                "email": "shrijay@hire4higherconsulting.com"
+            }
+        ],
         "gst_no": "24ASUPS2751A1ZO"
     },
     "Hrp Infra Private Limited": {
         "address": "337, Yash Arian, Near Swamivivekand Circle, Memnagar,Ahmedabad",
-        "contact": "Mr Hiren Patel ", 
-        "mobile": "+91 8128293072",
-        "email": "hrpinfra@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Hiren Patel",
+                "mobile": "+91 8128293072",
+                "email": "hrpinfra@gmail.com"
+            }
+        ],
         "gst_no": "24AACCH8234N1ZC"
     },
     "Hydrevo Design": {
         "address": "24-12, Tulsishyam Flats, Bhimjipura, New Wadaj, Ahmedabad ",
-        "contact": "Mr Hitesh Prajapati ", 
-        "mobile": "+91 91068 55837",
-        "email": "devansh3330@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Hitesh Prajapati",
+                "mobile": "+91 91068 55837",
+                "email": "devansh3330@gmail.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Inspire Engineering Solutions": {
         "address": "227, B-Wing, Thirthraj, Opp. VS Hospital, Ellizbridge,Ahmedabad",
-        "contact": "Mr Shivendra pal ", 
-        "mobile": "+91 8000049185",
-        "email": "info@inspireengs.com",
+        "contacts": [
+            {
+                "name": "Mr Shivendra pal",
+                "mobile": "+91 8000049185",
+                "email": "info@inspireengs.com"
+            }
+        ],
         "gst_no": "24BPZPP5092J1Z0"
     },
     "iSolve Systems": {
         "address": "FF14, Shubh Complex, Near Rajashtan Hospitals Shahibaug,Ahmedabad",
-        "contact": "Mr Biren", 
-        "mobile": "+91 8000499948",
-        "email": "biren.isolve@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Biren",
+                "mobile": "+91 8000499948",
+                "email": "biren.isolve@gmail.com"
+            }
+        ],
         "gst_no": "24BRNPM4686F1ZE"
     },
     "Khodiyar eSolutions LLP": {
         "address": "6th Floor, 611, The Link,Near Vijay Cross Road, Drive In Road,Navrangpura, Ahmedabad,",
-        "contact": "Mr Nimesh Patel", 
-        "mobile": "+91 7203008200",
-        "email": "info@khodiyaresolutions.com",
+        "contacts": [
+            {
+                "name": "Mr Nimesh Patel",
+                "mobile": "+91 7203008200",
+                "email": "info@khodiyaresolutions.com"
+            }
+        ],
         "gst_no": "24AAWFK0871B1ZD"
     },
     "M/S. Sigma Steel Product": {
         "address": "Survey No. 243, Kheda Dholka Highway, Chandana Gam,Kheda",
-        "contact": "Mr Rohit Jain", 
-        "mobile": "+91 9723117344",
-        "email": "sigmasteelproduct@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Rohit Jain",
+                "mobile": "+91 9723117344",
+                "email": "sigmasteelproduct@gmail.com"
+            }
+        ],
         "gst_no": "24AYYPJ5776A1Z2"
     },
     "MU Architects ": {
         "address": "3rd Floor, Union Hights, Opp. Rahul Raj Mall, Behind Lalbhai Contractor Staduim, Surat",
-        "contact": "Mr Ketan Solanki", 
-        "mobile": "+91 87582 73494",
-        "email": "info@designcore.co.in",
+        "contacts": [
+            {
+                "name": "Mr Ketan Solanki",
+                "mobile": "+91 87582 73494",
+                "email": "info@designcore.co.in"
+            }
+        ],
         "gst_no": "24AAPFM2663Q1ZL"
     },
     "N H Architects ": {
         "address": "911-912, I Square, Near Shukan Mall, Science City Road, Sola, Ahmedabad",
-        "contact": "Mr Hemal Desai", 
-        "mobile": "+91 9898196718",
-        "email": "nharchitects11@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Hemal Desai",
+                "mobile": "+91 9898196718",
+                "email": "nharchitects11@gmail.com"
+            }
+        ],
         "gst_no": "24AAMFN7983R1Z4"
     },
     "NFRAMEX Private Limited": {
         "address": "B-722, North Plaza, Visat-Gandhinagar Hi-way, Motera,Ahmedabad",
-        "contact": "Mr Paresh Patel ", 
-        "mobile": "+91 8511333587",
-        "email": "support@nframex.com",
+        "contacts": [
+            {
+                "name": "Mr Paresh Patel",
+                "mobile": "+91 8511333587",
+                "email": "support@nframex.com"
+            }
+        ],
         "gst_no": "24AAGCN8045F1ZI"
     },
     "Nymra Studios Private Limited": {
         "address": "1517-RK Prime Near Silver Heights, Circle, 150 Feet Ring Rd,Nana Mava, Rajkot, Gujarat",
-        "contact": "Mr Divyesh Ghadiya ", 
-        "mobile": "+91 77118 84488",
-        "email": "info@nymra.com",
+        "contacts": [
+            {
+                "name": "Mr Divyesh Ghadiya",
+                "mobile": "+91 77118 84488",
+                "email": "info@nymra.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Office Way Automation": {
         "address": "1, Ground Floor - Shila Appartment, Nr, Jhaju Hospital Nr. Ishwar Bhuvan Road, Navrangpura, Ahmedabad-380014",
-        "contact": "Mr Dipal Patwa ", 
-        "mobile": "+91 98254 14819",
-        "email": "info@patwaassociates.com",
+        "contacts": [
+            {
+                "name": "Mr Dipal Patwa",
+                "mobile": "+91 98254 14819",
+                "email": "info@patwaassociates.com"
+            }
+        ],
         "gst_no": "24ADZPP3655N1ZL"
     },
     "Patwa Associates": {
         "address": "501,5th Floor,Sarthak-Ii Complex,Swastik Cross Road,Opp Honda Activa Show Room, Navrangpura,Ahmedabad",
-        "contact": "Mr Rupin ", 
-        "mobile": "+91 9898083240",
-        "email": "rupin@officewayautomation.com",
+        "contacts": [
+            {
+                "name": "Mr Rupin",
+                "mobile": "+91 9898083240",
+                "email": "rupin@officewayautomation.com"
+            }
+        ],
         "gst_no": "24AVLPB0206D1ZG"
     },
     "Phoenix Interio": {
         "address": "304-Entice, Jayantilal Park Ambli - Bopal Road, Ahmedabad,",
-        "contact": "Mr Jigar  Mehta ", 
-        "mobile": "+91 9824254646",
-        "email": "jigar@phoenixinterio.net",
+        "contacts": [
+            {
+                "name": "Mr Jigar  Mehta",
+                "mobile": "+91 9824254646",
+                "email": "jigar@phoenixinterio.net"
+            }
+        ],
         "gst_no": "24ACEPM6631K2ZI"
     },
     "Plutomen Technologies Private Limited": {
         "address": "503, 5th Floor, Venus Atlantis, Anandnagar Road, Prahladnagar, Satellite, Ahmedabad",
-        "contact": "Mr Keyur Balawat ", 
-        "mobile": "+91 99797 65418",
-        "email": "keyur@pluto-men.com",
+        "contacts": [
+            {
+                "name": "Mr Keyur Balawat",
+                "mobile": "+91 99797 65418",
+                "email": "keyur@pluto-men.com"
+            }
+        ],
         "gst_no": "24AAICP8643B1ZI"
     },
     "Setu Infrastructure": {
         "address": "D 701-704 The First, Behind Keshav Baug Party Plot, Judges Bungtow Road, Vastrapur, Ahmedabad",
-        "contact": "Mr Niyat Patel ", 
-        "mobile": "079-40037661",
-        "email": "setuinf@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Niyat Patel",
+                "mobile": "079-40037661",
+                "email": "setuinf@gmail.com"
+            }
+        ],
         "gst_no": "24AARFS2603Q1ZP"
     },
     "Sulemans Design Studio": {
         "address": "Office No. 5, Ground Floor, Riddhi Siddhi Arcade-2, Sector-8,Gandhidham",
-        "contact": "Mr Shaad Khatri  ", 
-        "mobile": "+91 94293 41954",
-        "email": "khatrishaads@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Shaad Khatri",
+                "mobile": "+91 94293 41954",
+                "email": "khatrishaads@gmail.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "U Design Studio ": {
         "address": "405, Kairos, Opposite Mahatma Gandhi Labour Institute,Memnagar, Ahmedabad",
-        "contact": "Mr Pratik Soni ", 
-        "mobile": "+91 9909419309",
-        "email": "sonipratik1983@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Pratik Soni",
+                "mobile": "+91 9909419309",
+                "email": "sonipratik1983@gmail.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Yash Constuction": {
         "address": "415, Sun Avenue One Opposite Royal Enfield Showroom Shyamal-Manekbaug Road, Shyamal Cross Road",
-        "contact": "Mr.Umang Joshi ", 
-        "mobile": "+91 99798 42723",
-        "email": "yashconstruction415@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr.Umang Joshi",
+                "mobile": "+91 99798 42723",
+                "email": "yashconstruction415@gmail.com"
+            }
+        ],
         "gst_no": "24AOCPJ5088D1Z5"
     },
     "Abacus Technocrats Private Limited": {
         "address": "1001, Sears Tower, Panchwati, Near Gulbai Tekra, Ahmedabad",
-        "contact": "Mr. Jaykishan Makwana ", 
-        "mobile": "+91 9898159709",
-        "email": "abacus.epc@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Jaykishan Makwana",
+                "mobile": "+91 9898159709",
+                "email": "abacus.epc@gmail.com"
+            }
+        ],
         "gst_no": "24AAECA7755P1Z5"
     },
     "Accurate PMS Private Limited": {
         "address": "H-13-16, Sumel Business Park-6 Dudheshwar Road, Shahibaug, Ahmedabad 380004",
-        "contact": "Mr Pinnag Rathod ", 
-        "mobile": "+91 9924626516",
-        "email": "elv.projects@accuratepms.in",
+        "contacts": [
+            {
+                "name": "Mr Pinnag Rathod",
+                "mobile": "+91 9924626516",
+                "email": "elv.projects@accuratepms.in"
+            }
+        ],
         "gst_no": "24AAMCA2528C1Z3"
     },
     "Adaptive Technology (India) Private Limited": {
         "address": "301-305 Sahajanand Trade Center,Opp. Kothawala Flats, Ellisbridge, Ahmedabad - 380 006",
-        "contact": "Mr Mahamadali Patavat ", 
-        "mobile": "+91 9724014745",
-        "email": "mahamadali.patavat@infinitisolutions.com ",
+        "contacts": [
+            {
+                "name": "Mr Mahamadali Patavat",
+                "mobile": "+91 9724014745",
+                "email": "mahamadali.patavat@infinitisolutions.com"
+            }
+        ],
         "gst_no": "24AABCA8447P1Z9"
     },
     "Atomep Enteam Private Limited": {
         "address": "316, Sangath Central, b/h. 4D square Mall, Visat Koba Road, Motera, Ahmedabad.",
-        "contact": "Mr Apoorv Tripathi ", 
-        "mobile": "+91 9904827161",
-        "email": "mepf@atomep.com",
+        "contacts": [
+            {
+                "name": "Mr Apoorv Tripathi",
+                "mobile": "+91 9904827161",
+                "email": "mepf@atomep.com"
+            }
+        ],
         "gst_no": "24AAUCA8738J1Z0"
     },
     "AUM ASSOCIATES": {
         "address": "D-418, Ganesh Glory-11, Jagatput Road, Ahmedabad 382470",
-        "contact": "Mr. Jaydeep ", 
-        "mobile": "+91 8401163977",
-        "email": "jaydeep0308@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Jaydeep",
+                "mobile": "+91 8401163977",
+                "email": "jaydeep0308@gmail.com"
+            }
+        ],
         "gst_no": "24BPNPR1102P2AZM"
     },
     "Authentic Computers": {
         "address": "F1, Woodland Appartment, Opp. Syndicate Bank, Paldi, Ahmedabad",
-        "contact": "Mr. Hansal Jhaveri ", 
-        "mobile": "+91 9825700144",
-        "email": "hansaljhaveri@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Hansal Jhaveri",
+                "mobile": "+91 9825700144",
+                "email": "hansaljhaveri@gmail.com"
+            }
+        ],
         "gst_no": "24ACZPJ4746P1ZN"
     },
     "AV Designs": {
         "address": "1109, Swati Clover, Near Shilaj Circle, SP Ring Road, Ahmedabad.",
-        "contact": "Mr. Anand Patel", 
-        "mobile": "+91 8849430718",
-        "email": "vstudio.191@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Anand Patel",
+                "mobile": "+91 8849430718",
+                "email": "vstudio.191@gmail.com"
+            }
+        ],
         "gst_no": "24AOMPP2322N1ZP"
     },
     "Blueribbon 3d studio": {
         "address": "C-1018, Rajyash rise, nr vishala circle, Ahmedabad",
-        "contact": "Mr. Vijay Jadav", 
-        "mobile": "+91 9624465429",
-        "email": "blueribbon3d@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Vijay Jadav",
+                "mobile": "+91 9624465429",
+                "email": "blueribbon3d@gmail.com"
+            }
+        ],
         "gst_no": "24AOJPJ0934R1ZK"
     },
     "BrainZ Institute of Design": {
         "address": "A-203 Himalaya Arcade, Opp Vastrapur Lake, Vastrapur,Ahmedabad",
-        "contact": "Mr. Anil Dangi ", 
-        "mobile": "+91 9375858567",
-        "email": "brainzgroup@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Anil Dangi",
+                "mobile": "+91 9375858567",
+                "email": "brainzgroup@gmail.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Brijesh Patel Project Consultancy": {
         "address": "First Floor, Radha Chamber, Sardarnagar Circle, Rajkot",
-        "contact": "Mr. Brijesh Patel ", 
-        "mobile": "+91 9825078757",
-        "email": "abrijeshpatel@yahoo.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Brijesh Patel",
+                "mobile": "+91 9825078757",
+                "email": "abrijeshpatel@yahoo.co.in"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Craox Technologies LLP": {
         "address": "B1/ 202, Westgate Business Bay, S.G. Highway, Makarba",
-        "contact": "Mr. Nikhil Dhamsaniya ", 
-        "mobile": "+91 9724416997",
-        "email": "nikhil@craox.com",
+        "contacts": [
+            {
+                "name": "Mr. Nikhil Dhamsaniya",
+                "mobile": "+91 9724416997",
+                "email": "nikhil@craox.com"
+            }
+        ],
         "gst_no": "24AAOFC2246A1ZY"
     },
     "Creative IT Solutions": {
         "address": "Third Floor, B/10, Hemratna Co. Op. Hous. Soc. Abhinandan Appartment, Nr. Kothari Tower, Sabarmati, Ahmedabad, Gujarat, 380005",
-        "contact": "Mr. Milan Shah ", 
-        "mobile": "+91 9898069097",
-        "email": "creativeitmilan@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Milan Shah",
+                "mobile": "+91 9898069097",
+                "email": "creativeitmilan@gmail.com"
+            }
+        ],
         "gst_no": "24BOPPS6020G1ZU"
     },
     "Designcore Studio Private Limited": {
         "address": "310, Union Heights B/H L.C. Stadium, Dumas Road, Surat, Gujarat",
-        "contact": "Mr. Ketan Solanki", 
-        "mobile": "0261 2971661",
-        "email": "info@designcore.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Ketan Solanki",
+                "mobile": "0261 2971661",
+                "email": "info@designcore.co.in"
+            }
+        ],
         "gst_no": "24AAICD4127E1Z1"
     },
     "Dhanvanti Engineering Private Limited": {
         "address": "LS.No.: 218, Bhavda-Undrel Road, Near Bhavda Village, Bhavda, Ahmedabad",
-        "contact": "Mr. Jitendra Singh Gehlot", 
-        "mobile": "+91 9712990715",
-        "email": "accounts@dhanvantieng.com",
+        "contacts": [
+            {
+                "name": "Mr. Jitendra Singh Gehlot",
+                "mobile": "+91 9712990715",
+                "email": "accounts@dhanvantieng.com"
+            }
+        ],
         "gst_no": "24AAICD4893M1Z3"
     },
     "Kuke Associates": {
         "address": "303,304 Patron, opp. Kensville Golf Academy, Rajpath Rangoli Rd, near Deendayal Comunity Hall, Ahmedabad,",
-        "contact": "Mr. Tanmay Prajapati", 
-        "mobile": "+91 9904202050",
-        "email": "studio@kukeassociates.com",
+        "contacts": [
+            {
+                "name": "Mr. Tanmay Prajapati",
+                "mobile": "+91 9904202050",
+                "email": "studio@kukeassociates.com"
+            }
+        ],
         "gst_no": "24AGCPP6870H1Z8"
     },
     "Limited Edition": {
         "address": "321, Ashvmegh Elegance, Opp. Rudra Tower, Bhudarpura Road, Ambawadi, Ahmedabad",
-        "contact": "Mr. Vijay Jain", 
-        "mobile": "+91 9327574998",
-        "email": "connectlimitededition@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Vijay Jain",
+                "mobile": "+91 9327574998",
+                "email": "connectlimitededition@gmail.com"
+            }
+        ],
         "gst_no": "24AEOPJ3084R1ZT"
     },
     "MI Architect & Associates": {
         "address": "Titanium Square, C-204, Cross Road, Nr. SG Highway, Thaltej, Ahmedabad, Gujarat 380054",
-        "contact": "Mr. Mihir Patel ", 
-        "mobile": "+91 9904449410",
-        "email": "info.miarch@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Mihir Patel",
+                "mobile": "+91 9904449410",
+                "email": "info.miarch@gmail.com"
+            }
+        ],
         "gst_no": "24APLPP4317B1Z6"
     },
     "Micro Equipment Corporation": {
         "address": "504, Supath Opp. Rasranjan, Vijay Cross Road, Navrangpura, Ahmedabad",
-        "contact": "Mr. Hiren Sanghvi", 
-        "mobile": "+91 9825528096",
-        "email": "hiren@microecorp.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Hiren Sanghvi",
+                "mobile": "+91 9825528096",
+                "email": "hiren@microecorp.co.in"
+            }
+        ],
         "gst_no": "24CQIPS3753G1ZM"
     },
     "Pramukh Interior": {
         "address": "213, Shivam Complex, Science City Road, Ahmedabad",
-        "contact": "Mr. Prashant Parmar", 
-        "mobile": "+91 9825398519",
-        "email": "shayonaconsultant50@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr. Prashant Parmar",
+                "mobile": "+91 9825398519",
+                "email": "shayonaconsultant50@yahoo.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Reepra Infotech": {
         "address": "M-10, Jolly Shopping Point, B/S G-3 Mall, Ghod Dod Road, Surat",
-        "contact": "Mr. Pranav Desai", 
-        "mobile": "+91 98241 55886",
-        "email": "reeprainfotech@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Pranav Desai",
+                "mobile": "+91 98241 55886",
+                "email": "reeprainfotech@gmail.com"
+            }
+        ],
         "gst_no": "24AFUPD6830J1Z7"
     },
     "Sach Infraprojects Private Limited": {
         "address": "701 Zion Prime, Near Baghban Party Plot, Thaltej Shilaj Road, Ahmedabad, Gujarat",
-        "contact": "Mr. Sachin Gajjar", 
-        "mobile": "+91 9909976501",
-        "email": "mail@sachinfraprojects.com",
+        "contacts": [
+            {
+                "name": "Mr. Sachin Gajjar",
+                "mobile": "+91 9909976501",
+                "email": "mail@sachinfraprojects.com"
+            }
+        ],
         "gst_no": "24AAPCS2797A1Z7"
     },
     "SCOPE UNLIMITED": {
         "address": "903,904, Shiromani Complex, Satellite, Ahmedabad, Gujarat, 380015",
-        "contact": "Mr. Kanhai Shah", 
-        "mobile": "+91 8849041010",
-        "email": "kanhai@scopeinterior.com",
+        "contacts": [
+            {
+                "name": "Mr. Kanhai Shah",
+                "mobile": "+91 8849041010",
+                "email": "kanhai@scopeinterior.com"
+            }
+        ],
         "gst_no": "24ABWFS6202K1ZR"
     },
     "Spline Design ": {
         "address": "201,Sheel Complex,Nr-Mithakhali Six Road, Ahmedabad",
-        "contact": "Mr.  Devang Vaghela", 
-        "mobile": "+91 9825395890",
-        "email": "splinedesign@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr.  Devang Vaghela",
+                "mobile": "+91 9825395890",
+                "email": "splinedesign@yahoo.com"
+            }
+        ],
         "gst_no": "24AFAPV1243B1Z1"
     },
     "Sunshine Infotactics": {
         "address": "FC-2/M-9, Jolly Shopping Point B/SD, G3 Show Room, Ghod Dod Road, Surat",
-        "contact": "Mr. Pranav Desai", 
-        "mobile": "+91 9924188955",
-        "email": "ssinfotics@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Pranav Desai",
+                "mobile": "+91 9924188955",
+                "email": "ssinfotics@gmail.com"
+            }
+        ],
         "gst_no": "24AEGPD4791M1Z9"
     },
     "Velox Group": {
         "address": "156/157, Second Floor, Sona Complex, Kansa Cross Road, Vishnagar-384315",
-        "contact": "Mr.Lalit Patel", 
-        "mobile": "+91 99246 18871",
-        "email": " info@veloxgroup.co.in",
+        "contacts": [
+            {
+                "name": "Mr.Lalit Patel",
+                "mobile": "+91 99246 18871",
+                "email": "info@veloxgroup.co.in"
+            }
+        ],
         "gst_no": "24AAMFV0255A1ZK"
     },
     "Aavkash Designs": {
         "address": "509-510, Luxuria Trade Hub, Surat Dumas Road, Rundh,Surat",
-        "contact": "Mr.Smit Thakkar ", 
-        "mobile": "+91 9979200092",
-        "email": " smit_thakkar@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr.Smit Thakkar",
+                "mobile": "+91 9979200092",
+                "email": "smit_thakkar@yahoo.com"
+            }
+        ],
         "gst_no": "24ADYPT9899F1Z9"
     },
     "Anupam Architects": {
         "address": "108, Jal Darsan Tower, Near Multi Stories Building, Nanpura, Surat-395 001",
-        "contact": "Mr. Hansal Lakdawala", 
-        "mobile": "+91 9909005401, +91 261247294, +91 9925010203",
-        "email": " anupamarchitects@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr. Hansal Lakdawala",
+                "mobile": "+91 9909005401, +91 261247294, +91 9925010203",
+                "email": "anupamarchitects@yahoo.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Building Services Bureau": {
         "address": "2nd Floor, City Mall, Near Rajpath Club, S. G. Highway, Ahmedabad.",
-        "contact": "Mr. Amit Shah ", 
-        "mobile": "9428412444, 9825243906",
-        "email": "amit@bsbdesign.in",
+        "contacts": [
+            {
+                "name": "Mr. Amit Shah",
+                "mobile": "9428412444, 9825243906",
+                "email": "amit@bsbdesign.in"
+            }
+        ],
         "gst_no": "24ACUPS2207F2ZJ"
     },
     "COB 7 Studio": {
         "address": "501, Elite Business Icon, Opp. Shapath Hexa, Sola, S. G. Highway, Ahmedabad-380060",
-        "contact": "Mr. Pratik Gajjar ", 
-        "mobile": "079-48901529",
-        "email": "cob7studio@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Pratik Gajjar",
+                "mobile": "079-48901529",
+                "email": "cob7studio@gmail.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Dss Projects Management": {
         "address": "302, Shivalik Shilp, Iscon cross road, Opp. Shrifal Hotel, S G highway, Ahmedabad, Ahmedabad, Gujarat, 380015",
-        "contact": "Mr. Devang Shah ", 
-        "mobile": "+91 99241 19785",
-        "email": "team@dsspm.com",
+        "contacts": [
+            {
+                "name": "Mr. Devang Shah",
+                "mobile": "+91 99241 19785",
+                "email": "team@dsspm.com"
+            }
+        ],
         "gst_no": "24ANSPS3259C1ZR"
     },
     "Dip Structural Consultant": {
         "address": "205, Aditraj Arcade, Opp. Titanium City Center, Anandnagar Road, Ahmedabad - 3800l15",
-        "contact": "Mr. Dipesh Mistry", 
-        "mobile": "079-26740377",
-        "email": "dipstructuralconsultant@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Dipesh Mistry",
+                "mobile": "079-26740377",
+                "email": "dipstructuralconsultant@gmail.com"
+            }
+        ],
         "gst_no": "24AAKFD5706E1ZQ"
     },
     "I Design": {
         "address": "301, Arohi-2 Complex, Nr. Shalby Hospital, Nr. Memnagar fire Station, Navarangpura, Ahmedabad-380009",
-        "contact": "Mr. Keyur Bhatt ", 
-        "mobile": "+91 98242 58626",
-        "email": "arkeyur@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Keyur Bhatt",
+                "mobile": "+91 98242 58626",
+                "email": "arkeyur@gmail.com"
+            }
+        ],
         "gst_no": " 24AIMPB2880R1ZS"
     },
     "Khodiyar CAD Center (I) Private Limited": {
         "address": "3rd Floor, Acumen Complex Near  Passport Office, UniverSity Road, Ahmedabad - 380015",
-        "contact": "Mr. Nimesh Patel", 
-        "mobile": "9898981166, 9725471166",
-        "email": "info@khodiyarcadcenter.com",
+        "contacts": [
+            {
+                "name": "Mr. Nimesh Patel",
+                "mobile": "9898981166, 9725471166",
+                "email": "info@khodiyarcadcenter.com"
+            }
+        ],
         "gst_no": "24AADCK4967E1ZJ"
     },
     "Mecha Civil Designs": {
         "address": "sf 231, Orange Mall, Nr Sharda Petrol Pump, Chandkheda,Ahmedabad, Gujarat",
-        "contact": "Mr. Vishal", 
-        "mobile": "+91 9725935504",
-        "email": "vish20.surti@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Vishal",
+                "mobile": "+91 9725935504",
+                "email": "vish20.surti@gmail.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Red & White Multimedia Education": {
         "address": "1-2, Sardar Complex, B/h. Sarswati School, Gaushala, A. K. Road, Surat 395006",
-        "contact": "Mr. Hitesh Desai ", 
-        "mobile": "+91 93275 06324",
-        "email": "hitesdesai@hotmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Hitesh Desai",
+                "mobile": "+91 93275 06324",
+                "email": "hitesdesai@hotmail.com"
+            }
+        ],
         "gst_no": "24ASQPD8578E1ZE"
     },
     "GreenLawn 3D": {
         "address": "13, Avi Bunglows, Opp Star Bazaar, Satellite Road, Ahmedabad-380015",
-        "contact": " Mr. Pallav Patel", 
-        "mobile": "+91 997 452 8245",
-        "email": "info@greenlawn3d.com",
+        "contacts": [
+            {
+                "name": "Mr. Pallav Patel",
+                "mobile": "+91 997 452 8245",
+                "email": "info@greenlawn3d.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Adhwa Architecture. Interiors": {
         "address": "A-6, Asim Bunglows, At Bopal, Ta Daskroi, Village Bopal,Ahmedabad",
-        "contact": " Mrs. Ankita Adhwa", 
-        "mobile": "+91 9723522208",
-        "email": "dhwanil@adhwa.in",
+        "contacts": [
+            {
+                "name": "Mrs. Ankita Adhwa",
+                "mobile": "+91 9723522208",
+                "email": "dhwanil@adhwa.in"
+            }
+        ],
         "gst_no": "24ALFPJ7068R1ZF"
     },
     "Anand Patel Architects": {
         "address": "402, Shanti Mall, Sattadhar Cross Road, Ahnredabad",
-        "contact": " Mr. Anand patel ", 
-        "mobile": "79 27415829",
-        "email": "ar.anandpatel@gmail com",
+        "contacts": [
+            {
+                "name": "Mr. Anand patel",
+                "mobile": "79 27415829",
+                "email": "ar.anandpatel@gmail com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Bharat Beams Private Limited": {
         "address": "Plot No. 10/3, GIDC Industrial Estate, Vatva, Ahmedabad",
-        "contact": "Mr. Snehal ", 
-        "mobile": "+91 9979775957",
-        "email": "snehal@bharatbeams.com",
+        "contacts": [
+            {
+                "name": "Mr. Snehal",
+                "mobile": "+91 9979775957",
+                "email": "snehal@bharatbeams.com"
+            }
+        ],
         "gst_no": "24AAECB6127G1ZZ"
     },
     "Disegno Architects & Interior Designers": {
         "address": "Office No. 314, Khinvasara Trade Center, Near Dange Chowk, Wakad Road, Thefgaon, Pune",
-        "contact": "Mrs. Deepali Savant", 
-        "mobile": "+91 8806563311",
-        "email": "architects.disegno@gmail.com",
+        "contacts": [
+            {
+                "name": "Mrs. Deepali Savant",
+                "mobile": "+91 8806563311",
+                "email": "architects.disegno@gmail.com"
+            }
+        ],
         "gst_no": "27DDLPS6070P1ZK"
     },
     "Earth Architect": {
         "address": "101 Shreeji Chambers, Popat Mohalla, Nr Police Station, Nanpura, Surat - 395001",
-        "contact": "Mr. Abhishek Patel ", 
-        "mobile": "+91 98251 94194",
-        "email": "ar.abhishekpatel@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Abhishek Patel",
+                "mobile": "+91 98251 94194",
+                "email": "ar.abhishekpatel@gmail.com"
+            }
+        ],
         "gst_no": "24AHVPP6575D1ZT"
     },
     "Earthen Design": {
         "address": "704, Core House, Near Hirabaug Railway Crossing, Ambawadi-380006",
-        "contact": "Mr Kaivalya Shah", 
-        "mobile": "+91 9825732438",
-        "email": "earthen.design@hotmail.com",
+        "contacts": [
+            {
+                "name": "Mr Kaivalya Shah",
+                "mobile": "+91 9825732438",
+                "email": "earthen.design@hotmail.com"
+            }
+        ],
         "gst_no": "24BEGPS8888R1Z5"
     },
     "Eskay Engineers": {
         "address": "A-401, Millenium Plaza, Vastrapur, Ahmedabad,",
-        "contact": "Mr. Rakshit Patel ", 
-        "mobile": "+91 9601297007",
-        "email": "rakshitpatel@eskayengineers.in",
+        "contacts": [
+            {
+                "name": "Mr. Rakshit Patel",
+                "mobile": "+91 9601297007",
+                "email": "rakshitpatel@eskayengineers.in"
+            }
+        ],
         "gst_no": "24AABFE4274F1ZR"
     },
     "Ganesh Housing Corporation Ltd": {
         "address": "Ganesh Corporate House, 100 FT., Hebatpur - Thaltej Road,Off S.G. Highway, Thaltej, Ahmedabad ",
-        "contact": "Mr. Sanjay Patel", 
-        "mobile": "+91 8780717230",
-        "email": "sanjay.ghayal@ganeshhousing.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Sanjay Patel",
+                "mobile": "+91 8780717230",
+                "email": "sanjay.ghayal@ganeshhousing.co.in"
+            }
+        ],
         "gst_no": "24AAACG5590Q1Z4"
     },
     "Ghorecha Associate": {
         "address": "503, Swagat Complex, Beside Lal Bunglow, C. G. Road, Ahmedabad",
-        "contact": "Mr. Yagnesh Ghorecha", 
-        "mobile": "+91 9825955111",
-        "email": "ghorechassociate@yahoo.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Yagnesh Ghorecha",
+                "mobile": "+91 9825955111",
+                "email": "ghorechassociate@yahoo.co.in"
+            }
+        ],
         "gst_no": "24ABBPG3038L1ZX"
     },
     "Ishika Stone Arts ": {
         "address": "A212, Shastri Nagar, Jodhpur-342003, Rajasthan",
-        "contact": "Mr. Sanjay Mehta", 
-        "mobile": "+91 9414701382",
-        "email": "ishikastonearts@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Sanjay Mehta",
+                "mobile": "+91 9414701382",
+                "email": "ishikastonearts@gmail.com"
+            }
+        ],
         "gst_no": "08AJQPM7957B1ZQ"
     },
     "Jigar Panchal Architects": {
         "address": "1102,Colonnade, opp. Iscon Temple brt stand, Iscon cross roads, Ahnredabad",
-        "contact": "Mr. Jigar Panchal ", 
-        "mobile": "+91 9824364922",
-        "email": "architectjpl135@gmail com",
+        "contacts": [
+            {
+                "name": "Mr. Jigar Panchal",
+                "mobile": "+91 9824364922",
+                "email": "architectjpl135@gmail com"
+            }
+        ],
         "gst_no": "24AQMPP4349P1Z2"
     },
     "LA Dimentia Private Limited": {
         "address": "11, Krishna Bunglows, Opp. Takshsshila Apartment, Gagban Party Plot, Thaltej, Ahmedabad",
-        "contact": "Mr. Jignesh Suthar ", 
-        "mobile": "+91 9998969488",
-        "email": "info@ ladimentiaarchitects.com",
+        "contacts": [
+            {
+                "name": "Mr. Jignesh Suthar",
+                "mobile": "+91 9998969488",
+                "email": "info@ ladimentiaarchitects.com"
+            }
+        ],
         "gst_no": "24AACCL5092L1ZA"
     },
     "MMP Architects ": {
         "address": "4th Floor, Office No. 1, Agrawal Mall, S. G. Highway, Ahmedabad-",
-        "contact": "Mr. Malin Patel", 
-        "mobile": "+91 9327058799",
-        "email": "mmpstudio@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr. Malin Patel",
+                "mobile": "+91 9327058799",
+                "email": "mmpstudio@yahoo.com"
+            }
+        ],
         "gst_no": "24AASPP5811E1ZN"
     },
     "Morphallaxis (Architecture+Design)": {
         "address": "A18, Simandhar 2, Opp. Vishwakarma Temple, Gota Road, Chandlodia, Ahmedabad",
-        "contact": "Mr. Abhishek Panchal", 
-        "mobile": "+91 8460406040",
-        "email": "studio@morphallaxis.in",
+        "contacts": [
+            {
+                "name": "Mr. Abhishek Panchal",
+                "mobile": "+91 8460406040",
+                "email": "studio@morphallaxis.in"
+            }
+        ],
         "gst_no": "24AQGPP1499J1ZF"
     },
     "N Scale Associate": {
         "address": "302-303, Maruti Titanium, Near Galaxy Business House, Opp. Torrent Power Station, S. P. Ring Road, Nikol, Ahmedabad,",
-        "contact": "Mr. Vajubhai C Kantariya", 
-        "mobile": "+91 9825259970",
-        "email": "nscaleassociate@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Vajubhai C Kantariya",
+                "mobile": "+91 9825259970",
+                "email": "nscaleassociate@gmail.com"
+            }
+        ],
         "gst_no": "24AFVPK6050J1Z3"
     },
     "Param Interactive ": {
         "address": "Nisarg Bunglow, 45, Near Navrachna School, Sama, Vadodara",
-        "contact": "Mr. Suhit Gajjar ", 
-        "mobile": "+91 9898022048",
-        "email": "suhitgajjar@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Suhit Gajjar",
+                "mobile": "+91 9898022048",
+                "email": "suhitgajjar@gmail.com"
+            }
+        ],
         "gst_no": "24AAUFP8410D1Z7"
     },
     "Proportions": {
         "address": "402, Advait Complex, Near Sandesh Press, Vastrapur, Ahmedabad",
-        "contact": "Mr. Amrish Mandlik", 
-        "mobile": "+91 98792 34928",
-        "email": "aramrishm@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Amrish Mandlik",
+                "mobile": "+91 98792 34928",
+                "email": "aramrishm@gmail.com"
+            }
+        ],
         "gst_no": "24APVPM6175J1Z6"
     },
     "PZARCHSTUDIO": {
         "address": "GF 11, Green View Avenue, Science City, Ahmedabad-",
-        "contact": "Mr. Pinakin", 
-        "mobile": "+91 9265995355",
-        "email": "pzarchstudio@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Pinakin",
+                "mobile": "+91 9265995355",
+                "email": "pzarchstudio@gmail.com"
+            }
+        ],
         "gst_no": "24AZBPP7757R1ZH"
     },
     "Reema Engineers": {
         "address": "103, Sarjan Industrial Estate, S. P. Ring Road, Nikol-Kathwada Char Rasta, Odhav, Ahmedabad",
-        "contact": "Mr. Mahesh Patel", 
-        "mobile": "+91 9725 005 006",
-        "email": "remaengg@gmial.com",
+        "contacts": [
+            {
+                "name": "Mr. Mahesh Patel",
+                "mobile": "+91 9725 005 006",
+                "email": "remaengg@gmial.com"
+            }
+        ],
         "gst_no": "24ALYPK2474R1Z3"
     },
     "Rim Quality System ": {
         "address": "A/202, Krishna Complex, Opp. Devashish School, Bodakdev, Ahmedabad-380054",
-        "contact": "Mr. Nikit Shah", 
-        "mobile": "+91 9712906378",
-        "email": "rimqms@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr. Nikit Shah",
+                "mobile": "+91 9712906378",
+                "email": "rimqms@yahoo.com"
+            }
+        ],
         "gst_no": "24AMDPS8174J1ZL"
     },
     "Sakshham Consultants ": {
         "address": "B2, 3rd Floor, Medicare Center, B/h MJ Library, Ellisbridge, Ahmedabad",
-        "contact": "Mr. Valay Shah", 
-        "mobile": "+91 8238000704",
-        "email": "info@sakshham.com",
+        "contacts": [
+            {
+                "name": "Mr. Valay Shah",
+                "mobile": "+91 8238000704",
+                "email": "info@sakshham.com"
+            }
+        ],
         "gst_no": "24ACFFS8757D1ZX"
     },
     "Snehal K Ved": {
         "address": "B-405, Ganesh Plaza, Near Navarangpura Post, Office, Opp. Navarangpura Bus Stop, Navarangpura,Ahmedabad.-380 009",
-        "contact": "Mr. Snehal Ved ", 
-        "mobile": "+91 94260 77093",
-        "email": "snehengineers@yahoo.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Snehal Ved",
+                "mobile": "+91 94260 77093",
+                "email": "snehengineers@yahoo.co.in"
+            }
+        ],
         "gst_no": "24AAIPV7641Q1ZU"
     },
     "Sopan Infotech": {
         "address": "1/530, 1st Floor, Kubb's Corner, Opp. Kailash Sweet, Timliyawad, Nanpura, Surat",
-        "contact": "Mr. Mahek mistry ", 
-        "mobile": "+91 9725554395",
-        "email": "info@sied.in; mahek.mistry@sopaninfotech.com",
+        "contacts": [
+            {
+                "name": "Mr. Mahek mistry",
+                "mobile": "+91 9725554395",
+                "email": "info@sied.in; mahek.mistry@sopaninfotech.com"
+            }
+        ],
         "gst_no": "24BAIPM1037N1ZM"
     },
     "Squelette Design": {
         "address": "B/406, Times Square 2, Sindhu Bhavan Marg, beside Avalon Hotel, Thaltej, Ahmedabad,",
-        "contact": "Mr. Prashant Trivedi", 
-        "mobile": "+91 9537113319",
-        "email": "squelettedesign@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Prashant Trivedi",
+                "mobile": "+91 9537113319",
+                "email": "squelettedesign@gmail.com"
+            }
+        ],
         "gst_no": "24ADWFS9890B1ZE"
     },
     "Vee Design ": {
         "address": "13, Paridise Appartment, Opp. Ketav Petrol Pump, Dr. V. S. Road, Ambawadi",
-        "contact": "Mr. Naman Shah", 
-        "mobile": "+91 9825016458",
-        "email": "veedesign@veedesign.in",
+        "contacts": [
+            {
+                "name": "Mr. Naman Shah",
+                "mobile": "+91 9825016458",
+                "email": "veedesign@veedesign.in"
+            }
+        ],
         "gst_no": "24AABFV1734F1ZJ"
     },
     "Ayushmi Creation Private Limited ": {
         "address": "603/604, Vihav Trade Centre, Vasna Bhayli Road, Nr. Waves Club, Vadodara, Gujarat 391410",
-        "contact": "Mrs. Mousumi Raina", 
-        "mobile": "+91 9510630502",
-        "email": "mousumi@ayushmicreation.com",
+        "contacts": [
+            {
+                "name": "Mrs. Mousumi Raina",
+                "mobile": "+91 9510630502",
+                "email": "mousumi@ayushmicreation.com"
+            }
+        ],
         "gst_no": "24ABDCA0758J1ZR"
     },
     "Oneknotone Technologies LLP ": {
         "address": "5th Floor, Trisha Square 1, Above PN Gadgil Jewelers, Jetalpur Road, Vadodara-390007",
-        "contact": "Mr. Alap Acharya", 
-        "mobile": "+91 7984732336",
-        "email": "info@oneknotone.co",
+        "contacts": [
+            {
+                "name": "Mr. Alap Acharya",
+                "mobile": "+91 7984732336",
+                "email": "info@oneknotone.co"
+            }
+        ],
         "gst_no": "24AAGFO8583L2ZM"
     },
     "Praful Parmar": {
         "address": "Sneh Plaza Road, Chnadkheda, Ahmedabad",
-        "contact": "Mr. Praful Parmar", 
-        "mobile": "+91 8866522132",
-        "email": "parmarpraful40@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Praful Parmar",
+                "mobile": "+91 8866522132",
+                "email": "parmarpraful40@gmail.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "ARCELIA DEVELOPERS PRIVATE LIMITED": {
         "address": "4-5, B/H. Rajpath Club, Nr Mann Party, Plot, Sigma Corporate-1, Sindhu Bhavan Road, Bodakdev, Ahmedabad",
-        "contact": "Mr. Vipul Shah", 
-        "mobile": "+91 9099016512",
-        "email": "vshah@pacificacompanies.in",
+        "contacts": [
+            {
+                "name": "Mr. Vipul Shah",
+                "mobile": "+91 9099016512",
+                "email": "vshah@pacificacompanies.in"
+            }
+        ],
         "gst_no": "24AAUCA5161F1ZM"
     },
     "Dimore Surfaces Private Limited": {
         "address": "11, Titanium, First Floor, Near Prahladnagar Garden, Corporate Road, Satellite, Ahmedabad 380015",
-        "contact": "Mr. Nishad Soni", 
-        "mobile": "+91 7069001542",
-        "email": "it@dimore.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Nishad Soni",
+                "mobile": "+91 7069001542",
+                "email": "it@dimore.co.in"
+            }
+        ],
         "gst_no": "24AAKCD1711G1Z3"
     },
     "Urjavinya Solutions Private Limited": {
         "address": "A-367, Money Plant High Street, B/h Shell Petrol Pump, Jagatpur Road, S G Highway, Ahmedabad 382470",
-        "contact": "Mr. Vipul Patel", 
-        "mobile": "+91 98240 77930",
-        "email": "vipul.patel@urjavinya.com",
+        "contacts": [
+            {
+                "name": "Mr. Vipul Patel",
+                "mobile": "+91 98240 77930",
+                "email": "vipul.patel@urjavinya.com"
+            }
+        ],
         "gst_no": "24AACCN8260A1ZV"
     },
     "JV Consultant": {
         "address": "UG 13 18, V3 Cornery Honey park Road, Adajan, Surat.",
-        "contact": "Mr. Bipin Gajjar", 
-        "mobile": "+91 98676 86389",
-        "email": "jvmepf@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr. Bipin Gajjar",
+                "mobile": "+91 98676 86389",
+                "email": "jvmepf@yahoo.com"
+            }
+        ],
         "gst_no": "24AGUPG3400E1ZT"
     },
     "Awakeen Studio Private Limited": {
         "address": "A 547, MoneyPlant Jagatpur Rd, Jagatpur Village, near GANESH GLORY, Gota, Ahmedabad, Gujarat 382470",
-        "contact": "Mr. Jatin Vaghela", 
-        "mobile": "+91 74055 37233",
-        "email": "jatin@awakeenstudio.com",
+        "contacts": [
+            {
+                "name": "Mr. Jatin Vaghela",
+                "mobile": "+91 74055 37233",
+                "email": "jatin@awakeenstudio.com"
+            }
+        ],
         "gst_no": "24AASCA3812B1Z2"
     },
     "Madhya Pradesh Cupro Metals Private Limited": {
         "address": "D-11, Industrial Estate, Govindpura, Bhopal - 462023",
-        "contact": "Mr.Akshay Nema", 
-        "mobile": "+91 88899 43337",
-        "email": "mpcupro@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr.Akshay Nema",
+                "mobile": "+91 88899 43337",
+                "email": "mpcupro@gmail.com"
+            }
+        ],
         "gst_no": "23AAACM5106C1Z9"
     },
     "FALGUN CENTRIFUGE PRIVATE LIMITED": {
         "address": "14, Shayona Ind. Estate, Nr. Panchratna Estate, Ahmedabad-382445, Gujarat, India.",
-        "contact": "Mr. Falgun Devmurari", 
-        "mobile": "+91 75676 86574",
-        "email": "falguncentrifuge@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Falgun Devmurari",
+                "mobile": "+91 75676 86574",
+                "email": "falguncentrifuge@gmail.com"
+            }
+        ],
         "gst_no": "24AAECF9772H1ZC"
     },
     "INVOIT PLAST MACHINERY  PRIVATE LIMITED": {
         "address": "Shade No. 176, NK3 Industrial Estate, Bakrol-Bujarang, Ahmedabad",
-        "contact": "Mr. Arvind Patel", 
-        "mobile": "+91 6354602502",
-        "email": "arvind@invoitplast.net",
+        "contacts": [
+            {
+                "name": "Mr. Arvind Patel",
+                "mobile": "+91 6354602502",
+                "email": "arvind@invoitplast.net"
+            }
+        ],
         "gst_no": "24AAECI8405N1ZC"
     },
     "ARKILO": {
         "address": "W No. 8/2108, Anurag Plus, Digi Street, Near Sayaji Liabrary, Madhumati Colony, Navsari-396445, Gujarat ",
-        "contact": "Mr. Jay Kapadia ", 
-        "mobile": "+91 8758662915",
-        "email": "kapadia.architect@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Jay Kapadia",
+                "mobile": "+91 8758662915",
+                "email": "kapadia.architect@gmail.com"
+            }
+        ],
         "gst_no": "24EKUPK5622Q1ZB"
     },
     "M/S. SATYAM ENGINEERING SERVICES": {
         "address": "805/ 8th floor, Filix Tower, opp. Asian paints, LBS Road, Sonapur, Bhandup (W), Mumbai - 400078",
-        "contact": "Mr. Ganesh Pawar", 
-        "mobile": "+91 9769132888",
-        "email": "ganesh.pawar@satyames.com",
+        "contacts": [
+            {
+                "name": "Mr. Ganesh Pawar",
+                "mobile": "+91 9769132888",
+                "email": "ganesh.pawar@satyames.com"
+            }
+        ],
         "gst_no": "27BJBPP5949J2ZN"
     },
     "Upright Consultants": {
         "address": "E, Royal Homes, Opp. Satyam Vista, Gota Village, Ahmedabad, Ahmedabad, Gujarat, 382481",
-        "contact": "Mr. Rahul Raval", 
-        "mobile": "+91 96244 06822",
-        "email": "uprightconsultants24@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Rahul Raval",
+                "mobile": "+91 96244 06822",
+                "email": "uprightconsultants24@gmail.com"
+            }
+        ],
         "gst_no": "24ASWPR4065Q1ZN"
     },
     "Agniforma Techcraft Private Limited": {
         "address": "101,102, Parashawnath E Square, Corporate Road, Prahladnagar,Ahmedabad-380015",
-        "contact": "Mr. Nirmeet Kacheria", 
-        "mobile": "+91 98980 02236",
-        "email": "nirmeet.kacheria@agniforma.com",
+        "contacts": [
+            {
+                "name": "Mr. Nirmeet Kacheria",
+                "mobile": "+91 98980 02236",
+                "email": "nirmeet.kacheria@agniforma.com"
+            }
+        ],
         "gst_no": "24AAVCA9825B1ZI"
     },
     "Studio Black Brick": {
         "address": "C-212, Sumel 11, Opp. Namste Circle, Shahibaugh Ahmedabad - 380004",
-        "contact": "Mr. Chirag Shah", 
-        "mobile": "+91 7990105299",
-        "email": "studioblackbrick1@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Chirag Shah",
+                "mobile": "+91 7990105299",
+                "email": "studioblackbrick1@gmail.com"
+            }
+        ],
         "gst_no": "NOT APPLICABLE"
     },
     "Acme Computing Services ": {
         "address": "TDX No. 1&2, 12-vadi, Nr. Gau-Shala Gate, Opp. Old ST Bus Stand, Adipur (Dist. Kachchh) State: GUJARAT - 370205",
-        "contact": "Mr. Nitesh Punjani", 
-        "mobile": "+91 9426218218",
-        "email": "info@acmecomputing.net ",
+        "contacts": [
+            {
+                "name": "Mr. Nitesh Punjani",
+                "mobile": "+91 9426218218",
+                "email": "info@acmecomputing.net"
+            }
+        ],
         "gst_no": "24AHHPP4426B1ZP"
     },
     "Dimore Build Mart Private Limited": {
         "address": "Plot No. 023, Kerala GIDC, Sarkhej Bavla Highway, Opp. Arvee Denim Spinning UNIT 2, Swastik Industrial Estate, Ahmedabad - 382220",
-        "contact": "Mr. Nishad Soni", 
-        "mobile": "+91 7069001542",
-        "email": "it@dimore.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Nishad Soni",
+                "mobile": "+91 7069001542",
+                "email": "it@dimore.co.in"
+            }
+        ],
         "gst_no": "24AAHCD3085C1ZZ"
     },
     "KRISHANT ELECTRICAL PANELS": {
         "address": "50, Swetayan Industrial Park, Near V-Trans Transport Kathawada, GIDC, Ahmedabad 382430",
-        "contact": "Mr. Shailesh Gohil", 
-        "mobile": "+91 83203 84869",
-        "email": "1906krishantelectricals@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Shailesh Gohil",
+                "mobile": "+91 83203 84869",
+                "email": "1906krishantelectricals@gmail.com"
+            }
+        ],
         "gst_no": "24BFWPG4463B1ZH"
     },
     "Rudra Computer": {
         "address": "2, Trikammukhi Ni Chali, Khokhara Village, Anand Chowk, Ahmedabad 380008",
-        "contact": "Mr. Rakesh", 
-        "mobile": "+91 99781 18200",
-        "email": "rudra1331@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Rakesh",
+                "mobile": "+91 99781 18200",
+                "email": "rudra1331@gmail.com"
+            }
+        ],
         "gst_no": "24APUPP6495H1Z2"
     },
     "SFERABLU": {
         "address": "5/b, Jain Society, Ellisbridge, Ahmedabad",
-        "contact": "Mr. Naman Shah", 
-        "mobile": "+91 9825016458",
-        "email": "sferablu@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Naman Shah",
+                "mobile": "+91 9825016458",
+                "email": "sferablu@gmail.com"
+            }
+        ],
         "gst_no": "24AMWPS1765J1ZB"
     },
     "Techno Engineers": {
         "address": "57/1/P, GIDC Phase I, Narmada Nagar, Bharuch 392015",
-        "contact": "Mr. Narendra Singh Thakur", 
-        "mobile": "+91 81286 99680",
-        "email": "technical@technoeng.in",
+        "contacts": [
+            {
+                "name": "Mr. Narendra Singh Thakur",
+                "mobile": "+91 81286 99680",
+                "email": "technical@technoeng.in"
+            }
+        ],
         "gst_no": "24AADFT4432C1ZO"
     },
     "True Value Nirman Private Limited": {
         "address": "True Value House , Opp. Sundarvan Bus Stop , Near Isro , Satellite , Ahmedabad-380015",
-        "contact": "Mr. Pranav Shah", 
-        "mobile": "+91 9727735737",
-        "email": "pranav.truevalue@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Pranav Shah",
+                "mobile": "+91 9727735737",
+                "email": "pranav.truevalue@gmail.com"
+            }
+        ],
         "gst_no": "24AAECM4005A3Z9"
     },
     "ASI Technology Private Limited": {
         "address": "D-72, Suryam Industrial Park, Nikol,Ahmedabad-382350",
-        "contact": "Mr. Ravi Patel", 
-        "mobile": "+91 8460612341",
-        "email": "asi@asitechnology.in",
+        "contacts": [
+            {
+                "name": "Mr. Ravi Patel",
+                "mobile": "+91 8460612341",
+                "email": "asi@asitechnology.in"
+            }
+        ],
         "gst_no": "24AAXCA5281B1ZM"
     },
     "Divine Engitech": {
         "address": "A/160/4, New Ritanagar, Sureliya Estate Road, Rabaricoloni Cross Road, Amraiwadi, Ahmedabad - 380026 ",
-        "contact": "Mr. DilipVichhaniya", 
-        "mobile": "+91 90338 85409",
-        "email": "dilip@divineengitech.com",
+        "contacts": [
+            {
+                "name": "Mr. DilipVichhaniya",
+                "mobile": "+91 90338 85409",
+                "email": "dilip@divineengitech.com"
+            }
+        ],
         "gst_no": "24AAUFD6775H1ZV"
     },
     "Dynamic Control Systems": {
         "address": "AL-535/1, Road No. 45, Near Post Office, GIDC, Odhav, Ahmedabad-382415",
-        "contact": "Mr. Rajesh Patel", 
-        "mobile": "+91 90997 11999",
-        "email": "info@dynamicpanel.com",
+        "contacts": [
+            {
+                "name": "Mr. Rajesh Patel",
+                "mobile": "+91 90997 11999",
+                "email": "info@dynamicpanel.com"
+            }
+        ],
         "gst_no": "24ACZPP4197J1ZO"
     },
     "NEXT GEN POWER CONTROLS": {
         "address": "8, Rashmi Growth Hub Ind. Estate, Opp. Vijay Sales Showroom, Nr. Shivkunj Exortica, S.P. Ring Road, Odhav, Ahmedabad - 382415",
-        "contact": "Mr. Sanjay Patel", 
-        "mobile": "+91 917301 8114",
-        "email": "nextgen.panel@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Sanjay Patel",
+                "mobile": "+91 917301 8114",
+                "email": "nextgen.panel@gmail.com"
+            }
+        ],
         "gst_no": "24BXGPP8440K1Z3"
     },
     "Pramukh Industries": {
         "address": "304/6/2-B GIDC Industrial Estate Makarpura, Vadodara-390010",
-        "contact": "Mr. Harikrushna Patel", 
-        "mobile": "+91 99988 21194",
-        "email": "hpramukh@yahoo.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Harikrushna Patel",
+                "mobile": "+91 99988 21194",
+                "email": "hpramukh@yahoo.co.in"
+            }
+        ],
         "gst_no": "24ADAPP0517C1ZA"
     },
     "Prayan Electrical And Automation Private Limited": {
         "address": "Krishna Industrial Park, Plot No. 23, Mahakali Rd, Kubadthal, Gujarat 382433",
-        "contact": "Mr. Sandip Upadhyay", 
-        "mobile": "+91 8160946360",
-        "email": "info@prayanelectricals.com",
+        "contacts": [
+            {
+                "name": "Mr. Sandip Upadhyay",
+                "mobile": "+91 8160946360",
+                "email": "info@prayanelectricals.com"
+            }
+        ],
         "gst_no": "24AAKCP8607R1ZN"
-    },  
+    },
     "Shiv Electromac": {
         "address": "56/3, Meldi Estate, Near Gota, Railway Over Bridge, Gota, Ahmedabad, Gujarat 382481",
-        "contact": "Mr. Sunil Patel",
-        "mobile": "+91 9824947476",
-        "email": "shivelectromac99@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr. Sunil Patel",
+                "mobile": "+91 9824947476",
+                "email": "shivelectromac99@yahoo.com"
+            }
+        ],
         "gst_no": "24AOHPP6087M1ZA"
     },
     "SVM Associates Design Detailing and Drafting": {
         "address": "C-303, Ganesh Glory-11, Jagatpur Rd, Nr.BSNL Office, Ahmedabad-382470",
-        "contact": "Mr. Vidyut Maradiya",
-        "mobile": "+91 9824097800",
-        "email": "svmassociatesd3@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Vidyut Maradiya",
+                "mobile": "+91 9824097800",
+                "email": "svmassociatesd3@gmail.com"
+            }
+        ],
         "gst_no": "24CFKPM8840K1ZY"
     },
     "Kanhai Engineers": {
         "address": "Block B, 809+810, PNTC B/H Titanium City Center, Prahladnagar, Ahmedabad-380 015 ",
-        "contact": "Mr. Hardik Upadhyay",
-        "mobile": "+91 9909956455",
-        "email": "kanhaiengineers@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Hardik Upadhyay",
+                "mobile": "+91 9909956455",
+                "email": "kanhaiengineers@gmail.com"
+            }
+        ],
         "gst_no": "24ADHPU8282G1Z4"
     },
     "Parth Electricals": {
         "address": "A-69, Vishala (West) Industrial Estate, Odhav-Nikol Ring Road, Odhav, Ahmedabad 382415",
-        "contact": "Mr. Pratik Vitthalapara ",
-        "mobile": "+91 9913766539",
-        "email": "info.parthelectricals@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Pratik Vitthalapara",
+                "mobile": "+91 9913766539",
+                "email": "info.parthelectricals@gmail.com"
+            }
+        ],
         "gst_no": "24AAGFP1081J1ZB"
     },
     "SKY GREEN INTERIOR": {
         "address": "409, 4th Floor, Central by Sangath IPL, Next to PVR cinema, Near Lake & Garden, Motera, Ahmedabad-380005",
-        "contact": "Mr. Sanket Patel",
-        "mobile": "+91 9898779779",
-        "email": "info@skygreen.in",
+        "contacts": [
+            {
+                "name": "Mr. Sanket Patel",
+                "mobile": "+91 9898779779",
+                "email": "info@skygreen.in"
+            }
+        ],
         "gst_no": "24AUUPR5746A1ZC"
     },
     "JAPAN SHAH CONSULTING ENGINEERS": {
         "address": "620, Sun Avenue One, Manekbaug, Ahmedbad",
-        "contact": "Mr. Japan Shah",
-        "mobile": "+91 9426401793",
-        "email": "jsceoffice@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Japan Shah",
+                "mobile": "+91 9426401793",
+                "email": "jsceoffice@gmail.com"
+            }
+        ],
         "gst_no": "24BTJPS8403E1ZN"
-
     },
     "MARK DESIGN": {
         "address": "B-306, Premium House, Opp.Gandhigram Rly.Station, Naheru Bridge, Ashram Road Ahmedabad.",
-        "contact": "Mr. Dhrumil Modi",
-        "mobile": "+91 8866382003",
-        "email": "dhrumil3306@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Dhrumil Modi",
+                "mobile": "+91 8866382003",
+                "email": "dhrumil3306@gmail.com"
+            }
+        ],
         "gst_no": "Not Applicable"
     },
     "MOX FABRICATORS AND ENGINEERS": {
         "address": "Block-J-704, Shreedhar Sparsh, Nr.Shreeedhar Heaven, B/H Royal Resturant, Vastral, Sp Ring Road, Ahmedabad, Gujarat, 382418",
-        "contact": "Mr. Bhavesh Patel",
-        "mobile": "+91 9574090755",
-        "email": "moxcrane@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Bhavesh Patel",
+                "mobile": "+91 9574090755",
+                "email": "moxcrane@gmail.com"
+            }
+        ],
         "gst_no": "24BLSPP1032P1ZN"
     },
     "NIKKA INSTRUMENTATION PRIVATE LIMITED": {
         "address": "6284/5, G.I.D.C. Industrial Estate, Makarpura, Vadodara - 390 010",
-        "contact": "Mr. Rajiv",
-        "mobile": "+91 9879548800",
-        "email": "contact@nikkainc.com",
+        "contacts": [
+            {
+                "name": "Mr. Rajiv",
+                "mobile": "+91 9879548800",
+                "email": "contact@nikkainc.com"
+            }
+        ],
         "gst_no": "24AADCN0429L1ZK"
     },
     "Pratiti Enterprise LLP": {
         "address": "Office D 301\", Elanza, Crest, Nr. Sigma House, Sindhu Bhavan Road, Bodakdev, Thaltej Gam, Ahmedabad, Gujarat, lndia - 380059",
-        "contact": "Mr Pravin Dave",
-        "mobile": "+91 9825323604",
-        "email": "pravindave@torrentpower.com",
+        "contacts": [
+            {
+                "name": "Mr Pravin Dave",
+                "mobile": "+91 9825323604",
+                "email": "pravindave@torrentpower.com"
+            }
+        ],
         "gst_no": ""
     },
     "M SQUARE CONSULTING ENGINEERS": {
         "address": "206, Skywalk The Element, Jagatpur Road, SG Highway, Jagatpur, Ahmedabad, Gujarat- 382481",
-        "contact": "Mr Miraj Dalsania",
-        "mobile": "+91 8780261075",
-        "email": "msquare.consultingengineers@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr Miraj Dalsania",
+                "mobile": "+91 8780261075",
+                "email": "msquare.consultingengineers@gmail.com"
+            }
+        ],
         "gst_no": "24ABSFM1619A1ZJ"
     },
     "Joyous Inc.": {
         "address": "28, 73, Fortune North Industrial Park, B/H, Gamthi Restaurant, Nr. Nana Chiloda Circle, 200 S.P. Ring Road, Muthiya, Ahmedabad - 382330",
-        "contact": "Mr. Gaurav Bhavsar",
-        "mobile": "+91 9426526283",
-        "email": "gaurav@joyousinc.in",
+        "contacts": [
+            {
+                "name": "Mr. Gaurav Bhavsar",
+                "mobile": "+91 9426526283",
+                "email": "gaurav@joyousinc.in"
+            }
+        ],
         "gst_no": "24AKXPB1989N1ZD"
     },
     "Lineweights Architecture": {
         "address": "A-1045, Moneyplant highstreet by V2, Near BSNL, Jagatpur Chenpur road, S.G highway, Ahmedabad- 382470",
-        "contact": "Mr. Yash Patel",
-        "mobile": "+91 8401303401",
-        "email": "Office@lwa.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Yash Patel",
+                "mobile": "+91 8401303401",
+                "email": "Office@lwa.co.in"
+            }
+        ],
         "gst_no": "Not Applicable"
     },
     "Gamecrio Studios PRIVATE LIMITED": {
         "address": "622/621 Sakar 9, Opp. Old RBI, Ashram Road, Ahmedabad 380009",
-        "contact": "Mr. Dharmesh Prajapati",
-        "mobile": "+91 7043259999",
-        "email": "info@gamecrio.com",
+        "contacts": [
+            {
+                "name": "Mr. Dharmesh Prajapati",
+                "mobile": "+91 7043259999",
+                "email": "info@gamecrio.com"
+            }
+        ],
         "gst_no": "24AAJCG0843P1ZB"
     },
     "Balaji Digital Image": {
         "address": "2nd Floor, Om Center, Shreyas Crossing Overbridge, Ambawadi, Ahmedabad ‐ 380015",
-        "contact": "Mr. Hemin Contractor",
-        "mobile": "+91 9925019371",
-        "email": "hemiin@balajigroup.net.in",
+        "contacts": [
+            {
+                "name": "Mr. Hemin Contractor",
+                "mobile": "+91 9925019371",
+                "email": "hemiin@balajigroup.net.in"
+            }
+        ],
         "gst_no": "24AGFPC4622D1Z4"
     },
     "UNM FOUNDATION": {
         "address": "UNM Foundation, 104, South Tower, ONE42, Opp. Jayantilal Park BRTS Bus Stop, Ambli-Bopal Road, Ahmedabad - 380054",
-        "contact": "Mr. Maulik Shah",
-        "mobile": "+91 8200949377",
-        "email": "maulikshah@unmfoudation.com",
+        "contacts": [
+            {
+                "name": "Mr. Maulik Shah",
+                "mobile": "+91 8200949377",
+                "email": "maulikshah@unmfoudation.com"
+            }
+        ],
         "gst_no": "24AAFCT2636R2ZU"
     },
     "Essar Power Gujarat LIMITED": {
         "address": "Jamnagar - Okha Highway, Khambhalia P. O. Dist. Devbhumi Dwarka-361305 Gujarat",
-        "contact": "Mr. Avinash Dilip Chaudhari",
-        "mobile": "+91 9930136291",
-        "email": "avinash.chaudhari@essarpower.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Avinash Dilip Chaudhari",
+                "mobile": "+91 9930136291",
+                "email": "avinash.chaudhari@essarpower.co.in"
+            }
+        ],
         "gst_no": "24AABCE7510K1ZT"
     },
     "FLEXISTAR POLYMERS INDIA PRIVATE LIMITED": {
         "address": "Survey No. NA774/2 Village Radhu Near Pathapura Bus Stop, Kheda Dholha State Highway, KHEDA, Gujarat 387560",
-        "contact": "",
-        "mobile": "+91 9311672388",
-        "email": "dalip@flexistarpolymers.com",
+        "contacts": [
+            {
+                "name": "",
+                "mobile": "+91 9311672388",
+                "email": "dalip@flexistarpolymers.com"
+            }
+        ],
         "gst_no": "24AAFCF4001Q1ZO"
     },
     "M S BUILDCON": {
         "address": "Titoda Bus Stop, House No 939, Suthar Vas, Gandhinagar, Tintoda, Titoda, Gandhinagar, Gujarat, 382422",
-        "contact": "Mr. Sahil Nileshkumar Thakor",
-        "mobile": "+91 9714404323",
-        "email": "sahilthakor5555@gmail.com ",
+        "contacts": [
+            {
+                "name": "Mr. Sahil Nileshkumar Thakor",
+                "mobile": "+91 9714404323",
+                "email": "sahilthakor5555@gmail.com"
+            }
+        ],
         "gst_no": "24AYHPT5477D1Z5"
     },
     "MONIKA FABRICATORS AND ENGINEERS": {
         "address": "26, Parth Industrial Estate, Jamfalwadi Canal Road Amraiwadi Ahmedabad",
-        "contact": "Mr. Bhavik Panchal",
-        "mobile": "+91 9879301414",
-        "email": "info@monikafabengineers.com",
+        "contacts": [
+            {
+                "name": "Mr. Bhavik Panchal",
+                "mobile": "+91 9879301414",
+                "email": "info@monikafabengineers.com"
+            }
+        ],
         "gst_no": "24DAQPP9441B1ZI"
     },
     "Paradigm Outsourcing Private Limited": {
         "address": "Titanium Business Park, Opp Palladium, Corporate Road Prahladnagar, Ahmedabad",
-        "contact": "Mr. Parth Mandge",
-        "mobile": "+91 9725211464",
-        "email": "info@theparadigmengineering.com",
+        "contacts": [
+            {
+                "name": "Mr. Parth Mandge",
+                "mobile": "+91 9725211464",
+                "email": "info@theparadigmengineering.com"
+            }
+        ],
         "gst_no": "24AANCP7871Q1ZE"
     },
     "SERVO TECH CONTROL SYSTEM": {
         "address": "Sub Plot No-12, United Industrial Hub, Kathwada Bhuvaldi Road, Near Hingalaj Mata Temple, Kathwada, Ahmedabad, Gujarat-382430",
-        "contact": "Mr. Dhruv Patel",
-        "mobile": "+91 9825315375",
-        "email": "info@servotechpanels.com",
+        "contacts": [
+            {
+                "name": "Mr. Dhruv Patel",
+                "mobile": "+91 9825315375",
+                "email": "info@servotechpanels.com"
+            }
+        ],
         "gst_no": "24ABRFS1235P1ZN"
     },
     "The Stellar Media": {
         "address": "D-104, Ganesh Glory 11. Jagatpur Road, Ahmedabad -382481",
-        "contact": "Mr. Abhishek Bhavsar",
-        "mobile": "+91 9998069643",
-        "email": "abhishek@thestellarmedia.com",
+        "contacts": [
+            {
+                "name": "Mr. Abhishek Bhavsar",
+                "mobile": "+91 9998069643",
+                "email": "abhishek@thestellarmedia.com"
+            }
+        ],
         "gst_no": "24A0WPB9674B1ZP"
     },
-
     "UTCREST DESIGN": {
         "address": "509,Subh Univerasal,Opp. Vijaylaxmi Hall,Vesu Surat  Gujarat",
-        "contact": "Mr. Vikash Jangid",
-        "mobile": "+91 9825130893",
-        "email": "Interior@utcrest.com",
+        "contacts": [
+            {
+                "name": "Mr. Vikash Jangid",
+                "mobile": "+91 9825130893",
+                "email": "Interior@utcrest.com"
+            }
+        ],
         "gst_no": "Not Applicable"
-
     },
     "INSOLARE ENERGY LIMITED": {
         "address": "501 to 505, Altimus, Nr. Blue Dart., B/h. Torrent Pharma Office, Off. Ashram Road, Riverfront (West), Ahmedabad- 380009",
-        "contact": "Mr. Shani Thummar",
-        "mobile": "+91 9979423705",
-        "email": "shani.thummar@insolare.com",
+        "contacts": [
+            {
+                "name": "Mr. Shani Thummar",
+                "mobile": "+91 9979423705",
+                "email": "shani.thummar@insolare.com"
+            }
+        ],
         "gst_no": "24AABCI9750P1Z1"
     },
     "JDK Consultancy Services": {
         "address": "576/C M.G. Road, T.I. Mall In Front Of, Indore City-452002",
-        "contact": "Mr. Surbhi Agrawal",
-        "mobile": "+91 8889912630",
-        "email": "nilh_in@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr. Surbhi Agrawal",
+                "mobile": "+91 8889912630",
+                "email": "nilh_in@yahoo.com"
+            }
+        ],
         "gst_no": "23AQDPA964OB1ZH"
     },
     "Kushal Thakker Architects": {
         "address": "Office No. -6/7, Plot No. 262 12B, First Floor, Shanti Prakash Market, Near Bhaipratap Circle, Gandhidham - 370201",
-        "contact": "Mr. Kaushal Thakker",
-        "mobile": "+91 9722221084",
-        "email": "kushalthakker1994@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Kaushal Thakker",
+                "mobile": "+91 9722221084",
+                "email": "kushalthakker1994@gmail.com"
+            }
+        ],
         "gst_no": "Not Applicable"
     },
     "Shree Ram Architect": {
         "address": "Bus Stand, Mahadev Colony, Kankroli Rajashtan - 313324",
-        "contact": "Mr. Dharmendra Purabia",
-        "mobile": "+91 7742007008",
-        "email": "hello@shreeramarchitects.in",
+        "contacts": [
+            {
+                "name": "Mr. Dharmendra Purabia",
+                "mobile": "+91 7742007008",
+                "email": "hello@shreeramarchitects.in"
+            }
+        ],
         "gst_no": "Not Applicable"
     },
     "Yagnesh Thakkar": {
         "address": "601 6th Floor Kashayp Apartments Part Opp Mohan Shopping Center Near Best High School Bhairvnath Road Maninagar Ahmedabad 380028",
-        "contact": "Mr. Yagnesh Thakkar",
-        "mobile": "+91 9909022630",
-        "email": "ykt1109@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Yagnesh Thakkar",
+                "mobile": "+91 9909022630",
+                "email": "ykt1109@gmail.com"
+            }
+        ],
         "gst_no": "Not Applicable"
     },
     "Nikka Robotics Solution and Technology": {
         "address": "Plot No 140 Horizon Industrial Park AT Bamangam, Village Bamangam Tal. Karjan Vadodara - 391243",
-        "contact": "Mr Dhaval Thaker",
-        "mobile": "+91 9825323604",
-        "email": "dhaval@nikkainc.com",
+        "contacts": [
+            {
+                "name": "Mr Dhaval Thaker",
+                "mobile": "+91 9825323604",
+                "email": "dhaval@nikkainc.com"
+            }
+        ],
         "gst_no": "24AAQFN7478R1Z2"
     },
     "R27 PROJECTS": {
         "address": "C1104, Titanium city center, Satellite, Ahmedabad - 380015, Gujarat ",
-        "contact": "Mr. Rakesh Shah",
-        "mobile": "+91 9909802505",
-        "email": "info@r27interiors.in",
+        "contacts": [
+            {
+                "name": "Mr. Rakesh Shah",
+                "mobile": "+91 9909802505",
+                "email": "info@r27interiors.in"
+            }
+        ],
         "gst_no": "24DMKPS3781R1Z0"
     },
     "NISHARDH CRAFT PRIVATE LIMITED": {
         "address": "476/477, Halol-2 GIDC, Halol-2 Masvad GIDC, Village Masvad, Taluka - Halol, District - Pancjmahals",
-        "contact": "Mr. Chirag Patel",
-        "mobile": "+91 9601520540",
-        "email": "Info@ncengineering.in",
+        "contacts": [
+            {
+                "name": "Mr. Chirag Patel",
+                "mobile": "+91 9601520540",
+                "email": "Info@ncengineering.in"
+            }
+        ],
         "gst_no": "24AAJCN3242R1Z1"
     },
     "N C Engineering": {
         "address": "606, Viranamuvada, Naroda, Khanpur, Mahisagar",
-        "contact": "Mr. Chirag Patel",
-        "mobile": "+91 9601520540",
-        "email": "info@ncengineering.in",
+        "contacts": [
+            {
+                "name": "Mr. Chirag Patel",
+                "mobile": "+91 9601520540",
+                "email": "info@ncengineering.in"
+            }
+        ],
         "gst_no": "24DNXPP5707G1ZH"
     },
     "BIM ASSOCIATES": {
         "address": "B907, Prahladnagar Trade Centre, Radio Mirchi Road, Near Titanium City Centre, Vejalpur, Ahmedabad 380051",
-        "contact": "MS Jahnvi Chauhan ",
-        "mobile": "+91 8780708883",
-        "email": "contact@bimassociates.com; jahnvi.chauhan@bimassociates.com",
+        "contacts": [
+            {
+                "name": "MS Jahnvi Chauhan",
+                "mobile": "+91 8780708883",
+                "email": "contact@bimassociates.com; jahnvi.chauhan@bimassociates.com"
+            }
+        ],
         "gst_no": "24ASTPG4732E1ZS"
     },
     "MARUTI CONSULTANTS": {
         "address": "411, Center Point, Vandematram Road, Gota,Ahmedabad",
-        "contact": "Mr. Nitin Patel",
-        "mobile": "+91 9998865120",
-        "email": "nitin.patel0921@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Nitin Patel",
+                "mobile": "+91 9998865120",
+                "email": "nitin.patel0921@gmail.com"
+            }
+        ],
         "gst_no": "24ASTPP8520F2ZE"
     },
     "NORMA DEVELOPERS PRIVATE LIMITED": {
         "address": "4th Floor, 2286, IndiQube Opus, Sanjeevani Nagar, Kodigehalli Gate Junction, Bengaluru, Bengaluru Urban, Karnataka, 560092",
-        "contact": "Mr. Vipul Shah",
-        "mobile": "+91 9316072612",
-        "email": "vshah@pacificacompanies.in",
+        "contacts": [
+            {
+                "name": "Mr. Vipul Shah",
+                "mobile": "+91 9316072612",
+                "email": "vshah@pacificacompanies.in"
+            }
+        ],
         "gst_no": "29AADCP9153B1ZE"
     },
     "ALTEREGO TECHNOLOGY LIMITED": {
         "address": "THE FIRST, C-809, BEHIND KESHAVBAUG PARTY PLOT, VASTRAPUR, AHMEDABAD 380015",
-        "contact": "Mr. Avadhesh Pandya",
-        "mobile": "+91 9879339955",
-        "email": "avadhesh@alterego-technology.com",
+        "contacts": [
+            {
+                "name": "Mr. Avadhesh Pandya",
+                "mobile": "+91 9879339955",
+                "email": "avadhesh@alterego-technology.com"
+            }
+        ],
         "gst_no": "24AAHCA7107L1ZO"
     },
     "Dishant Kela & Associates": {
         "address": "F2, First Floor, Plot No. 220, Police Station Road, Ward 12B,  Gandhidham (Kutch) 370201",
-        "contact": "Mr. Dishant Kela",
-        "mobile": "+91 9825226192",
-        "email": "info@dkandassociates.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Dishant Kela",
+                "mobile": "+91 9825226192",
+                "email": "info@dkandassociates.co.in"
+            }
+        ],
         "gst_no": "24AANFN3146K1Z2"
     },
     "Nirman Associates": {
         "address": "FF 7, Krishna Plaza, T. R. Chokdi, Talod, 383215",
-        "contact": "Mr. Rajan Mistry",
-        "mobile": "+91 9825060576",
-        "email": "rajen@nirmanarchitect.com",
+        "contacts": [
+            {
+                "name": "Mr. Rajan Mistry",
+                "mobile": "+91 9825060576",
+                "email": "rajen@nirmanarchitect.com"
+            }
+        ],
         "gst_no": "24AANFN3146K1Z2"
     },
     "Khodiyar eSolutions LLP.": {
         "address": "6th Floor,611 The Link, Near Vijay Cross Road, Drive In Road, Navrangpura-Ahmedabad-380009",
-        "contact": "Mr. Nimesh Patel",
-        "mobile": "+91 9898008200",
-        "email": "nimesh@khodiyaresolutions.com",
+        "contacts": [
+            {
+                "name": "Mr. Nimesh Patel",
+                "mobile": "+91 9898008200",
+                "email": "nimesh@khodiyaresolutions.com"
+            }
+        ],
         "gst_no": "24AAWFK0871B1ZD"
     },
     "PACIFICA INDIA PROJECTS PRIVATE LIMITED-Hillcrest": {
         "address": "Sy No. 310 311 319 320, Serilingampally, Nanakramguda, Rangareddy, Hyderabad, Hyderabad,Telangana 500045",
-        "contact": "Mr. Vipul Shah",
-        "mobile": "+91 9316072612",
-        "email": "vshah@pacificacompanies.in",
+        "contacts": [
+            {
+                "name": "Mr. Vipul Shah",
+                "mobile": "+91 9316072612",
+                "email": "vshah@pacificacompanies.in"
+            }
+        ],
         "gst_no": "36AADCP7522N1Z1"
     },
     "Ashtavinayaka Technocrafts Private Limited": {
         "address": "Survey No-682/1, Ta-Daskroi At Post-Undrel, Ahmedabad-382433",
-        "contact": "Mr. Ghanshyam Jangle",
-        "mobile": "+91 9428520645",
-        "email": "ghanshyam@ashtavinayaka.com",
+        "contacts": [
+            {
+                "name": "Mr. Ghanshyam Jangle",
+                "mobile": "+91 9428520645",
+                "email": "ghanshyam@ashtavinayaka.com"
+            }
+        ],
         "gst_no": "24AAHCA8805F1ZU"
     },
     "Strideck Technologies Private Limited": {
         "address": "5F, 516, Pramukh Square, Above Dmart, Opp. Ashka Hospital, Sargasan, Gandhinagar",
-        "contact": "Mr. Ravi Patel",
-        "mobile": "+91 9925007200",
-        "email": "ravi@strideck.com",
+        "contacts": [
+            {
+                "name": "Mr. Ravi Patel",
+                "mobile": "+91 9925007200",
+                "email": "ravi@strideck.com"
+            }
+        ],
         "gst_no": "24ABMCS6014J1Z7"
     },
     "SHARDA ENGINEERS AND CONTRACTORS": {
         "address": "813, GANESH GLORY, ABOVE SBI BANK , JAGATPUR ROAD, GOTA AHMEDABAD 382481",
-        "contact": "Mr. Girish Patel",
-        "mobile": "+91 9723166556",
-        "email": "shardaengineersandcontractors5@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Girish Patel",
+                "mobile": "+91 9723166556",
+                "email": "shardaengineersandcontractors5@gmail.com"
+            }
+        ],
         "gst_no": "24AEQFS1858A1Z0"
     },
     "ARBIM STUDIO PRIVATE LIMITED": {
         "address": "Office 1007, B square 2, Ambli Road, Vikram Nagar, Ahmedabad Gujarat: 380054",
-        "contact": "Mr. Rajan Shikka",
-        "mobile": "+91 9723433296",
-        "email": "info@arbstudio.com",
+        "contacts": [
+            {
+                "name": "Mr. Rajan Shikka",
+                "mobile": "+91 9723433296",
+                "email": "info@arbstudio.com"
+            }
+        ],
         "gst_no": "24AAXCA3395G1Z9"
     },
     "McWay Managements Limited": {
         "address": "1005‐1006, 10th Floor, Capitol Icon, Opp. Ashka Hospital, Sargasan, Gandhinagar ‐ 282 421",
-        "contact": "MS Bhumi Suthar",
-        "mobile": "+91 9327049813",
-        "email": "hr@mcway.in",
+        "contacts": [
+            {
+                "name": "MS Bhumi Suthar",
+                "mobile": "+91 9327049813",
+                "email": "hr@mcway.in"
+            }
+        ],
         "gst_no": "24AAMCM6609E1ZH"
     },
     "MechMind Technologies Private Limited": {
         "address": "D-104, Survey no. 502/A/1, SP-3, Sakshat apartment, Nr. Nandishwar Mahadev temple, Bakeri city, Vejalpur, Ahmedabad 380 051",
-        "contact": "Mr. Hemant Bakarania",
-        "mobile": "+91 9714953100",
-        "email": "info@mechmindtechnologies.com",
+        "contacts": [
+            {
+                "name": "Mr. Hemant Bakarania",
+                "mobile": "+91 9714953100",
+                "email": "info@mechmindtechnologies.com"
+            }
+        ],
         "gst_no": "24AAFCT2636R2ZU"
     },
     "KU KE ASSOCIATES": {
         "address": "303 Patron, 3rd Floor, Opp. Epic Hospital, Rajpath Rangoli Road, Bodakdev, Ahmedabad 380054",
-        "contact": "Mr. Tanmay Prajapati",
-        "mobile": "+91 9924400107",
-        "email": "studio@kukeassociates.com",
+        "contacts": [
+            {
+                "name": "Mr. Tanmay Prajapati",
+                "mobile": "+91 9924400107",
+                "email": "studio@kukeassociates.com"
+            }
+        ],
         "gst_no": "24AGCPP6870H1Z8"
     },
     "DRKDS INFOTECH": {
         "address": "120 Naxatra-8, Sadhu Vaswani Road, Rajkot  360 005",
-        "contact": "Jyotin Boghani",
-        "mobile": "+91 9227602362",
-        "email": " jyotinb@yahoo.com",
+        "contacts": [
+            {
+                "name": "Jyotin Boghani",
+                "mobile": "+91 9227602362",
+                "email": "jyotinb@yahoo.com"
+            }
+        ],
         "gst_no": "24ABPPB8058F2ZM"
     },
     "Abhi Metals": {
         "address": "Plot No. : 3957, 3958, 3975, 3975, Road \"U\", Balaji Chowk, GIDC, Phase-3, Dared, Jamnagar - 361 004",
-        "contact": "Mr. Nirav Mehta",
-        "mobile": "+91 2882731260",
-        "email": "purchase@abhimetals.com",
+        "contacts": [
+            {
+                "name": "Mr. Nirav Mehta",
+                "mobile": "+91 2882731260",
+                "email": "purchase@abhimetals.com"
+            }
+        ],
         "gst_no": "24ABCF9351R1ZZ"
     },
     "Cheminsight Solutions India Private Limited": {
         "address": "E-1002,Prahladnagar Tred Center(PNTC), SAC, Ahmedabad - 3800 015",
-        "contact": "Mr. Pankaj Tiwari",
-        "mobile": "+91 7949237162",
-        "email": "info@cheminsight.in",
+        "contacts": [
+            {
+                "name": "Mr. Pankaj Tiwari",
+                "mobile": "+91 7949237162",
+                "email": "info@cheminsight.in"
+            }
+        ],
         "gst_no": "24AALCC7737J1ZA"
     },
     "HEAT COOL ENGINEERING": {
         "address": "Plot No. 30, Madhuvan Industrial Park, Kubadthal Village Daskroi Taluka Ahmedabad - 382445 ",
-        "contact": "Mr. Rajnikant Prajapati",
-        "mobile": "+91 9978991153",
-        "email": "heatcoolengineering23@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Rajnikant Prajapati",
+                "mobile": "+91 9978991153",
+                "email": "heatcoolengineering23@gmail.com"
+            }
+        ],
         "gst_no": "24ANIPP1663P1ZH"
     },
     "INDU IONPURE (IND) PVT LTD": {
         "address": "Gala No C-8, Qureshi Estate, Zilu parab Rd, Near Chinchoti Naka,Village Chinchoti, Naigon (E) Palghar 401208",
-        "contact": "Mr. Satish Pal",
-        "mobile": "+91 9930037882",
-        "email": "satish@induionpure.com",
+        "contacts": [
+            {
+                "name": "Mr. Satish Pal",
+                "mobile": "+91 9930037882",
+                "email": "satish@induionpure.com"
+            }
+        ],
         "gst_no": "27AACCI5687C1ZH"
     },
     "Jay Engineering": {
         "address": "Plot No. 141, Horizon Industrial Park, Vill. : Bamangam, Ta.: Karjan, Dist. : Vadodara-391243",
-        "contact": "Mr. Surendra Panchal",
-        "mobile": "+91 9586759737",
-        "email": "jayengineering903@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Surendra Panchal",
+                "mobile": "+91 9586759737",
+                "email": "jayengineering903@gmail.com"
+            }
+        ],
         "gst_no": "24AOFPP8220G1Z2"
     },
     "Neelkanth Engineering Industries ": {
         "address": "B-1, 90/6, A, Phase-1, Nr. Pushpak Industrial Estate Cross Road, Phase-1, GIDC, Vatva, Ahmedabad 382445",
-        "contact": "Mr. Pranav Kothari",
-        "mobile": "+91 9978991153",
-        "email": "pranav@neelkanthcranes.com",
+        "contacts": [
+            {
+                "name": "Mr. Pranav Kothari",
+                "mobile": "+91 9978991153",
+                "email": "pranav@neelkanthcranes.com"
+            }
+        ],
         "gst_no": "24AACFN7220R1Z0"
     },
     "Surendra Industries": {
         "address": "303/19/A, G.I.D.C. Ind. Estate Makarpura, Vadodara-390010",
-        "contact": "Mr. Surendra Panchal",
-        "mobile": "+91 9825027707",
-        "email": "surendra.industries891@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Surendra Panchal",
+                "mobile": "+91 9825027707",
+                "email": "surendra.industries891@gmail.com"
+            }
+        ],
         "gst_no": "24ALEPP2513J1ZA"
     },
     "AEC CHENNAI PRIVATE LIMITED": {
         "address": "No.16, 3rd Floor, 16th Street, 3rd Main Road, Nanganallur, Chennai Tamil Nadu India 600061",
-        "contact": "Mr. Muniyan",
-        "mobile": "+91 9840863682",
-        "email": "aecpurchase@aecchennai.com",
+        "contacts": [
+            {
+                "name": "Mr. Muniyan",
+                "mobile": "+91 9840863682",
+                "email": "aecpurchase@aecchennai.com"
+            }
+        ],
         "gst_no": "33AAXCA3635K1ZA"
     },
     "HARDIK COMPUTERS": {
         "address": "FF 7 VANDEMATRAM ICON, NEW S G ROAD, GOTA, AHMEDABAD-382481",
-        "contact": "Mr. Hardik",
-        "mobile": "+91 9925199238",
-        "email": "hardikcomputers99@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Hardik",
+                "mobile": "+91 9925199238",
+                "email": "hardikcomputers99@gmail.com"
+            }
+        ],
         "gst_no": "24BWDPS4314R1Z2"
     },
     "Maan Aluminium Limited": {
         "address": "A:  Plot No. 67,68 A & 75 ,Sector-1 Pithampur ,Dist.-Dhar.M.P. Pin Code-454775",
-        "contact": "Mr. Vishesh Kaithwas",
-        "mobile": "+91 9584538818",
-        "email": "info@maanaluminium.in",
+        "contacts": [
+            {
+                "name": "Mr. Vishesh Kaithwas",
+                "mobile": "+91 9584538818",
+                "email": "info@maanaluminium.in"
+            }
+        ],
         "gst_no": "23AAFCM0088C1ZX"
     },
     "Matharoo Assocites": {
         "address": "19, Pleasure Ville2, Near Kalhaar, Shilaj, Ahmedabad 380059",
-        "contact": "Mr. Mohit Maru",
-        "mobile": "+91 9879543505",
-        "email": "studio@matharooassociates.com",
+        "contacts": [
+            {
+                "name": "Mr. Mohit Maru",
+                "mobile": "+91 9879543505",
+                "email": "studio@matharooassociates.com"
+            }
+        ],
         "gst_no": "24AFZPM7275H1ZP"
     },
     "Sagar Info Solutions": {
         "address": "A74 Shivam Tower, Someshwara Row Houses-1, Opp. City Gold Theatre, Satellite, Ahmedabad 380015",
-        "contact": "Mr. Anurag",
-        "mobile": "+91 9327001176",
-        "email": "sisanurag@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Anurag",
+                "mobile": "+91 9327001176",
+                "email": "sisanurag@gmail.com"
+            }
+        ],
         "gst_no": "24AQCPS8775Q1ZT"
     },
     "SUCHI SEMICON PRIVATE LIMITED": {
         "address": "Plot No-26/A-B 3/2885/C, Suchi House, Nr Kinnary Cinema, Salabatpura, Surat, Gujarat - 395002",
-        "contact": "Mr. Saravanan Pillai",
-        "mobile": "+91 9727827826",
-        "email": "procurement@suchisemicon.com",
+        "contacts": [
+            {
+                "name": "Mr. Saravanan Pillai",
+                "mobile": "+91 9727827826",
+                "email": "procurement@suchisemicon.com"
+            }
+        ],
         "gst_no": "24ABLCS1800M1ZA"
     },
     "CREATIVE PROFILE CUTTING": {
         "address": "PLOT NO : 116, DEDIYASAN GIDC-II, MAHESANA",
-        "contact": "Mr. Shiv Prajapati",
-        "mobile": "+91 9662180276",
-        "email": "creativeprofilecutting276@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Shiv Prajapati",
+                "mobile": "+91 9662180276",
+                "email": "creativeprofilecutting276@gmail.com"
+            }
+        ],
         "gst_no": "24AARFC4631Q1ZX"
     },
     "GANGA INFRASTRUCTURE": {
         "address": "Shop No. 20, Shubh Non Trading Association, TP Scheme 1, High Way Road, Kalol, Gandhinagar, 382721",
-        "contact": "Mr. Krunal Gajjar",
-        "mobile": "+91 9726169525",
-        "email": "gajjarkrunal27@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Krunal Gajjar",
+                "mobile": "+91 9726169525",
+                "email": "gajjarkrunal27@gmail.com"
+            }
+        ],
         "gst_no": "24AHFPG6787L1ZV"
     },
     "Smit Thakkar": {
         "address": "509, Luxuria Trde Hub, Dumas Road, Surat",
-        "contact": "Mr. Smit Thakkar",
-        "mobile": "+91 9979200092",
-        "email": "smit_thakkar@yahoo.com",
+        "contacts": [
+            {
+                "name": "Mr. Smit Thakkar",
+                "mobile": "+91 9979200092",
+                "email": "smit_thakkar@yahoo.com"
+            }
+        ],
         "gst_no": "24ADYPT9899F1Z9"
     },
     "SPACE 9 DESIGN STUDIO": {
         "address": "213, SHIVALIK SATYAMEV, OPP. HETARTH PARTY PLOT, SCIENCE CITY ROAD, AHMEDABAD. 380060",
-        "contact": "Mr. Rahul Vyas",
-        "mobile": "+91 9033260991",
-        "email": "space9designstudio@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Rahul Vyas",
+                "mobile": "+91 9033260991",
+                "email": "space9designstudio@gmail.com"
+            }
+        ],
         "gst_no": "Not Applicable"
     },
     "Decision Plus Systems inc": {
         "address": "Flat No.: 6-7,Ekta Tower, Vasna Barrage Road, Ahmedabad - 380007",
-        "contact": "Mr. Bharat Dodia",
-        "mobile": "+91 9925047432",
-        "email": "sales@decisionplus.in",
+        "contacts": [
+            {
+                "name": "Mr. Bharat Dodia",
+                "mobile": "+91 9925047432",
+                "email": "sales@decisionplus.in"
+            }
+        ],
         "gst_no": "24ABKPD4330M2ZR"
     },
     "Flamingo Architects": {
         "address": "First Floor, Maa Ashapura Complex, Soniwad, Bhuj",
-        "contact": "Mr. Faisal Khatri",
-        "mobile": "+91 8156058977",
-        "email": "flamingoarchitects@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Faisal Khatri",
+                "mobile": "+91 8156058977",
+                "email": "flamingoarchitects@gmail.com"
+            }
+        ],
         "gst_no": "24AAFFF1989G1ZC"
     },
     "Karan Desai Architects": {
         "address": "E-1013, Ganesh Glory-11, Sarkhej - Gandhinagar Hwy, Jagatpur, Ahmedabad 382481",
-        "contact": "Mr. Karan Desai",
-        "mobile": "+91 9081811170",
-        "email": "arkd1170@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Karan Desai",
+                "mobile": "+91 9081811170",
+                "email": "arkd1170@gmail.com"
+            }
+        ],
         "gst_no": "Not Applicable"
     },
     "M & Sons Engitech": {
         "address": "66, Sumin Nagar, Opp. Bhavna School, Vastral, 382418.",
-        "contact": "Mr. Vipul Prajapati",
-        "mobile": "+91 7041388058",
-        "email": "mandsonsengitech@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Vipul Prajapati",
+                "mobile": "+91 7041388058",
+                "email": "mandsonsengitech@gmail.com"
+            }
+        ],
         "gst_no": "24ESVPP7654C1Z6"
     },
     "Morais Developers  Private Limited": {
         "address": "24AMahalakshmi Nagar, K K Nagar, Trichy, Tamil Nadu, Tiruchirappalli - 620021",
-        "contact": "Mr. Viramani Raja",
-        "mobile": "+91 8925973356",
-        "email": "itadmin@moraiscity.com",
+        "contacts": [
+            {
+                "name": "Mr. Viramani Raja",
+                "mobile": "+91 8925973356",
+                "email": "itadmin@moraiscity.com"
+            }
+        ],
         "gst_no": "33AAOCS0810R1Z0"
     },
     "NUANCE DESIGN STUDIO": {
         "address": "A-403, SNS Atria, Opp. Jolly Party Plot, Next to Happy Excelencia, Vesu, Surat.",
-        "contact": "Mr. Mrunal Gandhi",
-        "mobile": "+91 9998910189",
-        "email": "mrrunalgandhi@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Mrunal Gandhi",
+                "mobile": "+91 9998910189",
+                "email": "mrrunalgandhi@gmail.com"
+            }
+        ],
         "gst_no": "Not Applicable"
     },
     "P CUBE CONSULTANTS LLP": {
         "address": "A 1111, K.P. EPITOME Near Vodafone corporate house, Makarba, S G Highway, Ahmedabad.",
-        "contact": "Mr. Prakash Siyani",
-        "mobile": "+91 7874836614",
-        "email": "account@pcubeconsultants.com ",
+        "contacts": [
+            {
+                "name": "Mr. Prakash Siyani",
+                "mobile": "+91 7874836614",
+                "email": "account@pcubeconsultants.com"
+            }
+        ],
         "gst_no": "24AANFP7871P1ZA"
     },
     "SAHJANAND INFRATECH PRIVATE LIMITED": {
         "address": "Survey No. 47/1, Village Lasundra, Savli, Vadodara - 391775",
-        "contact": "Mr. Dhagash Modi",
-        "mobile": "+91 9974544945",
-        "email": "info@sahjanandcranes.com",
+        "contacts": [
+            {
+                "name": "Mr. Dhagash Modi",
+                "mobile": "+91 9974544945",
+                "email": "info@sahjanandcranes.com"
+            }
+        ],
         "gst_no": "24ABGCS6996M1ZG"
     },
     "Sarthi Computer Consultancy": {
         "address": "S-19, Sarthi Complex, Jashoda Cross Road, Ahmedabad 382445",
-        "contact": "Mr. Satish Patel",
-        "mobile": "+91 9426072809",
-        "email": "sarthicomputerconsultancy@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Satish Patel",
+                "mobile": "+91 9426072809",
+                "email": "sarthicomputerconsultancy@gmail.com"
+            }
+        ],
         "gst_no": "24ACYPP9121B1ZG"
     },
     "Shree Vinayak Pack Machine": {
         "address": "Plot No. 114, 115, 116, 117, Nakshatra Industrial Hub, Near Ashopalav Hotel, Amba Hotel, Indore Highway, Ta.- Daskroi, V - Chandail, Ahmedabad 382433",
-        "contact": "Mr. C. B. Zala",
-        "mobile": "+91 9978833851",
-        "email": "shreevinayakpackmachine@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. C. B. Zala",
+                "mobile": "+91 9978833851",
+                "email": "shreevinayakpackmachine@gmail.com"
+            }
+        ],
         "gst_no": "24AAOPZ9206D1ZE"
     },
     "Swastik Interiors": {
         "address": "S-2, Plot 583, Ward 12/C, Police Stn Road , Gandhidham (Kutch - Gujarat)",
-        "contact": "Mr. Hasmukh Vaghela",
-        "mobile": "+91 9724110557",
-        "email": "swastik0013@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Hasmukh Vaghela",
+                "mobile": "+91 9724110557",
+                "email": "swastik0013@gmail.com"
+            }
+        ],
         "gst_no": "Not Applicable"
     },
     "ICE MAKE REFRIGERATION LIMITED": {
         "address": "Survey No. 226 - 227, Dantali Indu. Estate,Gota- Vadsar Road, At. Dantali,Ta. Kalol, Dist : Gandhinagar - 382721",
-        "contact": "Mr. Hiten Rajput",
-        "mobile": "+91 9727762584",
-        "email": "hitenrajputit@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Hiten Rajput",
+                "mobile": "+91 9727762584",
+                "email": "hitenrajputit@gmail.com"
+            }
+        ],
         "gst_no": "24AACCI0566L1ZK"
     },
     "Thumbimpressions LLP": {
         "address": "SY No 38/1 Plot No. 12, Bandaria Complex, behind Sub Jail, Surat, Gujarat - 395002",
-        "contact": "Mr. Milind Jhaveri",
-        "mobile": "+91 9825568625",
-        "email": "milind@thumbimpression.org",
+        "contacts": [
+            {
+                "name": "Mr. Milind Jhaveri",
+                "mobile": "+91 9825568625",
+                "email": "milind@thumbimpression.org"
+            }
+        ],
         "gst_no": "24AAIFT2961K1ZW"
     },
     "Excel Informatics Pvt Ltd": {
         "address": "C-2, Suryodaya Complex, Building F, Survey No 154/4, Kalbhor Nagar, Chinchwad, Pune-411019",
-        "contact": "Mr. Amol Bhosale",
-        "mobile": "+91 9822197248",
-        "email": "abhosale@eiplonline.com",
+        "contacts": [
+            {
+                "name": "Mr. Amol Bhosale",
+                "mobile": "+91 9822197248",
+                "email": "abhosale@eiplonline.com"
+            }
+        ],
         "gst_no": "27AAACE9842K1Z9"
     },
     "Veri5D (Formally Named as PINKAL MISTRY & ASSOCIATES)": {
         "address": "405, Sakar East,40mt Tarsali – Danteshwar Ring Road, Vadodara ‐ 390009",
-        "contact": "Ms. Pinkal Mistry",
-        "mobile": "+91 9898591813",
-        "email": "info@veri5dindia.com",
+        "contacts": [
+            {
+                "name": "Ms. Pinkal Mistry",
+                "mobile": "+91 9898591813",
+                "email": "info@veri5dindia.com"
+            }
+        ],
         "gst_no": "24BMTPM7418JZH"
     },
     "Brahma Fabricon": {
         "address": "Block No. 332, Village : Ankhi, Por, Vadodara 391243",
-        "contact": "Mr. Dipen Sheth",
-        "mobile": "+91 8320244173",
-        "email": "brahmafebricon@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Dipen Sheth",
+                "mobile": "+91 8320244173",
+                "email": "brahmafebricon@gmail.com"
+            }
+        ],
         "gst_no": "24ASEPS9270J2Z8"
     },
     "AIRMAX (GUJARAT) PVT. LTD.": {
         "address": "1201-1204, Palak Prime, 12th Floor, Opp. Double Hilton Tree, Iscon - Ambli Road, Bopal, Ahmedabad - 380054",
-        "contact": "Mr. Jignesh Parikh",
-        "mobile": "+91 9824087344",
-        "email": "seairmax@yahoo.co.in",
+        "contacts": [
+            {
+                "name": "Mr. Jignesh Parikh",
+                "mobile": "+91 9824087344",
+                "email": "seairmax@yahoo.co.in"
+            }
+        ],
         "gst_no": "24AADCA6797L1Z6"
     },
     "K P ENGINEERING": {
         "address": "E-90, Suryam Industrial Park, Nr.Torrent Power Sub Station, Nikol, Ahmedabad, Gujarat, 382350",
-        "contact": "Mr. Hitesh Thummar",
-        "mobile": "+91 9978702477",
-        "email": "kp.engineering.ahd@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Hitesh Thummar",
+                "mobile": "+91 9978702477",
+                "email": "kp.engineering.ahd@gmail.com"
+            }
+        ],
         "gst_no": "24AANFK0232B1ZZ"
     },
     "SIDDHARTH ENGINEERS": {
         "address": "4, Ramjikrupa Raw House, Amroli Raod, Katargam, Surat, Gujarat, 395004",
-        "contact": "Mr. Hitesh Patel",
-        "mobile": "+91 8758596901/6377688873",
-        "email": "siddharth.engineers@yahoo.in",
+        "contacts": [
+            {
+                "name": "Mr. Hitesh Patel",
+                "mobile": "+91 8758596901/6377688873",
+                "email": "siddharth.engineers@yahoo.in"
+            }
+        ],
         "gst_no": "24AIHPP2228G1ZG"
     },
     "FARMTON FOODS PRIVATE LIMITED": {
         "address": "Office No. A831, A832 & A833, Money Plant High Street, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382470",
-        "contact": "Mr. Virdattsinh Rajput ",
-        "mobile": "+91 9586989809",
-        "email": "purchase2@farmtonfoods.com",
+        "contacts": [
+            {
+                "name": "Mr. Virdattsinh Rajput",
+                "mobile": "+91 9586989809",
+                "email": "purchase2@farmtonfoods.com"
+            }
+        ],
         "gst_no": "24AAFCF5920L1ZK"
     },
     "Saraswati Technical Service Pvt Ltd.": {
         "address": "C-133, Bapu Nagar, Jaipur, Rajasthan-3020 15",
-        "contact": "Mr. Rajesh Gangwal",
-        "mobile": "+91 9001861740",
-        "email": "rajeshgangwal786@ymail.com",
+        "contacts": [
+            {
+                "name": "Mr. Rajesh Gangwal",
+                "mobile": "+91 9001861740",
+                "email": "rajeshgangwal786@ymail.com"
+            }
+        ],
         "gst_no": "08AADCS197 5L1ZW"
     },
     "Avrax Infracon LLP": {
         "address": "204/C, Vishweshwar Appartments, Near Valkeshwar Flats,  Ghatlodia, Ahmedadbad-380061",
-        "contact": "Mr. Nalin Kumar Jha",
-        "mobile": "+91 9879575207",
-        "email": "avraxinfracon@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Nalin Kumar Jha",
+                "mobile": "+91 9879575207",
+                "email": "avraxinfracon@gmail.com"
+            }
+        ],
         "gst_no": "24ABXFA4857H1ZY"
     },
     "EXCEL INFORMATICS PVT. LTD.": {
         "address": "C-2, Suryodaya Complex, Bldg. - F, Survey No. 154/4, Kalbhornagar, Chinchwad, Pune - 411019",
-        "contact": "Mr. Amol Bhosale",
-        "mobile": "+91 9822197248/9822197249",
-        "email": "abhosale@eiplonline.com; pmulik@eiplonline.com",
+        "contacts": [
+            {
+                "name": "Mr. Amol Bhosale",
+                "mobile": "+91 9822197248/9822197249",
+                "email": "abhosale@eiplonline.com; pmulik@eiplonline.com"
+            }
+        ],
         "gst_no": "27AAACE9842K1Z9"
     },
     "NRM SYNERGY": {
         "address": "1010/1011, Addor Aspire, Near Jhanvee Restaurant, University Road, Gulbai Tekra, Ahmedabad-380015.",
-        "contact": "Mr. Pravinsinh Rajput",
-        "mobile": "+91 8128786546",
-        "email": "nrmacc1010@gmail.com",
+        "contacts": [
+            {
+                "name": "Mr. Pravinsinh Rajput",
+                "mobile": "+91 8128786546",
+                "email": "nrmacc1010@gmail.com"
+            }
+        ],
         "gst_no": "24AAPFN5998R1ZY"
     }
-    
 }

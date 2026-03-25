@@ -2697,6 +2697,12 @@ def main():
             st.header("Recipient Details")
             
             # REPLACE VENDOR DROPDOWN WITH END USER DROPDOWN
+            # Track selection changes for Quotation End User
+            if 'prev_enduser_quote' not in st.session_state:
+                st.session_state.prev_enduser_quote = "Select End User"
+            if 'prev_contact_quote' not in st.session_state:
+                st.session_state.prev_contact_quote = ""
+
             selected_enduser_quote = st.selectbox(
                 "Select Company", 
                 options=get_enduser_dropdown_options(),
@@ -2704,50 +2710,52 @@ def main():
             )
             
             # UPDATE END USER FIELDS WHEN DROPDOWN SELECTION CHANGES FOR QUOTATION
-            if selected_enduser_quote and selected_enduser_quote != "Select End User":
-                enduser_data = END_USER_DATABASE.get(selected_enduser_quote, {})
-                contacts = get_contacts_list(enduser_data)
-                contact_names = get_contact_dropdown_options(contacts)
+            enduser_changed = selected_enduser_quote != st.session_state.prev_enduser_quote
+            if enduser_changed:
+                st.session_state.prev_enduser_quote = selected_enduser_quote
+                st.session_state.prev_contact_quote = "" # Reset contact tracker on company change
                 
-                # Contact person dropdown
-                selected_contact_quote = st.selectbox(
-                    "Select Contact Person",
-                    options=contact_names,
-                    key="contact_dropdown_quote"
-                )
+            enduser_data = END_USER_DATABASE.get(selected_enduser_quote, {}) if selected_enduser_quote != "Select End User" else {}
+            contacts = get_contacts_list(enduser_data)
+            contact_names = get_contact_dropdown_options(contacts)
+            
+            # Contact person dropdown
+            selected_contact_quote = st.selectbox(
+                "Select Contact Person",
+                options=contact_names,
+                key="contact_dropdown_quote"
+            )
+            contact_changed = selected_contact_quote != st.session_state.prev_contact_quote
+
+            if enduser_changed or contact_changed:
+                st.session_state.prev_contact_quote = selected_contact_quote
                 contact_idx = contact_names.index(selected_contact_quote) if selected_contact_quote in contact_names else 0
                 
-                st.session_state.quote_end_company_data = selected_enduser_quote
-                st.session_state.quote_end_address_data = enduser_data.get("address", "")
-                st.session_state.quote_end_gst_no_data = enduser_data.get("gst_no", "")
-                
-                if contacts and contact_idx < len(contacts):
-                    sel_contact = contacts[contact_idx]
-                    st.session_state.quote_end_person_data = sel_contact.get("name", "")
-                    st.session_state.quote_end_mobile_data = sel_contact.get("mobile", "")
-                    st.session_state.quote_end_email_data = sel_contact.get("email", "")
+                if selected_enduser_quote != "Select End User":
+                    st.session_state.quote_end_company = selected_enduser_quote
+                    st.session_state.quote_end_address = enduser_data.get("address", "")
+                    st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
+                    
+                    if contacts and contact_idx < len(contacts):
+                        sel_contact = contacts[contact_idx]
+                        st.session_state.quote_end_person = sel_contact.get("name", "")
+                        st.session_state.quote_end_mobile = sel_contact.get("mobile", "")
+                        st.session_state.quote_end_email = sel_contact.get("email", "")
+                    else:
+                        st.session_state.quote_end_person = ""
+                        st.session_state.quote_end_mobile = ""
+                        st.session_state.quote_end_email = ""
+                st.rerun()
             
             # UPDATE TEXT INPUT FIELDS TO USE END USER DATA INSTEAD OF VENDOR DATA
-            vendor_name = st.text_input("Company Name", 
-                                    value=st.session_state.get("quote_end_company_data", "Baldridge & Associates Pvt Ltd."), 
-                                    key="quote_end_company")
-            vendor_address = st.text_area("Company Address", 
-                                        value=st.session_state.get("quote_end_address_data", "406 Sakar East, Vadodara 390009"), 
-                                        key="quote_end_address")
-            vendor_email = st.text_input("Email", 
-                                    value=st.session_state.get("quote_end_email_data", "info@company.com"), 
-                                    key="quote_end_email")
-            vendor_contact = st.text_input("Contact Person (Kind Attention)", 
-                                        value=st.session_state.get("quote_end_person_data", "Mr. Dev"), 
-                                        key="quote_end_person")
-            vendor_mobile = st.text_input("Mobile", 
-                                        value=st.session_state.get("quote_end_mobile_data", "1234567891"), 
-                                        key="quote_end_mobile")
+            vendor_name = st.text_input("Company Name", key="quote_end_company")
+            vendor_address = st.text_area("Company Address", key="quote_end_address")
+            vendor_email = st.text_input("Email", key="quote_end_email")
+            vendor_contact = st.text_input("Contact Person (Kind Attention)", key="quote_end_person")
+            vendor_mobile = st.text_input("Mobile", key="quote_end_mobile")
             
             # You can also add GST field if needed
-            vendor_gst = st.text_input("GST No (Optional)", 
-                                    value=st.session_state.get("quote_end_gst_no_data", ""), 
-                                    key="quote_end_gst_no")
+            vendor_gst = st.text_input("GST No (Optional)", key="quote_end_gst_no")
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")
@@ -3041,6 +3049,12 @@ def main():
             vendor_options = get_vendor_dropdown_options()
             st.sidebar.info(f"Vendor dropdown options: {len(vendor_options)} items")
             
+            # Track selection changes for PO Vendor
+            if 'prev_vendor_po' not in st.session_state:
+                st.session_state.prev_vendor_po = "Select Vendor"
+            if 'prev_vendor_contact_po' not in st.session_state:
+                st.session_state.prev_vendor_contact_po = ""
+
             selected_vendor = st.selectbox(
                 "Select Vendor", 
                 options=vendor_options,
@@ -3048,55 +3062,70 @@ def main():
             )
             
             # UPDATE VENDOR FIELDS WHEN DROPDOWN SELECTION CHANGES
-            if selected_vendor and selected_vendor != "Select Vendor":
-                vendor_data = VENDOR_DATABASE.get(selected_vendor, {})
-                contacts = get_contacts_list(vendor_data)
-                contact_names = get_contact_dropdown_options(contacts)
+            vendor_changed = selected_vendor != st.session_state.prev_vendor_po
+            if vendor_changed:
+                st.session_state.prev_vendor_po = selected_vendor
+                st.session_state.prev_vendor_contact_po = ""
                 
-                # Contact person dropdown for vendor
-                selected_vendor_contact = st.selectbox(
-                    "Select Vendor Contact",
-                    options=contact_names,
-                    key="vendor_contact_dropdown_po"
-                )
+            vendor_data = VENDOR_DATABASE.get(selected_vendor, {}) if selected_vendor != "Select Vendor" else {}
+            contacts = get_contacts_list(vendor_data)
+            contact_names = get_contact_dropdown_options(contacts)
+            
+            # Contact person dropdown for vendor
+            selected_vendor_contact = st.selectbox(
+                "Select Vendor Contact",
+                options=contact_names,
+                key="vendor_contact_dropdown_po"
+            )
+            vendor_contact_changed = selected_vendor_contact != st.session_state.prev_vendor_contact_po
+
+            if vendor_changed or vendor_contact_changed:
+                st.session_state.prev_vendor_contact_po = selected_vendor_contact
                 contact_idx = contact_names.index(selected_vendor_contact) if selected_vendor_contact in contact_names else 0
                 
-                st.session_state.po_vendor_name_data = selected_vendor
-                st.session_state.po_vendor_address_data = vendor_data.get("address", "")
-                st.session_state.po_gst_no_data = vendor_data.get("gst_no", "")
-                st.session_state.po_pan_no_data = vendor_data.get("pan_no", "")
-                st.session_state.po_msme_no_data = vendor_data.get("msme_no", "")
-                
-                if contacts and contact_idx < len(contacts):
-                    sel_contact = contacts[contact_idx]
-                    st.session_state.po_vendor_contact_data = sel_contact.get("name", "")
-                    st.session_state.po_vendor_mobile_data = sel_contact.get("mobile", "")
+                if selected_vendor != "Select Vendor":
+                    st.session_state.po_vendor_name = selected_vendor
+                    st.session_state.po_vendor_address = vendor_data.get("address", "")
+                    st.session_state.po_gst_no = vendor_data.get("gst_no", "")
+                    st.session_state.po_pan_no = vendor_data.get("pan_no", "")
+                    st.session_state.po_msme_no = vendor_data.get("msme_no", "")
+                    
+                    if contacts and contact_idx < len(contacts):
+                        sel_contact = contacts[contact_idx]
+                        st.session_state.po_vendor_contact = sel_contact.get("name", "")
+                        st.session_state.po_vendor_mobile = sel_contact.get("mobile", "")
+                    else:
+                        st.session_state.po_vendor_contact = ""
+                        st.session_state.po_vendor_mobile = ""
+                st.rerun()
             
             st.subheader("Vendor Details")
             vendor_name = st.text_input(
                 "Vendor Name",
-                value=st.session_state.get("po_vendor_name_data", "Arkance IN Pvt. Ltd."),
                 key="po_vendor_name"
             )
             vendor_address = st.text_area(
                 "Vendor Address",
-                value=st.session_state.get("po_vendor_address_data", "Unit 801-802, 8th Floor, Tower 1..."),
                 key="po_vendor_address"
             )
             vendor_contact = st.text_input(
                 "Contact Person",
-                value=st.session_state.get("po_vendor_contact_data", "Ms/Mr"),
                 key="po_vendor_contact"
             )
             vendor_mobile = st.text_input(
                 "Mobile",
-                value=st.session_state.get("po_vendor_mobile_data", "+91 1234567890"),
                 key="po_vendor_mobile"
             )
             
             st.subheader("End User Details")
             
             # End User Dropdown
+            # Track selection changes for PO End User
+            if 'prev_enduser_po' not in st.session_state:
+                st.session_state.prev_enduser_po = "Select End User"
+            if 'prev_enduser_contact_po' not in st.session_state:
+                st.session_state.prev_enduser_contact_po = ""
+
             selected_enduser = st.selectbox(
                 "Select End User", 
                 options=get_enduser_dropdown_options(),
@@ -3104,52 +3133,61 @@ def main():
             )
             
             # Update end user fields when dropdown selection changes
-            if selected_enduser and selected_enduser != "Select End User":
-                enduser_data = END_USER_DATABASE.get(selected_enduser, {})
-                contacts = get_contacts_list(enduser_data)
-                contact_names = get_contact_dropdown_options(contacts)
+            enduser_po_changed = selected_enduser != st.session_state.prev_enduser_po
+            if enduser_po_changed:
+                st.session_state.prev_enduser_po = selected_enduser
+                st.session_state.prev_enduser_contact_po = ""
                 
-                # Contact person dropdown for end user
-                selected_enduser_contact = st.selectbox(
-                    "Select End User Contact",
-                    options=contact_names,
-                    key="enduser_contact_dropdown_po"
-                )
+            enduser_data = END_USER_DATABASE.get(selected_enduser, {}) if selected_enduser != "Select End User" else {}
+            contacts = get_contacts_list(enduser_data)
+            contact_names = get_contact_dropdown_options(contacts)
+            
+            # Contact person dropdown for end user
+            selected_enduser_contact = st.selectbox(
+                "Select End User Contact",
+                options=contact_names,
+                key="enduser_contact_dropdown_po"
+            )
+            enduser_contact_changed = selected_enduser_contact != st.session_state.prev_enduser_contact_po
+
+            if enduser_po_changed or enduser_contact_changed:
+                st.session_state.prev_enduser_contact_po = selected_enduser_contact
                 contact_idx = contact_names.index(selected_enduser_contact) if selected_enduser_contact in contact_names else 0
                 
-                st.session_state.po_end_company_data = selected_enduser
-                st.session_state.po_end_address_data = enduser_data.get("address", "")
-                st.session_state.po_end_gst_no_data = enduser_data.get("gst_no", "")
-                
-                if contacts and contact_idx < len(contacts):
-                    sel_contact = contacts[contact_idx]
-                    st.session_state.po_end_person_data = sel_contact.get("name", "")
-                    st.session_state.po_end_mobile_data = sel_contact.get("mobile", "")
-                    st.session_state.po_end_email_data = sel_contact.get("email", "")
+                if selected_enduser != "Select End User":
+                    st.session_state.po_end_company = selected_enduser
+                    st.session_state.po_end_address = enduser_data.get("address", "")
+                    st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
+                    
+                    if contacts and contact_idx < len(contacts):
+                        sel_contact = contacts[contact_idx]
+                        st.session_state.po_end_person = sel_contact.get("name", "")
+                        st.session_state.po_end_mobile = sel_contact.get("mobile", "")
+                        st.session_state.po_end_email = sel_contact.get("email", "")
+                    else:
+                        st.session_state.po_end_person = ""
+                        st.session_state.po_end_mobile = ""
+                        st.session_state.po_end_email = ""
+                st.rerun()
             
             end_company = st.text_input(
                 "End User Company",
-                value=st.session_state.get("po_end_company_data", "Baldridge & Associates Pvt Ltd."),
                 key="po_end_company"
             )
             end_address = st.text_area(
                 "End User Address",
-                value=st.session_state.get("po_end_address_data", "406 Sakar East, Vadodara 390009"),
                 key="po_end_address"
             )
             end_person = st.text_input(
                 "End User Contact",
-                value=st.session_state.get("po_end_person_data", "Mr. Dev"),
                 key="po_end_person"
             )
             end_mobile = st.text_input(
                 "End Mobile",
-                value=str(st.session_state.get("po_end_mobile_data", "1234567891") or "").strip(),
                 key="po_end_mobile"
             )
             end_email = st.text_input(
                 "End User Email",
-                value=st.session_state.get("po_end_email_data", "info@company.com"),
                 key="po_end_email"
             )
             
@@ -3217,18 +3255,15 @@ def main():
             )
             gst_no = st.text_input(
                 "GST No",
-                value=st.session_state.get("po_gst_no_data", "24ANMPP4891R1ZX"),
-                key="po_gst_no_input"
+                key="po_gst_no"
             )
             pan_no = st.text_input(
                 "PAN No",
-                value=st.session_state.get("po_pan_no_data", "ANMPP4891R"),
-                key="po_pan_no_input"
+                key="po_pan_no"
             )
             msme_no = st.text_input(
                 "MSME No",
-                value=st.session_state.get("po_msme_no_data", "UDYAM-GJ-01-0117646"),
-                key="po_msme_no_input"
+                key="po_msme_no"
             )
             
             # Terms & Authorization
@@ -3460,6 +3495,12 @@ def main():
             st.subheader("Buyer Details")
             
             # SIMPLE DROPDOWN LIKE QUOTATION TAB
+            # Track selection changes for Invoice Buyer
+            if 'prev_buyer_invoice' not in st.session_state:
+                st.session_state.prev_buyer_invoice = "Select End User"
+            if 'prev_buyer_contact_invoice' not in st.session_state:
+                st.session_state.prev_buyer_contact_invoice = ""
+
             selected_enduser_invoice = st.selectbox(
                 "Select Buyer", 
                 options=get_enduser_dropdown_options(),
@@ -3467,54 +3508,62 @@ def main():
             )
             
             # UPDATE BUYER FIELDS WHEN DROPDOWN SELECTION CHANGES - WITH CONTACT DROPDOWN
-            if selected_enduser_invoice and selected_enduser_invoice != "Select End User":
-                enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
-                contacts = get_contacts_list(enduser_data)
-                contact_names = get_contact_dropdown_options(contacts)
+            buyer_changed = selected_enduser_invoice != st.session_state.prev_buyer_invoice
+            if buyer_changed:
+                st.session_state.prev_buyer_invoice = selected_enduser_invoice
+                st.session_state.prev_buyer_contact_invoice = ""
                 
-                # Contact person dropdown for invoice buyer
-                selected_buyer_contact = st.selectbox(
-                    "Select Buyer Contact",
-                    options=contact_names,
-                    key="buyer_contact_dropdown_invoice"
-                )
+            enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {}) if selected_enduser_invoice != "Select End User" else {}
+            contacts = get_contacts_list(enduser_data)
+            contact_names = get_contact_dropdown_options(contacts)
+            
+            # Contact person dropdown for invoice buyer
+            selected_buyer_contact = st.selectbox(
+                "Select Buyer Contact",
+                options=contact_names,
+                key="buyer_contact_dropdown_invoice"
+            )
+            buyer_contact_changed = selected_buyer_contact != st.session_state.prev_buyer_contact_invoice
+
+            if buyer_changed or buyer_contact_changed:
+                st.session_state.prev_buyer_contact_invoice = selected_buyer_contact
                 contact_idx = contact_names.index(selected_buyer_contact) if selected_buyer_contact in contact_names else 0
                 
-                st.session_state.invoice_buyer_company_data = selected_enduser_invoice
-                st.session_state.invoice_buyer_address_data = enduser_data.get("address", "")
-                st.session_state.invoice_buyer_gst_data = enduser_data.get("gst_no", "")
-                
-                if contacts and contact_idx < len(contacts):
-                    sel_contact = contacts[contact_idx]
-                    st.session_state.invoice_buyer_mobile_data = sel_contact.get("mobile", "")
-                    st.session_state.invoice_buyer_email_data = sel_contact.get("email", "")
+                if selected_enduser_invoice != "Select End User":
+                    st.session_state.invoice_buyer_company = selected_enduser_invoice
+                    st.session_state.invoice_buyer_address = enduser_data.get("address", "")
+                    st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
+                    
+                    if contacts and contact_idx < len(contacts):
+                        sel_contact = contacts[contact_idx]
+                        st.session_state.invoice_buyer_mobile = sel_contact.get("mobile", "")
+                        st.session_state.invoice_buyer_email = sel_contact.get("email", "")
+                    else:
+                        st.session_state.invoice_buyer_mobile = ""
+                        st.session_state.invoice_buyer_email = ""
+                st.rerun()
             
             # USE SESSION STATE VALUES IN TEXT INPUTS - SIMPLE LIKE QUOTATION
             buyer_name = st.text_input(
                 "Buyer Name",
-                value=st.session_state.get("invoice_buyer_company_data", "Baldridge & Associates Pvt Ltd."),
                 key="invoice_buyer_company"
             )
             
             buyer_address = st.text_area(
                 "Buyer Address",
-                value=st.session_state.get("invoice_buyer_address_data", "406 Sakar East, Vadodara 390009"),
                 key="invoice_buyer_address"
             )
 
             buyer_mobile = st.text_input(
                 "Buyer mobile.",
-                value=st.session_state.get("invoice_buyer_mobile_data", "98987 91813"),
                 key="invoice_buyer_mobile"
             )
             buyer_email = st.text_input(
                 "Buyer email.",
-                value=st.session_state.get("invoice_buyer_email_data", "dmistry@baseengr.com"),
                 key="invoice_buyer_email"
             )
             buyer_gst = st.text_input(
                 "Buyer GST No.",
-                value=st.session_state.get("invoice_buyer_gst_data", "24AAHCB9"),
                 key="invoice_buyer_gst"
             )
 

@@ -103,20 +103,20 @@ def update_vendor_fields(selected_vendor, contact_index=0):
         vendor_data = VENDOR_DATABASE.get(selected_vendor, {})
         contacts = get_contacts_list(vendor_data)
         
-        st.session_state.po_vendor_name_data = selected_vendor
-        st.session_state.po_vendor_address_data = vendor_data.get("address", "")
-        st.session_state.po_gst_no_data = vendor_data.get("gst_no", "")
-        st.session_state.po_pan_no_data = vendor_data.get("pan_no", "")
-        st.session_state.po_msme_no_data = vendor_data.get("msme_no", "")
+        st.session_state.po_vendor_name = selected_vendor
+        st.session_state.po_vendor_address = vendor_data.get("address", "")
+        st.session_state.po_gst_no = vendor_data.get("gst_no", "")
+        st.session_state.po_pan_no = vendor_data.get("pan_no", "")
+        st.session_state.po_msme_no = vendor_data.get("msme_no", "")
         
         # Set contact fields from selected contact
         if contacts and contact_index < len(contacts):
             selected_contact = contacts[contact_index]
-            st.session_state.po_vendor_contact_data = selected_contact.get("name", "")
-            st.session_state.po_vendor_mobile_data = selected_contact.get("mobile", "")
+            st.session_state.po_vendor_contact = selected_contact.get("name", "")
+            st.session_state.po_vendor_mobile = selected_contact.get("mobile", "")
         else:
-            st.session_state.po_vendor_contact_data = ""
-            st.session_state.po_vendor_mobile_data = ""
+            st.session_state.po_vendor_contact = ""
+            st.session_state.po_vendor_mobile = ""
 
 # --- Helper Functions for End User Management ---
 def get_enduser_dropdown_options():
@@ -129,20 +129,20 @@ def update_enduser_fields(selected_enduser, contact_index=0):
         enduser_data = END_USER_DATABASE.get(selected_enduser, {})
         contacts = get_contacts_list(enduser_data)
         
-        st.session_state.po_end_company_data = selected_enduser
-        st.session_state.po_end_address_data = enduser_data.get("address", "")
-        st.session_state.po_end_gst_no_data = enduser_data.get("gst_no", "")
+        st.session_state.po_end_company = selected_enduser
+        st.session_state.po_end_address = enduser_data.get("address", "")
+        st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
         
         # Set contact fields from selected contact
         if contacts and contact_index < len(contacts):
             selected_contact = contacts[contact_index]
-            st.session_state.po_end_person_data = selected_contact.get("name", "")
-            st.session_state.po_end_mobile_data = selected_contact.get("mobile", "")
-            st.session_state.po_end_email_data = selected_contact.get("email", "")
+            st.session_state.po_end_person = selected_contact.get("name", "")
+            st.session_state.po_end_mobile = selected_contact.get("mobile", "")
+            st.session_state.po_end_email = selected_contact.get("email", "")
         else:
-            st.session_state.po_end_person_data = ""
-            st.session_state.po_end_mobile_data = ""
-            st.session_state.po_end_email_data = ""
+            st.session_state.po_end_person = ""
+            st.session_state.po_end_mobile = ""
+            st.session_state.po_end_email = ""
 
 
 # --- Helper Functions for Quotation and PO ---
@@ -2465,63 +2465,63 @@ def main():
         st.session_state.current_invoice_quarter = get_current_quarter()
 
     # Invoice buyer session states - ADDED
-    if "invoice_buyer_company_data" not in st.session_state:
-        st.session_state.invoice_buyer_company_data = "Baldridge & Associates Pvt Ltd."
-    if "invoice_buyer_address_data" not in st.session_state:
-        st.session_state.invoice_buyer_address_data = "406 Sakar East, Vadodara 390009"
-    if "invoice_buyer_gst_data" not in st.session_state:
-        st.session_state.invoice_buyer_gst_data = "24AAHCB9"
-    if "invoice_buyer_mobile_data" not in st.session_state:
-        st.session_state.invoice_buyer_mobile_data = "98987 91813"
-    if "invoice_buyer_email_data" not in st.session_state:
-        st.session_state.invoice_buyer_email_data = "dmistry@baseengr.com"
+    if "invoice_buyer_company" not in st.session_state:
+        st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
+    if "invoice_buyer_address" not in st.session_state:
+        st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
+    if "invoice_buyer_gst" not in st.session_state:
+        st.session_state.invoice_buyer_gst = "24AAHCB9"
+    if "invoice_buyer_mobile" not in st.session_state:
+        st.session_state.invoice_buyer_mobile = "98987 91813"
+    if "invoice_buyer_email" not in st.session_state:
+        st.session_state.invoice_buyer_email = "dmistry@baseengr.com"
     
                 #     st.session_state.invoice_buyer_mobile = enduser_data.get("mobile", "")
                 # st.session_state.invoice_buyer_email = enduser_data.get("email", "")
 
     # Vendor session states
-    if "po_vendor_name_data" not in st.session_state:
-        st.session_state.po_vendor_name_data = "Arkance IN Pvt. Ltd."
-    if "po_vendor_address_data" not in st.session_state:
-        st.session_state.po_vendor_address_data = "Unit 801-802, 8th Floor, Tower 1..."
-    if "po_vendor_contact_data" not in st.session_state:
-        st.session_state.po_vendor_contact_data = "Ms/Mr"
-    if "po_vendor_mobile_data" not in st.session_state:
-        st.session_state.po_vendor_mobile_data = "+91 1234567890"
-    if "po_gst_no_data" not in st.session_state:
-        st.session_state.po_gst_no_data = "24ANMPP4891R1ZX"
-    if "po_pan_no_data" not in st.session_state:
-        st.session_state.po_pan_no_data = "ANMPP4891R"
-    if "po_msme_no_data" not in st.session_state:
-        st.session_state.po_msme_no_data = "UDYAM-GJ-01-0117646"
+    if "po_vendor_name" not in st.session_state:
+        st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
+    if "po_vendor_address" not in st.session_state:
+        st.session_state.po_vendor_address = "Unit 801-802, 8th Floor, Tower 1..."
+    if "po_vendor_contact" not in st.session_state:
+        st.session_state.po_vendor_contact = "Ms/Mr"
+    if "po_vendor_mobile" not in st.session_state:
+        st.session_state.po_vendor_mobile = "+91 1234567890"
+    if "po_gst_no" not in st.session_state:
+        st.session_state.po_gst_no = "24ANMPP4891R1ZX"
+    if "po_pan_no" not in st.session_state:
+        st.session_state.po_pan_no = "ANMPP4891R"
+    if "po_msme_no" not in st.session_state:
+        st.session_state.po_msme_no = "UDYAM-GJ-01-0117646"
 
     # Quotation end user session states
-    if "quote_end_company_data" not in st.session_state:
-        st.session_state.quote_end_company_data = "Baldridge & Associates Pvt Ltd."
-    if "quote_end_address_data" not in st.session_state:
-        st.session_state.quote_end_address_data = "406 Sakar East, Vadodara 390009"
-    if "quote_end_person_data" not in st.session_state:
-        st.session_state.quote_end_person_data = "Mr. Dev"
-    if "quote_end_mobile_data" not in st.session_state:
-        st.session_state.quote_end_mobile_data = "1234567891"
-    if "quote_end_email_data" not in st.session_state:
-        st.session_state.quote_end_email_data = "info@company.com"
-    if "quote_end_gst_no_data" not in st.session_state:
-        st.session_state.quote_end_gst_no_data = "24AAHCB9"
+    if "quote_end_company" not in st.session_state:
+        st.session_state.quote_end_company = "Baldridge & Associates Pvt Ltd."
+    if "quote_end_address" not in st.session_state:
+        st.session_state.quote_end_address = "406 Sakar East, Vadodara 390009"
+    if "quote_end_person" not in st.session_state:
+        st.session_state.quote_end_person = "Mr. Dev"
+    if "quote_end_mobile" not in st.session_state:
+        st.session_state.quote_end_mobile = "1234567891"
+    if "quote_end_email" not in st.session_state:
+        st.session_state.quote_end_email = "info@company.com"
+    if "quote_end_gst_no" not in st.session_state:
+        st.session_state.quote_end_gst_no = "24AAHCB9"
 
     # PO end user session states - ADDED
-    if "po_end_company_data" not in st.session_state:
-        st.session_state.po_end_company_data = "Baldridge & Associates Pvt Ltd."
-    if "po_end_address_data" not in st.session_state:
-        st.session_state.po_end_address_data = "406 Sakar East, Vadodara 390009"
-    if "po_end_person_data" not in st.session_state:
-        st.session_state.po_end_person_data = "Mr. Dev"
-    if "po_end_mobile_data" not in st.session_state:
-        st.session_state.po_end_mobile_data = "1234567891"
-    if "po_end_email_data" not in st.session_state:
-        st.session_state.po_end_email_data = "info@company.com"
-    if "po_end_gst_no_data" not in st.session_state:
-        st.session_state.po_end_gst_no_data = "24AAHCB9"
+    if "po_end_company" not in st.session_state:
+        st.session_state.po_end_company = "Baldridge & Associates Pvt Ltd."
+    if "po_end_address" not in st.session_state:
+        st.session_state.po_end_address = "406 Sakar East, Vadodara 390009"
+    if "po_end_person" not in st.session_state:
+        st.session_state.po_end_person = "Mr. Dev"
+    if "po_end_mobile" not in st.session_state:
+        st.session_state.po_end_mobile = "1234567891"
+    if "po_end_email" not in st.session_state:
+        st.session_state.po_end_email = "info@company.com"
+    if "po_end_gst_no" not in st.session_state:
+        st.session_state.po_end_gst_no = "24AAHCB9"
 
     # PO bill to/ship to session states - ADDED
     if "po_bill_to_company" not in st.session_state:
@@ -2564,16 +2564,16 @@ def main():
         End_user_mobile = safe_strip(end_user.get("End Mobile", ""))
 
         # Save to session_state (so Invoice & PO can use)
-        st.session_state.po_vendor_name_data = vendor["Vendor Name"]
-        st.session_state.po_vendor_address_data = vendor["Vendor Address"]
-        st.session_state.po_vendor_contact_data = vendor["Contact Person"]
-        st.session_state.po_vendor_mobile_data = vendor_mobile
-        st.session_state.po_end_company_data = end_user["End User Company"]
-        st.session_state.po_end_address_data = end_user["End User Address"]
-        st.session_state.po_end_person_data = end_user["End User Contact"]
-        st.session_state.po_end_mobile_data = End_user_mobile
-        st.session_state.po_end_email_data = end_user["End User Email"]
-        st.session_state.po_end_gst_no_data = end_user["GST NO"]
+        st.session_state.po_vendor_name = vendor["Vendor Name"]
+        st.session_state.po_vendor_address = vendor["Vendor Address"]
+        st.session_state.po_vendor_contact = vendor["Contact Person"]
+        st.session_state.po_vendor_mobile = vendor_mobile
+        st.session_state.po_end_company = end_user["End User Company"]
+        st.session_state.po_end_address = end_user["End User Address"]
+        st.session_state.po_end_person = end_user["End User Contact"]
+        st.session_state.po_end_mobile = End_user_mobile
+        st.session_state.po_end_email = end_user["End User Email"]
+        st.session_state.po_end_gst_no = end_user["GST NO"]
 
         st.info("Vendor & End User details auto-filled from Excel ✅")
 

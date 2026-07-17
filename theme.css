@@ -309,3 +309,56 @@ section[data-testid="stSidebar"] code {
 [data-testid="stStatusWidget"] {
     border-radius: 10px !important;
 }
+
+/* === GLASSMORPHIC CARD CONTAINERS FOR FORM SECTIONS === */
+.main div[data-testid="stHorizontalBlock"]>div[data-testid="column"] {
+    background: rgba(255, 255, 255, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+    border-radius: 16px !important;
+    padding: 26px !important;
+    box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.04) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    transition: all 0.3s ease !important;
+}
+
+.main div[data-testid="stHorizontalBlock"]>div[data-testid="column"]:hover {
+    box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.08) !important;
+    border-color: rgba(102, 126, 234, 0.2) !important;
+}
+
+/* Reset styles for nested columns (like inside product detail rows or columns nested inside cards) */
+.main div[data-testid="stExpander"] div[data-testid="column"],
+.main div[data-testid="column"] div[data-testid="stHorizontalBlock"]>div[data-testid="column"] {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    transition: none !important;
+}
+
+/* === GLOWING HOVER STATE FOR BUTTONS === */
+button[kind="primary"]:hover,
+[data-testid="stBaseButton-primary"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.45) !important;
+}
+
+.stDownloadButton>button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(17, 153, 142, 0.45) !important;
+}
+
+/* === INTERACTIVE EXPANDERS WITH LEFT BORDER HIGHLIGHT === */
+[data-testid="stExpander"] {
+    border-left: 4px solid #667eea !important;
+    background: rgba(255, 255, 255, 0.4) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+[data-testid="stExpander"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 18px rgba(102, 126, 234, 0.08) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+}

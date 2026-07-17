@@ -3784,20 +3784,20 @@ def main():
                     mime="application/pdf",
                     key="invoice_download_button")
                                 
-# Clean up temporary files
-for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_stamp.jpg"]:
-    if os.path.exists(path):
-        try:
-            os.remove(path)
-        except:
-            pass
+    # Clean up temporary files
+    for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_stamp.jpg"]:
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+            except:
+                pass
 
-st.divider()
-st.markdown(
-    '<div style="text-align:center;padding:10px 0;opacity:0.6">'
-    '<p style="font-size:0.8rem;color:#666">© 2025 CM INFOTECH — Document Generator · Built with ❤️ using Streamlit</p>'
-    '</div>',
-    unsafe_allow_html=True
+    st.divider()
+    st.markdown(
+        '<div style="text-align:center;padding:10px 0;opacity:0.6">'
+        '<p style="font-size:0.8rem;color:#666">© 2025 CM INFOTECH — Document Generator · Built with ❤️ using Streamlit</p>'
+        '</div>',
+        unsafe_allow_html=True
 )
 
 if __name__ == "__main__":

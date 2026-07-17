@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 import streamlit as st
 import pandas as pd
 import datetime
@@ -46,10 +47,107 @@ def load_json_data(filename, default_data=None):
         st.sidebar.error(f"❌ Unexpected error reading {filename}: {e}. Using empty database.")
         return default_data or {}
 
+import re
+
 # Load vendor, end user, and product databases
 VENDOR_DATABASE = load_json_data('vendor.json')
 END_USER_DATABASE = load_json_data('endusers.json')
 PRODUCT_CATALOG = load_json_data('products.json')
+
+def validate_gst(gst):
+    """
+    Validate Indian GSTIN format.
+    Format: 15 characters (e.g. 24ANMPP4891R1ZX)
+    """
+    if not gst:
+        return False, "GST number is required."
+    gst = gst.strip().upper()
+    pattern = r"^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$"
+    if not re.match(pattern, gst):
+        return False, "Invalid GSTIN format (should be 15 chars, e.g. 24ANMPP4891R1ZX)"
+    return True, ""
+
+def validate_pan(pan):
+    """
+    Validate Indian PAN card format.
+    Format: 10 characters (e.g. ANMPP4891R)
+    """
+    if not pan:
+        return False, "PAN number is required."
+    pan = pan.strip().upper()
+    pattern = r"^[A-Z]{5}[0-9]{4}[A-Z]{1}$"
+    if not re.match(pattern, pan):
+        return False, "Invalid PAN format (should be 10 characters, e.g. ANMPP4891R)"
+    return True, ""
+
+def show_validation_warning(msg):
+    """Display an inline warning in red for form inputs"""
+    st.markdown(f'<p style="color:#e53e3e;font-size:0.82rem;margin-top:-12px;margin-bottom:12px;padding-left:4px;">⚠ {msg}</p>', unsafe_allow_html=True)
+
+def show_document_preview(doc_type, doc_number, company_name, items_list, grand_total):
+    """Render a styled visual preview of the document before generation"""
+    items_html = ""
+    for idx, item in enumerate(items_list):
+        name = item.get("name") or item.get("description") or "Item"
+        qty = item.get("qty") or item.get("quantity") or 1
+        price = item.get("basic") or item.get("unit_rate") or 0.0
+        total = qty * price
+        items_html += f"""
+        <tr style="border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.85rem;">
+            <td style="padding: 8px; color: #4a5568;">{idx+1}</td>
+            <td style="padding: 8px; color: #2d3748; font-weight: 500;">{name}</td>
+            <td style="padding: 8px; color: #4a5568; text-align: center;">{qty}</td>
+            <td style="padding: 8px; color: #4a5568; text-align: right;">₹{price:,.2f}</td>
+            <td style="padding: 8px; color: #2d3748; font-weight: 600; text-align: right;">₹{total:,.2f}</td>
+        </tr>
+        """
+    
+    preview_html = f"""
+    <div style="background: white; border-radius: 14px; padding: 24px; border: 1px solid rgba(0,0,0,0.08); 
+                box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #667eea; padding-bottom: 12px; margin-bottom: 16px;">
+            <div>
+                <h4 style="margin: 0; color: #2d3748; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; color: #667eea;">{doc_type} PREVIEW</h4>
+                <p style="margin: 4px 0 0 0; color: #718096; font-size: 0.75rem;">Doc #: <strong>{doc_number}</strong></p>
+            </div>
+            <div style="text-align: right;">
+                <p style="margin: 0; font-weight: 700; color: #2d3748; font-size: 0.9rem;">CM INFOTECH</p>
+                <p style="margin: 2px 0 0 0; color: #718096; font-size: 0.7rem;">Ahmedabad, India</p>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+            <p style="margin: 0; font-size: 0.75rem; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">Client / End User</p>
+            <p style="margin: 4px 0 0 0; font-weight: 600; color: #2d3748; font-size: 0.9rem;">{company_name}</p>
+        </div>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+            <thead>
+                <tr style="background: rgba(102, 126, 234, 0.05); border-bottom: 1px solid rgba(102, 126, 234, 0.1); font-size: 0.75rem; color: #4a5568; text-transform: uppercase;">
+                    <th style="padding: 8px; text-align: left; font-weight: 600;">#</th>
+                    <th style="padding: 8px; text-align: left; font-weight: 600;">Description</th>
+                    <th style="padding: 8px; text-align: center; font-weight: 600;">Qty</th>
+                    <th style="padding: 8px; text-align: right; font-weight: 600;">Rate</th>
+                    <th style="padding: 8px; text-align: right; font-weight: 600;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {items_html}
+            </tbody>
+        </table>
+        
+        <div style="display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 12px;">
+            <div style="text-align: right;">
+                <span style="color: #718096; font-size: 0.8rem; margin-right: 12px; font-weight: 500;">ESTIMATED TOTAL:</span>
+                <span style="color: #667eea; font-weight: 800; font-size: 1.15rem;">₹{grand_total:,.2f}</span>
+            </div>
+        </div>
+    </div>
+    """
+    st.markdown(preview_html, unsafe_allow_html=True)
+
+
+
 
 
 
@@ -2079,8 +2177,6 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_email}")
 
-
-
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)
     pdf.set_font(pdf.default_font, "", 12)
@@ -2176,97 +2272,89 @@ def main():
     )
 
     # --- Logo and Stamp Configuration in Sidebar ---
-    st.sidebar.header("📷 Company Branding")
-    
-    # Option 1: Use GitHub images
-    use_github = st.sidebar.checkbox("Use GitHub Images", value=True, 
-                                   help="Use logo and stamp from GitHub repository")
-    
-    # Option 2: Upload custom images
-    uploaded_logo = None
-    uploaded_stamp = None
-    
-    if not use_github:
-        st.sidebar.subheader("Upload Custom Images")
-        uploaded_logo = st.sidebar.file_uploader("Upload Company Logo", 
-                                               type=["png", "jpg", "jpeg"], 
-                                               key="global_logo")
-        uploaded_stamp = st.sidebar.file_uploader("Upload Company Stamp", 
-                                                type=["png", "jpg", "jpeg"], 
-                                                key="global_stamp")
-    
-    # Load images based on selection
-    global_logo_path = None
-    global_stamp_path = None
-    
-    if use_github:
-        with st.sidebar.status("Loading images from GitHub..."):
-            global_logo_path, global_stamp_path = load_images_from_github()
-            
-            if global_logo_path:
-                st.sidebar.success("✓ GitHub logo loaded")
-            else:
-                st.sidebar.error("❌ GitHub logo failed")
-                
-            if global_stamp_path:
-                st.sidebar.success("✓ GitHub stamp loaded")
-            else:
-                st.sidebar.error("❌ GitHub stamp failed")
-    else:
-        if uploaded_logo:
-            global_logo_path = save_uploaded_file(uploaded_logo, "custom_logo.jpg")
-            if global_logo_path:
-                st.sidebar.success("✓ Custom logo loaded")
+    with st.sidebar.expander("📷 Company Branding", expanded=True):
+        # Option 1: Use GitHub images
+        use_github = st.checkbox("Use GitHub Images", value=True, 
+                                       help="Use logo and stamp from GitHub repository")
         
-        if uploaded_stamp:
-            global_stamp_path = save_uploaded_file(uploaded_stamp, "custom_stamp.jpg")
-            if global_stamp_path:
-                st.sidebar.success("✓ Custom stamp loaded")
-    
-    # Display image status
-    st.sidebar.subheader("Image Status")
-    if global_logo_path:
-        st.sidebar.info("Logo: ✅ Loaded")
-    else:
-        st.sidebar.error("Logo: ❌ Not available")
-    
-    if global_stamp_path:
-        st.sidebar.info("Stamp: ✅ Loaded")
-    else:
-        st.sidebar.error("Stamp: ❌ Not available")
+        # Option 2: Upload custom images
+        uploaded_logo = None
+        uploaded_stamp = None
+        
+        if not use_github:
+            st.markdown("---")
+            st.markdown("### Upload Custom Images")
+            uploaded_logo = st.file_uploader("Upload Company Logo", 
+                                                   type=["png", "jpg", "jpeg"], 
+                                                   key="global_logo")
+            uploaded_stamp = st.file_uploader("Upload Company Stamp", 
+                                                    type=["png", "jpg", "jpeg"], 
+                                                    key="global_stamp")
+        
+        # Load images based on selection
+        global_logo_path = None
+        global_stamp_path = None
+        
+        if use_github:
+            with st.status("Loading images from GitHub...", expanded=False) as status:
+                global_logo_path, global_stamp_path = load_images_from_github()
+                if global_logo_path and global_stamp_path:
+                    status.update(label="✓ Logo and Stamp loaded from GitHub", state="complete")
+                else:
+                    status.update(label="⚠ Failed to load all assets", state="error")
+        else:
+            if uploaded_logo:
+                global_logo_path = save_uploaded_file(uploaded_logo, "custom_logo.jpg")
+                if global_logo_path:
+                    st.success("✓ Custom logo loaded")
+            
+            if uploaded_stamp:
+                global_stamp_path = save_uploaded_file(uploaded_stamp, "custom_stamp.jpg")
+                if global_stamp_path:
+                    st.success("✓ Custom stamp loaded")
+        
+        # Display image status
+        st.markdown("---")
+        st.markdown("**Image Load Status**")
+        if global_logo_path:
+            st.info("Logo: ✅ Active")
+        else:
+            st.error("Logo: ❌ Missing")
+        
+        if global_stamp_path:
+            st.info("Stamp: ✅ Active")
+        else:
+            st.error("Stamp: ❌ Missing")
 
     # Add Data Debug Section
-    st.sidebar.header("🔄 Data Debug")
-    
-    # Force refresh button
-    if st.sidebar.button("🔄 Force Refresh All Data", key="force_refresh_all"):
-        st.cache_data.clear()
-        st.sidebar.success("✅ All caches cleared! Data will reload.")
-        st.rerun()
-    
-    # Check data files button
-    if st.sidebar.button("📊 Check Data Files"):
-        try:
-            # Check vendor.json
-            with open('vendor.json', 'r', encoding='utf-8') as f:
-                vendor_data = json.load(f)
-            st.sidebar.success(f"✅ vendor.json: {len(vendor_data)} vendors")
-            if vendor_data:
-                first_vendor = list(vendor_data.keys())[0]
-                st.sidebar.info(f"First vendor: {first_vendor}")
-        except Exception as e:
-            st.sidebar.error(f"❌ vendor.json error: {e}")
+    with st.sidebar.expander("🔄 Database & Debug Tools", expanded=False):
+        # Force refresh button
+        if st.button("🔄 Force Refresh All Data", key="force_refresh_all", use_container_width=True):
+            st.cache_data.clear()
+            st.success("✅ All caches cleared!")
+            st.rerun()
         
-        try:
-            # Check endusers.json
-            with open('endusers.json', 'r', encoding='utf-8') as f:
-                enduser_data = json.load(f)
-            st.sidebar.success(f"✅ endusers.json: {len(enduser_data)} end users")
-            if enduser_data:
-                first_enduser = list(enduser_data.keys())[0]
-                st.sidebar.info(f"First end user: {first_enduser}")
-        except Exception as e:
-            st.sidebar.error(f"❌ endusers.json error: {e}")
+        # Check data files button
+        if st.button("📊 Check File Integrity", key="check_file_integrity", use_container_width=True):
+            try:
+                # Check vendor.json
+                with open('vendor.json', 'r', encoding='utf-8') as f:
+                    vendor_data = json.load(f)
+                st.success(f"vendor.json: {len(vendor_data)} vendors loaded")
+                if vendor_data:
+                    st.caption(f"First entry: {list(vendor_data.keys())[0]}")
+            except Exception as e:
+                st.error(f"vendor.json error: {e}")
+            
+            try:
+                # Check endusers.json
+                with open('endusers.json', 'r', encoding='utf-8') as f:
+                    enduser_data = json.load(f)
+                st.success(f"endusers.json: {len(enduser_data)} endusers loaded")
+                if enduser_data:
+                    st.caption(f"First entry: {list(enduser_data.keys())[0]}")
+            except Exception as e:
+                st.error(f"endusers.json error: {e}")
 
     # --- Initialize Session State ---
 # Quotation session states
@@ -2601,6 +2689,10 @@ def main():
             
             # You can also add GST field if needed
             vendor_gst = st.text_input("GST No (Optional)", key="quote_end_gst_no")
+            if vendor_gst.strip():
+                is_valid, msg = validate_gst(vendor_gst)
+                if not is_valid:
+                    show_validation_warning(msg)
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")
@@ -2687,6 +2779,13 @@ def main():
         with col5:
             st.metric("Grand Total", f"₹{grand_total:,.2f}")
         
+        # Document preview container
+        st.subheader("👀 Live Document Preview")
+        if st.session_state.quotation_products:
+            show_document_preview("Quotation", st.session_state.quotation_number, vendor_name, st.session_state.quotation_products, grand_total)
+        else:
+            st.info("Add products to see live document preview.")
+
         # Use global images
         st.subheader("Company Branding")
         st.info("Using global logo and stamp from sidebar settings")
@@ -2764,6 +2863,44 @@ def main():
                     
                 except Exception as e:
                     st.error(f"Error generating PDF: {str(e)}")
+
+        # --- Quick Transfer Section ---
+        st.markdown("---")
+        st.subheader("📋 Quick Transfer")
+        st.caption("Copy this quotation's details to other generators to save time.")
+        col_copy1, col_copy2 = st.columns(2)
+        with col_copy1:
+            if st.button("🛒 Copy to Purchase Order", key="copy_to_po", use_container_width=True):
+                if not st.session_state.quotation_products:
+                    st.warning("No products to copy.")
+                else:
+                    st.session_state.po_end_company = st.session_state.quote_end_company
+                    st.session_state.po_end_address = st.session_state.quote_end_address
+                    st.session_state.po_end_person = st.session_state.quote_end_person
+                    st.session_state.po_end_mobile = st.session_state.quote_end_mobile
+                    st.session_state.po_end_email = st.session_state.quote_end_email
+                    st.session_state.po_end_gst_no = st.session_state.quote_end_gst_no
+                    st.session_state.products = [dict(p) for p in st.session_state.quotation_products]
+                    st.success("✅ Copied to Purchase Order! Go to 'Purchase Order Generator' tab.")
+        with col_copy2:
+            if st.button("🧾 Copy to Tax Invoice", key="copy_to_invoice", use_container_width=True):
+                if not st.session_state.quotation_products:
+                    st.warning("No products to copy.")
+                else:
+                    st.session_state.invoice_buyer_company = st.session_state.quote_end_company
+                    st.session_state.invoice_buyer_address = st.session_state.quote_end_address
+                    st.session_state.invoice_buyer_mobile = st.session_state.quote_end_mobile
+                    st.session_state.invoice_buyer_email = st.session_state.quote_end_email
+                    st.session_state.invoice_buyer_gst = st.session_state.quote_end_gst_no
+                    
+                    # Copy items
+                    st.session_state.invoice_num_items = len(st.session_state.quotation_products)
+                    for idx, p in enumerate(st.session_state.quotation_products):
+                        st.session_state[f"invoice_desc_{idx}"] = p["name"]
+                        st.session_state[f"invoice_rate_{idx}"] = p["basic"]
+                        st.session_state[f"invoice_qty_{idx}"] = p["qty"]
+                        
+                    st.success("✅ Copied to Tax Invoice! Go to 'Tax Invoice Generator' tab.")
 
                 
     # --- Tab 2: Purchase Order Generator ---
@@ -3102,10 +3239,18 @@ def main():
                 "GST No",
                 key="po_gst_no"
             )
+            if gst_no.strip():
+                is_valid, msg = validate_gst(gst_no)
+                if not is_valid:
+                    show_validation_warning(msg)
             pan_no = st.text_input(
                 "PAN No",
                 key="po_pan_no"
             )
+            if pan_no.strip():
+                is_valid, msg = validate_pan(pan_no)
+                if not is_valid:
+                    show_validation_warning(msg)
             msme_no = st.text_input(
                 "MSME No",
                 key="po_msme_no"
@@ -3130,7 +3275,12 @@ def main():
             total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.products)
             grand_total = total_base + total_gst
             amount_words = num2words(grand_total, to="currency", currency="INR").title()
-            st.metric("Grand Total", f"₹{grand_total:,.2f}")
+            # Document preview container
+            st.subheader("👀 Live Document Preview")
+            if st.session_state.products:
+                show_document_preview("Purchase Order", st.session_state.po_number, end_company, st.session_state.products, grand_total)
+            else:
+                st.info("Add products to see live document preview.")
 
             # Use global logo
             logo_path = global_logo_path
@@ -3411,6 +3561,10 @@ def main():
                 "Buyer GST No.",
                 key="invoice_buyer_gst"
             )
+            if buyer_gst.strip():
+                is_valid, msg = validate_gst(buyer_gst)
+                if not is_valid:
+                    show_validation_warning(msg)
 
             st.subheader("Products")
             items = []
@@ -3474,6 +3628,19 @@ def main():
             if not stamp_path:
                 st.warning("⚠ No company stamp available")
             
+            # Calculate dynamic totals for preview
+            temp_basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
+            temp_sgst = round(temp_basic_amount * 0.09, 2)
+            temp_cgst = round(temp_basic_amount * 0.09, 2)
+            temp_final_amount = round(temp_basic_amount + temp_sgst + temp_cgst)
+            
+            # Document preview container
+            st.subheader("👀 Live Document Preview")
+            if items:
+                show_document_preview("Tax Invoice", st.session_state.invoice_number, buyer_name, items, temp_final_amount)
+            else:
+                st.info("Add products to see live document preview.")
+
             st.subheader("Invoice Preview & Download")
 
             if st.button("Generate Invoice", key="generate_invoice_button"):

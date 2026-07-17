@@ -84,6 +84,11 @@ def show_validation_warning(msg):
     """Display an inline warning in red for form inputs"""
     st.markdown(f'<p style="color:#e53e3e;font-size:0.82rem;margin-top:-12px;margin-bottom:12px;padding-left:4px;">⚠ {msg}</p>', unsafe_allow_html=True)
 
+def show_validation_success(msg="Format Verified"):
+    """Display an inline success indicator in green for valid inputs"""
+    st.markdown(f'<p style="color:#10b981;font-size:0.82rem;margin-top:-12px;margin-bottom:12px;padding-left:4px;font-weight:600;">✓ {msg}</p>', unsafe_allow_html=True)
+
+
 def show_document_preview(doc_type, doc_number, company_name, items_list, grand_total):
     """Render a styled visual preview of the document before generation"""
     items_html = ""
@@ -2710,6 +2715,8 @@ def main():
                 is_valid, msg = validate_gst(vendor_gst)
                 if not is_valid:
                     show_validation_warning(msg)
+                else:
+                    show_validation_success("GSTIN Format Verified")
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")
@@ -3260,6 +3267,8 @@ def main():
                 is_valid, msg = validate_gst(gst_no)
                 if not is_valid:
                     show_validation_warning(msg)
+                else:
+                    show_validation_success("GSTIN Format Verified")
             pan_no = st.text_input(
                 "PAN No",
                 key="po_pan_no"
@@ -3268,6 +3277,8 @@ def main():
                 is_valid, msg = validate_pan(pan_no)
                 if not is_valid:
                     show_validation_warning(msg)
+                else:
+                    show_validation_success("PAN Format Verified")
             msme_no = st.text_input(
                 "MSME No",
                 key="po_msme_no"
@@ -3582,6 +3593,8 @@ def main():
                 is_valid, msg = validate_gst(buyer_gst)
                 if not is_valid:
                     show_validation_warning(msg)
+                else:
+                    show_validation_success("GSTIN Format Verified")
 
             st.subheader("Products")
             items = []

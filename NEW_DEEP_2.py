@@ -1,22 +1,20 @@
 import streamlit as st
-from fpdf import FPDF
 import pandas as pd
-from num2words import num2words
 import datetime
 import io
-from PIL import Image
 import os
-from fpdf import FPDF, HTMLMixin
-import textwrap
-import html as _html 
 import json
-import requests  # Add this import for downloading from GitHub
+import time
+import textwrap
+import html as _html
+import requests
+from fpdf import FPDF, HTMLMixin
+from num2words import num2words
+from PIL import Image
 
-# GitHub Configuration - FIXED URLs
+# GitHub Configuration
 LOGO_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/logo_final.jpg"
 STAMP_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/stamp.jpg"
-
-import time
 
 # --- Global Data and Configuration ---
 # Product catalog is now loaded from products.json (same pattern as vendor.json and endusers.json)
@@ -53,12 +51,7 @@ VENDOR_DATABASE = load_json_data('vendor.json')
 END_USER_DATABASE = load_json_data('endusers.json')
 PRODUCT_CATALOG = load_json_data('products.json')
 
-# Debug: Print what's loaded
-print("=" * 50)
-print(f"DEBUG: Loaded {len(VENDOR_DATABASE)} vendors from vendor.json")
-print(f"DEBUG: Loaded {len(END_USER_DATABASE)} end users from endusers.json")
-print(f"DEBUG: Loaded {len(PRODUCT_CATALOG)} products from products.json")
-print("=" * 50)
+
 
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
@@ -158,8 +151,6 @@ def get_current_quarter():
     else:
         return "Q4"
 
-import os
-
 # Simple file-based counter for PO sequence
 PO_COUNTER_FILE = "po_counter.txt"
 
@@ -230,8 +221,6 @@ def get_next_sequence_number_po(po_number):
     except:
         pass
     return 1
-import os
-
 # Simple file-based counter for quotations
 QUOTATION_COUNTER_FILE = "quotation_counter.txt"
 
@@ -325,8 +314,6 @@ def get_next_sequence_number(quotation_number):
         pass
     return 1
 
-
-import os
 
 # Simple file-based counter for Invoice sequence
 INVOICE_COUNTER_FILE = "invoice_counter.txt"
@@ -1006,7 +993,6 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
             st.error(f"PDF generation failed: {e}")
             return b""
 
-from fpdf import FPDF
 # --- PDF Class for Tax Invoice ---
 class PDF(FPDF):
     def __init__(self):
@@ -1587,9 +1573,9 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
     # Bank details lines
     bank_lines = [
         ("Bank Name", "IDFC FIRST BANK"),
-        ("Branch", "AHMEDAB11AD Shyamal Branch"),
-        ("Account No", "8813042018211"),
-        ("IFS Code", "IDFB004033511")
+        ("Branch", "AHMEDABAD Shyamal Branch"),
+        ("Account No", "88130420182"),
+        ("IFS Code", "IDFB0040335")
     ]
 
     pdf.set_font(pdf.default_font, "", 10)
@@ -1648,7 +1634,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
         "1. PAYMENT TO BE A/C PAYEE 'CMINFOTECH'.",
         "2. ALL WARRANTY SUBJECT TO RESPECTIVE PRINCIPAL COMPANY'S POLICY.",
         "3. GOOD ONCE SOLD WILL NOT BE TAKEN BACK UNDER ANY CIRCUMSTANCES.",
-        "4. INTEREST WILL BE CHARGED @24% P.A IF PAYMENT IS NOT MADE WITHIN TIME.",
+        "4. INTEREST WILL BE CHARGED @24% PER ANNUM IF PAYMENT IS NOT MADE WITHIN TIME.",
     ]
 
     # Write terms in left box with wrapping
@@ -2324,10 +2310,29 @@ def save_uploaded_file(uploaded_file, filename):
         st.sidebar.error(f"Error saving {filename}: {str(e)}")
         return None
 
+# --- Custom CSS Theme ---
+def inject_custom_css():
+    """Inject modern premium CSS theme for the dashboard"""
+    css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'theme.css')
+    if os.path.exists(css_path):
+        with open(css_path, 'r') as f:
+            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
 # --- The main function with Logo/Stamp Management ---
 def main():
-    st.set_page_config(page_title="Document Generator", page_icon="📑", layout="wide")
-    st.title("📑 Document Generator - Invoice, PO & Quotation")
+    st.set_page_config(page_title="CM INFOTECH | Document Generator", page_icon="📑", layout="wide", initial_sidebar_state="expanded")
+    inject_custom_css()
+    st.markdown(
+        '<div style="text-align:center;padding:8px 0 24px 0">'
+        '<div style="font-size:2.5rem;margin-bottom:4px">📑</div>'
+        '<h1 style="margin:0;font-size:2rem;background:linear-gradient(135deg,#667eea,#764ba2);'
+        '-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">'
+        'CM INFOTECH — Document Generator</h1>'
+        '<p style="color:#999;font-size:0.85rem;margin-top:6px;letter-spacing:3px;'
+        'text-transform:uppercase;font-weight:500">'
+        'Quotation · Purchase Order · Tax Invoice</p></div>',
+        unsafe_allow_html=True
+    )
 
     # --- Logo and Stamp Configuration in Sidebar ---
     st.sidebar.header("📷 Company Branding")
@@ -2422,7 +2427,6 @@ def main():
         except Exception as e:
             st.sidebar.error(f"❌ endusers.json error: {e}")
 
-    # --- Initialize Session State ---
     # --- Initialize Session State ---
 # Quotation session states
     if "quotation_seq" not in st.session_state:
@@ -2578,7 +2582,7 @@ def main():
         st.info("Vendor & End User details auto-filled from Excel ✅")
 
     # Create tabs for different document types
-    tab1, tab2, tab3 = st.tabs(["Quotation Generator", "Purchase Order Generator", "Tax Invoice Generator"])
+    tab1, tab2, tab3 = st.tabs(["📋 Quotation Generator", "🛒 Purchase Order Generator", "🧾 Tax Invoice Generator"])
 
     # --- Tab 1: Quotation Generator ---
     with tab1:
@@ -3751,7 +3755,12 @@ for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_s
             pass
 
 st.divider()
-st.caption("© 2025 Document Generator - CM INFOTECH")
+st.markdown(
+    '<div style="text-align:center;padding:10px 0;opacity:0.6">'
+    '<p style="font-size:0.8rem;color:#666">© 2025 CM INFOTECH — Document Generator · Built with ❤️ using Streamlit</p>'
+    '</div>',
+    unsafe_allow_html=True
+)
 
 if __name__ == "__main__":
     main()

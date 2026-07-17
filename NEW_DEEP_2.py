@@ -102,68 +102,65 @@ def show_document_preview(doc_type, doc_number, company_name, items_list, grand_
         total_base += base_amount
         total_gst += item_gst
         
-        items_html += f"""
-        <tr style="border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.85rem;">
-            <td style="padding: 8px; color: #4a5568;">{idx+1}</td>
-            <td style="padding: 8px; color: #2d3748; font-weight: 500;">{name}</td>
-            <td style="padding: 8px; color: #4a5568; text-align: center;">{qty}</td>
-            <td style="padding: 8px; color: #4a5568; text-align: right;">₹{price:,.2f}</td>
-            <td style="padding: 8px; color: #2d3748; font-weight: 600; text-align: right;">₹{base_amount:,.2f}</td>
-        </tr>
-        """
+        items_html += (
+            f'<tr style="border-bottom:1px solid rgba(0,0,0,0.05);font-size:0.85rem;">'
+            f'<td style="padding:8px;color:#4a5568;">{idx+1}</td>'
+            f'<td style="padding:8px;color:#2d3748;font-weight:500;">{name}</td>'
+            f'<td style="padding:8px;color:#4a5568;text-align:center;">{qty}</td>'
+            f'<td style="padding:8px;color:#4a5568;text-align:right;">₹{price:,.2f}</td>'
+            f'<td style="padding:8px;color:#2d3748;font-weight:600;text-align:right;">₹{base_amount:,.2f}</td>'
+            f'</tr>'
+        )
         
     calculated_grand_total = round(total_base + total_gst)
     
-    preview_html = f"""
-    <div style="background: white; border-radius: 14px; padding: 24px; border: 1px solid rgba(0,0,0,0.08); 
-                box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #667eea; padding-bottom: 12px; margin-bottom: 16px;">
-            <div>
-                <h4 style="margin: 0; color: #2d3748; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; color: #667eea;">{doc_type} PREVIEW</h4>
-                <p style="margin: 4px 0 0 0; color: #718096; font-size: 0.75rem;">Doc #: <strong>{doc_number}</strong></p>
-            </div>
-            <div style="text-align: right;">
-                <p style="margin: 0; font-weight: 700; color: #2d3748; font-size: 0.9rem;">CM INFOTECH</p>
-                <p style="margin: 2px 0 0 0; color: #718096; font-size: 0.7rem;">Ahmedabad, India</p>
-            </div>
-        </div>
-        
-        <div style="margin-bottom: 16px;">
-            <p style="margin: 0; font-size: 0.75rem; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">Client / End User</p>
-            <p style="margin: 4px 0 0 0; font-weight: 600; color: #2d3748; font-size: 0.9rem;">{company_name}</p>
-        </div>
-        
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
-            <thead>
-                <tr style="background: rgba(102, 126, 234, 0.05); border-bottom: 1px solid rgba(102, 126, 234, 0.1); font-size: 0.75rem; color: #4a5568; text-transform: uppercase;">
-                    <th style="padding: 8px; text-align: left; font-weight: 600;">#</th>
-                    <th style="padding: 8px; text-align: left; font-weight: 600;">Description</th>
-                    <th style="padding: 8px; text-align: center; font-weight: 600;">Qty</th>
-                    <th style="padding: 8px; text-align: right; font-weight: 600;">Rate</th>
-                    <th style="padding: 8px; text-align: right; font-weight: 600;">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {items_html}
-            </tbody>
-        </table>
-        
-        <div style="border-top: 1px solid rgba(0,0,0,0.08); padding-top: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-            <div style="font-size: 0.85rem; color: #4a5568; display: flex; justify-content: flex-end; width: 100%;">
-                <span style="font-weight: 500; margin-right: 8px;">Subtotal (Base):</span>
-                <span style="font-weight: 600; min-width: 120px; text-align: right; display: inline-block;">₹{total_base:,.2f}</span>
-            </div>
-            <div style="font-size: 0.85rem; color: #4a5568; display: flex; justify-content: flex-end; width: 100%;">
-                <span style="font-weight: 500; margin-right: 8px;">GST Breakdown:</span>
-                <span style="font-weight: 600; min-width: 120px; text-align: right; display: inline-block;">₹{total_gst:,.2f}</span>
-            </div>
-            <div style="margin-top: 8px; border-top: 2px solid #667eea; padding-top: 8px; font-size: 1.15rem; color: #667eea; font-weight: 800; display: flex; justify-content: flex-end; width: 100%;">
-                <span style="margin-right: 8px; font-size: 0.85rem; font-weight: 700; color: #718096; text-transform: uppercase; align-self: center;">Estimated Total:</span>
-                <span style="min-width: 120px; text-align: right; display: inline-block;">₹{calculated_grand_total:,.2f}</span>
-            </div>
-        </div>
-    </div>
-    """
+    preview_html = (
+        f'<div style="background:white;border-radius:14px;padding:24px;border:1px solid rgba(0,0,0,0.08);'
+        f'box-shadow:0 4px 20px rgba(0,0,0,0.05);margin-bottom:20px;">'
+        f'<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #667eea;padding-bottom:12px;margin-bottom:16px;">'
+        f'<div>'
+        f'<h4 style="margin:0;color:#2d3748;font-weight:700;text-transform:uppercase;font-size:0.85rem;letter-spacing:1px;color:#667eea;">{doc_type} PREVIEW</h4>'
+        f'<p style="margin:4px 0 0 0;color:#718096;font-size:0.75rem;">Doc #: <strong>{doc_number}</strong></p>'
+        f'</div>'
+        f'<div style="text-align:right;">'
+        f'<p style="margin:0;font-weight:700;color:#2d3748;font-size:0.9rem;">CM INFOTECH</p>'
+        f'<p style="margin:2px 0 0 0;color:#718096;font-size:0.7rem;">Ahmedabad, India</p>'
+        f'</div>'
+        f'</div>'
+        f'<div style="margin-bottom:16px;">'
+        f'<p style="margin:0;font-size:0.75rem;color:#718096;text-transform:uppercase;letter-spacing:0.5px;">Client / End User</p>'
+        f'<p style="margin:4px 0 0 0;font-weight:600;color:#2d3748;font-size:0.9rem;">{company_name}</p>'
+        f'</div>'
+        f'<table style="width:100%;border-collapse:collapse;margin-bottom:16px;">'
+        f'<thead>'
+        f'<tr style="background:rgba(102,126,234,0.05);border-bottom:1px solid rgba(102,126,234,0.1);font-size:0.75rem;color:#4a5568;text-transform:uppercase;">'
+        f'<th style="padding:8px;text-align:left;font-weight:600;">#</th>'
+        f'<th style="padding:8px;text-align:left;font-weight:600;">Description</th>'
+        f'<th style="padding:8px;text-align:center;font-weight:600;">Qty</th>'
+        f'<th style="padding:8px;text-align:right;font-weight:600;">Rate</th>'
+        f'<th style="padding:8px;text-align:right;font-weight:600;">Amount</th>'
+        f'</tr>'
+        f'</thead>'
+        f'<tbody>'
+        f'{items_html}'
+        f'</tbody>'
+        f'</table>'
+        f'<div style="border-top:1px solid rgba(0,0,0,0.08);padding-top:12px;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">'
+        f'<div style="font-size:0.85rem;color:#4a5568;display:flex;justify-content:flex-end;width:100%;">'
+        f'<span style="font-weight:500;margin-right:8px;">Subtotal (Base):</span>'
+        f'<span style="font-weight:600;min-width:120px;text-align:right;display:inline-block;">₹{total_base:,.2f}</span>'
+        f'</div>'
+        f'<div style="font-size:0.85rem;color:#4a5568;display:flex;justify-content:flex-end;width:100%;">'
+        f'<span style="font-weight:500;margin-right:8px;">GST Breakdown:</span>'
+        f'<span style="font-weight:600;min-width:120px;text-align:right;display:inline-block;">₹{total_gst:,.2f}</span>'
+        f'</div>'
+        f'<div style="margin-top:8px;border-top:2px solid #667eea;padding-top:8px;font-size:1.15rem;color:#667eea;font-weight:800;display:flex;justify-content:flex-end;width:100%;">'
+        f'<span style="margin-right:8px;font-size:0.85rem;font-weight:700;color:#718096;text-transform:uppercase;align-self:center;">Estimated Total:</span>'
+        f'<span style="min-width:120px;text-align:right;display:inline-block;">₹{calculated_grand_total:,.2f}</span>'
+        f'</div>'
+        f'</div>'
+        f'</div>'
+    )
     st.markdown(preview_html, unsafe_allow_html=True)
 
 

@@ -2279,538 +2279,1375 @@ def inject_custom_css():
 
 # --- The main function with Logo/Stamp Management ---
 def main():
-        st.set_page_config(page_title="CM INFOTECH | Document Generator", page_icon="📑", layout="wide", initial_sidebar_state="expanded")
-        inject_custom_css()
-        st.markdown(
-            '<div style="text-align:center;padding:8px 0 24px 0">'
-            '<div style="font-size:2.5rem;margin-bottom:4px">📑</div>'
-            '<h1 style="margin:0;font-size:2rem;background:linear-gradient(135deg,#667eea,#764ba2);'
-            '-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">'
-            'CM INFOTECH — Document Generator</h1>'
-            '<p style="color:#999;font-size:0.85rem;margin-top:6px;letter-spacing:3px;'
-            'text-transform:uppercase;font-weight:500">'
-            'Quotation · Purchase Order · Tax Invoice</p></div>',
-            unsafe_allow_html=True
-        )
+    st.set_page_config(page_title="CM INFOTECH | Document Generator", page_icon="📑", layout="wide", initial_sidebar_state="expanded")
+    inject_custom_css()
+    st.markdown(
+        '<div style="text-align:center;padding:8px 0 24px 0">'
+        '<div style="font-size:2.5rem;margin-bottom:4px">📑</div>'
+        '<h1 style="margin:0;font-size:2rem;background:linear-gradient(135deg,#667eea,#764ba2);'
+        '-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">'
+        'CM INFOTECH — Document Generator</h1>'
+        '<p style="color:#999;font-size:0.85rem;margin-top:6px;letter-spacing:3px;'
+        'text-transform:uppercase;font-weight:500">'
+        'Quotation · Purchase Order · Tax Invoice</p></div>',
+        unsafe_allow_html=True
+    )
 
-        # --- Logo and Stamp Configuration in Sidebar ---
-        with st.sidebar.expander("📷 Company Branding", expanded=True):
-            # Option 1: Use GitHub images
-            use_github = st.checkbox("Use GitHub Images", value=True, 
-                                        help="Use logo and stamp from GitHub repository")
-            
-            # Option 2: Upload custom images
-            uploaded_logo = None
-            uploaded_stamp = None
-            
-            if not use_github:
-                st.markdown("---")
-                st.markdown("### Upload Custom Images")
-                uploaded_logo = st.file_uploader("Upload Company Logo", 
-                                                    type=["png", "jpg", "jpeg"], 
-                                                    key="global_logo")
-                uploaded_stamp = st.file_uploader("Upload Company Stamp", 
-                                                        type=["png", "jpg", "jpeg"], 
-                                                        key="global_stamp")
-            
-            # Load images based on selection
-            global_logo_path = None
-            global_stamp_path = None
-            
-            if use_github:
-                with st.status("Loading images from GitHub...", expanded=False) as status:
-                    global_logo_path, global_stamp_path = load_images_from_github()
-                    if global_logo_path and global_stamp_path:
-                        status.update(label="✓ Logo and Stamp loaded from GitHub", state="complete")
-                    else:
-                        status.update(label="⚠ Failed to load all assets", state="error")
-            else:
-                if uploaded_logo:
-                    global_logo_path = save_uploaded_file(uploaded_logo, "custom_logo.jpg")
-                    if global_logo_path:
-                        st.success("✓ Custom logo loaded")
-                
-                if uploaded_stamp:
-                    global_stamp_path = save_uploaded_file(uploaded_stamp, "custom_stamp.jpg")
-                    if global_stamp_path:
-                        st.success("✓ Custom stamp loaded")
-            
-            # Display image status
-            st.markdown("---")
-            st.markdown("**Image Load Status**")
-            if global_logo_path:
-                st.info("Logo: ✅ Active")
-            else:
-                st.error("Logo: ❌ Missing")
-            
-            if global_stamp_path:
-                st.info("Stamp: ✅ Active")
-            else:
-                st.error("Stamp: ❌ Missing")
-
-        # Add Data Debug Section
-        with st.sidebar.expander("🔄 Database & Debug Tools", expanded=False):
-            # Force refresh button
-            if st.button("🔄 Force Refresh All Data", key="force_refresh_all", use_container_width=True):
-                st.cache_data.clear()
-                st.success("✅ All caches cleared!")
-                st.rerun()
-            
-            # Check data files button
-            if st.button("📊 Check File Integrity", key="check_file_integrity", use_container_width=True):
-                try:
-                    # Check vendor.json
-                    with open('vendor.json', 'r', encoding='utf-8') as f:
-                        vendor_data = json.load(f)
-                    st.success(f"vendor.json: {len(vendor_data)} vendors loaded")
-                    if vendor_data:
-                        st.caption(f"First entry: {list(vendor_data.keys())[0]}")
-                except Exception as e:
-                    st.error(f"vendor.json error: {e}")
-                
-                try:
-                    # Check endusers.json
-                    with open('endusers.json', 'r', encoding='utf-8') as f:
-                        enduser_data = json.load(f)
-                    st.success(f"endusers.json: {len(enduser_data)} endusers loaded")
-                    if enduser_data:
-                        st.caption(f"First entry: {list(enduser_data.keys())[0]}")
-                except Exception as e:
-                    st.error(f"endusers.json error: {e}")
-
-        # --- Initialize Session State ---
-    # Quotation session states
-        if "quotation_seq" not in st.session_state:
-            st.session_state.quotation_seq = get_current_quotation_sequence()
-        if "quotation_products" not in st.session_state:
-            st.session_state.quotation_products = []
-        if "last_quotation_number" not in st.session_state:
-            st.session_state.last_quotation_number = ""
-        if "quotation_number" not in st.session_state:
-            st.session_state.quotation_number = generate_quotation_number("SD", st.session_state.quotation_seq)
-        if "current_quote_sales_person" not in st.session_state:
-            st.session_state.current_quote_sales_person = "SD"
-
-        # PO session states  
-        if "po_seq" not in st.session_state:
-            st.session_state.po_seq = get_current_po_sequence()
-        if "products" not in st.session_state:
-            st.session_state.products = []
-        if "company_name" not in st.session_state:
-            st.session_state.company_name = "CM INFOTECH"
-        if "po_number" not in st.session_state:
-            st.session_state.po_number = generate_po_number("CP", st.session_state.po_seq)
-        if "po_date" not in st.session_state:
-            st.session_state.po_date = datetime.date.today().strftime("%d-%m-%Y")
-        if "last_po_number" not in st.session_state:
-            st.session_state.last_po_number = ""
-        if "current_po_sales_person" not in st.session_state:
-            st.session_state.current_po_sales_person = "CP"
-        if "current_po_quarter" not in st.session_state:
-            st.session_state.current_po_quarter = get_current_quarter()
-
-        # Invoice session states
-        if "invoice_seq" not in st.session_state:
-            st.session_state.invoice_seq = get_current_invoice_sequence()
-        if "invoice_number" not in st.session_state:
-            st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
-        if "last_invoice_number" not in st.session_state:
-            st.session_state.last_invoice_number = ""
-        if "current_invoice_quarter" not in st.session_state:
-            st.session_state.current_invoice_quarter = get_current_quarter()
-
-        # Invoice buyer session states - ADDED
-        if "invoice_buyer_company" not in st.session_state:
-            st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
-        if "invoice_buyer_address" not in st.session_state:
-            st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
-        if "invoice_buyer_gst" not in st.session_state:
-            st.session_state.invoice_buyer_gst = "24AAHCB9"
-        if "invoice_buyer_mobile" not in st.session_state:
-            st.session_state.invoice_buyer_mobile = "98987 91813"
-        if "invoice_buyer_email" not in st.session_state:
-            st.session_state.invoice_buyer_email = "dmistry@baseengr.com"
+    # --- Logo and Stamp Configuration in Sidebar ---
+    with st.sidebar.expander("📷 Company Branding", expanded=True):
+        # Option 1: Use GitHub images
+        use_github = st.checkbox("Use GitHub Images", value=True, 
+                                       help="Use logo and stamp from GitHub repository")
         
-                    #     st.session_state.invoice_buyer_mobile = enduser_data.get("mobile", "")
-                    # st.session_state.invoice_buyer_email = enduser_data.get("email", "")
-
-        # Vendor session states
-        if "po_vendor_name" not in st.session_state:
-            st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
-        if "po_vendor_address" not in st.session_state:
-            st.session_state.po_vendor_address = "Unit 801-802, 8th Floor, Tower 1..."
-        if "po_vendor_contact" not in st.session_state:
-            st.session_state.po_vendor_contact = "Ms/Mr"
-        if "po_vendor_mobile" not in st.session_state:
-            st.session_state.po_vendor_mobile = "+91 1234567890"
-        if "po_gst_no" not in st.session_state:
-            st.session_state.po_gst_no = "24ANMPP4891R1ZX"
-        if "po_pan_no" not in st.session_state:
-            st.session_state.po_pan_no = "ANMPP4891R"
-        if "po_msme_no" not in st.session_state:
-            st.session_state.po_msme_no = "UDYAM-GJ-01-0117646"
-
-        # Quotation end user session states
-        if "quote_end_company" not in st.session_state:
-            st.session_state.quote_end_company = "Baldridge & Associates Pvt Ltd."
-        if "quote_end_address" not in st.session_state:
-            st.session_state.quote_end_address = "406 Sakar East, Vadodara 390009"
-        if "quote_end_person" not in st.session_state:
-            st.session_state.quote_end_person = "Mr. Dev"
-        if "quote_end_mobile" not in st.session_state:
-            st.session_state.quote_end_mobile = "1234567891"
-        if "quote_end_email" not in st.session_state:
-            st.session_state.quote_end_email = "info@company.com"
-        if "quote_end_gst_no" not in st.session_state:
-            st.session_state.quote_end_gst_no = "24AAHCB9"
-
-        # PO end user session states - ADDED
-        if "po_end_company" not in st.session_state:
-            st.session_state.po_end_company = "Baldridge & Associates Pvt Ltd."
-        if "po_end_address" not in st.session_state:
-            st.session_state.po_end_address = "406 Sakar East, Vadodara 390009"
-        if "po_end_person" not in st.session_state:
-            st.session_state.po_end_person = "Mr. Dev"
-        if "po_end_mobile" not in st.session_state:
-            st.session_state.po_end_mobile = "1234567891"
-        if "po_end_email" not in st.session_state:
-            st.session_state.po_end_email = "info@company.com"
-        if "po_end_gst_no" not in st.session_state:
-            st.session_state.po_end_gst_no = "24AAHCB9"
-
-        # PO bill to/ship to session states - ADDED
-        if "po_bill_to_company" not in st.session_state:
-            st.session_state.po_bill_to_company = "CM INFOTECH"
-        if "po_bill_to_address" not in st.session_state:
-            st.session_state.po_bill_to_address = "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"
-        if "po_ship_to_company" not in st.session_state:
-            st.session_state.po_ship_to_company = "CM INFOTECH"
-        if "po_ship_to_address" not in st.session_state:
-            st.session_state.po_ship_to_address = "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"
-
-        # --- Upload Excel and Load Vendor/End User ---
-        uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
-
-        if uploaded_excel:
-            vendors_df = pd.read_excel(uploaded_excel, sheet_name="Vendors", dtype={"Mobile": str})
-            endusers_df = pd.read_excel(uploaded_excel, sheet_name="EndUsers")
-
-            st.success("✅ Excel loaded successfully!")
-
-            # --- Select Vendor ---
-            vendor_name = st.selectbox("Select Vendor", vendors_df["Vendor Name"].unique())
-            vendor = vendors_df[vendors_df["Vendor Name"] == vendor_name].iloc[0]
-
-            # --- Select End User ---
-            end_user_name = st.selectbox("Select End User", endusers_df["End User Company"].unique())
-            end_user = endusers_df[endusers_df["End User Company"] == end_user_name].iloc[0]
-
-            # --- Clean and Convert Mobile (avoid float or NaN issues) ---
-            def safe_strip(value):
-                """Safely convert any value to string and strip whitespace."""
-                try:
-                    if pd.isna(value):
-                        return ""
-                    return str(value).split(".")[0].strip()
-                except Exception:
-                    return ""
-
-            vendor_mobile = safe_strip(vendor.get("Mobile", ""))
-            End_user_mobile = safe_strip(end_user.get("End Mobile", ""))
-
-            # Save to session_state (so Invoice & PO can use)
-            st.session_state.po_vendor_name = vendor["Vendor Name"]
-            st.session_state.po_vendor_address = vendor["Vendor Address"]
-            st.session_state.po_vendor_contact = vendor["Contact Person"]
-            st.session_state.po_vendor_mobile = vendor_mobile
-            st.session_state.po_end_company = end_user["End User Company"]
-            st.session_state.po_end_address = end_user["End User Address"]
-            st.session_state.po_end_person = end_user["End User Contact"]
-            st.session_state.po_end_mobile = End_user_mobile
-            st.session_state.po_end_email = end_user["End User Email"]
-            st.session_state.po_end_gst_no = end_user["GST NO"]
-
-            st.info("Vendor & End User details auto-filled from Excel ✅")
-
-        # Create tabs for different document types
-        tab1, tab2, tab3 = st.tabs(["📋 Quotation Generator", "🛒 Purchase Order Generator", "🧾 Tax Invoice Generator"])
-
-        # --- Tab 1: Quotation Generator ---
-        with tab1:
-            if global_logo_path and os.path.exists(global_logo_path):
-                st.image(global_logo_path, width=150)
-                st.markdown("### Quotation Generator")
-            else:
-                st.header("Quotation Generator")  
-            
-            today = datetime.date.today()
-            current_quarter = get_current_quarter()
-            
-            # Sales Person Selection - ONLY ONE SELECTION
-            st.sidebar.header("Quotation Settings")
-            sales_person = st.sidebar.selectbox("Select Sales Person", 
-                                            options=list(SALES_PERSON_MAPPING.keys()), 
-                                            format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
-                                            key="quote_sales_person")
-            
-            # Get current sales person info
-            current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
-            
-            # Generate quotation number based on selected sales person
-            def get_quotation_number():
-                if st.session_state.last_quotation_number:
-                    try:
-                        last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
-                        
-                        if last_sales_person == sales_person and last_quarter == current_quarter:
-                            next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
-                            return generate_quotation_number(sales_person, next_sequence)
-                        else:
-                            return generate_quotation_number(sales_person, 1)
-                    except:
-                        return generate_quotation_number(sales_person, st.session_state.quotation_seq)
+        # Option 2: Upload custom images
+        uploaded_logo = None
+        uploaded_stamp = None
+        
+        if not use_github:
+            st.markdown("---")
+            st.markdown("### Upload Custom Images")
+            uploaded_logo = st.file_uploader("Upload Company Logo", 
+                                                   type=["png", "jpg", "jpeg"], 
+                                                   key="global_logo")
+            uploaded_stamp = st.file_uploader("Upload Company Stamp", 
+                                                    type=["png", "jpg", "jpeg"], 
+                                                    key="global_stamp")
+        
+        # Load images based on selection
+        global_logo_path = None
+        global_stamp_path = None
+        
+        if use_github:
+            with st.status("Loading images from GitHub...", expanded=False) as status:
+                global_logo_path, global_stamp_path = load_images_from_github()
+                if global_logo_path and global_stamp_path:
+                    status.update(label="✓ Logo and Stamp loaded from GitHub", state="complete")
                 else:
-                    return generate_quotation_number(sales_person, st.session_state.quotation_seq)
+                    status.update(label="⚠ Failed to load all assets", state="error")
+        else:
+            if uploaded_logo:
+                global_logo_path = save_uploaded_file(uploaded_logo, "custom_logo.jpg")
+                if global_logo_path:
+                    st.success("✓ Custom logo loaded")
             
-            # Initialize or update quotation number when sales person changes
-            if "current_quote_sales_person" not in st.session_state:
-                st.session_state.current_quote_sales_person = sales_person
-                st.session_state.quotation_number = get_quotation_number()
-            
-            # Update quotation number if sales person changes or quarter changes
-            if (st.session_state.current_quote_sales_person != sales_person or 
-                st.session_state.get('current_quarter', '') != current_quarter):
-                st.session_state.current_quote_sales_person = sales_person
-                st.session_state.current_quarter = current_quarter
-                st.session_state.quotation_number = get_quotation_number()
-            
-            # Display current sales person info
-            st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
-            st.sidebar.info(f"**Current Quarter:** {current_quarter}")
-            
-            # Show auto-generated breakdown
+            if uploaded_stamp:
+                global_stamp_path = save_uploaded_file(uploaded_stamp, "custom_stamp.jpg")
+                if global_stamp_path:
+                    st.success("✓ Custom stamp loaded")
+        
+        # Display image status
+        st.markdown("---")
+        st.markdown("**Image Load Status**")
+        if global_logo_path:
+            st.info("Logo: ✅ Active")
+        else:
+            st.error("Logo: ❌ Missing")
+        
+        if global_stamp_path:
+            st.info("Stamp: ✅ Active")
+        else:
+            st.error("Stamp: ❌ Missing")
+
+    # Add Data Debug Section
+    with st.sidebar.expander("🔄 Database & Debug Tools", expanded=False):
+        # Force refresh button
+        if st.button("🔄 Force Refresh All Data", key="force_refresh_all", use_container_width=True):
+            st.cache_data.clear()
+            st.success("✅ All caches cleared!")
+            st.rerun()
+        
+        # Check data files button
+        if st.button("📊 Check File Integrity", key="check_file_integrity", use_container_width=True):
             try:
-                prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(st.session_state.quotation_number)
-                st.sidebar.success(f"**Auto-generated Quotation Number**")
-                st.sidebar.info(f"**Format:** {current_sp}/{quarter}/{date_part}/{year_range}_{sequence}")
-            except:
-                st.sidebar.warning("Could not parse quotation number")
-            
-            # Editable quotation number WITHOUT sales person selection
-            st.sidebar.subheader("Quotation Number Editor")
-            
-            # Parse current quotation number for editing
-            try:
-                current_prefix, current_sp, current_q, current_date, current_year_range, current_seq = parse_quotation_number(st.session_state.quotation_number)
-                
-                # Create editable components (NO SALES PERSON SELECTION)
-                col1, col2, col3, col4 = st.sidebar.columns([1, 2, 2, 1])
-                
-                with col1:
-                    st.text_input("Sales Person", value=current_sp, key="quote_sp_display", disabled=True)
-                
-                with col2:
-                    new_date = st.text_input("Date", value=current_date, key="quote_date_edit")
-                
-                with col3:
-                    new_year_range = st.text_input("Year Range", value=current_year_range, key="quote_year_edit")
-                
-                with col4:
-                    new_sequence = st.number_input("Sequence", 
-                                                min_value=1, 
-                                                value=int(current_seq), 
-                                                step=1,
-                                                key="quote_seq_edit")
-                
-                # Construct new quotation number using the SELECTED sales person, not the edited one
-                new_quotation_number = f"CMI/{sales_person}/{current_q}/{new_date}/{new_year_range}_{new_sequence:03d}"
-                
-                # Update if changed
-                if new_quotation_number != st.session_state.quotation_number:
-                    st.session_state.quotation_number = new_quotation_number
-                    
+                # Check vendor.json
+                with open('vendor.json', 'r', encoding='utf-8') as f:
+                    vendor_data = json.load(f)
+                st.success(f"vendor.json: {len(vendor_data)} vendors loaded")
+                if vendor_data:
+                    st.caption(f"First entry: {list(vendor_data.keys())[0]}")
             except Exception as e:
-                st.sidebar.error(f"Error parsing quotation number: {e}")
-                st.session_state.quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
+                st.error(f"vendor.json error: {e}")
             
-            # Display final quotation number
-            st.sidebar.code(st.session_state.quotation_number)
+            try:
+                # Check endusers.json
+                with open('endusers.json', 'r', encoding='utf-8') as f:
+                    enduser_data = json.load(f)
+                st.success(f"endusers.json: {len(enduser_data)} endusers loaded")
+                if enduser_data:
+                    st.caption(f"First entry: {list(enduser_data.keys())[0]}")
+            except Exception as e:
+                st.error(f"endusers.json error: {e}")
+
+    # --- Initialize Session State ---
+# Quotation session states
+    if "quotation_seq" not in st.session_state:
+        st.session_state.quotation_seq = get_current_quotation_sequence()
+    if "quotation_products" not in st.session_state:
+        st.session_state.quotation_products = []
+    if "last_quotation_number" not in st.session_state:
+        st.session_state.last_quotation_number = ""
+    if "quotation_number" not in st.session_state:
+        st.session_state.quotation_number = generate_quotation_number("SD", st.session_state.quotation_seq)
+    if "current_quote_sales_person" not in st.session_state:
+        st.session_state.current_quote_sales_person = "SD"
+
+    # PO session states  
+    if "po_seq" not in st.session_state:
+        st.session_state.po_seq = get_current_po_sequence()
+    if "products" not in st.session_state:
+        st.session_state.products = []
+    if "company_name" not in st.session_state:
+        st.session_state.company_name = "CM INFOTECH"
+    if "po_number" not in st.session_state:
+        st.session_state.po_number = generate_po_number("CP", st.session_state.po_seq)
+    if "po_date" not in st.session_state:
+        st.session_state.po_date = datetime.date.today().strftime("%d-%m-%Y")
+    if "last_po_number" not in st.session_state:
+        st.session_state.last_po_number = ""
+    if "current_po_sales_person" not in st.session_state:
+        st.session_state.current_po_sales_person = "CP"
+    if "current_po_quarter" not in st.session_state:
+        st.session_state.current_po_quarter = get_current_quarter()
+
+    # Invoice session states
+    if "invoice_seq" not in st.session_state:
+        st.session_state.invoice_seq = get_current_invoice_sequence()
+    if "invoice_number" not in st.session_state:
+        st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
+    if "last_invoice_number" not in st.session_state:
+        st.session_state.last_invoice_number = ""
+    if "current_invoice_quarter" not in st.session_state:
+        st.session_state.current_invoice_quarter = get_current_quarter()
+
+    # Invoice buyer session states - ADDED
+    if "invoice_buyer_company" not in st.session_state:
+        st.session_state.invoice_buyer_company = "Baldridge & Associates Pvt Ltd."
+    if "invoice_buyer_address" not in st.session_state:
+        st.session_state.invoice_buyer_address = "406 Sakar East, Vadodara 390009"
+    if "invoice_buyer_gst" not in st.session_state:
+        st.session_state.invoice_buyer_gst = "24AAHCB9"
+    if "invoice_buyer_mobile" not in st.session_state:
+        st.session_state.invoice_buyer_mobile = "98987 91813"
+    if "invoice_buyer_email" not in st.session_state:
+        st.session_state.invoice_buyer_email = "dmistry@baseengr.com"
+    
+                #     st.session_state.invoice_buyer_mobile = enduser_data.get("mobile", "")
+                # st.session_state.invoice_buyer_email = enduser_data.get("email", "")
+
+    # Vendor session states
+    if "po_vendor_name" not in st.session_state:
+        st.session_state.po_vendor_name = "Arkance IN Pvt. Ltd."
+    if "po_vendor_address" not in st.session_state:
+        st.session_state.po_vendor_address = "Unit 801-802, 8th Floor, Tower 1..."
+    if "po_vendor_contact" not in st.session_state:
+        st.session_state.po_vendor_contact = "Ms/Mr"
+    if "po_vendor_mobile" not in st.session_state:
+        st.session_state.po_vendor_mobile = "+91 1234567890"
+    if "po_gst_no" not in st.session_state:
+        st.session_state.po_gst_no = "24ANMPP4891R1ZX"
+    if "po_pan_no" not in st.session_state:
+        st.session_state.po_pan_no = "ANMPP4891R"
+    if "po_msme_no" not in st.session_state:
+        st.session_state.po_msme_no = "UDYAM-GJ-01-0117646"
+
+    # Quotation end user session states
+    if "quote_end_company" not in st.session_state:
+        st.session_state.quote_end_company = "Baldridge & Associates Pvt Ltd."
+    if "quote_end_address" not in st.session_state:
+        st.session_state.quote_end_address = "406 Sakar East, Vadodara 390009"
+    if "quote_end_person" not in st.session_state:
+        st.session_state.quote_end_person = "Mr. Dev"
+    if "quote_end_mobile" not in st.session_state:
+        st.session_state.quote_end_mobile = "1234567891"
+    if "quote_end_email" not in st.session_state:
+        st.session_state.quote_end_email = "info@company.com"
+    if "quote_end_gst_no" not in st.session_state:
+        st.session_state.quote_end_gst_no = "24AAHCB9"
+
+    # PO end user session states - ADDED
+    if "po_end_company" not in st.session_state:
+        st.session_state.po_end_company = "Baldridge & Associates Pvt Ltd."
+    if "po_end_address" not in st.session_state:
+        st.session_state.po_end_address = "406 Sakar East, Vadodara 390009"
+    if "po_end_person" not in st.session_state:
+        st.session_state.po_end_person = "Mr. Dev"
+    if "po_end_mobile" not in st.session_state:
+        st.session_state.po_end_mobile = "1234567891"
+    if "po_end_email" not in st.session_state:
+        st.session_state.po_end_email = "info@company.com"
+    if "po_end_gst_no" not in st.session_state:
+        st.session_state.po_end_gst_no = "24AAHCB9"
+
+    # PO bill to/ship to session states - ADDED
+    if "po_bill_to_company" not in st.session_state:
+        st.session_state.po_bill_to_company = "CM INFOTECH"
+    if "po_bill_to_address" not in st.session_state:
+        st.session_state.po_bill_to_address = "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"
+    if "po_ship_to_company" not in st.session_state:
+        st.session_state.po_ship_to_company = "CM INFOTECH"
+    if "po_ship_to_address" not in st.session_state:
+        st.session_state.po_ship_to_address = "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"
+
+    # --- Upload Excel and Load Vendor/End User ---
+    uploaded_excel = st.file_uploader("📂 Upload Vendor & End User Excel", type=["xlsx"])
+
+    if uploaded_excel:
+        vendors_df = pd.read_excel(uploaded_excel, sheet_name="Vendors", dtype={"Mobile": str})
+        endusers_df = pd.read_excel(uploaded_excel, sheet_name="EndUsers")
+
+        st.success("✅ Excel loaded successfully!")
+
+        # --- Select Vendor ---
+        vendor_name = st.selectbox("Select Vendor", vendors_df["Vendor Name"].unique())
+        vendor = vendors_df[vendors_df["Vendor Name"] == vendor_name].iloc[0]
+
+        # --- Select End User ---
+        end_user_name = st.selectbox("Select End User", endusers_df["End User Company"].unique())
+        end_user = endusers_df[endusers_df["End User Company"] == end_user_name].iloc[0]
+
+        # --- Clean and Convert Mobile (avoid float or NaN issues) ---
+        def safe_strip(value):
+            """Safely convert any value to string and strip whitespace."""
+            try:
+                if pd.isna(value):
+                    return ""
+                return str(value).split(".")[0].strip()
+            except Exception:
+                return ""
+
+        vendor_mobile = safe_strip(vendor.get("Mobile", ""))
+        End_user_mobile = safe_strip(end_user.get("End Mobile", ""))
+
+        # Save to session_state (so Invoice & PO can use)
+        st.session_state.po_vendor_name = vendor["Vendor Name"]
+        st.session_state.po_vendor_address = vendor["Vendor Address"]
+        st.session_state.po_vendor_contact = vendor["Contact Person"]
+        st.session_state.po_vendor_mobile = vendor_mobile
+        st.session_state.po_end_company = end_user["End User Company"]
+        st.session_state.po_end_address = end_user["End User Address"]
+        st.session_state.po_end_person = end_user["End User Contact"]
+        st.session_state.po_end_mobile = End_user_mobile
+        st.session_state.po_end_email = end_user["End User Email"]
+        st.session_state.po_end_gst_no = end_user["GST NO"]
+
+        st.info("Vendor & End User details auto-filled from Excel ✅")
+
+    # Create tabs for different document types
+    tab1, tab2, tab3 = st.tabs(["📋 Quotation Generator", "🛒 Purchase Order Generator", "🧾 Tax Invoice Generator"])
+
+    # --- Tab 1: Quotation Generator ---
+    with tab1:
+        if global_logo_path and os.path.exists(global_logo_path):
+            st.image(global_logo_path, width=150)
+            st.markdown("### Quotation Generator")
+        else:
+            st.header("Quotation Generator")  
+        
+        today = datetime.date.today()
+        current_quarter = get_current_quarter()
+        
+        # Sales Person Selection - ONLY ONE SELECTION
+        st.sidebar.header("Quotation Settings")
+        sales_person = st.sidebar.selectbox("Select Sales Person", 
+                                        options=list(SALES_PERSON_MAPPING.keys()), 
+                                        format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+                                        key="quote_sales_person")
+        
+        # Get current sales person info
+        current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
+        
+        # Generate quotation number based on selected sales person
+        def get_quotation_number():
+            if st.session_state.last_quotation_number:
+                try:
+                    last_prefix, last_sales_person, last_quarter, last_date, last_year_range, last_sequence = parse_quotation_number(st.session_state.last_quotation_number)
+                    
+                    if last_sales_person == sales_person and last_quarter == current_quarter:
+                        next_sequence = get_next_sequence_number(st.session_state.last_quotation_number)
+                        return generate_quotation_number(sales_person, next_sequence)
+                    else:
+                        return generate_quotation_number(sales_person, 1)
+                except:
+                    return generate_quotation_number(sales_person, st.session_state.quotation_seq)
+            else:
+                return generate_quotation_number(sales_person, st.session_state.quotation_seq)
+        
+        # Initialize or update quotation number when sales person changes
+        if "current_quote_sales_person" not in st.session_state:
+            st.session_state.current_quote_sales_person = sales_person
+            st.session_state.quotation_number = get_quotation_number()
+        
+        # Update quotation number if sales person changes or quarter changes
+        if (st.session_state.current_quote_sales_person != sales_person or 
+            st.session_state.get('current_quarter', '') != current_quarter):
+            st.session_state.current_quote_sales_person = sales_person
+            st.session_state.current_quarter = current_quarter
+            st.session_state.quotation_number = get_quotation_number()
+        
+        # Display current sales person info
+        st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
+        st.sidebar.info(f"**Current Quarter:** {current_quarter}")
+        
+        # Show auto-generated breakdown
+        try:
+            prefix, current_sp, quarter, date_part, year_range, sequence = parse_quotation_number(st.session_state.quotation_number)
+            st.sidebar.success(f"**Auto-generated Quotation Number**")
+            st.sidebar.info(f"**Format:** {current_sp}/{quarter}/{date_part}/{year_range}_{sequence}")
+        except:
+            st.sidebar.warning("Could not parse quotation number")
+        
+        # Editable quotation number WITHOUT sales person selection
+        st.sidebar.subheader("Quotation Number Editor")
+        
+        # Parse current quotation number for editing
+        try:
+            current_prefix, current_sp, current_q, current_date, current_year_range, current_seq = parse_quotation_number(st.session_state.quotation_number)
             
-            quotation_auto_increment = st.sidebar.checkbox("Auto-increment Sequence", value=True, key="quote_auto_increment")
-            
-            if st.sidebar.button("Reset to Auto-generate", use_container_width=True):
-                st.session_state.quotation_seq = 1
-                st.session_state.last_quotation_number = ""
-                st.session_state.quotation_number = get_quotation_number()
-                st.sidebar.success("Quotation number reset to auto-generated")
-                st.rerun()
-            
-            # Main form
-            col1, col2 = st.columns([1, 1])
+            # Create editable components (NO SALES PERSON SELECTION)
+            col1, col2, col3, col4 = st.sidebar.columns([1, 2, 2, 1])
             
             with col1:
-                st.header("Recipient Details")
-                
-                # REPLACE VENDOR DROPDOWN WITH END USER DROPDOWN
-                # Track selection changes for Quotation End User
-                if 'prev_enduser_quote' not in st.session_state:
-                    st.session_state.prev_enduser_quote = "Select End User"
-                if 'prev_contact_quote' not in st.session_state:
-                    st.session_state.prev_contact_quote = ""
-
-                selected_enduser_quote = st.selectbox(
-                    "Select Company", 
-                    options=get_enduser_dropdown_options(),
-                    key="enduser_dropdown_quote"
-                )
-                
-                # UPDATE END USER FIELDS WHEN DROPDOWN SELECTION CHANGES FOR QUOTATION
-                enduser_changed = selected_enduser_quote != st.session_state.prev_enduser_quote
-                if enduser_changed:
-                    st.session_state.prev_enduser_quote = selected_enduser_quote
-                    st.session_state.prev_contact_quote = "" # Reset contact tracker on company change
-                    
-                enduser_data = END_USER_DATABASE.get(selected_enduser_quote, {}) if selected_enduser_quote != "Select End User" else {}
-                contacts = get_contacts_list(enduser_data)
-                contact_names = get_contact_dropdown_options(contacts)
-                
-                # Contact person dropdown
-                selected_contact_quote = st.selectbox(
-                    "Select Contact Person",
-                    options=contact_names,
-                    key="contact_dropdown_quote"
-                )
-                contact_changed = selected_contact_quote != st.session_state.prev_contact_quote
-
-                if enduser_changed or contact_changed:
-                    st.session_state.prev_contact_quote = selected_contact_quote
-                    contact_idx = contact_names.index(selected_contact_quote) if selected_contact_quote in contact_names else 0
-                    
-                    if selected_enduser_quote != "Select End User":
-                        st.session_state.quote_end_company = selected_enduser_quote
-                        st.session_state.quote_end_address = enduser_data.get("address", "")
-                        st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
-                        
-                        if contacts and contact_idx < len(contacts):
-                            sel_contact = contacts[contact_idx]
-                            st.session_state.quote_end_person = sel_contact.get("name", "")
-                            st.session_state.quote_end_mobile = sel_contact.get("mobile", "")
-                            st.session_state.quote_end_email = sel_contact.get("email", "")
-                        else:
-                            st.session_state.quote_end_person = ""
-                            st.session_state.quote_end_mobile = ""
-                            st.session_state.quote_end_email = ""
-                    st.rerun()
-                
-                # UPDATE TEXT INPUT FIELDS TO USE END USER DATA INSTEAD OF VENDOR DATA
-                vendor_name = st.text_input("Company Name", key="quote_end_company")
-                vendor_address = st.text_area("Company Address", key="quote_end_address")
-                vendor_email = st.text_input("Email", key="quote_end_email")
-                vendor_contact = st.text_input("Contact Person (Kind Attention)", key="quote_end_person")
-                vendor_mobile = st.text_input("Mobile", key="quote_end_mobile")
-                
-                # You can also add GST field if needed
-                vendor_gst = st.text_input("GST No (Optional)", key="quote_end_gst_no")
-                if vendor_gst.strip():
-                    is_valid, msg = validate_gst(vendor_gst)
-                    if not is_valid:
-                        show_validation_warning(msg)
-                    else:
-                        show_validation_success("GSTIN Format Verified")
-
-                st.header("Quotation Details")
-                price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")
-                subject_line = st.text_input("Subject", "Proposal for Adobe Commercial Software License", key="quote_subject")
-                intro_paragraphs_1 = st.text_area("Introduction Paragraph",
-                """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization. """,
-                key="quote_intro"
-                )
-
+                st.text_input("Sales Person", value=current_sp, key="quote_sp_display", disabled=True)
             
             with col2:
-                st.header("Products & Services")
+                new_date = st.text_input("Date", value=current_date, key="quote_date_edit")
+            
+            with col3:
+                new_year_range = st.text_input("Year Range", value=current_year_range, key="quote_year_edit")
+            
+            with col4:
+                new_sequence = st.number_input("Sequence", 
+                                            min_value=1, 
+                                            value=int(current_seq), 
+                                            step=1,
+                                            key="quote_seq_edit")
+            
+            # Construct new quotation number using the SELECTED sales person, not the edited one
+            new_quotation_number = f"CMI/{sales_person}/{current_q}/{new_date}/{new_year_range}_{new_sequence:03d}"
+            
+            # Update if changed
+            if new_quotation_number != st.session_state.quotation_number:
+                st.session_state.quotation_number = new_quotation_number
                 
-                # Add input fields for both annexure and quotation title
-                col_annexure, col_title = st.columns(2)
+        except Exception as e:
+            st.sidebar.error(f"Error parsing quotation number: {e}")
+            st.session_state.quotation_number = generate_quotation_number(sales_person, st.session_state.quotation_seq)
+        
+        # Display final quotation number
+        st.sidebar.code(st.session_state.quotation_number)
+        
+        quotation_auto_increment = st.sidebar.checkbox("Auto-increment Sequence", value=True, key="quote_auto_increment")
+        
+        if st.sidebar.button("Reset to Auto-generate", use_container_width=True):
+            st.session_state.quotation_seq = 1
+            st.session_state.last_quotation_number = ""
+            st.session_state.quotation_number = get_quotation_number()
+            st.sidebar.success("Quotation number reset to auto-generated")
+            st.rerun()
+        
+        # Main form
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            st.header("Recipient Details")
+            
+            # REPLACE VENDOR DROPDOWN WITH END USER DROPDOWN
+            # Track selection changes for Quotation End User
+            if 'prev_enduser_quote' not in st.session_state:
+                st.session_state.prev_enduser_quote = "Select End User"
+            if 'prev_contact_quote' not in st.session_state:
+                st.session_state.prev_contact_quote = ""
+
+            selected_enduser_quote = st.selectbox(
+                "Select Company", 
+                options=get_enduser_dropdown_options(),
+                key="enduser_dropdown_quote"
+            )
+            
+            # UPDATE END USER FIELDS WHEN DROPDOWN SELECTION CHANGES FOR QUOTATION
+            enduser_changed = selected_enduser_quote != st.session_state.prev_enduser_quote
+            if enduser_changed:
+                st.session_state.prev_enduser_quote = selected_enduser_quote
+                st.session_state.prev_contact_quote = "" # Reset contact tracker on company change
                 
-                with col_annexure:
-                    annexure_text = st.text_input(
-                        "Annexure Text", 
-                        "Annexure I - Commercials", 
-                        key="quote_annexure_input",
-                        help="Enter annexure text (e.g., Annexure I - Commercials, Annexure II - Terms)"
+            enduser_data = END_USER_DATABASE.get(selected_enduser_quote, {}) if selected_enduser_quote != "Select End User" else {}
+            contacts = get_contacts_list(enduser_data)
+            contact_names = get_contact_dropdown_options(contacts)
+            
+            # Contact person dropdown
+            selected_contact_quote = st.selectbox(
+                "Select Contact Person",
+                options=contact_names,
+                key="contact_dropdown_quote"
+            )
+            contact_changed = selected_contact_quote != st.session_state.prev_contact_quote
+
+            if enduser_changed or contact_changed:
+                st.session_state.prev_contact_quote = selected_contact_quote
+                contact_idx = contact_names.index(selected_contact_quote) if selected_contact_quote in contact_names else 0
+                
+                if selected_enduser_quote != "Select End User":
+                    st.session_state.quote_end_company = selected_enduser_quote
+                    st.session_state.quote_end_address = enduser_data.get("address", "")
+                    st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
+                    
+                    if contacts and contact_idx < len(contacts):
+                        sel_contact = contacts[contact_idx]
+                        st.session_state.quote_end_person = sel_contact.get("name", "")
+                        st.session_state.quote_end_mobile = sel_contact.get("mobile", "")
+                        st.session_state.quote_end_email = sel_contact.get("email", "")
+                    else:
+                        st.session_state.quote_end_person = ""
+                        st.session_state.quote_end_mobile = ""
+                        st.session_state.quote_end_email = ""
+                st.rerun()
+            
+            # UPDATE TEXT INPUT FIELDS TO USE END USER DATA INSTEAD OF VENDOR DATA
+            vendor_name = st.text_input("Company Name", key="quote_end_company")
+            vendor_address = st.text_area("Company Address", key="quote_end_address")
+            vendor_email = st.text_input("Email", key="quote_end_email")
+            vendor_contact = st.text_input("Contact Person (Kind Attention)", key="quote_end_person")
+            vendor_mobile = st.text_input("Mobile", key="quote_end_mobile")
+            
+            # You can also add GST field if needed
+            vendor_gst = st.text_input("GST No (Optional)", key="quote_end_gst_no")
+            if vendor_gst.strip():
+                is_valid, msg = validate_gst(vendor_gst)
+                if not is_valid:
+                    show_validation_warning(msg)
+                else:
+                    show_validation_success("GSTIN Format Verified")
+
+            st.header("Quotation Details")
+            price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")
+            subject_line = st.text_input("Subject", "Proposal for Adobe Commercial Software License", key="quote_subject")
+            intro_paragraphs_1 = st.text_area("Introduction Paragraph",
+            """This is with reference to your requirement for Adobe Software. It gives us great pleasure to know that we are being considered by you and are invited to fulfill the requirements of your organization. """,
+            key="quote_intro"
+            )
+
+        
+        with col2:
+            st.header("Products & Services")
+            
+            # Add input fields for both annexure and quotation title
+            col_annexure, col_title = st.columns(2)
+            
+            with col_annexure:
+                annexure_text = st.text_input(
+                    "Annexure Text", 
+                    "Annexure I - Commercials", 
+                    key="quote_annexure_input",
+                    help="Enter annexure text (e.g., Annexure I - Commercials, Annexure II - Terms)"
+                )
+            
+            with col_title:
+                quotation_title = st.text_input(
+                    "Quotation Title", 
+                    "Quotation for Adobe Software", 
+                    key="quote_title_input",
+                    help="Enter the main title that will appear below annexure"
+                )
+            
+            # --- SAME PRODUCT SELECTION LOGIC AS PO ---
+            st.subheader("Add Products")
+            selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="quote_product_select_catalog")
+            
+            if st.button("➕ Add Selected Product", key="quote_add_selected_product"):
+                if selected_product:
+                    details = PRODUCT_CATALOG[selected_product]
+                    st.session_state.quotation_products.append({
+                        "name": selected_product,
+                        "basic": details["basic"],
+                        "gst_percent": details["gst_percent"],
+                        "qty": 1.0,
+                    })
+                    st.success(f"{selected_product} added!")
+            
+            if st.button("➕ Add Empty Product", key="quote_add_empty_product"):
+                st.session_state.quotation_products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+
+            # Display current products with EDITABLE fields (same as PO)
+            st.subheader("Current Products")
+            for i, p in enumerate(st.session_state.quotation_products):
+                with st.expander(f"Product {i+1}: {p['name']}", expanded=i == 0):
+                    st.session_state.quotation_products[i]["name"] = st.text_input("Name", p["name"], key=f"quote_name_{i}")
+                    st.session_state.quotation_products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"quote_basic_{i}")
+                    st.session_state.quotation_products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"quote_gst_{i}")
+                    st.session_state.quotation_products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"quote_qty_{i}")
+                    if st.button("Remove", key=f"quote_remove_{i}"):
+                        st.session_state.quotation_products.pop(i)
+                        st.rerun()
+        
+        # Preview and Generate Section
+        st.header("Preview & Generate Quotation")
+        
+        # Show the current quotation number prominently with sales person info
+        st.info(f"**Quotation Number:** {st.session_state.quotation_number}")
+        st.info(f"**Sales Person:** {current_sales_person_info['name']} ({sales_person}) - {current_sales_person_info['email']}")
+        
+        # Calculate totals
+        totals = calculate_quotation_totals(st.session_state.quotation_products)
+        
+        # Preview and totals calculation (same as PO)
+        total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
+        total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.quotation_products)
+        grand_total = total_base + total_gst
+        amount_words = num2words(grand_total, to="currency", currency="INR").title()
+        
+        col3, col4, col5 = st.columns(3)
+        with col3:
+            st.metric("Total Base Amount", f"₹{total_base:,.2f}")
+        with col4:
+            st.metric("Total GST", f"₹{total_gst:,.2f}")
+        with col5:
+            st.metric("Grand Total", f"₹{grand_total:,.2f}")
+        
+        # Document preview container
+        st.subheader("👀 Live Document Preview")
+        if st.session_state.quotation_products:
+            show_document_preview("Quotation", st.session_state.quotation_number, vendor_name, st.session_state.quotation_products, grand_total)
+        else:
+            st.info("Add products to see live document preview.")
+
+        # Use global images
+        st.subheader("Company Branding")
+        st.info("Using global logo and stamp from sidebar settings")
+        logo_path = global_logo_path
+        stamp_path = global_stamp_path
+
+        if not logo_path:
+            st.warning("⚠ No company logo available")
+        if not stamp_path:
+            st.warning("⚠ No company stamp available")
+        
+        if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
+            if not st.session_state.quotation_products:
+                st.error("Please add at least one product to generate the quotation.")
+            else:
+                # Calculate total from all products (same as PO logic)
+                products_total = 0
+                for p in st.session_state.quotation_products:
+                    gst_amt = p["basic"] * p["gst_percent"] / 100
+                    per_unit_price = p["basic"] + gst_amt
+                    total = per_unit_price * p["qty"]
+                    products_total += total
+
+                # Calculate round off to make final amount whole number (same as PO)
+                rounded_total = round(products_total)
+                round_off = rounded_total - products_total
+
+                # Update grand_total and amount_words with rounded amount
+                grand_total = rounded_total
+                amount_words = number_to_words(rounded_total)
+
+                quotation_data = {
+                    "quotation_number": st.session_state.quotation_number,
+                    "quotation_date": today.strftime("%d-%m-%Y"),
+                    "vendor_name": vendor_name,
+                    "vendor_address": vendor_address,
+                    "vendor_email": vendor_email,
+                    "vendor_contact": vendor_contact,
+                    "vendor_mobile": vendor_mobile,
+                    "products": st.session_state.quotation_products,
+                    "price_validity": price_validity,
+                    "grand_total": grand_total,
+                    "round_off": round_off,
+                    "amount_words": amount_words,
+                    "subject": subject_line,
+                    "intro_paragraph": intro_paragraphs_1,
+                    "product_name": selected_product if selected_product else "Software",   
+                    "sales_person_code": sales_person,  
+                    "annexure_text": annexure_text,  
+                    "quotation_title": quotation_title
+                }
+                
+                try:
+                    pdf_bytes = create_quotation_pdf(quotation_data, logo_path, stamp_path)
+                    
+                    # Store the last quotation number for sequence tracking
+                    st.session_state.last_quotation_number = st.session_state.quotation_number
+                    
+                    # Auto-increment for next quotation
+                    if quotation_auto_increment:
+                        next_sequence = get_next_quotation_sequence()
+                        st.session_state.quotation_seq = next_sequence
+                    
+                    st.success("✅ Quotation generated successfully!")
+                    st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
+                    
+                    # Download button
+                    st.download_button(
+                        "⬇ Download Quotation PDF",
+                        data=pdf_bytes,
+                        file_name=f"{vendor_name}_{st.session_state.quotation_number.replace('/', '_')}.pdf",
+                        mime="application/pdf",
+                        use_container_width=True
                     )
+                    
+                except Exception as e:
+                    st.error(f"Error generating PDF: {str(e)}")
+
+        # --- Quick Transfer Section ---
+        st.markdown("---")
+        st.subheader("📋 Quick Transfer")
+        st.caption("Copy this quotation's details to other generators to save time.")
+        col_copy1, col_copy2 = st.columns(2)
+        with col_copy1:
+            if st.button("🛒 Copy to Purchase Order", key="copy_to_po", use_container_width=True):
+                if not st.session_state.quotation_products:
+                    st.warning("No products to copy.")
+                else:
+                    st.session_state.po_end_company = st.session_state.quote_end_company
+                    st.session_state.po_end_address = st.session_state.quote_end_address
+                    st.session_state.po_end_person = st.session_state.quote_end_person
+                    st.session_state.po_end_mobile = st.session_state.quote_end_mobile
+                    st.session_state.po_end_email = st.session_state.quote_end_email
+                    st.session_state.po_end_gst_no = st.session_state.quote_end_gst_no
+                    st.session_state.products = [dict(p) for p in st.session_state.quotation_products]
+                    st.success("✅ Copied to Purchase Order! Go to 'Purchase Order Generator' tab.")
+        with col_copy2:
+            if st.button("🧾 Copy to Tax Invoice", key="copy_to_invoice", use_container_width=True):
+                if not st.session_state.quotation_products:
+                    st.warning("No products to copy.")
+                else:
+                    st.session_state.invoice_buyer_company = st.session_state.quote_end_company
+                    st.session_state.invoice_buyer_address = st.session_state.quote_end_address
+                    st.session_state.invoice_buyer_mobile = st.session_state.quote_end_mobile
+                    st.session_state.invoice_buyer_email = st.session_state.quote_end_email
+                    st.session_state.invoice_buyer_gst = st.session_state.quote_end_gst_no
+                    
+                    # Copy items
+                    st.session_state.invoice_num_items = len(st.session_state.quotation_products)
+                    for idx, p in enumerate(st.session_state.quotation_products):
+                        st.session_state[f"invoice_desc_{idx}"] = p["name"]
+                        st.session_state[f"invoice_rate_{idx}"] = p["basic"]
+                        st.session_state[f"invoice_qty_{idx}"] = p["qty"]
+                        
+                    st.success("✅ Copied to Tax Invoice! Go to 'Tax Invoice Generator' tab.")
+
                 
-                with col_title:
-                    quotation_title = st.text_input(
-                        "Quotation Title", 
-                        "Quotation for Adobe Software", 
-                        key="quote_title_input",
-                        help="Enter the main title that will appear below annexure"
-                    )
+    # --- Tab 2: Purchase Order Generator ---
+    with tab2:
+        if global_logo_path and os.path.exists(global_logo_path):
+            st.image(global_logo_path, width=150)
+            st.markdown("### Purchase Order Generator")
+        else:
+            st.header("Purchase Order Generator")  
+        
+        today = datetime.date.today()
+        current_quarter = get_current_quarter()
+        
+        # PO Settings in sidebar for this tab
+        st.sidebar.header("PO Settings")
+        
+        # Sales Person Selection for PO
+        po_sales_person = st.sidebar.selectbox("Select Sales Person", 
+                                            options=list(SALES_PERSON_MAPPING.keys()), 
+                                            format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
+                                            key="po_sales_person_select")
+        
+        # Get current sales person info
+        current_sales_person_info = SALES_PERSON_MAPPING.get(po_sales_person, SALES_PERSON_MAPPING['CP'])
+        
+        # Generate PO number based on selected sales person
+        def get_po_number():
+            if st.session_state.last_po_number:
+                try:
+                    last_prefix, last_sales_person, last_year, last_quarter, last_sequence = parse_po_number(st.session_state.last_po_number)
+                    
+                    if last_sales_person == po_sales_person and last_quarter == current_quarter:
+                        next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
+                        return generate_po_number(po_sales_person, next_sequence)
+                    else:
+                        return generate_po_number(po_sales_person, 1)
+                except:
+                    return generate_po_number(po_sales_person, st.session_state.po_seq)
+            else:
+                return generate_po_number(po_sales_person, st.session_state.po_seq)
+        
+        # Initialize or update PO number when sales person changes
+        if "current_po_sales_person" not in st.session_state:
+            st.session_state.current_po_sales_person = po_sales_person
+            st.session_state.po_number = get_po_number()
+        
+        # Update PO number if sales person changes or quarter changes
+        if (st.session_state.current_po_sales_person != po_sales_person or 
+            st.session_state.get('current_po_quarter', '') != current_quarter):
+            st.session_state.current_po_sales_person = po_sales_person
+            st.session_state.current_po_quarter = current_quarter
+            st.session_state.po_number = get_po_number()
+        
+        # Display current sales person info
+        st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
+        st.sidebar.info(f"**Current Quarter:** {current_quarter}")
+        
+        # Show auto-generated breakdown
+        try:
+            prefix, current_sp, year, quarter, sequence = parse_po_number(st.session_state.po_number)
+            st.sidebar.success(f"**Auto-generated PO Number**")
+            st.sidebar.info(f"**Format:** {current_sp}/{year}/{quarter}_{sequence}")
+        except:
+            st.sidebar.warning("Could not parse PO number")
+        
+        # Editable PO number WITH sales person selection
+        st.sidebar.subheader("PO Number Editor")
+        
+        # Parse current PO number for editing
+        try:
+            current_prefix, current_sp, current_year, current_q, current_seq = parse_po_number(st.session_state.po_number)
+            
+            # Create editable components
+            col1, col2, col3, col4 = st.sidebar.columns([1, 2, 2, 1])
+            
+            with col1:
+                st.text_input("Sales Person", value=current_sp, key="po_sp_display", disabled=True)
+            
+            with col2:
+                new_year = st.text_input("Year", value=current_year, key="po_year_edit")
+            
+            with col3:
+                new_quarter = st.text_input("Quarter", value=current_q, key="po_quarter_edit")
+            
+            with col4:
+                new_sequence = st.number_input("Sequence", 
+                                            min_value=1, 
+                                            value=int(current_seq), 
+                                            step=1,
+                                            key="po_seq_edit")
+            
+            # Construct new PO number using the SELECTED sales person, not the edited one
+            new_po_number = f"CMI/{po_sales_person}/{new_year}/{new_quarter}_{new_sequence:03d}"
+            
+            # Update if changed
+            if new_po_number != st.session_state.po_number:
+                st.session_state.po_number = new_po_number
                 
-                # --- SAME PRODUCT SELECTION LOGIC AS PO ---
-                st.subheader("Add Products")
-                selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="quote_product_select_catalog")
+        except Exception as e:
+            st.sidebar.error(f"Error parsing PO number: {e}")
+            st.session_state.po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
+        
+        # Display final PO number
+        st.sidebar.code(st.session_state.po_number)
+        
+        po_auto_increment = st.sidebar.checkbox("Auto-increment Sequence", value=True, key="po_auto_increment_checkbox")
+        
+        if st.sidebar.button("Reset to Auto-generate", use_container_width=True, key="po_reset_auto_generate"):
+            st.session_state.po_seq = 1
+            st.session_state.last_po_number = ""
+            st.session_state.po_number = get_po_number()
+            st.sidebar.success("PO number reset to auto-generated")
+            st.rerun()
+        
+        # Add Force Refresh Vendor Data button in PO tab sidebar
+        if st.sidebar.button("🔄 Force Refresh Vendor Data", key="force_refresh_vendor_po"):
+            st.cache_data.clear()
+            st.sidebar.success("✅ Vendor data cache cleared!")
+            st.rerun()
+        
+        # Single tab with two columns
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.subheader("Vendor & End User Details")
+            
+            # Vendor Selection - SHOW DEBUG INFO
+            vendor_options = get_vendor_dropdown_options()
+            st.sidebar.info(f"Vendor dropdown options: {len(vendor_options)} items")
+            
+            # Track selection changes for PO Vendor
+            if 'prev_vendor_po' not in st.session_state:
+                st.session_state.prev_vendor_po = "Select Vendor"
+            if 'prev_vendor_contact_po' not in st.session_state:
+                st.session_state.prev_vendor_contact_po = ""
+
+            selected_vendor = st.selectbox(
+                "Select Vendor", 
+                options=vendor_options,
+                key="vendor_dropdown_po"
+            )
+            
+            # UPDATE VENDOR FIELDS WHEN DROPDOWN SELECTION CHANGES
+            vendor_changed = selected_vendor != st.session_state.prev_vendor_po
+            if vendor_changed:
+                st.session_state.prev_vendor_po = selected_vendor
+                st.session_state.prev_vendor_contact_po = ""
                 
-                if st.button("➕ Add Selected Product", key="quote_add_selected_product"):
+            vendor_data = VENDOR_DATABASE.get(selected_vendor, {}) if selected_vendor != "Select Vendor" else {}
+            contacts = get_contacts_list(vendor_data)
+            contact_names = get_contact_dropdown_options(contacts)
+            
+            # Contact person dropdown for vendor
+            selected_vendor_contact = st.selectbox(
+                "Select Vendor Contact",
+                options=contact_names,
+                key="vendor_contact_dropdown_po"
+            )
+            vendor_contact_changed = selected_vendor_contact != st.session_state.prev_vendor_contact_po
+
+            if vendor_changed or vendor_contact_changed:
+                st.session_state.prev_vendor_contact_po = selected_vendor_contact
+                contact_idx = contact_names.index(selected_vendor_contact) if selected_vendor_contact in contact_names else 0
+                
+                if selected_vendor != "Select Vendor":
+                    st.session_state.po_vendor_name = selected_vendor
+                    st.session_state.po_vendor_address = vendor_data.get("address", "")
+                    st.session_state.po_gst_no = vendor_data.get("gst_no", "")
+                    st.session_state.po_pan_no = vendor_data.get("pan_no", "")
+                    st.session_state.po_msme_no = vendor_data.get("msme_no", "")
+                    
+                    if contacts and contact_idx < len(contacts):
+                        sel_contact = contacts[contact_idx]
+                        st.session_state.po_vendor_contact = sel_contact.get("name", "")
+                        st.session_state.po_vendor_mobile = sel_contact.get("mobile", "")
+                    else:
+                        st.session_state.po_vendor_contact = ""
+                        st.session_state.po_vendor_mobile = ""
+                st.rerun()
+            
+            st.subheader("Vendor Details")
+            vendor_name = st.text_input(
+                "Vendor Name",
+                key="po_vendor_name"
+            )
+            vendor_address = st.text_area(
+                "Vendor Address",
+                key="po_vendor_address"
+            )
+            vendor_contact = st.text_input(
+                "Contact Person",
+                key="po_vendor_contact"
+            )
+            vendor_mobile = st.text_input(
+                "Mobile",
+                key="po_vendor_mobile"
+            )
+            
+            st.subheader("End User Details")
+            
+            # End User Dropdown
+            # Track selection changes for PO End User
+            if 'prev_enduser_po' not in st.session_state:
+                st.session_state.prev_enduser_po = "Select End User"
+            if 'prev_enduser_contact_po' not in st.session_state:
+                st.session_state.prev_enduser_contact_po = ""
+
+            selected_enduser = st.selectbox(
+                "Select End User", 
+                options=get_enduser_dropdown_options(),
+                key="enduser_dropdown_po"
+            )
+            
+            # Update end user fields when dropdown selection changes
+            enduser_po_changed = selected_enduser != st.session_state.prev_enduser_po
+            if enduser_po_changed:
+                st.session_state.prev_enduser_po = selected_enduser
+                st.session_state.prev_enduser_contact_po = ""
+                
+            enduser_data = END_USER_DATABASE.get(selected_enduser, {}) if selected_enduser != "Select End User" else {}
+            contacts = get_contacts_list(enduser_data)
+            contact_names = get_contact_dropdown_options(contacts)
+            
+            # Contact person dropdown for end user
+            selected_enduser_contact = st.selectbox(
+                "Select End User Contact",
+                options=contact_names,
+                key="enduser_contact_dropdown_po"
+            )
+            enduser_contact_changed = selected_enduser_contact != st.session_state.prev_enduser_contact_po
+
+            if enduser_po_changed or enduser_contact_changed:
+                st.session_state.prev_enduser_contact_po = selected_enduser_contact
+                contact_idx = contact_names.index(selected_enduser_contact) if selected_enduser_contact in contact_names else 0
+                
+                if selected_enduser != "Select End User":
+                    st.session_state.po_end_company = selected_enduser
+                    st.session_state.po_end_address = enduser_data.get("address", "")
+                    st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
+                    
+                    if contacts and contact_idx < len(contacts):
+                        sel_contact = contacts[contact_idx]
+                        st.session_state.po_end_person = sel_contact.get("name", "")
+                        st.session_state.po_end_mobile = sel_contact.get("mobile", "")
+                        st.session_state.po_end_email = sel_contact.get("email", "")
+                    else:
+                        st.session_state.po_end_person = ""
+                        st.session_state.po_end_mobile = ""
+                        st.session_state.po_end_email = ""
+                st.rerun()
+            
+            end_company = st.text_input(
+                "End User Company",
+                key="po_end_company"
+            )
+            end_address = st.text_area(
+                "End User Address",
+                key="po_end_address"
+            )
+            end_person = st.text_input(
+                "End User Contact",
+                key="po_end_person"
+            )
+            end_mobile = st.text_input(
+                "End Mobile",
+                key="po_end_mobile"
+            )
+            end_email = st.text_input(
+                "End User Email",
+                key="po_end_email"
+            )
+            
+            # Products Section under End User
+            st.subheader("Products")
+            selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
+            
+            col_add1, col_add2 = st.columns(2)
+            with col_add1:
+                if st.button("➕ Add Selected Product", key="po_add_selected_product", use_container_width=True):
                     if selected_product:
                         details = PRODUCT_CATALOG[selected_product]
-                        st.session_state.quotation_products.append({
+                        st.session_state.products.append({
                             "name": selected_product,
                             "basic": details["basic"],
                             "gst_percent": details["gst_percent"],
                             "qty": 1.0,
                         })
                         st.success(f"{selected_product} added!")
-                
-                if st.button("➕ Add Empty Product", key="quote_add_empty_product"):
-                    st.session_state.quotation_products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+                        st.rerun()
+            with col_add2:
+                if st.button("➕ Add Empty Product", key="po_add_empty_product", use_container_width=True):
+                    st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
+                    st.rerun()
 
-                # Display current products with EDITABLE fields (same as PO)
-                st.subheader("Current Products")
-                for i, p in enumerate(st.session_state.quotation_products):
-                    with st.expander(f"Product {i+1}: {p['name']}", expanded=i == 0):
-                        st.session_state.quotation_products[i]["name"] = st.text_input("Name", p["name"], key=f"quote_name_{i}")
-                        st.session_state.quotation_products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"quote_basic_{i}")
-                        st.session_state.quotation_products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"quote_gst_{i}")
-                        st.session_state.quotation_products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"quote_qty_{i}")
-                        if st.button("Remove", key=f"quote_remove_{i}"):
-                            st.session_state.quotation_products.pop(i)
-                            st.rerun()
+            # Display products
+            for i, p in enumerate(st.session_state.products):
+                with st.expander(f"Product {i+1}: {p['name']}", expanded=True):
+                    col_prod1, col_prod2, col_prod3, col_prod4 = st.columns([3, 2, 2, 1])
+                    with col_prod1:
+                        st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
+                    with col_prod2:
+                        st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
+                    with col_prod3:
+                        st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
+                    with col_prod4:
+                        st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
+                    if st.button("Remove", key=f"po_remove_{i}", use_container_width=True):
+                        st.session_state.products.pop(i)
+                        st.rerun()
+
+        with col2:
+            st.subheader("Company & Tax Details")
             
-            # Preview and Generate Section
-            st.header("Preview & Generate Quotation")
+            # Company Details
+            bill_to_company = st.text_input(
+                "Bill To",
+                value=safe_str_state("po_bill_to_company", "CM INFOTECH"),
+                key="po_bill_to_company_input"
+            )
+            bill_to_address = st.text_area(
+                "Bill To Address",
+                value=safe_str_state("po_bill_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
+                key="po_bill_to_address_input"
+            )
+            ship_to_company = st.text_input(
+                "Ship To",
+                value=safe_str_state("po_ship_to_company", "CM INFOTECH"),
+                key="po_ship_to_company_input"
+            )
+            ship_to_address = st.text_area(
+                "Ship To Address",
+                value=safe_str_state("po_ship_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
+                key="po_ship_to_address_input"
+            )
+            gst_no = st.text_input(
+                "GST No",
+                key="po_gst_no"
+            )
+            if gst_no.strip():
+                is_valid, msg = validate_gst(gst_no)
+                if not is_valid:
+                    show_validation_warning(msg)
+                else:
+                    show_validation_success("GSTIN Format Verified")
+            pan_no = st.text_input(
+                "PAN No",
+                key="po_pan_no"
+            )
+            if pan_no.strip():
+                is_valid, msg = validate_pan(pan_no)
+                if not is_valid:
+                    show_validation_warning(msg)
+                else:
+                    show_validation_success("PAN Format Verified")
+            msme_no = st.text_input(
+                "MSME No",
+                key="po_msme_no"
+            )
             
-            # Show the current quotation number prominently with sales person info
-            st.info(f"**Quotation Number:** {st.session_state.quotation_number}")
-            st.info(f"**Sales Person:** {current_sales_person_info['name']} ({sales_person}) - {current_sales_person_info['email']}")
+            # Terms & Authorization
+            st.subheader("Terms & Authorization")
+            payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
+            delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
+            delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
+            prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
+            authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
             
-            # Calculate totals
-            totals = calculate_quotation_totals(st.session_state.quotation_products)
+            # Preview & Generate Section under Terms & Authorization
+            st.subheader("Preview & Generate")
             
-            # Preview and totals calculation (same as PO)
-            total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
-            total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.quotation_products)
+            # Show the current PO number prominently with sales person info
+            st.info(f"**PO Number:** {st.session_state.po_number}")
+            st.info(f"**Sales Person:** {current_sales_person_info['name']} ({po_sales_person}) - {current_sales_person_info['email']}")
+            
+            total_base = sum(p["basic"] * p["qty"] for p in st.session_state.products)
+            total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.products)
             grand_total = total_base + total_gst
             amount_words = num2words(grand_total, to="currency", currency="INR").title()
-            
-            col3, col4, col5 = st.columns(3)
-            with col3:
-                st.metric("Total Base Amount", f"₹{total_base:,.2f}")
-            with col4:
-                st.metric("Total GST", f"₹{total_gst:,.2f}")
-            with col5:
-                st.metric("Grand Total", f"₹{grand_total:,.2f}")
-            
             # Document preview container
             st.subheader("👀 Live Document Preview")
-            if st.session_state.quotation_products:
-                show_document_preview("Quotation", st.session_state.quotation_number, vendor_name, st.session_state.quotation_products, grand_total)
+            if st.session_state.products:
+                show_document_preview("Purchase Order", st.session_state.po_number, end_company, st.session_state.products, grand_total)
             else:
                 st.info("Add products to see live document preview.")
 
-            # Use global images
+            # Use global logo
+            logo_path = global_logo_path
+            if not logo_path:
+                st.warning("No company logo available. Please upload one in the sidebar.")
+            
+            if st.button("Generate PO", type="primary", key="po_generate_button", use_container_width=True):
+                # Calculate total from all products
+                products_total = 0
+                for p in st.session_state.products:
+                    gst_amt = p["basic"] * p["gst_percent"] / 100
+                    per_unit_price = p["basic"] + gst_amt
+                    total = per_unit_price * p["qty"]
+                    products_total += total
+
+                # Calculate round off to make final amount whole number
+                rounded_total = round(products_total)
+                round_off = rounded_total - products_total
+
+                # Update grand_total and amount_words with rounded amount
+                grand_total = rounded_total
+                amount_words = number_to_words(rounded_total)
+
+                po_data = {
+                    "po_number": st.session_state.po_number,
+                    "po_date": st.session_state.po_date,
+                    "vendor_name": vendor_name,
+                    "vendor_address": vendor_address,
+                    "vendor_contact": vendor_contact,
+                    "vendor_mobile": vendor_mobile,
+                    "gst_no": gst_no,
+                    "pan_no": pan_no,
+                    "msme_no": msme_no,
+                    "bill_to_company": bill_to_company,
+                    "bill_to_address": bill_to_address,
+                    "ship_to_company": ship_to_company,
+                    "ship_to_address": ship_to_address,
+                    "end_company": end_company,
+                    "end_address": end_address,
+                    "end_person": end_person,
+                    "end_mobile": end_mobile,
+                    "end_email": end_email,
+                    "products": st.session_state.products,
+                    "grand_total": grand_total,
+                    "amount_words": amount_words,
+                    "payment_terms": payment_terms,
+                    "delivery_terms": delivery_terms,
+                    "prepared_by": prepared_by,
+                    "authorized_by": authorized_by,
+                    "company_name": st.session_state.company_name
+                }
+
+                pdf_bytes = create_po_pdf(po_data, logo_path)
+                # Store the last PO number for sequence tracking
+                st.session_state.last_po_number = st.session_state.po_number
+                
+                # Auto-increment for next PO
+                if po_auto_increment:
+                    next_sequence = get_next_po_sequence()
+                    st.session_state.po_seq = next_sequence
+
+                st.success("Purchase Order generated!")
+                st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
+                
+                st.download_button(
+                    "⬇ Download Purchase Order",
+                    data=pdf_bytes,
+                    file_name=f"{end_company}_{st.session_state.po_number.replace('/', '_')}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True
+                )
+                
+    # --- Tab 3: Tax Invoice Generator ---
+    with tab3:
+        # Display company logo instead of text header
+        if global_logo_path and os.path.exists(global_logo_path):
+            st.image(global_logo_path, width=150)
+            st.markdown("### Tax Invoice Generator")
+        else:
+            st.header("Tax Invoice Generator")  
+        
+        today = datetime.date.today()
+        current_quarter = get_current_quarter()
+        
+        # Invoice Settings in sidebar for this tab
+        st.sidebar.header("Invoice Settings")
+        
+        # Generate invoice number - SIMPLER LOGIC THAT WORKS WITH EXISTING COUNTER
+        def get_invoice_number():
+            if st.session_state.last_invoice_number:
+                try:
+                    last_prefix, last_year_range, last_quarter, last_sequence = parse_invoice_number(st.session_state.last_invoice_number)
+                    
+                    if last_quarter == current_quarter:
+                        next_sequence = get_next_sequence_number_invoice(st.session_state.last_invoice_number)
+                        return generate_invoice_number(next_sequence)
+                    else:
+                        return generate_invoice_number(1)
+                except:
+                    return generate_invoice_number(st.session_state.invoice_seq)
+            else:
+                return generate_invoice_number(st.session_state.invoice_seq)
+        
+        # Initialize or update invoice number when quarter changes
+        if "current_invoice_quarter" not in st.session_state:
+            st.session_state.current_invoice_quarter = current_quarter
+            st.session_state.invoice_number = get_invoice_number()
+        
+        # Update invoice number if quarter changes
+        if st.session_state.get('current_invoice_quarter', '') != current_quarter:
+            st.session_state.current_invoice_quarter = current_quarter
+            st.session_state.invoice_number = get_invoice_number()
+        
+        # Display current quarter info
+        st.sidebar.info(f"**Current Quarter:** {current_quarter}")
+        
+        # Show auto-generated breakdown
+        try:
+            prefix, year_range, quarter, sequence = parse_invoice_number(st.session_state.invoice_number)
+            st.sidebar.success(f"**Auto-generated Invoice Number**")
+            st.sidebar.info(f"**Format:** {year_range}/{quarter}/{sequence}")
+        except:
+            st.sidebar.warning("Could not parse invoice number")
+        
+        # Editable invoice number - SIMPLER VERSION
+        st.sidebar.subheader("Invoice Number Editor")
+        
+        # Parse current invoice number for editing
+        try:
+            current_prefix, current_year_range, current_q, current_seq = parse_invoice_number(st.session_state.invoice_number)
+            
+            # Create editable components
+            col1, col2, col3 = st.sidebar.columns([2, 2, 1])
+            
+            with col1:
+                new_year_range = st.text_input("Year Range", value=current_year_range, key="invoice_year_edit")
+            
+            with col2:
+                new_quarter = st.text_input("Quarter", value=current_q, key="invoice_quarter_edit")
+            
+            with col3:
+                new_sequence = st.number_input("Sequence", 
+                                            min_value=1, 
+                                            value=int(current_seq), 
+                                            step=1,
+                                            key="invoice_seq_edit")
+            
+            # Construct new invoice number
+            new_invoice_number = f"CMI/{new_year_range}/{new_quarter}/{new_sequence:02d}"
+            
+            # Update if changed
+            if new_invoice_number != st.session_state.invoice_number:
+                st.session_state.invoice_number = new_invoice_number
+                
+        except Exception as e:
+            st.sidebar.error(f"Error parsing invoice number: {e}")
+            st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
+        
+        # Display final invoice number
+        st.sidebar.code(st.session_state.invoice_number)
+        
+        invoice_auto_increment = st.sidebar.checkbox("Auto-increment Sequence", value=True, key="invoice_auto_increment")
+        
+        if st.sidebar.button("Reset to Auto-generate", use_container_width=True, key="invoice_reset_auto_generate"):
+            # DON'T reset the counter file - just use the next sequence
+            next_sequence = get_next_invoice_sequence()
+            st.session_state.invoice_seq = next_sequence
+            st.session_state.last_invoice_number = ""
+            st.session_state.invoice_number = generate_invoice_number(next_sequence)
+            st.sidebar.success(f"Invoice number reset to next sequence: {next_sequence}")
+            st.rerun()
+
+        # Rest of your invoice tab code remains the same...
+        col1, col2 = st.columns([1,1])
+        with col1:
+            st.subheader("Invoice Details")
+            
+            # Show the current invoice number prominently with sales person info
+            st.info(f"**Invoice Number:** {st.session_state.invoice_number}")
+            # st.info(f"**Sales Person:** {current_sales_person_info['name']} ({invoice_sales_person}) - {current_sales_person_info['email']}")
+            
+            # Use the session state invoice number
+            invoice_no = st.text_input("Invoice No", st.session_state.invoice_number, key="invoice_number_input")
+            # Rest of your code...
+            invoice_date = st.text_input("Invoice Date", datetime.date.today().strftime("%d-%m-%Y"))
+            Suppliers_Reference = st.text_input("Supplier's Reference", "NA")
+            Others_Reference = st.text_input("Other's Reference", "NA")
+            buyers_order_no = st.text_input("Buyer's Order No.", "Online")
+            buyers_order_date = st.text_input("Buyer's Order Date", datetime.date.today().strftime("%d-%m-%Y"))
+            dispatched_through = st.text_input("Dispatched Through", "Online")
+            
+            # Payment Terms
+            payment_terms = st.text_input("Mode/Terms of Payment", "100% Advance with Purchase")
+            
+            terms_of_delivery = st.text_input("Terms of delivery", "Within Month")
+            
+            # Destination
+            destination = st.text_input("Destination", "Vadodara")
+            
+            st.subheader("Seller Details")
+            vendor_name = st.text_input("Seller Name", "CM INFOTECH")
+            vendor_address = st.text_area("Seller Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
+            vendor_gst = st.text_input("Seller GST No.", "24ANMPP4891R1ZX")
+            vendor_msme = st.text_input("Seller MSME Registration No.", "UDYAM-GJ-01-0117646")
+
+        with col2:
+            st.subheader("Buyer Details")
+            
+            # SIMPLE DROPDOWN LIKE QUOTATION TAB
+            # Track selection changes for Invoice Buyer
+            if 'prev_buyer_invoice' not in st.session_state:
+                st.session_state.prev_buyer_invoice = "Select End User"
+            if 'prev_buyer_contact_invoice' not in st.session_state:
+                st.session_state.prev_buyer_contact_invoice = ""
+
+            selected_enduser_invoice = st.selectbox(
+                "Select Buyer", 
+                options=get_enduser_dropdown_options(),
+                key="enduser_dropdown_invoice"
+            )
+            
+            # UPDATE BUYER FIELDS WHEN DROPDOWN SELECTION CHANGES - WITH CONTACT DROPDOWN
+            buyer_changed = selected_enduser_invoice != st.session_state.prev_buyer_invoice
+            if buyer_changed:
+                st.session_state.prev_buyer_invoice = selected_enduser_invoice
+                st.session_state.prev_buyer_contact_invoice = ""
+                
+            enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {}) if selected_enduser_invoice != "Select End User" else {}
+            contacts = get_contacts_list(enduser_data)
+            contact_names = get_contact_dropdown_options(contacts)
+            
+            # Contact person dropdown for invoice buyer
+            selected_buyer_contact = st.selectbox(
+                "Select Buyer Contact",
+                options=contact_names,
+                key="buyer_contact_dropdown_invoice"
+            )
+            buyer_contact_changed = selected_buyer_contact != st.session_state.prev_buyer_contact_invoice
+
+            if buyer_changed or buyer_contact_changed:
+                st.session_state.prev_buyer_contact_invoice = selected_buyer_contact
+                contact_idx = contact_names.index(selected_buyer_contact) if selected_buyer_contact in contact_names else 0
+                
+                if selected_enduser_invoice != "Select End User":
+                    st.session_state.invoice_buyer_company = selected_enduser_invoice
+                    st.session_state.invoice_buyer_address = enduser_data.get("address", "")
+                    st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
+                    
+                    if contacts and contact_idx < len(contacts):
+                        sel_contact = contacts[contact_idx]
+                        st.session_state.invoice_buyer_mobile = sel_contact.get("mobile", "")
+                        st.session_state.invoice_buyer_email = sel_contact.get("email", "")
+                    else:
+                        st.session_state.invoice_buyer_mobile = ""
+                        st.session_state.invoice_buyer_email = ""
+                st.rerun()
+            
+            # USE SESSION STATE VALUES IN TEXT INPUTS - SIMPLE LIKE QUOTATION
+            buyer_name = st.text_input(
+                "Buyer Name",
+                key="invoice_buyer_company"
+            )
+            
+            buyer_address = st.text_area(
+                "Buyer Address",
+                key="invoice_buyer_address"
+            )
+
+            buyer_mobile = st.text_input(
+                "Buyer mobile.",
+                key="invoice_buyer_mobile"
+            )
+            buyer_email = st.text_input(
+                "Buyer email.",
+                key="invoice_buyer_email"
+            )
+            buyer_gst = st.text_input(
+                "Buyer GST No.",
+                key="invoice_buyer_gst"
+            )
+            if buyer_gst.strip():
+                is_valid, msg = validate_gst(buyer_gst)
+                if not is_valid:
+                    show_validation_warning(msg)
+                else:
+                    show_validation_success("GSTIN Format Verified")
+
+            st.subheader("Products")
+            items = []
+            num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
+            for i in range(num_items):
+                with st.expander(f"Product {i+1}", expanded=True):
+                    # Product catalog dropdown
+                    product_options = ["-- Select from Catalog --"] + list(PRODUCT_CATALOG.keys())
+                    selected_inv_product = st.selectbox(
+                        f"Select Product {i+1}",
+                        options=product_options,
+                        key=f"invoice_product_select_{i}"
+                    )
+                    
+                    # Auto-fill product name and rate from catalog
+                    default_desc = "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription"
+                    default_rate = 36500.00
+                    
+                    if selected_inv_product and selected_inv_product != "-- Select from Catalog --":
+                        catalog_entry = PRODUCT_CATALOG.get(selected_inv_product, {})
+                        default_desc = selected_inv_product
+                        default_rate = catalog_entry.get("basic", 0.0)
+                    
+                    # Product description (auto-filled from catalog, editable)
+                    desc_name = st.text_area(f"Product Description {i+1}", default_desc, key=f"invoice_desc_{i}")
+                    
+                    # Serial, Contract, End Date fields
+                    col_s, col_c, col_e = st.columns(3)
+                    with col_s:
+                        serial_no = st.text_input(f"Serial #", "", key=f"invoice_serial_{i}", placeholder="e.g. 575-26831580")
+                    with col_c:
+                        contract_no = st.text_input(f"Contract #", "", key=f"invoice_contract_{i}", placeholder="e.g. 110004988191")
+                    with col_e:
+                        end_date = st.text_input(f"End Date", "", key=f"invoice_enddate_{i}", placeholder="e.g. 17/04/2026")
+                    
+                    # Build final description: product name + serial/contract/end date
+                    full_desc = desc_name
+                    if serial_no:
+                        full_desc += f"\nSerial #{serial_no}"
+                    if contract_no:
+                        full_desc += f"\nContract #{contract_no}"
+                    if end_date:
+                        full_desc += f"\nEnd Date: {end_date}"
+                    
+                    hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
+                    qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
+                    rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, default_rate, key=f"invoice_rate_{i}")
+                    rate = round(rate, 2)
+                    items.append({"description": full_desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
+
+            st.subheader("Declaration")
+            declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
+            
             st.subheader("Company Branding")
             st.info("Using global logo and stamp from sidebar settings")
             logo_path = global_logo_path
@@ -2821,983 +3658,146 @@ def main():
             if not stamp_path:
                 st.warning("⚠ No company stamp available")
             
-            if st.button("Generate Quotation PDF", type="primary", use_container_width=True, key="generate_quote"):
-                if not st.session_state.quotation_products:
-                    st.error("Please add at least one product to generate the quotation.")
-                else:
-                    # Calculate total from all products (same as PO logic)
-                    products_total = 0
-                    for p in st.session_state.quotation_products:
-                        gst_amt = p["basic"] * p["gst_percent"] / 100
-                        per_unit_price = p["basic"] + gst_amt
-                        total = per_unit_price * p["qty"]
-                        products_total += total
-
-                    # Calculate round off to make final amount whole number (same as PO)
-                    rounded_total = round(products_total)
-                    round_off = rounded_total - products_total
-
-                    # Update grand_total and amount_words with rounded amount
-                    grand_total = rounded_total
-                    amount_words = number_to_words(rounded_total)
-
-                    quotation_data = {
-                        "quotation_number": st.session_state.quotation_number,
-                        "quotation_date": today.strftime("%d-%m-%Y"),
-                        "vendor_name": vendor_name,
-                        "vendor_address": vendor_address,
-                        "vendor_email": vendor_email,
-                        "vendor_contact": vendor_contact,
-                        "vendor_mobile": vendor_mobile,
-                        "products": st.session_state.quotation_products,
-                        "price_validity": price_validity,
-                        "grand_total": grand_total,
-                        "round_off": round_off,
-                        "amount_words": amount_words,
-                        "subject": subject_line,
-                        "intro_paragraph": intro_paragraphs_1,
-                        "product_name": selected_product if selected_product else "Software",   
-                        "sales_person_code": sales_person,  
-                        "annexure_text": annexure_text,  
-                        "quotation_title": quotation_title
-                    }
-                    
-                    try:
-                        pdf_bytes = create_quotation_pdf(quotation_data, logo_path, stamp_path)
-                        
-                        # Store the last quotation number for sequence tracking
-                        st.session_state.last_quotation_number = st.session_state.quotation_number
-                        
-                        # Auto-increment for next quotation
-                        if quotation_auto_increment:
-                            next_sequence = get_next_quotation_sequence()
-                            st.session_state.quotation_seq = next_sequence
-                        
-                        st.success("✅ Quotation generated successfully!")
-                        st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
-                        
-                        # Download button
-                        st.download_button(
-                            "⬇ Download Quotation PDF",
-                            data=pdf_bytes,
-                            file_name=f"{vendor_name}_{st.session_state.quotation_number.replace('/', '_')}.pdf",
-                            mime="application/pdf",
-                            use_container_width=True
-                        )
-                        
-                    except Exception as e:
-                        st.error(f"Error generating PDF: {str(e)}")
-
-            # --- Quick Transfer Section ---
-            st.markdown("---")
-            st.subheader("📋 Quick Transfer")
-            st.caption("Copy this quotation's details to other generators to save time.")
-            col_copy1, col_copy2 = st.columns(2)
-            with col_copy1:
-                if st.button("🛒 Copy to Purchase Order", key="copy_to_po", use_container_width=True):
-                    if not st.session_state.quotation_products:
-                        st.warning("No products to copy.")
-                    else:
-                        st.session_state.po_end_company = st.session_state.quote_end_company
-                        st.session_state.po_end_address = st.session_state.quote_end_address
-                        st.session_state.po_end_person = st.session_state.quote_end_person
-                        st.session_state.po_end_mobile = st.session_state.quote_end_mobile
-                        st.session_state.po_end_email = st.session_state.quote_end_email
-                        st.session_state.po_end_gst_no = st.session_state.quote_end_gst_no
-                        st.session_state.products = [dict(p) for p in st.session_state.quotation_products]
-                        st.success("✅ Copied to Purchase Order! Go to 'Purchase Order Generator' tab.")
-            with col_copy2:
-                if st.button("🧾 Copy to Tax Invoice", key="copy_to_invoice", use_container_width=True):
-                    if not st.session_state.quotation_products:
-                        st.warning("No products to copy.")
-                    else:
-                        st.session_state.invoice_buyer_company = st.session_state.quote_end_company
-                        st.session_state.invoice_buyer_address = st.session_state.quote_end_address
-                        st.session_state.invoice_buyer_mobile = st.session_state.quote_end_mobile
-                        st.session_state.invoice_buyer_email = st.session_state.quote_end_email
-                        st.session_state.invoice_buyer_gst = st.session_state.quote_end_gst_no
-                        
-                        # Copy items
-                        st.session_state.invoice_num_items = len(st.session_state.quotation_products)
-                        for idx, p in enumerate(st.session_state.quotation_products):
-                            st.session_state[f"invoice_desc_{idx}"] = p["name"]
-                            st.session_state[f"invoice_rate_{idx}"] = p["basic"]
-                            st.session_state[f"invoice_qty_{idx}"] = p["qty"]
-                            
-                        st.success("✅ Copied to Tax Invoice! Go to 'Tax Invoice Generator' tab.")
-
-                    
-        # --- Tab 2: Purchase Order Generator ---
-        with tab2:
-            if global_logo_path and os.path.exists(global_logo_path):
-                st.image(global_logo_path, width=150)
-                st.markdown("### Purchase Order Generator")
+            # Calculate dynamic totals for preview
+            temp_basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
+            temp_sgst = round(temp_basic_amount * 0.09, 2)
+            temp_cgst = round(temp_basic_amount * 0.09, 2)
+            temp_final_amount = round(temp_basic_amount + temp_sgst + temp_cgst)
+            
+            # Document preview container
+            st.subheader("👀 Live Document Preview")
+            if items:
+                show_document_preview("Tax Invoice", st.session_state.invoice_number, buyer_name, items, temp_final_amount)
             else:
-                st.header("Purchase Order Generator")  
-            
-            today = datetime.date.today()
-            current_quarter = get_current_quarter()
-            
-            # PO Settings in sidebar for this tab
-            st.sidebar.header("PO Settings")
-            
-            # Sales Person Selection for PO
-            po_sales_person = st.sidebar.selectbox("Select Sales Person", 
-                                                options=list(SALES_PERSON_MAPPING.keys()), 
-                                                format_func=lambda x: f"{x} - {SALES_PERSON_MAPPING[x]['name']}",
-                                                key="po_sales_person_select")
-            
-            # Get current sales person info
-            current_sales_person_info = SALES_PERSON_MAPPING.get(po_sales_person, SALES_PERSON_MAPPING['CP'])
-            
-            # Generate PO number based on selected sales person
-            def get_po_number():
-                if st.session_state.last_po_number:
+                st.info("Add products to see live document preview.")
+
+            st.subheader("Invoice Preview & Download")
+
+            if st.button("Generate Invoice", key="generate_invoice_button"):
+                # Get the current invoice number from session state (which includes manual edits)
+                current_invoice_no = st.session_state.invoice_number
+                
+                # Parse the manually edited invoice number to get the sequence
+                try:
+                    prefix, year_range, quarter, sequence = parse_invoice_number(current_invoice_no)
+                    manual_sequence = int(sequence)
+                    
+                    # UPDATE THE COUNTER FILE to match the manual sequence
+                    with open(INVOICE_COUNTER_FILE, 'w') as f:
+                        f.write(str(manual_sequence))
+                    
+                    # Update session state to reflect the new sequence
+                    st.session_state.invoice_seq = manual_sequence
+                    
+                    st.success(f"✅ Invoice sequence updated to: {manual_sequence}")
+                    
+                except Exception as e:
+                    st.error(f"Error parsing invoice number: {e}")
+                
+                # Now use the manually edited invoice number
+                invoice_no = current_invoice_no
+                
+                # Rest of your invoice calculation code...
+                # Calculate amounts with proper rounding like in PO generator
+                basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
+                sgst = round(basic_amount * 0.09, 2)
+                cgst = round(basic_amount * 0.09, 2)
+                final_amount_unrounded = basic_amount + sgst + cgst
+                
+                # ROUND TO WHOLE NUMBER LIKE PO GENERATOR
+                final_amount = round(final_amount_unrounded)
+                round_off = final_amount - final_amount_unrounded
+                
+                # Display calculated amounts for verification
+                st.info(f"**Calculated Amounts:** Basic: ₹{basic_amount:.2f}, SGST: ₹{sgst:.2f}, CGST: ₹{cgst:.2f}, Final: ₹{final_amount:.2f}")
+                if round_off != 0:
+                    st.info(f"**Round Off:** ₹{round_off:.2f}")
+                
+                # Convert to words with proper Indian currency format
+                def convert_to_indian_currency(amount):
+                    """Convert amount to Indian currency words format"""
                     try:
-                        last_prefix, last_sales_person, last_year, last_quarter, last_sequence = parse_po_number(st.session_state.last_po_number)
+                        # Split into rupees and paise
+                        rupees = int(amount)
+                        paise = round((amount - rupees) * 100)
                         
-                        if last_sales_person == po_sales_person and last_quarter == current_quarter:
-                            next_sequence = get_next_sequence_number_po(st.session_state.last_po_number)
-                            return generate_po_number(po_sales_person, next_sequence)
-                        else:
-                            return generate_po_number(po_sales_person, 1)
-                    except:
-                        return generate_po_number(po_sales_person, st.session_state.po_seq)
-                else:
-                    return generate_po_number(po_sales_person, st.session_state.po_seq)
-            
-            # Initialize or update PO number when sales person changes
-            if "current_po_sales_person" not in st.session_state:
-                st.session_state.current_po_sales_person = po_sales_person
-                st.session_state.po_number = get_po_number()
-            
-            # Update PO number if sales person changes or quarter changes
-            if (st.session_state.current_po_sales_person != po_sales_person or 
-                st.session_state.get('current_po_quarter', '') != current_quarter):
-                st.session_state.current_po_sales_person = po_sales_person
-                st.session_state.current_po_quarter = current_quarter
-                st.session_state.po_number = get_po_number()
-            
-            # Display current sales person info
-            st.sidebar.info(f"**Current Sales Person:** {current_sales_person_info['name']}")
-            st.sidebar.info(f"**Current Quarter:** {current_quarter}")
-            
-            # Show auto-generated breakdown
-            try:
-                prefix, current_sp, year, quarter, sequence = parse_po_number(st.session_state.po_number)
-                st.sidebar.success(f"**Auto-generated PO Number**")
-                st.sidebar.info(f"**Format:** {current_sp}/{year}/{quarter}_{sequence}")
-            except:
-                st.sidebar.warning("Could not parse PO number")
-            
-            # Editable PO number WITH sales person selection
-            st.sidebar.subheader("PO Number Editor")
-            
-            # Parse current PO number for editing
-            try:
-                current_prefix, current_sp, current_year, current_q, current_seq = parse_po_number(st.session_state.po_number)
-                
-                # Create editable components
-                col1, col2, col3, col4 = st.sidebar.columns([1, 2, 2, 1])
-                
-                with col1:
-                    st.text_input("Sales Person", value=current_sp, key="po_sp_display", disabled=True)
-                
-                with col2:
-                    new_year = st.text_input("Year", value=current_year, key="po_year_edit")
-                
-                with col3:
-                    new_quarter = st.text_input("Quarter", value=current_q, key="po_quarter_edit")
-                
-                with col4:
-                    new_sequence = st.number_input("Sequence", 
-                                                min_value=1, 
-                                                value=int(current_seq), 
-                                                step=1,
-                                                key="po_seq_edit")
-                
-                # Construct new PO number using the SELECTED sales person, not the edited one
-                new_po_number = f"CMI/{po_sales_person}/{new_year}/{new_quarter}_{new_sequence:03d}"
-                
-                # Update if changed
-                if new_po_number != st.session_state.po_number:
-                    st.session_state.po_number = new_po_number
-                    
-            except Exception as e:
-                st.sidebar.error(f"Error parsing PO number: {e}")
-                st.session_state.po_number = generate_po_number(po_sales_person, st.session_state.po_seq)
-            
-            # Display final PO number
-            st.sidebar.code(st.session_state.po_number)
-            
-            po_auto_increment = st.sidebar.checkbox("Auto-increment Sequence", value=True, key="po_auto_increment_checkbox")
-            
-            if st.sidebar.button("Reset to Auto-generate", use_container_width=True, key="po_reset_auto_generate"):
-                st.session_state.po_seq = 1
-                st.session_state.last_po_number = ""
-                st.session_state.po_number = get_po_number()
-                st.sidebar.success("PO number reset to auto-generated")
-                st.rerun()
-            
-            # Add Force Refresh Vendor Data button in PO tab sidebar
-            if st.sidebar.button("🔄 Force Refresh Vendor Data", key="force_refresh_vendor_po"):
-                st.cache_data.clear()
-                st.sidebar.success("✅ Vendor data cache cleared!")
-                st.rerun()
-            
-            # Single tab with two columns
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.subheader("Vendor & End User Details")
-                
-                # Vendor Selection - SHOW DEBUG INFO
-                vendor_options = get_vendor_dropdown_options()
-                st.sidebar.info(f"Vendor dropdown options: {len(vendor_options)} items")
-                
-                # Track selection changes for PO Vendor
-                if 'prev_vendor_po' not in st.session_state:
-                    st.session_state.prev_vendor_po = "Select Vendor"
-                if 'prev_vendor_contact_po' not in st.session_state:
-                    st.session_state.prev_vendor_contact_po = ""
-
-                selected_vendor = st.selectbox(
-                    "Select Vendor", 
-                    options=vendor_options,
-                    key="vendor_dropdown_po"
-                )
-                
-                # UPDATE VENDOR FIELDS WHEN DROPDOWN SELECTION CHANGES
-                vendor_changed = selected_vendor != st.session_state.prev_vendor_po
-                if vendor_changed:
-                    st.session_state.prev_vendor_po = selected_vendor
-                    st.session_state.prev_vendor_contact_po = ""
-                    
-                vendor_data = VENDOR_DATABASE.get(selected_vendor, {}) if selected_vendor != "Select Vendor" else {}
-                contacts = get_contacts_list(vendor_data)
-                contact_names = get_contact_dropdown_options(contacts)
-                
-                # Contact person dropdown for vendor
-                selected_vendor_contact = st.selectbox(
-                    "Select Vendor Contact",
-                    options=contact_names,
-                    key="vendor_contact_dropdown_po"
-                )
-                vendor_contact_changed = selected_vendor_contact != st.session_state.prev_vendor_contact_po
-
-                if vendor_changed or vendor_contact_changed:
-                    st.session_state.prev_vendor_contact_po = selected_vendor_contact
-                    contact_idx = contact_names.index(selected_vendor_contact) if selected_vendor_contact in contact_names else 0
-                    
-                    if selected_vendor != "Select Vendor":
-                        st.session_state.po_vendor_name = selected_vendor
-                        st.session_state.po_vendor_address = vendor_data.get("address", "")
-                        st.session_state.po_gst_no = vendor_data.get("gst_no", "")
-                        st.session_state.po_pan_no = vendor_data.get("pan_no", "")
-                        st.session_state.po_msme_no = vendor_data.get("msme_no", "")
+                        rupees_text = num2words(rupees, to='cardinal', lang='en_IN').title()
                         
-                        if contacts and contact_idx < len(contacts):
-                            sel_contact = contacts[contact_idx]
-                            st.session_state.po_vendor_contact = sel_contact.get("name", "")
-                            st.session_state.po_vendor_mobile = sel_contact.get("mobile", "")
+                        if paise > 0:
+                            paise_text = num2words(paise, to='cardinal', lang='en_IN').title()
+                            return f"{rupees_text} Rupees And {paise_text} Paise Only/-"
                         else:
-                            st.session_state.po_vendor_contact = ""
-                            st.session_state.po_vendor_mobile = ""
-                    st.rerun()
-                
-                st.subheader("Vendor Details")
-                vendor_name = st.text_input(
-                    "Vendor Name",
-                    key="po_vendor_name"
-                )
-                vendor_address = st.text_area(
-                    "Vendor Address",
-                    key="po_vendor_address"
-                )
-                vendor_contact = st.text_input(
-                    "Contact Person",
-                    key="po_vendor_contact"
-                )
-                vendor_mobile = st.text_input(
-                    "Mobile",
-                    key="po_vendor_mobile"
-                )
-                
-                st.subheader("End User Details")
-                
-                # End User Dropdown
-                # Track selection changes for PO End User
-                if 'prev_enduser_po' not in st.session_state:
-                    st.session_state.prev_enduser_po = "Select End User"
-                if 'prev_enduser_contact_po' not in st.session_state:
-                    st.session_state.prev_enduser_contact_po = ""
+                            return f"{rupees_text} Rupees Only/-"
+                            
+                    except Exception as e:
+                        return f"Amount: ₹{amount:.2f}"
 
-                selected_enduser = st.selectbox(
-                    "Select End User", 
-                    options=get_enduser_dropdown_options(),
-                    key="enduser_dropdown_po"
-                )
-                
-                # Update end user fields when dropdown selection changes
-                enduser_po_changed = selected_enduser != st.session_state.prev_enduser_po
-                if enduser_po_changed:
-                    st.session_state.prev_enduser_po = selected_enduser
-                    st.session_state.prev_enduser_contact_po = ""
-                    
-                enduser_data = END_USER_DATABASE.get(selected_enduser, {}) if selected_enduser != "Select End User" else {}
-                contacts = get_contacts_list(enduser_data)
-                contact_names = get_contact_dropdown_options(contacts)
-                
-                # Contact person dropdown for end user
-                selected_enduser_contact = st.selectbox(
-                    "Select End User Contact",
-                    options=contact_names,
-                    key="enduser_contact_dropdown_po"
-                )
-                enduser_contact_changed = selected_enduser_contact != st.session_state.prev_enduser_contact_po
+                amount_in_words = convert_to_indian_currency(final_amount)
+                tax_in_words = convert_to_indian_currency(round(sgst + cgst, 2))
 
-                if enduser_po_changed or enduser_contact_changed:
-                    st.session_state.prev_enduser_contact_po = selected_enduser_contact
-                    contact_idx = contact_names.index(selected_enduser_contact) if selected_enduser_contact in contact_names else 0
-                    
-                    if selected_enduser != "Select End User":
-                        st.session_state.po_end_company = selected_enduser
-                        st.session_state.po_end_address = enduser_data.get("address", "")
-                        st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
-                        
-                        if contacts and contact_idx < len(contacts):
-                            sel_contact = contacts[contact_idx]
-                            st.session_state.po_end_person = sel_contact.get("name", "")
-                            st.session_state.po_end_mobile = sel_contact.get("mobile", "")
-                            st.session_state.po_end_email = sel_contact.get("email", "")
-                        else:
-                            st.session_state.po_end_person = ""
-                            st.session_state.po_end_mobile = ""
-                            st.session_state.po_end_email = ""
-                    st.rerun()
-                
-                end_company = st.text_input(
-                    "End User Company",
-                    key="po_end_company"
-                )
-                end_address = st.text_area(
-                    "End User Address",
-                    key="po_end_address"
-                )
-                end_person = st.text_input(
-                    "End User Contact",
-                    key="po_end_person"
-                )
-                end_mobile = st.text_input(
-                    "End Mobile",
-                    key="po_end_mobile"
-                )
-                end_email = st.text_input(
-                    "End User Email",
-                    key="po_end_email"
-                )
-                
-                # Products Section under End User
-                st.subheader("Products")
-                selected_product = st.selectbox("Select from Catalog", [""] + list(PRODUCT_CATALOG.keys()), key="po_product_select_catalog")
-                
-                col_add1, col_add2 = st.columns(2)
-                with col_add1:
-                    if st.button("➕ Add Selected Product", key="po_add_selected_product", use_container_width=True):
-                        if selected_product:
-                            details = PRODUCT_CATALOG[selected_product]
-                            st.session_state.products.append({
-                                "name": selected_product,
-                                "basic": details["basic"],
-                                "gst_percent": details["gst_percent"],
-                                "qty": 1.0,
-                            })
-                            st.success(f"{selected_product} added!")
-                            st.rerun()
-                with col_add2:
-                    if st.button("➕ Add Empty Product", key="po_add_empty_product", use_container_width=True):
-                        st.session_state.products.append({"name": "New Product", "basic": 0.0, "gst_percent": 18.0, "qty": 1.0})
-                        st.rerun()
-
-                # Display products
-                for i, p in enumerate(st.session_state.products):
-                    with st.expander(f"Product {i+1}: {p['name']}", expanded=True):
-                        col_prod1, col_prod2, col_prod3, col_prod4 = st.columns([3, 2, 2, 1])
-                        with col_prod1:
-                            st.session_state.products[i]["name"] = st.text_input("Name", p["name"], key=f"po_name_{i}")
-                        with col_prod2:
-                            st.session_state.products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"po_basic_{i}")
-                        with col_prod3:
-                            st.session_state.products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"po_gst_{i}")
-                        with col_prod4:
-                            st.session_state.products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"po_qty_{i}")
-                        if st.button("Remove", key=f"po_remove_{i}", use_container_width=True):
-                            st.session_state.products.pop(i)
-                            st.rerun()
-
-            with col2:
-                st.subheader("Company & Tax Details")
-                
-                # Company Details
-                bill_to_company = st.text_input(
-                    "Bill To",
-                    value=safe_str_state("po_bill_to_company", "CM INFOTECH"),
-                    key="po_bill_to_company_input"
-                )
-                bill_to_address = st.text_area(
-                    "Bill To Address",
-                    value=safe_str_state("po_bill_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
-                    key="po_bill_to_address_input"
-                )
-                ship_to_company = st.text_input(
-                    "Ship To",
-                    value=safe_str_state("po_ship_to_company", "CM INFOTECH"),
-                    key="po_ship_to_company_input"
-                )
-                ship_to_address = st.text_area(
-                    "Ship To Address",
-                    value=safe_str_state("po_ship_to_address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur Chenpur Road, Jagatpur Village, Ahmedabad - 382481"),
-                    key="po_ship_to_address_input"
-                )
-                gst_no = st.text_input(
-                    "GST No",
-                    key="po_gst_no"
-                )
-                if gst_no.strip():
-                    is_valid, msg = validate_gst(gst_no)
-                    if not is_valid:
-                        show_validation_warning(msg)
-                    else:
-                        show_validation_success("GSTIN Format Verified")
-                pan_no = st.text_input(
-                    "PAN No",
-                    key="po_pan_no"
-                )
-                if pan_no.strip():
-                    is_valid, msg = validate_pan(pan_no)
-                    if not is_valid:
-                        show_validation_warning(msg)
-                    else:
-                        show_validation_success("PAN Format Verified")
-                msme_no = st.text_input(
-                    "MSME No",
-                    key="po_msme_no"
-                )
-                
-                # Terms & Authorization
-                st.subheader("Terms & Authorization")
-                payment_terms = st.text_input("Payment Terms", "30 Days from Invoice date.", key="po_payment_terms_input")
-                delivery_days = st.number_input("Delivery (Days)", min_value=1, value=2, key="po_delivery_days_input")
-                delivery_terms = st.text_input("Delivery Terms", f"Within {delivery_days} Days.", key="po_delivery_terms_input")
-                prepared_by = st.text_input("Prepared By", "Finance Department", key="po_prepared_by_input")
-                authorized_by = st.text_input("Authorized By", "CM INFOTECH", key="po_authorized_by_input")
-                
-                # Preview & Generate Section under Terms & Authorization
-                st.subheader("Preview & Generate")
-                
-                # Show the current PO number prominently with sales person info
-                st.info(f"**PO Number:** {st.session_state.po_number}")
-                st.info(f"**Sales Person:** {current_sales_person_info['name']} ({po_sales_person}) - {current_sales_person_info['email']}")
-                
-                total_base = sum(p["basic"] * p["qty"] for p in st.session_state.products)
-                total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.products)
-                grand_total = total_base + total_gst
-                amount_words = num2words(grand_total, to="currency", currency="INR").title()
-                # Document preview container
-                st.subheader("👀 Live Document Preview")
-                if st.session_state.products:
-                    show_document_preview("Purchase Order", st.session_state.po_number, end_company, st.session_state.products, grand_total)
-                else:
-                    st.info("Add products to see live document preview.")
-
-                # Use global logo
-                logo_path = global_logo_path
-                if not logo_path:
-                    st.warning("No company logo available. Please upload one in the sidebar.")
-                
-                if st.button("Generate PO", type="primary", key="po_generate_button", use_container_width=True):
-                    # Calculate total from all products
-                    products_total = 0
-                    for p in st.session_state.products:
-                        gst_amt = p["basic"] * p["gst_percent"] / 100
-                        per_unit_price = p["basic"] + gst_amt
-                        total = per_unit_price * p["qty"]
-                        products_total += total
-
-                    # Calculate round off to make final amount whole number
-                    rounded_total = round(products_total)
-                    round_off = rounded_total - products_total
-
-                    # Update grand_total and amount_words with rounded amount
-                    grand_total = rounded_total
-                    amount_words = number_to_words(rounded_total)
-
-                    po_data = {
-                        "po_number": st.session_state.po_number,
-                        "po_date": st.session_state.po_date,
-                        "vendor_name": vendor_name,
-                        "vendor_address": vendor_address,
-                        "vendor_contact": vendor_contact,
-                        "vendor_mobile": vendor_mobile,
-                        "gst_no": gst_no,
-                        "pan_no": pan_no,
-                        "msme_no": msme_no,
-                        "bill_to_company": bill_to_company,
-                        "bill_to_address": bill_to_address,
-                        "ship_to_company": ship_to_company,
-                        "ship_to_address": ship_to_address,
-                        "end_company": end_company,
-                        "end_address": end_address,
-                        "end_person": end_person,
-                        "end_mobile": end_mobile,
-                        "end_email": end_email,
-                        "products": st.session_state.products,
-                        "grand_total": grand_total,
-                        "amount_words": amount_words,
+                invoice_data = {
+                    "invoice": {"invoice_no": invoice_no, "date": invoice_date},
+                    "Reference": {"Suppliers_Reference": Suppliers_Reference, "Other": Others_Reference},
+                    "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
+                    "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst, "mobile":buyer_mobile, "email":buyer_email},
+                    "invoice_details": {
+                        "buyers_order_no": buyers_order_no,
+                        "buyers_order_date": buyers_order_date,
+                        "dispatched_through": dispatched_through,
                         "payment_terms": payment_terms,
-                        "delivery_terms": delivery_terms,
-                        "prepared_by": prepared_by,
-                        "authorized_by": authorized_by,
-                        "company_name": st.session_state.company_name
-                    }
+                        "terms_of_delivery": terms_of_delivery,
+                        "destination": destination
+                    },
+                    "items": items,
+                    "totals": {
+                        "basic_amount": basic_amount,
+                        "sgst": sgst,
+                        "cgst": cgst,
+                        "final_amount": final_amount,
+                        "amount_in_words": amount_in_words,
+                        "tax_in_words": tax_in_words
+                    },
+                    "declaration": declaration
+                }
 
-                    pdf_bytes = create_po_pdf(po_data, logo_path)
-                    # Store the last PO number for sequence tracking
-                    st.session_state.last_po_number = st.session_state.po_number
-                    
-                    # Auto-increment for next PO
-                    if po_auto_increment:
-                        next_sequence = get_next_po_sequence()
-                        st.session_state.po_seq = next_sequence
+                pdf_file = create_invoice_pdf(invoice_data, logo_path, stamp_path)
 
-                    st.success("Purchase Order generated!")
-                    st.info(f"📧 Sales Person: {current_sales_person_info['name']}")
+                # Store the last invoice number for sequence tracking
+                st.session_state.last_invoice_number = invoice_no
+                
+                # Auto-increment for next invoice - BUT RESPECT MANUAL SEQUENCE
+                if invoice_auto_increment:
+                    # Get the next sequence based on the manually set sequence
+                    next_sequence = manual_sequence + 1
+                    st.session_state.invoice_seq = next_sequence
                     
-                    st.download_button(
-                        "⬇ Download Purchase Order",
-                        data=pdf_bytes,
-                        file_name=f"{end_company}_{st.session_state.po_number.replace('/', '_')}.pdf",
-                        mime="application/pdf",
-                        use_container_width=True
-                    )
-                    
-        # --- Tab 3: Tax Invoice Generator ---
-        with tab3:
-            # Display company logo instead of text header
-            if global_logo_path and os.path.exists(global_logo_path):
-                st.image(global_logo_path, width=150)
-                st.markdown("### Tax Invoice Generator")
-            else:
-                st.header("Tax Invoice Generator")  
-            
-            today = datetime.date.today()
-            current_quarter = get_current_quarter()
-            
-            # Invoice Settings in sidebar for this tab
-            st.sidebar.header("Invoice Settings")
-            
-            # Generate invoice number - SIMPLER LOGIC THAT WORKS WITH EXISTING COUNTER
-            def get_invoice_number():
-                if st.session_state.last_invoice_number:
-                    try:
-                        last_prefix, last_year_range, last_quarter, last_sequence = parse_invoice_number(st.session_state.last_invoice_number)
-                        
-                        if last_quarter == current_quarter:
-                            next_sequence = get_next_sequence_number_invoice(st.session_state.last_invoice_number)
-                            return generate_invoice_number(next_sequence)
-                        else:
-                            return generate_invoice_number(1)
-                    except:
-                        return generate_invoice_number(st.session_state.invoice_seq)
-                else:
-                    return generate_invoice_number(st.session_state.invoice_seq)
-            
-            # Initialize or update invoice number when quarter changes
-            if "current_invoice_quarter" not in st.session_state:
-                st.session_state.current_invoice_quarter = current_quarter
-                st.session_state.invoice_number = get_invoice_number()
-            
-            # Update invoice number if quarter changes
-            if st.session_state.get('current_invoice_quarter', '') != current_quarter:
-                st.session_state.current_invoice_quarter = current_quarter
-                st.session_state.invoice_number = get_invoice_number()
-            
-            # Display current quarter info
-            st.sidebar.info(f"**Current Quarter:** {current_quarter}")
-            
-            # Show auto-generated breakdown
-            try:
-                prefix, year_range, quarter, sequence = parse_invoice_number(st.session_state.invoice_number)
-                st.sidebar.success(f"**Auto-generated Invoice Number**")
-                st.sidebar.info(f"**Format:** {year_range}/{quarter}/{sequence}")
-            except:
-                st.sidebar.warning("Could not parse invoice number")
-            
-            # Editable invoice number - SIMPLER VERSION
-            st.sidebar.subheader("Invoice Number Editor")
-            
-            # Parse current invoice number for editing
-            try:
-                current_prefix, current_year_range, current_q, current_seq = parse_invoice_number(st.session_state.invoice_number)
-                
-                # Create editable components
-                col1, col2, col3 = st.sidebar.columns([2, 2, 1])
-                
-                with col1:
-                    new_year_range = st.text_input("Year Range", value=current_year_range, key="invoice_year_edit")
-                
-                with col2:
-                    new_quarter = st.text_input("Quarter", value=current_q, key="invoice_quarter_edit")
-                
-                with col3:
-                    new_sequence = st.number_input("Sequence", 
-                                                min_value=1, 
-                                                value=int(current_seq), 
-                                                step=1,
-                                                key="invoice_seq_edit")
-                
-                # Construct new invoice number
-                new_invoice_number = f"CMI/{new_year_range}/{new_quarter}/{new_sequence:02d}"
-                
-                # Update if changed
-                if new_invoice_number != st.session_state.invoice_number:
-                    st.session_state.invoice_number = new_invoice_number
-                    
-            except Exception as e:
-                st.sidebar.error(f"Error parsing invoice number: {e}")
-                st.session_state.invoice_number = generate_invoice_number(st.session_state.invoice_seq)
-            
-            # Display final invoice number
-            st.sidebar.code(st.session_state.invoice_number)
-            
-            invoice_auto_increment = st.sidebar.checkbox("Auto-increment Sequence", value=True, key="invoice_auto_increment")
-            
-            if st.sidebar.button("Reset to Auto-generate", use_container_width=True, key="invoice_reset_auto_generate"):
-                # DON'T reset the counter file - just use the next sequence
-                next_sequence = get_next_invoice_sequence()
-                st.session_state.invoice_seq = next_sequence
-                st.session_state.last_invoice_number = ""
-                st.session_state.invoice_number = generate_invoice_number(next_sequence)
-                st.sidebar.success(f"Invoice number reset to next sequence: {next_sequence}")
-                st.rerun()
+                    # Update the counter file for next time
+                    with open(INVOICE_COUNTER_FILE, 'w') as f:
+                        f.write(str(next_sequence))
 
-            # Rest of your invoice tab code remains the same...
-            col1, col2 = st.columns([1,1])
-            with col1:
-                st.subheader("Invoice Details")
+                st.success("Invoice generated successfully!")
                 
-                # Show the current invoice number prominently with sales person info
-                st.info(f"**Invoice Number:** {st.session_state.invoice_number}")
-                # st.info(f"**Sales Person:** {current_sales_person_info['name']} ({invoice_sales_person}) - {current_sales_person_info['email']}")
-                
-                # Use the session state invoice number
-                invoice_no = st.text_input("Invoice No", st.session_state.invoice_number, key="invoice_number_input")
-                # Rest of your code...
-                invoice_date = st.text_input("Invoice Date", datetime.date.today().strftime("%d-%m-%Y"))
-                Suppliers_Reference = st.text_input("Supplier's Reference", "NA")
-                Others_Reference = st.text_input("Other's Reference", "NA")
-                buyers_order_no = st.text_input("Buyer's Order No.", "Online")
-                buyers_order_date = st.text_input("Buyer's Order Date", datetime.date.today().strftime("%d-%m-%Y"))
-                dispatched_through = st.text_input("Dispatched Through", "Online")
-                
-                # Payment Terms
-                payment_terms = st.text_input("Mode/Terms of Payment", "100% Advance with Purchase")
-                
-                terms_of_delivery = st.text_input("Terms of delivery", "Within Month")
-                
-                # Destination
-                destination = st.text_input("Destination", "Vadodara")
-                
-                st.subheader("Seller Details")
-                vendor_name = st.text_input("Seller Name", "CM INFOTECH")
-                vendor_address = st.text_area("Seller Address", "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur, Chenpur Road, Jagatpur Village, Ahmedabad - 382481")
-                vendor_gst = st.text_input("Seller GST No.", "24ANMPP4891R1ZX")
-                vendor_msme = st.text_input("Seller MSME Registration No.", "UDYAM-GJ-01-0117646")
-
-            with col2:
-                st.subheader("Buyer Details")
-                
-                # SIMPLE DROPDOWN LIKE QUOTATION TAB
-                # Track selection changes for Invoice Buyer
-                if 'prev_buyer_invoice' not in st.session_state:
-                    st.session_state.prev_buyer_invoice = "Select End User"
-                if 'prev_buyer_contact_invoice' not in st.session_state:
-                    st.session_state.prev_buyer_contact_invoice = ""
-
-                selected_enduser_invoice = st.selectbox(
-                    "Select Buyer", 
-                    options=get_enduser_dropdown_options(),
-                    key="enduser_dropdown_invoice"
-                )
-                
-                # UPDATE BUYER FIELDS WHEN DROPDOWN SELECTION CHANGES - WITH CONTACT DROPDOWN
-                buyer_changed = selected_enduser_invoice != st.session_state.prev_buyer_invoice
-                if buyer_changed:
-                    st.session_state.prev_buyer_invoice = selected_enduser_invoice
-                    st.session_state.prev_buyer_contact_invoice = ""
-                    
-                enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {}) if selected_enduser_invoice != "Select End User" else {}
-                contacts = get_contacts_list(enduser_data)
-                contact_names = get_contact_dropdown_options(contacts)
-                
-                # Contact person dropdown for invoice buyer
-                selected_buyer_contact = st.selectbox(
-                    "Select Buyer Contact",
-                    options=contact_names,
-                    key="buyer_contact_dropdown_invoice"
-                )
-                buyer_contact_changed = selected_buyer_contact != st.session_state.prev_buyer_contact_invoice
-
-                if buyer_changed or buyer_contact_changed:
-                    st.session_state.prev_buyer_contact_invoice = selected_buyer_contact
-                    contact_idx = contact_names.index(selected_buyer_contact) if selected_buyer_contact in contact_names else 0
-                    
-                    if selected_enduser_invoice != "Select End User":
-                        st.session_state.invoice_buyer_company = selected_enduser_invoice
-                        st.session_state.invoice_buyer_address = enduser_data.get("address", "")
-                        st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
-                        
-                        if contacts and contact_idx < len(contacts):
-                            sel_contact = contacts[contact_idx]
-                            st.session_state.invoice_buyer_mobile = sel_contact.get("mobile", "")
-                            st.session_state.invoice_buyer_email = sel_contact.get("email", "")
-                        else:
-                            st.session_state.invoice_buyer_mobile = ""
-                            st.session_state.invoice_buyer_email = ""
-                    st.rerun()
-                
-                # USE SESSION STATE VALUES IN TEXT INPUTS - SIMPLE LIKE QUOTATION
-                buyer_name = st.text_input(
-                    "Buyer Name",
-                    key="invoice_buyer_company"
-                )
-                
-                buyer_address = st.text_area(
-                    "Buyer Address",
-                    key="invoice_buyer_address"
-                )
-
-                buyer_mobile = st.text_input(
-                    "Buyer mobile.",
-                    key="invoice_buyer_mobile"
-                )
-                buyer_email = st.text_input(
-                    "Buyer email.",
-                    key="invoice_buyer_email"
-                )
-                buyer_gst = st.text_input(
-                    "Buyer GST No.",
-                    key="invoice_buyer_gst"
-                )
-                if buyer_gst.strip():
-                    is_valid, msg = validate_gst(buyer_gst)
-                    if not is_valid:
-                        show_validation_warning(msg)
-                    else:
-                        show_validation_success("GSTIN Format Verified")
-
-                st.subheader("Products")
-                items = []
-                num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
-                for i in range(num_items):
-                    with st.expander(f"Product {i+1}", expanded=True):
-                        # Product catalog dropdown
-                        product_options = ["-- Select from Catalog --"] + list(PRODUCT_CATALOG.keys())
-                        selected_inv_product = st.selectbox(
-                            f"Select Product {i+1}",
-                            options=product_options,
-                            key=f"invoice_product_select_{i}"
-                        )
-                        
-                        # Auto-fill product name and rate from catalog
-                        default_desc = "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription"
-                        default_rate = 36500.00
-                        
-                        if selected_inv_product and selected_inv_product != "-- Select from Catalog --":
-                            catalog_entry = PRODUCT_CATALOG.get(selected_inv_product, {})
-                            default_desc = selected_inv_product
-                            default_rate = catalog_entry.get("basic", 0.0)
-                        
-                        # Product description (auto-filled from catalog, editable)
-                        desc_name = st.text_area(f"Product Description {i+1}", default_desc, key=f"invoice_desc_{i}")
-                        
-                        # Serial, Contract, End Date fields
-                        col_s, col_c, col_e = st.columns(3)
-                        with col_s:
-                            serial_no = st.text_input(f"Serial #", "", key=f"invoice_serial_{i}", placeholder="e.g. 575-26831580")
-                        with col_c:
-                            contract_no = st.text_input(f"Contract #", "", key=f"invoice_contract_{i}", placeholder="e.g. 110004988191")
-                        with col_e:
-                            end_date = st.text_input(f"End Date", "", key=f"invoice_enddate_{i}", placeholder="e.g. 17/04/2026")
-                        
-                        # Build final description: product name + serial/contract/end date
-                        full_desc = desc_name
-                        if serial_no:
-                            full_desc += f"\nSerial #{serial_no}"
-                        if contract_no:
-                            full_desc += f"\nContract #{contract_no}"
-                        if end_date:
-                            full_desc += f"\nEnd Date: {end_date}"
-                        
-                        hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
-                        qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
-                        rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, default_rate, key=f"invoice_rate_{i}")
-                        rate = round(rate, 2)
-                        items.append({"description": full_desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
-
-                st.subheader("Declaration")
-                declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")
-                
-                st.subheader("Company Branding")
-                st.info("Using global logo and stamp from sidebar settings")
-                logo_path = global_logo_path
-                stamp_path = global_stamp_path
-
-                if not logo_path:
-                    st.warning("⚠ No company logo available")
-                if not stamp_path:
-                    st.warning("⚠ No company stamp available")
-                
-                # Calculate dynamic totals for preview
-                temp_basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
-                temp_sgst = round(temp_basic_amount * 0.09, 2)
-                temp_cgst = round(temp_basic_amount * 0.09, 2)
-                temp_final_amount = round(temp_basic_amount + temp_sgst + temp_cgst)
-                
-                # Document preview container
-                st.subheader("👀 Live Document Preview")
-                if items:
-                    show_document_preview("Tax Invoice", st.session_state.invoice_number, buyer_name, items, temp_final_amount)
-                else:
-                    st.info("Add products to see live document preview.")
-
-                st.subheader("Invoice Preview & Download")
-
-                if st.button("Generate Invoice", key="generate_invoice_button"):
-                    # Get the current invoice number from session state (which includes manual edits)
-                    current_invoice_no = st.session_state.invoice_number
-                    
-                    # Parse the manually edited invoice number to get the sequence
-                    try:
-                        prefix, year_range, quarter, sequence = parse_invoice_number(current_invoice_no)
-                        manual_sequence = int(sequence)
-                        
-                        # UPDATE THE COUNTER FILE to match the manual sequence
-                        with open(INVOICE_COUNTER_FILE, 'w') as f:
-                            f.write(str(manual_sequence))
-                        
-                        # Update session state to reflect the new sequence
-                        st.session_state.invoice_seq = manual_sequence
-                        
-                        st.success(f"✅ Invoice sequence updated to: {manual_sequence}")
-                        
-                    except Exception as e:
-                        st.error(f"Error parsing invoice number: {e}")
-                    
-                    # Now use the manually edited invoice number
-                    invoice_no = current_invoice_no
-                    
-                    # Rest of your invoice calculation code...
-                    # Calculate amounts with proper rounding like in PO generator
-                    basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
-                    sgst = round(basic_amount * 0.09, 2)
-                    cgst = round(basic_amount * 0.09, 2)
-                    final_amount_unrounded = basic_amount + sgst + cgst
-                    
-                    # ROUND TO WHOLE NUMBER LIKE PO GENERATOR
-                    final_amount = round(final_amount_unrounded)
-                    round_off = final_amount - final_amount_unrounded
-                    
-                    # Display calculated amounts for verification
-                    st.info(f"**Calculated Amounts:** Basic: ₹{basic_amount:.2f}, SGST: ₹{sgst:.2f}, CGST: ₹{cgst:.2f}, Final: ₹{final_amount:.2f}")
-                    if round_off != 0:
-                        st.info(f"**Round Off:** ₹{round_off:.2f}")
-                    
-                    # Convert to words with proper Indian currency format
-                    def convert_to_indian_currency(amount):
-                        """Convert amount to Indian currency words format"""
-                        try:
-                            # Split into rupees and paise
-                            rupees = int(amount)
-                            paise = round((amount - rupees) * 100)
-                            
-                            rupees_text = num2words(rupees, to='cardinal', lang='en_IN').title()
-                            
-                            if paise > 0:
-                                paise_text = num2words(paise, to='cardinal', lang='en_IN').title()
-                                return f"{rupees_text} Rupees And {paise_text} Paise Only/-"
-                            else:
-                                return f"{rupees_text} Rupees Only/-"
+                st.download_button(
+                    "⬇ Download Invoice PDF",
+                    data=pdf_file,
+                    file_name=f"{buyer_name}_{invoice_date}_{invoice_no.replace('/', '_')}.pdf",
+                    mime="application/pdf",
+                    key="invoice_download_button")
                                 
-                        except Exception as e:
-                            return f"Amount: ₹{amount:.2f}"
+# Clean up temporary files
+for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_stamp.jpg"]:
+    if os.path.exists(path):
+        try:
+            os.remove(path)
+        except:
+            pass
 
-                    amount_in_words = convert_to_indian_currency(final_amount)
-                    tax_in_words = convert_to_indian_currency(round(sgst + cgst, 2))
-
-                    invoice_data = {
-                        "invoice": {"invoice_no": invoice_no, "date": invoice_date},
-                        "Reference": {"Suppliers_Reference": Suppliers_Reference, "Other": Others_Reference},
-                        "vendor": {"name": vendor_name, "address": vendor_address, "gst": vendor_gst, "msme": vendor_msme},
-                        "buyer": {"name": buyer_name, "address": buyer_address, "gst": buyer_gst, "mobile":buyer_mobile, "email":buyer_email},
-                        "invoice_details": {
-                            "buyers_order_no": buyers_order_no,
-                            "buyers_order_date": buyers_order_date,
-                            "dispatched_through": dispatched_through,
-                            "payment_terms": payment_terms,
-                            "terms_of_delivery": terms_of_delivery,
-                            "destination": destination
-                        },
-                        "items": items,
-                        "totals": {
-                            "basic_amount": basic_amount,
-                            "sgst": sgst,
-                            "cgst": cgst,
-                            "final_amount": final_amount,
-                            "amount_in_words": amount_in_words,
-                            "tax_in_words": tax_in_words
-                        },
-                        "declaration": declaration
-                    }
-
-                    pdf_file = create_invoice_pdf(invoice_data, logo_path, stamp_path)
-
-                    # Store the last invoice number for sequence tracking
-                    st.session_state.last_invoice_number = invoice_no
-                    
-                    # Auto-increment for next invoice - BUT RESPECT MANUAL SEQUENCE
-                    if invoice_auto_increment:
-                        # Get the next sequence based on the manually set sequence
-                        next_sequence = manual_sequence + 1
-                        st.session_state.invoice_seq = next_sequence
-                        
-                        # Update the counter file for next time
-                        with open(INVOICE_COUNTER_FILE, 'w') as f:
-                            f.write(str(next_sequence))
-
-                    st.success("Invoice generated successfully!")
-                    
-                    st.download_button(
-                        "⬇ Download Invoice PDF",
-                        data=pdf_file,
-                        file_name=f"{buyer_name}_{invoice_date}_{invoice_no.replace('/', '_')}.pdf",
-                        mime="application/pdf",
-                        key="invoice_download_button")
-                                    
-    # Clean up temporary files
-    for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_stamp.jpg"]:
-        if os.path.exists(path):
-            try:
-                os.remove(path)
-            except:
-                pass
-
-    st.divider()
-    st.markdown(
-        '<div style="text-align:center;padding:10px 0;opacity:0.6">'
-        '<p style="font-size:0.8rem;color:#666">© 2025 CM INFOTECH — Document Generator · Built with ❤️ using Streamlit</p>'
-        '</div>',
-        unsafe_allow_html=True
+st.divider()
+st.markdown(
+    '<div style="text-align:center;padding:10px 0;opacity:0.6">'
+    '<p style="font-size:0.8rem;color:#666">© 2025 CM INFOTECH — Document Generator · Built with ❤️ using Streamlit</p>'
+    '</div>',
+    unsafe_allow_html=True
 )
 
 if __name__ == "__main__":

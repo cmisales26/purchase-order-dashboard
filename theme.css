@@ -15,22 +15,49 @@ section[data-testid="stSidebar"] {
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
 section[data-testid="stSidebar"] li,
-section[data-testid="stSidebar"] label {
-    color: #d4d4d8 !important;
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] label p {
+    color: #f0f4f8 !important;
+    /* High contrast readable light grey/white */
 }
 
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 {
-    color: #f0f0f0 !important;
+    color: #ffffff !important;
 }
 
 section[data-testid="stSidebar"] .stCheckbox label span[data-testid="stCheckboxLabel"] {
-    color: #d4d4d8 !important;
+    color: #ffffff !important;
 }
 
-section[data-testid="stSidebar"] [data-testid="stAlert"] p {
-    color: #333 !important;
+/* Sidebar Expander Custom Styling (High Contrast) */
+section[data-testid="stSidebar"] [data-testid="stExpander"] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary,
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary span,
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary p {
+    color: #ffffff !important;
+}
+
+/* Status widget & Alert box custom styling inside Sidebar */
+section[data-testid="stSidebar"] [data-testid="stStatusWidget"],
+section[data-testid="stSidebar"] [data-testid="stAlert"],
+section[data-testid="stSidebar"] div[role="alert"] {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stStatusWidget"] p,
+section[data-testid="stSidebar"] [data-testid="stStatusWidget"] span,
+section[data-testid="stSidebar"] [data-testid="stAlert"] p,
+section[data-testid="stSidebar"] [data-testid="stAlert"] span,
+section[data-testid="stSidebar"] div[role="alert"] p,
+section[data-testid="stSidebar"] div[role="alert"] span {
+    color: #ffffff !important;
 }
 
 /* === GLASSMORPHISM TABS === */

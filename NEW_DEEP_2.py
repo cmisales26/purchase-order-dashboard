@@ -467,39 +467,7 @@ class QUOTATION_PDF(FPDF):
         
         self.set_text_color(0, 0, 0)
 
-    # def footer(self):
-    #     self.set_y(-18)
-    #     self.set_font(self.default_font, "", 10)
-    #     self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
-        
-    #     # Make footer emails and phone clickable - FIXED OVERLAP
-    #     self.set_text_color(0, 0, 255)  # Blue color for links
-        
-    #     # Website link
-    #     # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
-        
-    #     # Email and phone on same line - FIXED
-    #     self.set_font(self.default_font, "U", 10)
-    #     email_text = " info@cminfotech.com "
-    #     phone_text = " +91 873 391 5721"
-        
-    #     # Calculate positions for proper alignment
-    #     page_width = self.w - 2 * self.l_margin
-    #     email_width = self.get_string_width(email_text)
-    #     phone_width = self.get_string_width(phone_text)
-    #     separator_width = self.get_string_width(" | ")
-        
-    #     total_width = email_width + separator_width + phone_width
-    #     start_x = (page_width - total_width) / 2 + self.l_margin
-        
-    #     self.set_x(start_x)
-    #     self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text}")
-    #     self.cell(separator_width, 4, " | ", ln=0)
-    #     self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
 
-    #     self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
-        
-    #     self.set_text_color(0, 0, 0)  # Reset to black
 
 def add_clickable_email(pdf, email, label="Email: "):
     """Add clickable email with label - FIXED OVERLAP"""
@@ -1753,96 +1721,7 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
-    # # --- Signature Boxes (Side by Side) ---
-    # y_signature_start = pdf.get_y()
 
-    # # Left side - Buyer's Company Signature (Blank box for future use)
-    # pdf.set_font(pdf.default_font, "B", 10)
-    # pdf.cell(95, 6, "Buyer's Company Signature", border="LRT", ln=0, align="C")
-
-    # # Right side - Our Company Signature
-    # pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
-
-    # # Create the signature boxes with DIFFERENT heights
-    # left_signature_box_height = 33
-    # right_signature_box_height = 33
-
-    # # Left signature box (Buyer - Blank)
-    # pdf.set_font(pdf.default_font, "I", 10)
-    # pdf.set_text_color(128, 128, 128)
-
-    # # Check if buyer logo is available
-    # buyer_logo_file = invoice_data.get('buyer', {}).get('logo_file')
-
-    # if buyer_logo_file:
-    #     try:
-    #         # Add buyer logo at the top of the left box
-    #         logo_width = 25
-    #         logo_x = 10 + (95 - logo_width) / 2
-    #         logo_y = pdf.get_y() + 4
-            
-    #         # Add buyer company logo
-    #         pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
-            
-    #         # Add buyer company name below logo
-    #         pdf.set_xy(10, logo_y + logo_width + 2)
-    #         pdf.set_font(pdf.default_font, "B", 9)
-    #         pdf.cell(95, 4, invoice_data['buyer']['name'], border=0, ln=1, align="C")
-            
-    #         # Add signature line and text
-    #         pdf.set_xy(10, pdf.get_y() + 8)
-    #         pdf.set_font(pdf.default_font, "", 9)
-    #         pdf.cell(95, 4, "_________________________", border=0, ln=1, align="C")
-    #         pdf.cell(95, 4, "Authorized Signatory", border=0, ln=1, align="C")
-            
-    #         # Draw the border around everything
-    #         pdf.set_xy(10, y_signature_start + 6)
-    #         pdf.cell(95, left_signature_box_height, "", border="LRB")
-            
-    #         # Update Y position after left box
-    #         y_after_left_signature = y_signature_start + 6 + left_signature_box_height
-            
-    #     except Exception as e:
-    #         st.warning(f"Could not add buyer logo: {e}")
-    #         # Fallback without logo
-    #         pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
-    #         y_after_left_signature = pdf.get_y()
-    # else:
-    #     # No buyer logo available, show original placeholder
-    #     pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
-    #     y_after_left_signature = pdf.get_y()
-
-    # # Right signature box (Our Company)
-    # pdf.set_xy(105, y_signature_start + 5)
-    # pdf.set_text_color(0, 0, 0)
-
-    # # Add stamp if available
-    # if stamp_file:
-    #     try:
-    #         stamp_width = 25
-    #         stamp_x = 105 + (96 - stamp_width) / 2
-    #         stamp_y = pdf.get_y() + 2
-    #         pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
-    #     except Exception as e:
-    #         st.warning(f"Could not add stamp: {e}")
-
-    # # Position for the signature text in right box
-    # pdf.set_xy(105, y_signature_start + 10 + right_signature_box_height - 10)
-    # pdf.set_font(pdf.default_font, "B", 10)
-    # pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
-
-    # # Draw border for right signature box
-    # pdf.set_xy(105, y_signature_start + 6)
-    # pdf.cell(96, right_signature_box_height, "", border="LRB")
-
-    # # Set Y position to continue after both signature boxes
-    # pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
-    # pdf.ln(6)
-    # pdf.set_font(pdf.default_font, "I", 10)
-    # pdf.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
-
-    # pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
-    # return pdf_bytes
 
 # --- PDF Class ---
 class PO_PDF(FPDF):
@@ -1930,24 +1809,7 @@ class PO_PDF(FPDF):
         self.set_text_color(0, 0, 0)
 
 
-    # def footer(self):
-    #     self.set_y(-18)
-    #     self.set_font(self.default_font, "", 10)
-    #     self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
-    #     self.set_text_color(0, 0, 255)
-    #     self.set_font(self.default_font, "U", 10)
-    #     # email1 = "cad@cmi.com"
-    #     email1 = "info@cminfotech.com "
-    #     phone_number =" +91 873 391 5721"
-    #     self.set_text_color(0, 0, 255)
-    #     self.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
-    #     self.set_x((self.w - 80) / 2)
-    #     self.cell(0, 0, "", link=f"tel:{phone_number}")
-    #     self.set_x((self.w - 60) / 2)
-    #     website ="www.cminfotech.com"
-    #     self.set_text_color(0, 0, 255)
-    #     self.cell(60, 4, f"{website}", ln=True, align="C", link=website)
-    #     self.set_text_color(0, 0, 0)
+
 
     def section_title(self, title):
         self.set_font(self.default_font, "B", 12)
@@ -1997,22 +1859,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     sanitized_authorized_by = pdf.sanitize_text(po_data['authorized_by'])
     sanitized_company_name = pdf.sanitize_text(po_data['company_name'])
     
-    # # --- Vendor & Bill/Ship ---
-    # pdf.set_font(pdf.default_font, "B", 12)
-    # pdf.section_title("To:")
-    # pdf.set_font(pdf.default_font, "B", 12)
-    # pdf.multi_cell(95, 5, sanitized_vendor_name)
-    # pdf.set_font(pdf.default_font, "", 12)
-    # pdf.multi_cell(95, 5, f"{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
-    # pdf.ln(5)
-    # # pdf.set_xy(110, pdf.get_y() - 20)
-    # # pdf.set_font(pdf.default_font, "B", 10)
-    # pdf.multi_cell(70, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
-    # pdf.set_xy(125, pdf.get_y() - 25)
-    # pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
-    # pdf.ln(2)
-    # pdf.multi_cell(0, 5, f"GST NO: {sanitized_gst_no}\nPAN NO: {sanitized_pan_no}\nMSME Registration No: {sanitized_msme_no}")
-    # pdf.ln(2)
+
     # --- Vendor & Bill/Ship ---
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.section_title("To:")
@@ -2232,13 +2079,7 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_email}")
 
-    # pdf.ln(2)
-    # pdf.set_font(pdf.default_font, "B", 12)
-    # pdf.cell(45, 5, "Authorized By")
-    # pdf.cell(5, 4, ":")
-    # pdf.set_font(pdf.default_font, "", 12)
-    # pdf.multi_cell(0, 5, f"{sanitized_authorized_by}")
-    
+
 
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)

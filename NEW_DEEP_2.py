@@ -87,20 +87,32 @@ def show_validation_warning(msg):
 def show_document_preview(doc_type, doc_number, company_name, items_list, grand_total):
     """Render a styled visual preview of the document before generation"""
     items_html = ""
+    total_base = 0.0
+    total_gst = 0.0
+    
     for idx, item in enumerate(items_list):
         name = item.get("name") or item.get("description") or "Item"
         qty = item.get("qty") or item.get("quantity") or 1
         price = item.get("basic") or item.get("unit_rate") or 0.0
-        total = qty * price
+        gst_percent = item.get("gst_percent", 18.0)  # Default to 18% if not set
+        
+        base_amount = qty * price
+        item_gst = base_amount * (gst_percent / 100)
+        
+        total_base += base_amount
+        total_gst += item_gst
+        
         items_html += f"""
         <tr style="border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.85rem;">
             <td style="padding: 8px; color: #4a5568;">{idx+1}</td>
             <td style="padding: 8px; color: #2d3748; font-weight: 500;">{name}</td>
             <td style="padding: 8px; color: #4a5568; text-align: center;">{qty}</td>
             <td style="padding: 8px; color: #4a5568; text-align: right;">₹{price:,.2f}</td>
-            <td style="padding: 8px; color: #2d3748; font-weight: 600; text-align: right;">₹{total:,.2f}</td>
+            <td style="padding: 8px; color: #2d3748; font-weight: 600; text-align: right;">₹{base_amount:,.2f}</td>
         </tr>
         """
+        
+    calculated_grand_total = round(total_base + total_gst)
     
     preview_html = f"""
     <div style="background: white; border-radius: 14px; padding: 24px; border: 1px solid rgba(0,0,0,0.08); 
@@ -136,10 +148,18 @@ def show_document_preview(doc_type, doc_number, company_name, items_list, grand_
             </tbody>
         </table>
         
-        <div style="display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 12px;">
-            <div style="text-align: right;">
-                <span style="color: #718096; font-size: 0.8rem; margin-right: 12px; font-weight: 500;">ESTIMATED TOTAL:</span>
-                <span style="color: #667eea; font-weight: 800; font-size: 1.15rem;">₹{grand_total:,.2f}</span>
+        <div style="border-top: 1px solid rgba(0,0,0,0.08); padding-top: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+            <div style="font-size: 0.85rem; color: #4a5568; display: flex; justify-content: flex-end; width: 100%;">
+                <span style="font-weight: 500; margin-right: 8px;">Subtotal (Base):</span>
+                <span style="font-weight: 600; min-width: 120px; text-align: right; display: inline-block;">₹{total_base:,.2f}</span>
+            </div>
+            <div style="font-size: 0.85rem; color: #4a5568; display: flex; justify-content: flex-end; width: 100%;">
+                <span style="font-weight: 500; margin-right: 8px;">GST Breakdown:</span>
+                <span style="font-weight: 600; min-width: 120px; text-align: right; display: inline-block;">₹{total_gst:,.2f}</span>
+            </div>
+            <div style="margin-top: 8px; border-top: 2px solid #667eea; padding-top: 8px; font-size: 1.15rem; color: #667eea; font-weight: 800; display: flex; justify-content: flex-end; width: 100%;">
+                <span style="margin-right: 8px; font-size: 0.85rem; font-weight: 700; color: #718096; text-transform: uppercase; align-self: center;">Estimated Total:</span>
+                <span style="min-width: 120px; text-align: right; display: inline-block;">₹{calculated_grand_total:,.2f}</span>
             </div>
         </div>
     </div>

@@ -297,12 +297,18 @@ div[data-testid="stSelectbox"] div[data-baseweb="select"]>div:focus-within {
 }
 
 /* === CODE BLOCKS (sidebar number display) === */
-section[data-testid="stSidebar"] code {
-    background: rgba(102, 126, 234, 0.15) !important;
-    color: #a5b4fc !important;
-    border-radius: 6px !important;
-    padding: 4px 10px !important;
-    font-size: 0.85rem;
+section[data-testid="stSidebar"] [data-testid="stCodeBlock"],
+section[data-testid="stSidebar"] [data-testid="stCodeBlock"] pre,
+section[data-testid="stSidebar"] [data-testid="stCodeBlock"] code {
+    background-color: #0f172a !important;
+    /* Deep dark slate background */
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stCodeBlock"] span {
+    color: #38bdf8 !important;
+    /* Light cyan text for contrast */
 }
 
 /* === STATUS WIDGET === */

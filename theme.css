@@ -297,18 +297,32 @@ div[data-testid="stSelectbox"] div[data-baseweb="select"]>div:focus-within {
 }
 
 /* === CODE BLOCKS (sidebar number display) === */
+section[data-testid="stSidebar"] pre,
+section[data-testid="stSidebar"] code,
+section[data-testid="stSidebar"] pre *,
+section[data-testid="stSidebar"] code *,
 section[data-testid="stSidebar"] [data-testid="stCodeBlock"],
-section[data-testid="stSidebar"] [data-testid="stCodeBlock"] pre,
-section[data-testid="stSidebar"] [data-testid="stCodeBlock"] code {
-    background-color: #0f172a !important;
-    /* Deep dark slate background */
-    border-radius: 10px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+section[data-testid="stSidebar"] [data-testid="stCodeBlock"] * {
+    background-color: #0f172a !important; /* Deep dark slate background */
+    color: #38bdf8 !important; /* Light cyan text for high contrast */
 }
 
-section[data-testid="stSidebar"] [data-testid="stCodeBlock"] span {
-    color: #38bdf8 !important;
-    /* Light cyan text for contrast */
+section[data-testid="stSidebar"] pre,
+section[data-testid="stSidebar"] [data-testid="stCodeBlock"] {
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    padding: 10px !important;
+}
+
+/* === DISABLED INPUTS IN SIDEBAR === */
+section[data-testid="stSidebar"] input:disabled,
+section[data-testid="stSidebar"] textarea:disabled,
+section[data-testid="stSidebar"] div[data-testid="stTextInput"] input:disabled,
+section[data-testid="stSidebar"] div[class*="disabled"] input {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
 }
 
 /* === STATUS WIDGET === */

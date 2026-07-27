@@ -294,21 +294,32 @@ def generate_quotation_number(sales_person, sequence_number):
 
 # --- Add this function with other helper functions ---
 def calculate_quotation_totals(products):
-    """Calculate quotation totals with round-off like PO generator"""
+    """Calculate quotation totals with round-off like PO generator.
+    When a product has use_special_price=True, GST and per-unit price
+    are calculated on the special_price instead of the basic price."""
     products_total = 0
+    total_base = 0
+    total_gst = 0
     for p in products:
-        gst_amt = p["basic"] * p["gst_percent"] / 100
-        per_unit_price = p["basic"] + gst_amt
+        # Determine effective price for GST/total calculation
+        if p.get("use_special_price") and p.get("special_price", 0) > 0:
+            effective_price = p["special_price"]
+        else:
+            effective_price = p["basic"]
+        gst_amt = effective_price * p["gst_percent"] / 100
+        per_unit_price = effective_price + gst_amt
         total = per_unit_price * p["qty"]
         products_total += total
+        total_base += effective_price * p["qty"]
+        total_gst += gst_amt * p["qty"]
 
     # Calculate round off to make final amount whole number (like PO)
     rounded_total = round(products_total)
     round_off = rounded_total - products_total
     
     return {
-        "total_base": sum(p["basic"] * p["qty"] for p in products),
-        "total_gst": sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in products),
+        "total_base": total_base,
+        "total_gst": total_gst,
         "grand_total_unrounded": products_total,
         "grand_total": rounded_total,
         "round_off": round_off
@@ -693,15 +704,23 @@ def add_page_two_commercials(pdf, data):
     
     add_quotation_header(pdf, annexure_text, quotation_title)
 
-    # --- Products Table - FIXED COLUMN WIDTHS (Wider Description) ---
-    col_widths = [70, 25, 25, 25, 15, 25]  # Increased Description from 70 to 100
-    headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
+    # --- Determine if any product uses special price ---
+    has_special_price = data.get('has_special_price', False)
+
+    if has_special_price:
+        # WITH Special Price column (7 columns like img 2)
+        col_widths = [55, 22, 22, 22, 22, 15, 22]
+        headers = ["Description", "Basic Price", "Special Price", "GST Tax\n@ 18%", "Per Unit\nPrice", "Qty.", "Total\n(INR)"]
+    else:
+        # Original format WITHOUT Special Price column (6 columns like img 1)
+        col_widths = [70, 25, 25, 25, 15, 25]
+        headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
     
     # Table Header
     pdf.set_fill_color(220, 220, 220)
     pdf.set_font(pdf.default_font, "B", 10)
     for width, header in zip(col_widths, headers):
-        pdf.cell(width, 6, header, border=1, align="C", fill=True)
+        pdf.cell(width, 10, header, border=1, align="C", fill=True)
     pdf.ln()
     
     # Table Rows
@@ -711,8 +730,14 @@ def add_page_two_commercials(pdf, data):
     for product in data["products"]:
         basic_price = product["basic"]
         qty = product["qty"]
-        gst_amount = basic_price * (product.get("gst_percent", 18.0) / 100)
-        per_unit_price = basic_price + gst_amount
+        
+        # Determine effective price for calculations
+        use_sp = product.get("use_special_price", False) and product.get("special_price", 0) > 0
+        special_price = product.get("special_price", 0) if use_sp else 0
+        effective_price = special_price if use_sp else basic_price
+        
+        gst_amount = effective_price * (product.get("gst_percent", 18.0) / 100)
+        per_unit_price = effective_price + gst_amount
         total = per_unit_price * qty
         grand_total_unrounded += total
         
@@ -725,49 +750,68 @@ def add_page_two_commercials(pdf, data):
         
         # Calculate how many lines the description will take
         desc_lines = pdf.multi_cell(col_widths[0], 5, desc, border=0, split_only=True)
-        desc_height = len(desc_lines) * 6
+        desc_height = max(len(desc_lines) * 6, 6)
         
         # Set position for description
         pdf.set_xy(pdf.l_margin, start_y)
         
-        # Draw description cell with proper height
-        if len(desc_lines) > 1:
-            # Multi-line description
-            pdf.multi_cell(col_widths[0], 6, desc, border=1)
-            current_y = pdf.get_y()
-            
-            # Set positions for other cells WITH COMMA FORMATTING
-            pdf.set_xy(pdf.l_margin + col_widths[0], start_y)
-            pdf.cell(col_widths[1], desc_height, f"{basic_price:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[2], desc_height, f"{gst_amount:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[3], desc_height, f"{per_unit_price:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[4], desc_height, f"{qty:.0f}", border=1, align="C")
-            pdf.cell(col_widths[5], desc_height, f"{total:,.2f}", border=1, align="R")
-            
-            # Move to next row
-            pdf.set_y(current_y)
+        if has_special_price:
+            # --- 7-column layout (with Special Price) ---
+            if len(desc_lines) > 1:
+                pdf.multi_cell(col_widths[0], 6, desc, border=1)
+                current_y = pdf.get_y()
+                pdf.set_xy(pdf.l_margin + col_widths[0], start_y)
+                pdf.cell(col_widths[1], desc_height, f"{basic_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[2], desc_height, f"{special_price:,.2f}" if use_sp else "", border=1, align="R")
+                pdf.cell(col_widths[3], desc_height, f"{gst_amount:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[4], desc_height, f"{per_unit_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[5], desc_height, f"{qty:.2f}", border=1, align="C")
+                pdf.cell(col_widths[6], desc_height, f"{total:,.2f}", border=1, align="R")
+                pdf.set_y(current_y)
+            else:
+                pdf.cell(col_widths[0], 6, desc, border=1)
+                pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[2], 6, f"{special_price:,.2f}" if use_sp else "", border=1, align="R")
+                pdf.cell(col_widths[3], 6, f"{gst_amount:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[4], 6, f"{per_unit_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[5], 6, f"{qty:.2f}", border=1, align="C")
+                pdf.cell(col_widths[6], 6, f"{total:,.2f}", border=1, align="R")
+                pdf.ln()
         else:
-            # Single line description WITH COMMA FORMATTING
-            pdf.cell(col_widths[0], 6, desc, border=1)
-            pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
-            pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
-            pdf.ln()
+            # --- 6-column layout (original, no Special Price) ---
+            if len(desc_lines) > 1:
+                pdf.multi_cell(col_widths[0], 6, desc, border=1)
+                current_y = pdf.get_y()
+                pdf.set_xy(pdf.l_margin + col_widths[0], start_y)
+                pdf.cell(col_widths[1], desc_height, f"{basic_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[2], desc_height, f"{gst_amount:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[3], desc_height, f"{per_unit_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[4], desc_height, f"{qty:.0f}", border=1, align="C")
+                pdf.cell(col_widths[5], desc_height, f"{total:,.2f}", border=1, align="R")
+                pdf.set_y(current_y)
+            else:
+                pdf.cell(col_widths[0], 6, desc, border=1)
+                pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
+                pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
+                pdf.ln()
 
-    # Round Off Row (NEW - like PO) WITH COMMA FORMATTING
+    # Round Off Row WITH COMMA FORMATTING
     round_off = data.get('round_off', 0.0)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(sum(col_widths[:-1]), 7, "Round Off", border=1, align="R")
-    pdf.cell(col_widths[5], 7, f"{round_off:,.2f}", border=1, align="R")
+    last_col_width = col_widths[-1]
+    summary_width = sum(col_widths[:-1])
+    pdf.cell(summary_width, 7, "Round Off", border=1, align="R")
+    pdf.cell(last_col_width, 7, f"{round_off:,.2f}", border=1, align="R")
     pdf.ln()
 
     # Grand Total Row - WITH COMMA FORMATTING
     grand_total = data.get('grand_total', grand_total_unrounded)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(sum(col_widths[:-1]), 7, "Final Amount to be Paid", border=1, align="R")
-    pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
+    pdf.cell(summary_width, 7, "Final Amount to be Paid", border=1, align="R")
+    pdf.cell(last_col_width, 7, f"{grand_total:,.2f}", border=1, align="R")
     pdf.ln(15)
 
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
@@ -2814,6 +2858,20 @@ def main():
                     st.session_state.quotation_products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"quote_basic_{i}")
                     st.session_state.quotation_products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"quote_gst_{i}")
                     st.session_state.quotation_products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"quote_qty_{i}")
+                    
+                    # Special Price toggle and input
+                    use_special = st.checkbox("💰 Special Price", value=p.get("use_special_price", False), key=f"quote_use_sp_{i}",
+                                              help="Enable to offer a special/discounted price for this product")
+                    st.session_state.quotation_products[i]["use_special_price"] = use_special
+                    if use_special:
+                        sp_val = p.get("special_price", p["basic"])
+                        st.session_state.quotation_products[i]["special_price"] = st.number_input(
+                            "Special Price (₹)", value=float(sp_val), format="%.2f", key=f"quote_sp_{i}",
+                            help="Enter the special price. GST will be calculated on this price instead of the basic price."
+                        )
+                    else:
+                        st.session_state.quotation_products[i]["special_price"] = 0.0
+                    
                     if st.button("Remove", key=f"quote_remove_{i}"):
                         st.session_state.quotation_products.pop(i)
                         st.rerun()
@@ -2825,14 +2883,20 @@ def main():
         st.info(f"**Quotation Number:** {st.session_state.quotation_number}")
         st.info(f"**Sales Person:** {current_sales_person_info['name']} ({sales_person}) - {current_sales_person_info['email']}")
         
-        # Calculate totals
+        # Calculate totals (uses special price when enabled)
         totals = calculate_quotation_totals(st.session_state.quotation_products)
         
-        # Preview and totals calculation (same as PO)
-        total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
-        total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.quotation_products)
+        # Use the totals from the proper calculation function
+        total_base = totals["total_base"]
+        total_gst = totals["total_gst"]
         grand_total = total_base + total_gst
         amount_words = num2words(grand_total, to="currency", currency="INR").title()
+        
+        # Check if any product uses special price
+        any_special = any(p.get("use_special_price", False) and p.get("special_price", 0) > 0 
+                          for p in st.session_state.quotation_products)
+        if any_special:
+            st.info("💰 **Special Pricing active** — the quotation PDF will include a Special Price column.")
         
         col3, col4, col5 = st.columns(3)
         with col3:
@@ -2873,6 +2937,12 @@ def main():
                 grand_total = rounded_total
                 amount_words = number_to_words(rounded_total)
 
+                # Determine if any product uses special pricing
+                has_special_price = any(
+                    p.get("use_special_price", False) and p.get("special_price", 0) > 0
+                    for p in st.session_state.quotation_products
+                )
+
                 quotation_data = {
                     "quotation_number": st.session_state.quotation_number,
                     "quotation_date": today.strftime("%d-%m-%Y"),
@@ -2891,7 +2961,8 @@ def main():
                     "product_name": selected_product if selected_product else "Software",   
                     "sales_person_code": sales_person,  
                     "annexure_text": annexure_text,  
-                    "quotation_title": quotation_title
+                    "quotation_title": quotation_title,
+                    "has_special_price": has_special_price
                 }
                 
                 try:

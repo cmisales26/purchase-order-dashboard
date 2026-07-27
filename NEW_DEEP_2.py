@@ -716,12 +716,29 @@ def add_page_two_commercials(pdf, data):
         col_widths = [70, 25, 25, 25, 15, 25]
         headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
     
-    # Table Header
+    # Table Header - use multi_cell for proper multi-line header rendering
     pdf.set_fill_color(220, 220, 220)
     pdf.set_font(pdf.default_font, "B", 10)
+    header_height = 12  # Fixed height for header row
+    header_y = pdf.get_y()
+    header_x = pdf.l_margin
     for width, header in zip(col_widths, headers):
-        pdf.cell(width, 10, header, border=1, align="C", fill=True)
-    pdf.ln()
+        x_pos = header_x
+        # Draw filled bordered rectangle for each header cell
+        pdf.rect(x_pos, header_y, width, header_height, 'D')
+        pdf.set_fill_color(220, 220, 220)
+        pdf.rect(x_pos, header_y, width, header_height, 'F')
+        pdf.rect(x_pos, header_y, width, header_height, 'D')
+        # Center text vertically and horizontally
+        lines = header.split('\n')
+        line_h = 4
+        total_text_h = len(lines) * line_h
+        start_text_y = header_y + (header_height - total_text_h) / 2
+        for li, line in enumerate(lines):
+            pdf.set_xy(x_pos, start_text_y + li * line_h)
+            pdf.cell(width, line_h, line, border=0, align="C")
+        header_x += width
+    pdf.set_xy(pdf.l_margin, header_y + header_height)
     
     # Table Rows
     pdf.set_font(pdf.default_font, "", 12)
@@ -2859,20 +2876,27 @@ def main():
                     st.session_state.quotation_products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"quote_gst_{i}")
                     st.session_state.quotation_products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"quote_qty_{i}")
                     
-                    # Special Price toggle and input
-                    use_special = st.checkbox("💰 Special Price", value=p.get("use_special_price", False), key=f"quote_use_sp_{i}",
-                                              help="Enable to offer a special/discounted price for this product")
+                    # Special Price - LARGE VISIBLE TOGGLE with styled container
+                    st.markdown("---")
+                    use_special = st.toggle(
+                        "💰 ENABLE SPECIAL PRICE",
+                        value=p.get("use_special_price", False),
+                        key=f"quote_use_sp_{i}",
+                        help="Turn ON to offer a special/discounted price for this product"
+                    )
                     st.session_state.quotation_products[i]["use_special_price"] = use_special
                     if use_special:
+                        st.success("✅ Special Price is ENABLED for this product")
                         sp_val = p.get("special_price", p["basic"])
                         st.session_state.quotation_products[i]["special_price"] = st.number_input(
-                            "Special Price (₹)", value=float(sp_val), format="%.2f", key=f"quote_sp_{i}",
+                            "💲 Enter Special Price (₹)", value=float(sp_val), format="%.2f", key=f"quote_sp_{i}",
                             help="Enter the special price. GST will be calculated on this price instead of the basic price."
                         )
                     else:
                         st.session_state.quotation_products[i]["special_price"] = 0.0
+                    st.markdown("---")
                     
-                    if st.button("Remove", key=f"quote_remove_{i}"):
+                    if st.button("❌ Remove Product", key=f"quote_remove_{i}"):
                         st.session_state.quotation_products.pop(i)
                         st.rerun()
         

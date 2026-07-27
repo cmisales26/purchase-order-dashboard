@@ -294,21 +294,32 @@ def generate_quotation_number(sales_person, sequence_number):
 
 # --- Add this function with other helper functions ---
 def calculate_quotation_totals(products):
-    """Calculate quotation totals with round-off like PO generator"""
+    """Calculate quotation totals with round-off like PO generator.
+    When a product has use_special_price=True, GST and per-unit price
+    are calculated on the special_price instead of the basic price."""
     products_total = 0
+    total_base = 0
+    total_gst = 0
     for p in products:
-        gst_amt = p["basic"] * p["gst_percent"] / 100
-        per_unit_price = p["basic"] + gst_amt
+        # Determine effective price for GST/total calculation
+        if p.get("use_special_price") and p.get("special_price", 0) > 0:
+            effective_price = p["special_price"]
+        else:
+            effective_price = p["basic"]
+        gst_amt = effective_price * p["gst_percent"] / 100
+        per_unit_price = effective_price + gst_amt
         total = per_unit_price * p["qty"]
         products_total += total
+        total_base += effective_price * p["qty"]
+        total_gst += gst_amt * p["qty"]
 
     # Calculate round off to make final amount whole number (like PO)
     rounded_total = round(products_total)
     round_off = rounded_total - products_total
     
     return {
-        "total_base": sum(p["basic"] * p["qty"] for p in products),
-        "total_gst": sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in products),
+        "total_base": total_base,
+        "total_gst": total_gst,
         "grand_total_unrounded": products_total,
         "grand_total": rounded_total,
         "round_off": round_off
@@ -587,7 +598,7 @@ def add_page_one_intro(pdf, data):
         
         "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
         
-        "Our partnership with Autodesk, GstarCAD, CADMATE, BricsCAD, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
+        "Our partnership with Autodesk, GstarCAD, Grabert, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
         
         "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
     ]
@@ -693,16 +704,41 @@ def add_page_two_commercials(pdf, data):
     
     add_quotation_header(pdf, annexure_text, quotation_title)
 
-    # --- Products Table - FIXED COLUMN WIDTHS (Wider Description) ---
-    col_widths = [70, 25, 25, 25, 15, 25]  # Increased Description from 70 to 100
-    headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
+    # --- Determine if any product uses special price ---
+    has_special_price = data.get('has_special_price', False)
+
+    if has_special_price:
+        # WITH Special Price column (7 columns like img 2)
+        col_widths = [55, 22, 22, 22, 22, 15, 22]
+        headers = ["Description", "Basic Price", "Special Price", "GST Tax\n@ 18%", "Per Unit\nPrice", "Qty.", "Total\n(INR)"]
+    else:
+        # Original format WITHOUT Special Price column (6 columns like img 1)
+        col_widths = [70, 25, 25, 25, 15, 25]
+        headers = ["Description", "Basic Price", "GST Tax @ 18%", "Per Unit Price", "Qty.", "Total"]
     
-    # Table Header
+    # Table Header - use multi_cell for proper multi-line header rendering
     pdf.set_fill_color(220, 220, 220)
     pdf.set_font(pdf.default_font, "B", 10)
+    header_height = 12  # Fixed height for header row
+    header_y = pdf.get_y()
+    header_x = pdf.l_margin
     for width, header in zip(col_widths, headers):
-        pdf.cell(width, 6, header, border=1, align="C", fill=True)
-    pdf.ln()
+        x_pos = header_x
+        # Draw filled bordered rectangle for each header cell
+        pdf.rect(x_pos, header_y, width, header_height, 'D')
+        pdf.set_fill_color(220, 220, 220)
+        pdf.rect(x_pos, header_y, width, header_height, 'F')
+        pdf.rect(x_pos, header_y, width, header_height, 'D')
+        # Center text vertically and horizontally
+        lines = header.split('\n')
+        line_h = 4
+        total_text_h = len(lines) * line_h
+        start_text_y = header_y + (header_height - total_text_h) / 2
+        for li, line in enumerate(lines):
+            pdf.set_xy(x_pos, start_text_y + li * line_h)
+            pdf.cell(width, line_h, line, border=0, align="C")
+        header_x += width
+    pdf.set_xy(pdf.l_margin, header_y + header_height)
     
     # Table Rows
     pdf.set_font(pdf.default_font, "", 12)
@@ -711,8 +747,14 @@ def add_page_two_commercials(pdf, data):
     for product in data["products"]:
         basic_price = product["basic"]
         qty = product["qty"]
-        gst_amount = basic_price * (product.get("gst_percent", 18.0) / 100)
-        per_unit_price = basic_price + gst_amount
+        
+        # Determine effective price for calculations
+        use_sp = product.get("use_special_price", False) and product.get("special_price", 0) > 0
+        special_price = product.get("special_price", 0) if use_sp else 0
+        effective_price = special_price if use_sp else basic_price
+        
+        gst_amount = effective_price * (product.get("gst_percent", 18.0) / 100)
+        per_unit_price = effective_price + gst_amount
         total = per_unit_price * qty
         grand_total_unrounded += total
         
@@ -725,49 +767,68 @@ def add_page_two_commercials(pdf, data):
         
         # Calculate how many lines the description will take
         desc_lines = pdf.multi_cell(col_widths[0], 5, desc, border=0, split_only=True)
-        desc_height = len(desc_lines) * 6
+        desc_height = max(len(desc_lines) * 6, 6)
         
         # Set position for description
         pdf.set_xy(pdf.l_margin, start_y)
         
-        # Draw description cell with proper height
-        if len(desc_lines) > 1:
-            # Multi-line description
-            pdf.multi_cell(col_widths[0], 6, desc, border=1)
-            current_y = pdf.get_y()
-            
-            # Set positions for other cells WITH COMMA FORMATTING
-            pdf.set_xy(pdf.l_margin + col_widths[0], start_y)
-            pdf.cell(col_widths[1], desc_height, f"{basic_price:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[2], desc_height, f"{gst_amount:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[3], desc_height, f"{per_unit_price:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[4], desc_height, f"{qty:.0f}", border=1, align="C")
-            pdf.cell(col_widths[5], desc_height, f"{total:,.2f}", border=1, align="R")
-            
-            # Move to next row
-            pdf.set_y(current_y)
+        if has_special_price:
+            # --- 7-column layout (with Special Price) ---
+            if len(desc_lines) > 1:
+                pdf.multi_cell(col_widths[0], 6, desc, border=1)
+                current_y = pdf.get_y()
+                pdf.set_xy(pdf.l_margin + col_widths[0], start_y)
+                pdf.cell(col_widths[1], desc_height, f"{basic_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[2], desc_height, f"{special_price:,.2f}" if use_sp else "", border=1, align="R")
+                pdf.cell(col_widths[3], desc_height, f"{gst_amount:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[4], desc_height, f"{per_unit_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[5], desc_height, f"{qty:.2f}", border=1, align="C")
+                pdf.cell(col_widths[6], desc_height, f"{total:,.2f}", border=1, align="R")
+                pdf.set_y(current_y)
+            else:
+                pdf.cell(col_widths[0], 6, desc, border=1)
+                pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[2], 6, f"{special_price:,.2f}" if use_sp else "", border=1, align="R")
+                pdf.cell(col_widths[3], 6, f"{gst_amount:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[4], 6, f"{per_unit_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[5], 6, f"{qty:.2f}", border=1, align="C")
+                pdf.cell(col_widths[6], 6, f"{total:,.2f}", border=1, align="R")
+                pdf.ln()
         else:
-            # Single line description WITH COMMA FORMATTING
-            pdf.cell(col_widths[0], 6, desc, border=1)
-            pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
-            pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
-            pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
-            pdf.ln()
+            # --- 6-column layout (original, no Special Price) ---
+            if len(desc_lines) > 1:
+                pdf.multi_cell(col_widths[0], 6, desc, border=1)
+                current_y = pdf.get_y()
+                pdf.set_xy(pdf.l_margin + col_widths[0], start_y)
+                pdf.cell(col_widths[1], desc_height, f"{basic_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[2], desc_height, f"{gst_amount:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[3], desc_height, f"{per_unit_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[4], desc_height, f"{qty:.0f}", border=1, align="C")
+                pdf.cell(col_widths[5], desc_height, f"{total:,.2f}", border=1, align="R")
+                pdf.set_y(current_y)
+            else:
+                pdf.cell(col_widths[0], 6, desc, border=1)
+                pdf.cell(col_widths[1], 6, f"{basic_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[2], 6, f"{gst_amount:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[3], 6, f"{per_unit_price:,.2f}", border=1, align="R")
+                pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
+                pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
+                pdf.ln()
 
-    # Round Off Row (NEW - like PO) WITH COMMA FORMATTING
+    # Round Off Row WITH COMMA FORMATTING
     round_off = data.get('round_off', 0.0)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(sum(col_widths[:-1]), 7, "Round Off", border=1, align="R")
-    pdf.cell(col_widths[5], 7, f"{round_off:,.2f}", border=1, align="R")
+    last_col_width = col_widths[-1]
+    summary_width = sum(col_widths[:-1])
+    pdf.cell(summary_width, 7, "Round Off", border=1, align="R")
+    pdf.cell(last_col_width, 7, f"{round_off:,.2f}", border=1, align="R")
     pdf.ln()
 
     # Grand Total Row - WITH COMMA FORMATTING
     grand_total = data.get('grand_total', grand_total_unrounded)
     pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(sum(col_widths[:-1]), 7, "Final Amount to be Paid", border=1, align="R")
-    pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
+    pdf.cell(summary_width, 7, "Final Amount to be Paid", border=1, align="R")
+    pdf.cell(last_col_width, 7, f"{grand_total:,.2f}", border=1, align="R")
     pdf.ln(15)
 
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
@@ -2814,7 +2875,28 @@ def main():
                     st.session_state.quotation_products[i]["basic"] = st.number_input("Basic (₹)", p["basic"], format="%.2f", key=f"quote_basic_{i}")
                     st.session_state.quotation_products[i]["gst_percent"] = st.number_input("GST %", p["gst_percent"], format="%.1f", key=f"quote_gst_{i}")
                     st.session_state.quotation_products[i]["qty"] = st.number_input("Qty", p["qty"], format="%.2f", key=f"quote_qty_{i}")
-                    if st.button("Remove", key=f"quote_remove_{i}"):
+                    
+                    # Special Price - LARGE VISIBLE TOGGLE with styled container
+                    st.markdown("---")
+                    use_special = st.toggle(
+                        "💰 ENABLE SPECIAL PRICE",
+                        value=p.get("use_special_price", False),
+                        key=f"quote_use_sp_{i}",
+                        help="Turn ON to offer a special/discounted price for this product"
+                    )
+                    st.session_state.quotation_products[i]["use_special_price"] = use_special
+                    if use_special:
+                        st.success("✅ Special Price is ENABLED for this product")
+                        sp_val = p.get("special_price", p["basic"])
+                        st.session_state.quotation_products[i]["special_price"] = st.number_input(
+                            "💲 Enter Special Price (₹)", value=float(sp_val), format="%.2f", key=f"quote_sp_{i}",
+                            help="Enter the special price. GST will be calculated on this price instead of the basic price."
+                        )
+                    else:
+                        st.session_state.quotation_products[i]["special_price"] = 0.0
+                    st.markdown("---")
+                    
+                    if st.button("❌ Remove Product", key=f"quote_remove_{i}"):
                         st.session_state.quotation_products.pop(i)
                         st.rerun()
         
@@ -2825,14 +2907,20 @@ def main():
         st.info(f"**Quotation Number:** {st.session_state.quotation_number}")
         st.info(f"**Sales Person:** {current_sales_person_info['name']} ({sales_person}) - {current_sales_person_info['email']}")
         
-        # Calculate totals
+        # Calculate totals (uses special price when enabled)
         totals = calculate_quotation_totals(st.session_state.quotation_products)
         
-        # Preview and totals calculation (same as PO)
-        total_base = sum(p["basic"] * p["qty"] for p in st.session_state.quotation_products)
-        total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.quotation_products)
+        # Use the totals from the proper calculation function
+        total_base = totals["total_base"]
+        total_gst = totals["total_gst"]
         grand_total = total_base + total_gst
         amount_words = num2words(grand_total, to="currency", currency="INR").title()
+        
+        # Check if any product uses special price
+        any_special = any(p.get("use_special_price", False) and p.get("special_price", 0) > 0 
+                          for p in st.session_state.quotation_products)
+        if any_special:
+            st.info("💰 **Special Pricing active** — the quotation PDF will include a Special Price column.")
         
         col3, col4, col5 = st.columns(3)
         with col3:
@@ -2873,6 +2961,12 @@ def main():
                 grand_total = rounded_total
                 amount_words = number_to_words(rounded_total)
 
+                # Determine if any product uses special pricing
+                has_special_price = any(
+                    p.get("use_special_price", False) and p.get("special_price", 0) > 0
+                    for p in st.session_state.quotation_products
+                )
+
                 quotation_data = {
                     "quotation_number": st.session_state.quotation_number,
                     "quotation_date": today.strftime("%d-%m-%Y"),
@@ -2891,7 +2985,8 @@ def main():
                     "product_name": selected_product if selected_product else "Software",   
                     "sales_person_code": sales_person,  
                     "annexure_text": annexure_text,  
-                    "quotation_title": quotation_title
+                    "quotation_title": quotation_title,
+                    "has_special_price": has_special_price
                 }
                 
                 try:
@@ -3766,6 +3861,15 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+
+
+
+
+
 # import streamlit as st
 # from fpdf import FPDF
 # import pandas as pd
@@ -3787,57 +3891,7 @@ if __name__ == "__main__":
 # import time
 
 # # --- Global Data and Configuration ---
-# PRODUCT_CATALOG = {
-#     "GstarCAD STDANDARD 2026 Perpetual": {"basic": 34777.0, "gst_percent": 18.0},
-#     "GstarCAD STDANDARD 2026 One year upgrade": {"basic": 18303.0, "gst_percent": 18.0},
-#     "GstarCAD STDANDARD 2026 Two year upgrade": {"basic": 18303.0, "gst_percent": 18.0},
-#     "GstarCAD STDANDARD 2026 Three + year upgrade": {"basic": 22696.0, "gst_percent": 18.0},
-
-#     "GstarCAD PROFESSIONAL 2026 Perpetual": {"basic": 46125.0, "gst_percent": 18.0},
-#     "GstarCAD PROFESSIONAL 2026 One year upgrade": {"basic": 25625.0, "gst_percent": 18.0},
-#     "GstarCAD PROFESSIONAL 2026 Two year upgrade": {"basic": 25625.0, "gst_percent": 18.0},
-#     "GstarCAD PROFESSIONAL 2026 Three + year upgrade": {"basic": 30018.0, "gst_percent": 18.0},
-
-#     "GstarCAD PLUS 2026 Perpetual": {"basic": 57107.0, "gst_percent": 18.0},
-#     "GstarCAD PLUS 2026 One year upgrade": {"basic": 29286.0, "gst_percent": 18.0},
-#     "GstarCAD PLUS 2026 Two year upgrade": {"basic": 32946.0, "gst_percent": 18.0},
-#     "GstarCAD PLUS 2026 Three + year upgrade": {"basic": 41000.0, "gst_percent": 18.0},
-
-#     "GstarCAD MECHANICAL 2025 Perpetual": {"basic": 92250.0, "gst_percent": 18.0},
-#     "GstarCAD MECHANICAL 2025 One year upgrade": {"basic": 73214.0, "gst_percent": 18.0},
-#     "GstarCAD MECHANICAL 2025 Two year upgrade": {"basic": 87857.0, "gst_percent": 18.0},
-#     "GstarCAD MECHANICAL 2025 Three + year upgrade": {"basic": 105428.0, "gst_percent": 18.0},
-
-#     "GstarCAD ARCHITECTURE 2021 Perpetual": {"basic": 92250.0, "gst_percent": 18.0},
-#     "GstarCAD ARCHITECTURE 2021 One year upgrade": {"basic": 73214.0, "gst_percent": 18.0},
-#     "GstarCAD ARCHITECTURE 2021 Two year upgrade": {"basic": 87857.0, "gst_percent": 18.0},
-#     "GstarCAD ARCHITECTURE 2021 Three + year upgrade": {"basic": 105428.0, "gst_percent": 18.0},
-
-#     "Archline.XP LT 2025 Perpetual": {"basic": 30450.0, "gst_percent": 18.0},
-#     "Archline.XP LT Yearly Subscription": {"basic": 26617.0, "gst_percent": 18.0},
-
-#     "Archline.XP Interior 2025 Perpetual": {"basic": 94500.0, "gst_percent": 18.0},
-#     "Archline.XP Interior Yearly Subscription": {"basic": 70875.0, "gst_percent": 18.0},
-
-#     "Archline.XP Professional 2025 Perpetual": {"basic": 126000.0, "gst_percent": 18.0},
-#     "Archline.XP Professional Yearly Subscription": {"basic": 94500.0, "gst_percent": 18.0},
-
-#     "Archline.XP MEP Module for LT 2025": {"basic": 30450.0, "gst_percent": 18.0},
-#     "Archline.XP MEP Module Yearly Subscription": {"basic": 21000.0, "gst_percent": 18.0},
-
-#     "Autodesk BIM Collaborate Pro - Single User Commercial Annual Subscription Renewal":{"basic":00.0,"gst_percent": 18.0},
-
-#     "Creative cloud pro plus for Teams": {"basic": 114560.0, "gst_percent": 18.0},
-#     "Creative cloud Pro for Teams": {"basic": 104560.0, "gst_percent": 18.0},
-#     "Adobe Creative Cloud All Apps": {"basic": 95000.0, "gst_percent": 18.0},
-#     "Adobe Acrobat Pro DC": {"basic": 25000.0, "gst_percent": 18.0},
-#     "Adobe Substance 3D Collection": {"basic": 85000.0, "gst_percent": 18.0},
-#     "Autodesk Commercial Software License": {"basic": 27500.0, "gst_percent": 18.0},
-#     "Solidworks Premium": {"basic": 50000.0, "gst_percent": 18.0},
-#     "Catia License": {"basic": 75000.0, "gst_percent": 18.0},
-#     "Mastercam Module": {"basic": 30000.0, "gst_percent": 18.0},
-#     "Siemens NX": {"basic": 65000.0, "gst_percent": 18.0},
-# }
+# # Product catalog is now loaded from products.json (same pattern as vendor.json and endusers.json)
 
 # # Load data from JSON files with BETTER CACHE CONTROL
 # @st.cache_data(ttl=1)  # Cache for only 1 second - updates immediately
@@ -3866,14 +3920,16 @@ if __name__ == "__main__":
 #         st.sidebar.error(f"❌ Unexpected error reading {filename}: {e}. Using empty database.")
 #         return default_data or {}
 
-# # Load vendor and end user databases
+# # Load vendor, end user, and product databases
 # VENDOR_DATABASE = load_json_data('vendor.json')
 # END_USER_DATABASE = load_json_data('endusers.json')
+# PRODUCT_CATALOG = load_json_data('products.json')
 
 # # Debug: Print what's loaded
 # print("=" * 50)
 # print(f"DEBUG: Loaded {len(VENDOR_DATABASE)} vendors from vendor.json")
 # print(f"DEBUG: Loaded {len(END_USER_DATABASE)} end users from endusers.json")
+# print(f"DEBUG: Loaded {len(PRODUCT_CATALOG)} products from products.json")
 # print("=" * 50)
 
 # # Sales Person Mapping - ONLY ONE DEFINITION
@@ -3883,6 +3939,25 @@ if __name__ == "__main__":
 #     "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721","designation": "Inside Sales Executive"},
 #     "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721","designation": "Inside Sales Executive"}
 # }
+
+# # --- Helper: Get contacts from a database entry (supports old & new format) ---
+# def get_contacts_list(entry_data):
+#     """Get contacts array from an entry, handling both old and new formats."""
+#     if "contacts" in entry_data:
+#         return entry_data["contacts"]
+#     # Backward compatibility: old format with single contact/mobile/email
+#     contact = entry_data.get("contact", "").strip()
+#     mobile = entry_data.get("mobile", "").strip()
+#     email = entry_data.get("email", "").strip()
+#     if contact or mobile or email:
+#         return [{"name": contact, "mobile": mobile, "email": email}]
+#     return []
+
+# def get_contact_dropdown_options(contacts_list):
+#     """Get contact names for a secondary dropdown."""
+#     if not contacts_list:
+#         return ["No contacts available"]
+#     return [c.get("name", "Unknown") for c in contacts_list]
 
 # # --- Helper Functions for Vendor Management ---
 # def get_vendor_dropdown_options():
@@ -3894,33 +3969,52 @@ if __name__ == "__main__":
 #         st.sidebar.error(f"Error getting vendor options: {e}")
 #         return ["Select Vendor"]
 
-# def update_vendor_fields(selected_vendor):
+# def update_vendor_fields(selected_vendor, contact_index=0):
 #     """Update session state with vendor details when vendor is selected"""
 #     if selected_vendor and selected_vendor != "Select Vendor":
 #         vendor_data = VENDOR_DATABASE.get(selected_vendor, {})
+#         contacts = get_contacts_list(vendor_data)
+        
 #         st.session_state.po_vendor_name = selected_vendor
 #         st.session_state.po_vendor_address = vendor_data.get("address", "")
-#         st.session_state.po_vendor_contact = vendor_data.get("contact", "")
-#         st.session_state.po_vendor_mobile = vendor_data.get("mobile", "")
 #         st.session_state.po_gst_no = vendor_data.get("gst_no", "")
 #         st.session_state.po_pan_no = vendor_data.get("pan_no", "")
 #         st.session_state.po_msme_no = vendor_data.get("msme_no", "")
+        
+#         # Set contact fields from selected contact
+#         if contacts and contact_index < len(contacts):
+#             selected_contact = contacts[contact_index]
+#             st.session_state.po_vendor_contact = selected_contact.get("name", "")
+#             st.session_state.po_vendor_mobile = selected_contact.get("mobile", "")
+#         else:
+#             st.session_state.po_vendor_contact = ""
+#             st.session_state.po_vendor_mobile = ""
 
 # # --- Helper Functions for End User Management ---
 # def get_enduser_dropdown_options():
 #     """Get end user names for dropdown"""
 #     return ["Select End User"] + list(END_USER_DATABASE.keys())
 
-# def update_enduser_fields(selected_enduser):
+# def update_enduser_fields(selected_enduser, contact_index=0):
 #     """Update session state with end user details when end user is selected"""
 #     if selected_enduser and selected_enduser != "Select End User":
 #         enduser_data = END_USER_DATABASE.get(selected_enduser, {})
+#         contacts = get_contacts_list(enduser_data)
+        
 #         st.session_state.po_end_company = selected_enduser
 #         st.session_state.po_end_address = enduser_data.get("address", "")
-#         st.session_state.po_end_person = enduser_data.get("contact", "")
-#         st.session_state.po_end_mobile = enduser_data.get("mobile", "")
-#         st.session_state.po_end_email = enduser_data.get("email", "")
 #         st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
+        
+#         # Set contact fields from selected contact
+#         if contacts and contact_index < len(contacts):
+#             selected_contact = contacts[contact_index]
+#             st.session_state.po_end_person = selected_contact.get("name", "")
+#             st.session_state.po_end_mobile = selected_contact.get("mobile", "")
+#             st.session_state.po_end_email = selected_contact.get("email", "")
+#         else:
+#             st.session_state.po_end_person = ""
+#             st.session_state.po_end_mobile = ""
+#             st.session_state.po_end_email = ""
 
 
 # # --- Helper Functions for Quotation and PO ---
@@ -4365,7 +4459,7 @@ if __name__ == "__main__":
         
 #         "CMI (CM INFOTECH) is now one of the leading IT solution providers in India, serving more than 1,000 subscribers across the India in Architecture, Construction, Geospatial, Infrastructure, Manufacturing, Multimedia and Graphic Solutions.",
         
-#         "Our partnership with Autodesk, GstarCAD, Grabert, CMS Intellicad, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
+#         "Our partnership with Autodesk, GstarCAD, CADMATE, BricsCAD, ZWCAD, Etabs, Trimble, Bentley, Solidworks, Solid Edge, Bluebeam, Adobe, Microsoft, Corel, Chaos, Nitro, Tally Quick Heal and many more brings in India the best solutions for design, construction and manufacturing. We are committed to making each of our clients successful with their design technology.",
         
 #         "As one of our privileged customers, we look forward to having you take part in our journey as we keep our eye on the future, where we will unleash ideas to create a better world!"
 #     ]
@@ -5365,9 +5459,9 @@ if __name__ == "__main__":
 #     # Bank details lines
 #     bank_lines = [
 #         ("Bank Name", "IDFC FIRST BANK"),
-#         ("Branch", "AHMEDAB11AD Shyamal Branch"),
-#         ("Account No", "8813042018211"),
-#         ("IFS Code", "IDFB004033511")
+#         ("Branch", "AHMEDABAD Shyamal Branch"),
+#         ("Account No", "88130420182"),
+#         ("IFS Code", "IDFB0040335")
 #     ]
 
 #     pdf.set_font(pdf.default_font, "", 10)
@@ -6475,6 +6569,12 @@ if __name__ == "__main__":
 #             st.header("Recipient Details")
             
 #             # REPLACE VENDOR DROPDOWN WITH END USER DROPDOWN
+#             # Track selection changes for Quotation End User
+#             if 'prev_enduser_quote' not in st.session_state:
+#                 st.session_state.prev_enduser_quote = "Select End User"
+#             if 'prev_contact_quote' not in st.session_state:
+#                 st.session_state.prev_contact_quote = ""
+
 #             selected_enduser_quote = st.selectbox(
 #                 "Select Company", 
 #                 options=get_enduser_dropdown_options(),
@@ -6482,36 +6582,52 @@ if __name__ == "__main__":
 #             )
             
 #             # UPDATE END USER FIELDS WHEN DROPDOWN SELECTION CHANGES FOR QUOTATION
-#             if selected_enduser_quote and selected_enduser_quote != "Select End User":
-#                 enduser_data = END_USER_DATABASE.get(selected_enduser_quote, {})
-#                 st.session_state.quote_end_company = selected_enduser_quote
-#                 st.session_state.quote_end_address = enduser_data.get("address", "")
-#                 st.session_state.quote_end_person = enduser_data.get("contact", "")
-#                 st.session_state.quote_end_mobile = enduser_data.get("mobile", "")
-#                 st.session_state.quote_end_email = enduser_data.get("email", "")
-#                 st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
+#             enduser_changed = selected_enduser_quote != st.session_state.prev_enduser_quote
+#             if enduser_changed:
+#                 st.session_state.prev_enduser_quote = selected_enduser_quote
+#                 st.session_state.prev_contact_quote = "" # Reset contact tracker on company change
+                
+#             enduser_data = END_USER_DATABASE.get(selected_enduser_quote, {}) if selected_enduser_quote != "Select End User" else {}
+#             contacts = get_contacts_list(enduser_data)
+#             contact_names = get_contact_dropdown_options(contacts)
+            
+#             # Contact person dropdown
+#             selected_contact_quote = st.selectbox(
+#                 "Select Contact Person",
+#                 options=contact_names,
+#                 key="contact_dropdown_quote"
+#             )
+#             contact_changed = selected_contact_quote != st.session_state.prev_contact_quote
+
+#             if enduser_changed or contact_changed:
+#                 st.session_state.prev_contact_quote = selected_contact_quote
+#                 contact_idx = contact_names.index(selected_contact_quote) if selected_contact_quote in contact_names else 0
+                
+#                 if selected_enduser_quote != "Select End User":
+#                     st.session_state.quote_end_company = selected_enduser_quote
+#                     st.session_state.quote_end_address = enduser_data.get("address", "")
+#                     st.session_state.quote_end_gst_no = enduser_data.get("gst_no", "")
+                    
+#                     if contacts and contact_idx < len(contacts):
+#                         sel_contact = contacts[contact_idx]
+#                         st.session_state.quote_end_person = sel_contact.get("name", "")
+#                         st.session_state.quote_end_mobile = sel_contact.get("mobile", "")
+#                         st.session_state.quote_end_email = sel_contact.get("email", "")
+#                     else:
+#                         st.session_state.quote_end_person = ""
+#                         st.session_state.quote_end_mobile = ""
+#                         st.session_state.quote_end_email = ""
+#                 st.rerun()
             
 #             # UPDATE TEXT INPUT FIELDS TO USE END USER DATA INSTEAD OF VENDOR DATA
-#             vendor_name = st.text_input("Company Name", 
-#                                     value=st.session_state.get("quote_end_company", "Baldridge & Associates Pvt Ltd."), 
-#                                     key="quote_end_company")
-#             vendor_address = st.text_area("Company Address", 
-#                                         value=st.session_state.get("quote_end_address", "406 Sakar East, Vadodara 390009"), 
-#                                         key="quote_end_address")
-#             vendor_email = st.text_input("Email", 
-#                                     value=st.session_state.get("quote_end_email", "info@company.com"), 
-#                                     key="quote_end_email")
-#             vendor_contact = st.text_input("Contact Person (Kind Attention)", 
-#                                         value=st.session_state.get("quote_end_person", "Mr. Dev"), 
-#                                         key="quote_end_person")
-#             vendor_mobile = st.text_input("Mobile", 
-#                                         value=st.session_state.get("quote_end_mobile", "1234567891"), 
-#                                         key="quote_end_mobile")
+#             vendor_name = st.text_input("Company Name", key="quote_end_company")
+#             vendor_address = st.text_area("Company Address", key="quote_end_address")
+#             vendor_email = st.text_input("Email", key="quote_end_email")
+#             vendor_contact = st.text_input("Contact Person (Kind Attention)", key="quote_end_person")
+#             vendor_mobile = st.text_input("Mobile", key="quote_end_mobile")
             
 #             # You can also add GST field if needed
-#             vendor_gst = st.text_input("GST No (Optional)", 
-#                                     value=st.session_state.get("quote_end_gst_no", ""), 
-#                                     key="quote_end_gst_no")
+#             vendor_gst = st.text_input("GST No (Optional)", key="quote_end_gst_no")
 
 #             st.header("Quotation Details")
 #             price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")
@@ -6805,6 +6921,12 @@ if __name__ == "__main__":
 #             vendor_options = get_vendor_dropdown_options()
 #             st.sidebar.info(f"Vendor dropdown options: {len(vendor_options)} items")
             
+#             # Track selection changes for PO Vendor
+#             if 'prev_vendor_po' not in st.session_state:
+#                 st.session_state.prev_vendor_po = "Select Vendor"
+#             if 'prev_vendor_contact_po' not in st.session_state:
+#                 st.session_state.prev_vendor_contact_po = ""
+
 #             selected_vendor = st.selectbox(
 #                 "Select Vendor", 
 #                 options=vendor_options,
@@ -6812,44 +6934,70 @@ if __name__ == "__main__":
 #             )
             
 #             # UPDATE VENDOR FIELDS WHEN DROPDOWN SELECTION CHANGES
-#             if selected_vendor and selected_vendor != "Select Vendor":
-#                 vendor_data = VENDOR_DATABASE.get(selected_vendor, {})
-#                 st.sidebar.info(f"Selected vendor: {selected_vendor}")
-#                 st.sidebar.info(f"Vendor data: {vendor_data}")
+#             vendor_changed = selected_vendor != st.session_state.prev_vendor_po
+#             if vendor_changed:
+#                 st.session_state.prev_vendor_po = selected_vendor
+#                 st.session_state.prev_vendor_contact_po = ""
                 
-#                 st.session_state.po_vendor_name = selected_vendor
-#                 st.session_state.po_vendor_address = vendor_data.get("address", "")
-#                 st.session_state.po_vendor_contact = vendor_data.get("contact", "")
-#                 st.session_state.po_vendor_mobile = vendor_data.get("mobile", "")
-#                 st.session_state.po_gst_no = vendor_data.get("gst_no", "")
-#                 st.session_state.po_pan_no = vendor_data.get("pan_no", "")
-#                 st.session_state.po_msme_no = vendor_data.get("msme_no", "")
+#             vendor_data = VENDOR_DATABASE.get(selected_vendor, {}) if selected_vendor != "Select Vendor" else {}
+#             contacts = get_contacts_list(vendor_data)
+#             contact_names = get_contact_dropdown_options(contacts)
+            
+#             # Contact person dropdown for vendor
+#             selected_vendor_contact = st.selectbox(
+#                 "Select Vendor Contact",
+#                 options=contact_names,
+#                 key="vendor_contact_dropdown_po"
+#             )
+#             vendor_contact_changed = selected_vendor_contact != st.session_state.prev_vendor_contact_po
+
+#             if vendor_changed or vendor_contact_changed:
+#                 st.session_state.prev_vendor_contact_po = selected_vendor_contact
+#                 contact_idx = contact_names.index(selected_vendor_contact) if selected_vendor_contact in contact_names else 0
+                
+#                 if selected_vendor != "Select Vendor":
+#                     st.session_state.po_vendor_name = selected_vendor
+#                     st.session_state.po_vendor_address = vendor_data.get("address", "")
+#                     st.session_state.po_gst_no = vendor_data.get("gst_no", "")
+#                     st.session_state.po_pan_no = vendor_data.get("pan_no", "")
+#                     st.session_state.po_msme_no = vendor_data.get("msme_no", "")
+                    
+#                     if contacts and contact_idx < len(contacts):
+#                         sel_contact = contacts[contact_idx]
+#                         st.session_state.po_vendor_contact = sel_contact.get("name", "")
+#                         st.session_state.po_vendor_mobile = sel_contact.get("mobile", "")
+#                     else:
+#                         st.session_state.po_vendor_contact = ""
+#                         st.session_state.po_vendor_mobile = ""
+#                 st.rerun()
             
 #             st.subheader("Vendor Details")
 #             vendor_name = st.text_input(
 #                 "Vendor Name",
-#                 value=st.session_state.get("po_vendor_name", "Arkance IN Pvt. Ltd."),
 #                 key="po_vendor_name"
 #             )
 #             vendor_address = st.text_area(
 #                 "Vendor Address",
-#                 value=st.session_state.get("po_vendor_address", "Unit 801-802, 8th Floor, Tower 1..."),
 #                 key="po_vendor_address"
 #             )
 #             vendor_contact = st.text_input(
 #                 "Contact Person",
-#                 value=st.session_state.get("po_vendor_contact", "Ms/Mr"),
 #                 key="po_vendor_contact"
 #             )
 #             vendor_mobile = st.text_input(
 #                 "Mobile",
-#                 value=st.session_state.get("po_vendor_mobile", "+91 1234567890"),
 #                 key="po_vendor_mobile"
 #             )
             
 #             st.subheader("End User Details")
             
 #             # End User Dropdown
+#             # Track selection changes for PO End User
+#             if 'prev_enduser_po' not in st.session_state:
+#                 st.session_state.prev_enduser_po = "Select End User"
+#             if 'prev_enduser_contact_po' not in st.session_state:
+#                 st.session_state.prev_enduser_contact_po = ""
+
 #             selected_enduser = st.selectbox(
 #                 "Select End User", 
 #                 options=get_enduser_dropdown_options(),
@@ -6857,38 +7005,61 @@ if __name__ == "__main__":
 #             )
             
 #             # Update end user fields when dropdown selection changes
-#             if selected_enduser and selected_enduser != "Select End User":
-#                 enduser_data = END_USER_DATABASE.get(selected_enduser, {})
-#                 st.session_state.po_end_company = selected_enduser
-#                 st.session_state.po_end_address = enduser_data.get("address", "")
-#                 st.session_state.po_end_person = enduser_data.get("contact", "")
-#                 st.session_state.po_end_mobile = enduser_data.get("mobile", "")
-#                 st.session_state.po_end_email = enduser_data.get("email", "")
-#                 st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
+#             enduser_po_changed = selected_enduser != st.session_state.prev_enduser_po
+#             if enduser_po_changed:
+#                 st.session_state.prev_enduser_po = selected_enduser
+#                 st.session_state.prev_enduser_contact_po = ""
+                
+#             enduser_data = END_USER_DATABASE.get(selected_enduser, {}) if selected_enduser != "Select End User" else {}
+#             contacts = get_contacts_list(enduser_data)
+#             contact_names = get_contact_dropdown_options(contacts)
+            
+#             # Contact person dropdown for end user
+#             selected_enduser_contact = st.selectbox(
+#                 "Select End User Contact",
+#                 options=contact_names,
+#                 key="enduser_contact_dropdown_po"
+#             )
+#             enduser_contact_changed = selected_enduser_contact != st.session_state.prev_enduser_contact_po
+
+#             if enduser_po_changed or enduser_contact_changed:
+#                 st.session_state.prev_enduser_contact_po = selected_enduser_contact
+#                 contact_idx = contact_names.index(selected_enduser_contact) if selected_enduser_contact in contact_names else 0
+                
+#                 if selected_enduser != "Select End User":
+#                     st.session_state.po_end_company = selected_enduser
+#                     st.session_state.po_end_address = enduser_data.get("address", "")
+#                     st.session_state.po_end_gst_no = enduser_data.get("gst_no", "")
+                    
+#                     if contacts and contact_idx < len(contacts):
+#                         sel_contact = contacts[contact_idx]
+#                         st.session_state.po_end_person = sel_contact.get("name", "")
+#                         st.session_state.po_end_mobile = sel_contact.get("mobile", "")
+#                         st.session_state.po_end_email = sel_contact.get("email", "")
+#                     else:
+#                         st.session_state.po_end_person = ""
+#                         st.session_state.po_end_mobile = ""
+#                         st.session_state.po_end_email = ""
+#                 st.rerun()
             
 #             end_company = st.text_input(
 #                 "End User Company",
-#                 value=st.session_state.get("po_end_company", "Baldridge & Associates Pvt Ltd."),
 #                 key="po_end_company"
 #             )
 #             end_address = st.text_area(
 #                 "End User Address",
-#                 value=st.session_state.get("po_end_address", "406 Sakar East, Vadodara 390009"),
 #                 key="po_end_address"
 #             )
 #             end_person = st.text_input(
 #                 "End User Contact",
-#                 value=st.session_state.get("po_end_person", "Mr. Dev"),
 #                 key="po_end_person"
 #             )
 #             end_mobile = st.text_input(
 #                 "End Mobile",
-#                 value=str(st.session_state.get("po_end_mobile", "1234567891") or "").strip(),
 #                 key="po_end_mobile"
 #             )
 #             end_email = st.text_input(
 #                 "End User Email",
-#                 value=st.session_state.get("po_end_email", "info@company.com"),
 #                 key="po_end_email"
 #             )
             
@@ -6956,18 +7127,15 @@ if __name__ == "__main__":
 #             )
 #             gst_no = st.text_input(
 #                 "GST No",
-#                 value=st.session_state.get("po_gst_no", "24ANMPP4891R1ZX"),
-#                 key="po_gst_no_input"
+#                 key="po_gst_no"
 #             )
 #             pan_no = st.text_input(
 #                 "PAN No",
-#                 value=st.session_state.get("po_pan_no", "ANMPP4891R"),
-#                 key="po_pan_no_input"
+#                 key="po_pan_no"
 #             )
 #             msme_no = st.text_input(
 #                 "MSME No",
-#                 value=st.session_state.get("po_msme_no", "UDYAM-GJ-01-0117646"),
-#                 key="po_msme_no_input"
+#                 key="po_msme_no"
 #             )
             
 #             # Terms & Authorization
@@ -7199,47 +7367,75 @@ if __name__ == "__main__":
 #             st.subheader("Buyer Details")
             
 #             # SIMPLE DROPDOWN LIKE QUOTATION TAB
+#             # Track selection changes for Invoice Buyer
+#             if 'prev_buyer_invoice' not in st.session_state:
+#                 st.session_state.prev_buyer_invoice = "Select End User"
+#             if 'prev_buyer_contact_invoice' not in st.session_state:
+#                 st.session_state.prev_buyer_contact_invoice = ""
+
 #             selected_enduser_invoice = st.selectbox(
 #                 "Select Buyer", 
 #                 options=get_enduser_dropdown_options(),
 #                 key="enduser_dropdown_invoice"
 #             )
             
-#             # UPDATE BUYER FIELDS WHEN DROPDOWN SELECTION CHANGES - SIMPLE LIKE QUOTATION
-#             if selected_enduser_invoice and selected_enduser_invoice != "Select End User":
-#                 enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {})
-#                 st.session_state.invoice_buyer_company = selected_enduser_invoice
-#                 st.session_state.invoice_buyer_address = enduser_data.get("address", "")
-#                 st.session_state.invoice_buyer_mobile = enduser_data.get("mobile", "")
-#                 st.session_state.invoice_buyer_email = enduser_data.get("email", "")
-#                 st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
+#             # UPDATE BUYER FIELDS WHEN DROPDOWN SELECTION CHANGES - WITH CONTACT DROPDOWN
+#             buyer_changed = selected_enduser_invoice != st.session_state.prev_buyer_invoice
+#             if buyer_changed:
+#                 st.session_state.prev_buyer_invoice = selected_enduser_invoice
+#                 st.session_state.prev_buyer_contact_invoice = ""
+                
+#             enduser_data = END_USER_DATABASE.get(selected_enduser_invoice, {}) if selected_enduser_invoice != "Select End User" else {}
+#             contacts = get_contacts_list(enduser_data)
+#             contact_names = get_contact_dropdown_options(contacts)
+            
+#             # Contact person dropdown for invoice buyer
+#             selected_buyer_contact = st.selectbox(
+#                 "Select Buyer Contact",
+#                 options=contact_names,
+#                 key="buyer_contact_dropdown_invoice"
+#             )
+#             buyer_contact_changed = selected_buyer_contact != st.session_state.prev_buyer_contact_invoice
+
+#             if buyer_changed or buyer_contact_changed:
+#                 st.session_state.prev_buyer_contact_invoice = selected_buyer_contact
+#                 contact_idx = contact_names.index(selected_buyer_contact) if selected_buyer_contact in contact_names else 0
+                
+#                 if selected_enduser_invoice != "Select End User":
+#                     st.session_state.invoice_buyer_company = selected_enduser_invoice
+#                     st.session_state.invoice_buyer_address = enduser_data.get("address", "")
+#                     st.session_state.invoice_buyer_gst = enduser_data.get("gst_no", "")
+                    
+#                     if contacts and contact_idx < len(contacts):
+#                         sel_contact = contacts[contact_idx]
+#                         st.session_state.invoice_buyer_mobile = sel_contact.get("mobile", "")
+#                         st.session_state.invoice_buyer_email = sel_contact.get("email", "")
+#                     else:
+#                         st.session_state.invoice_buyer_mobile = ""
+#                         st.session_state.invoice_buyer_email = ""
+#                 st.rerun()
             
 #             # USE SESSION STATE VALUES IN TEXT INPUTS - SIMPLE LIKE QUOTATION
 #             buyer_name = st.text_input(
 #                 "Buyer Name",
-#                 value=st.session_state.get("invoice_buyer_company", "Baldridge & Associates Pvt Ltd."),
 #                 key="invoice_buyer_company"
 #             )
             
 #             buyer_address = st.text_area(
 #                 "Buyer Address",
-#                 value=st.session_state.get("invoice_buyer_address", "406 Sakar East, Vadodara 390009"),
 #                 key="invoice_buyer_address"
 #             )
 
 #             buyer_mobile = st.text_input(
 #                 "Buyer mobile.",
-#                 value=st.session_state.get("invoice_buyer_mobile", "98987 91813"),
 #                 key="invoice_buyer_mobile"
 #             )
 #             buyer_email = st.text_input(
 #                 "Buyer email.",
-#                 value=st.session_state.get("invoice_buyer_email", "dmistry@baseengr.com"),
 #                 key="invoice_buyer_email"
 #             )
 #             buyer_gst = st.text_input(
 #                 "Buyer GST No.",
-#                 value=st.session_state.get("invoice_buyer_gst", "24AAHCB9"),
 #                 key="invoice_buyer_gst"
 #             )
 
@@ -7247,13 +7443,50 @@ if __name__ == "__main__":
 #             items = []
 #             num_items = st.number_input("Number of Products", 1, 10, 1, key="invoice_num_items")
 #             for i in range(num_items):
-#                 with st.expander(f"Product {i+1}"):
-#                     desc = st.text_area(f"Description {i+1}", "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription\nSerial #575-26831580\nContract #110004988191\nEnd Date: 17/04/2026", key=f"invoice_desc_{i}")
+#                 with st.expander(f"Product {i+1}", expanded=True):
+#                     # Product catalog dropdown
+#                     product_options = ["-- Select from Catalog --"] + list(PRODUCT_CATALOG.keys())
+#                     selected_inv_product = st.selectbox(
+#                         f"Select Product {i+1}",
+#                         options=product_options,
+#                         key=f"invoice_product_select_{i}"
+#                     )
+                    
+#                     # Auto-fill product name and rate from catalog
+#                     default_desc = "Autodesk BIM Collaborate Pro - Single-user\nCLOUD Commercial New Annual Subscription"
+#                     default_rate = 36500.00
+                    
+#                     if selected_inv_product and selected_inv_product != "-- Select from Catalog --":
+#                         catalog_entry = PRODUCT_CATALOG.get(selected_inv_product, {})
+#                         default_desc = selected_inv_product
+#                         default_rate = catalog_entry.get("basic", 0.0)
+                    
+#                     # Product description (auto-filled from catalog, editable)
+#                     desc_name = st.text_area(f"Product Description {i+1}", default_desc, key=f"invoice_desc_{i}")
+                    
+#                     # Serial, Contract, End Date fields
+#                     col_s, col_c, col_e = st.columns(3)
+#                     with col_s:
+#                         serial_no = st.text_input(f"Serial #", "", key=f"invoice_serial_{i}", placeholder="e.g. 575-26831580")
+#                     with col_c:
+#                         contract_no = st.text_input(f"Contract #", "", key=f"invoice_contract_{i}", placeholder="e.g. 110004988191")
+#                     with col_e:
+#                         end_date = st.text_input(f"End Date", "", key=f"invoice_enddate_{i}", placeholder="e.g. 17/04/2026")
+                    
+#                     # Build final description: product name + serial/contract/end date
+#                     full_desc = desc_name
+#                     if serial_no:
+#                         full_desc += f"\nSerial #{serial_no}"
+#                     if contract_no:
+#                         full_desc += f"\nContract #{contract_no}"
+#                     if end_date:
+#                         full_desc += f"\nEnd Date: {end_date}"
+                    
 #                     hsn = st.text_input(f"HSN/SAC {i+1}", "997331", key=f"invoice_hsn_{i}")
 #                     qty = st.number_input(f"Quantity {i+1}", 1.00, 100.00, 1.00, key=f"invoice_qty_{i}")
-#                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, 36500.00, key=f"invoice_rate_{i}")
+#                     rate = st.number_input(f"Unit Rate {i+1}", 0.00, 100000000.00, default_rate, key=f"invoice_rate_{i}")
 #                     rate = round(rate, 2)
-#                     items.append({"description": desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
+#                     items.append({"description": full_desc, "hsn": hsn, "quantity": qty, "unit_rate": rate})
 
 #             st.subheader("Declaration")
 #             declaration = st.text_area("Declaration", "IT IS HEREBY DECLARED THAT THE SOFTWARE HAS ALREADY BEEN DEDUCTED FOR TDS/WITH HOLDING TAX AND BY VIRTUE OF NOTIFICATION NO.: 21/20, SO 1323[E] DT 13/06/2012, YOU ARE EXEMPTED FROM DEDUCTING TDS ON PAYMENT/CREDIT AGAINST THIS INVOICE")

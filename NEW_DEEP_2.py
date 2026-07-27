@@ -1,21 +1,22 @@
-# pyrefly: ignore [missing-import]
 import streamlit as st
+from fpdf import FPDF
 import pandas as pd
+from num2words import num2words
 import datetime
 import io
-import os
-import json
-import time
-import textwrap
-import html as _html
-import requests
-from fpdf import FPDF, HTMLMixin
-from num2words import num2words
 from PIL import Image
+import os
+from fpdf import FPDF, HTMLMixin
+import textwrap
+import html as _html 
+import json
+import requests  # Add this import for downloading from GitHub
 
-# GitHub Configuration
+# GitHub Configuration - FIXED URLs
 LOGO_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/logo_final.jpg"
 STAMP_URL = "https://raw.githubusercontent.com/cmisales26/purchase-order-dashboard/main/stamp.jpg"
+
+import time
 
 # --- Global Data and Configuration ---
 # Product catalog is now loaded from products.json (same pattern as vendor.json and endusers.json)
@@ -47,131 +48,17 @@ def load_json_data(filename, default_data=None):
         st.sidebar.error(f"❌ Unexpected error reading {filename}: {e}. Using empty database.")
         return default_data or {}
 
-import re
-
 # Load vendor, end user, and product databases
 VENDOR_DATABASE = load_json_data('vendor.json')
 END_USER_DATABASE = load_json_data('endusers.json')
 PRODUCT_CATALOG = load_json_data('products.json')
 
-def validate_gst(gst):
-    """
-    Validate Indian GSTIN format.
-    Format: 15 characters (e.g. 24ANMPP4891R1ZX)
-    """
-    if not gst:
-        return False, "GST number is required."
-    gst = gst.strip().upper()
-    pattern = r"^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$"
-    if not re.match(pattern, gst):
-        return False, "Invalid GSTIN format (should be 15 chars, e.g. 24ANMPP4891R1ZX)"
-    return True, ""
-
-def validate_pan(pan):
-    """
-    Validate Indian PAN card format.
-    Format: 10 characters (e.g. ANMPP4891R)
-    """
-    if not pan:
-        return False, "PAN number is required."
-    pan = pan.strip().upper()
-    pattern = r"^[A-Z]{5}[0-9]{4}[A-Z]{1}$"
-    if not re.match(pattern, pan):
-        return False, "Invalid PAN format (should be 10 characters, e.g. ANMPP4891R)"
-    return True, ""
-
-def show_validation_warning(msg):
-    """Display an inline warning in red for form inputs"""
-    st.markdown(f'<p style="color:#e53e3e;font-size:0.82rem;margin-top:-12px;margin-bottom:12px;padding-left:4px;">⚠ {msg}</p>', unsafe_allow_html=True)
-
-def show_validation_success(msg="Format Verified"):
-    """Display an inline success indicator in green for valid inputs"""
-    st.markdown(f'<p style="color:#10b981;font-size:0.82rem;margin-top:-12px;margin-bottom:12px;padding-left:4px;font-weight:600;">✓ {msg}</p>', unsafe_allow_html=True)
-
-
-def show_document_preview(doc_type, doc_number, company_name, items_list, grand_total):
-    """Render a styled visual preview of the document before generation"""
-    items_html = ""
-    total_base = 0.0
-    total_gst = 0.0
-    
-    for idx, item in enumerate(items_list):
-        name = item.get("name") or item.get("description") or "Item"
-        qty = item.get("qty") or item.get("quantity") or 1
-        price = item.get("basic") or item.get("unit_rate") or 0.0
-        gst_percent = item.get("gst_percent", 18.0)  # Default to 18% if not set
-        
-        base_amount = qty * price
-        item_gst = base_amount * (gst_percent / 100)
-        
-        total_base += base_amount
-        total_gst += item_gst
-        
-        items_html += (
-            f'<tr style="border-bottom:1px solid rgba(0,0,0,0.05);font-size:0.85rem;">'
-            f'<td style="padding:8px;color:#4a5568;">{idx+1}</td>'
-            f'<td style="padding:8px;color:#2d3748;font-weight:500;">{name}</td>'
-            f'<td style="padding:8px;color:#4a5568;text-align:center;">{qty}</td>'
-            f'<td style="padding:8px;color:#4a5568;text-align:right;">₹{price:,.2f}</td>'
-            f'<td style="padding:8px;color:#2d3748;font-weight:600;text-align:right;">₹{base_amount:,.2f}</td>'
-            f'</tr>'
-        )
-        
-    calculated_grand_total = round(total_base + total_gst)
-    
-    preview_html = (
-        f'<div style="background:white;border-radius:14px;padding:24px;border:1px solid rgba(0,0,0,0.08);'
-        f'box-shadow:0 4px 20px rgba(0,0,0,0.05);margin-bottom:20px;">'
-        f'<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #667eea;padding-bottom:12px;margin-bottom:16px;">'
-        f'<div>'
-        f'<h4 style="margin:0;color:#2d3748;font-weight:700;text-transform:uppercase;font-size:0.85rem;letter-spacing:1px;color:#667eea;">{doc_type} PREVIEW</h4>'
-        f'<p style="margin:4px 0 0 0;color:#718096;font-size:0.75rem;">Doc #: <strong>{doc_number}</strong></p>'
-        f'</div>'
-        f'<div style="text-align:right;">'
-        f'<p style="margin:0;font-weight:700;color:#2d3748;font-size:0.9rem;">CM INFOTECH</p>'
-        f'<p style="margin:2px 0 0 0;color:#718096;font-size:0.7rem;">Ahmedabad, India</p>'
-        f'</div>'
-        f'</div>'
-        f'<div style="margin-bottom:16px;">'
-        f'<p style="margin:0;font-size:0.75rem;color:#718096;text-transform:uppercase;letter-spacing:0.5px;">Client / End User</p>'
-        f'<p style="margin:4px 0 0 0;font-weight:600;color:#2d3748;font-size:0.9rem;">{company_name}</p>'
-        f'</div>'
-        f'<table style="width:100%;border-collapse:collapse;margin-bottom:16px;">'
-        f'<thead>'
-        f'<tr style="background:rgba(102,126,234,0.05);border-bottom:1px solid rgba(102,126,234,0.1);font-size:0.75rem;color:#4a5568;text-transform:uppercase;">'
-        f'<th style="padding:8px;text-align:left;font-weight:600;">#</th>'
-        f'<th style="padding:8px;text-align:left;font-weight:600;">Description</th>'
-        f'<th style="padding:8px;text-align:center;font-weight:600;">Qty</th>'
-        f'<th style="padding:8px;text-align:right;font-weight:600;">Rate</th>'
-        f'<th style="padding:8px;text-align:right;font-weight:600;">Amount</th>'
-        f'</tr>'
-        f'</thead>'
-        f'<tbody>'
-        f'{items_html}'
-        f'</tbody>'
-        f'</table>'
-        f'<div style="border-top:1px solid rgba(0,0,0,0.08);padding-top:12px;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">'
-        f'<div style="font-size:0.85rem;color:#4a5568;display:flex;justify-content:flex-end;width:100%;">'
-        f'<span style="font-weight:500;margin-right:8px;">Subtotal (Base):</span>'
-        f'<span style="font-weight:600;min-width:120px;text-align:right;display:inline-block;">₹{total_base:,.2f}</span>'
-        f'</div>'
-        f'<div style="font-size:0.85rem;color:#4a5568;display:flex;justify-content:flex-end;width:100%;">'
-        f'<span style="font-weight:500;margin-right:8px;">GST Breakdown:</span>'
-        f'<span style="font-weight:600;min-width:120px;text-align:right;display:inline-block;">₹{total_gst:,.2f}</span>'
-        f'</div>'
-        f'<div style="margin-top:8px;border-top:2px solid #667eea;padding-top:8px;font-size:1.15rem;color:#667eea;font-weight:800;display:flex;justify-content:flex-end;width:100%;">'
-        f'<span style="margin-right:8px;font-size:0.85rem;font-weight:700;color:#718096;text-transform:uppercase;align-self:center;">Estimated Total:</span>'
-        f'<span style="min-width:120px;text-align:right;display:inline-block;">₹{calculated_grand_total:,.2f}</span>'
-        f'</div>'
-        f'</div>'
-        f'</div>'
-    )
-    st.markdown(preview_html, unsafe_allow_html=True)
-
-
-
-
-
+# Debug: Print what's loaded
+print("=" * 50)
+print(f"DEBUG: Loaded {len(VENDOR_DATABASE)} vendors from vendor.json")
+print(f"DEBUG: Loaded {len(END_USER_DATABASE)} end users from endusers.json")
+print(f"DEBUG: Loaded {len(PRODUCT_CATALOG)} products from products.json")
+print("=" * 50)
 
 # Sales Person Mapping - ONLY ONE DEFINITION
 SALES_PERSON_MAPPING = {
@@ -271,6 +158,8 @@ def get_current_quarter():
     else:
         return "Q4"
 
+import os
+
 # Simple file-based counter for PO sequence
 PO_COUNTER_FILE = "po_counter.txt"
 
@@ -341,6 +230,8 @@ def get_next_sequence_number_po(po_number):
     except:
         pass
     return 1
+import os
+
 # Simple file-based counter for quotations
 QUOTATION_COUNTER_FILE = "quotation_counter.txt"
 
@@ -434,6 +325,8 @@ def get_next_sequence_number(quotation_number):
         pass
     return 1
 
+
+import os
 
 # Simple file-based counter for Invoice sequence
 INVOICE_COUNTER_FILE = "invoice_counter.txt"
@@ -587,7 +480,39 @@ class QUOTATION_PDF(FPDF):
         
         self.set_text_color(0, 0, 0)
 
+    # def footer(self):
+    #     self.set_y(-18)
+    #     self.set_font(self.default_font, "", 10)
+    #     self.cell(0, 4, "E/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village, Ahmedabad - 382481", ln=True, align="C")
+        
+    #     # Make footer emails and phone clickable - FIXED OVERLAP
+    #     self.set_text_color(0, 0, 255)  # Blue color for links
+        
+    #     # Website link
+    #     # self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
+        
+    #     # Email and phone on same line - FIXED
+    #     self.set_font(self.default_font, "U", 10)
+    #     email_text = " info@cminfotech.com "
+    #     phone_text = " +91 873 391 5721"
+        
+    #     # Calculate positions for proper alignment
+    #     page_width = self.w - 2 * self.l_margin
+    #     email_width = self.get_string_width(email_text)
+    #     phone_width = self.get_string_width(phone_text)
+    #     separator_width = self.get_string_width(" | ")
+        
+    #     total_width = email_width + separator_width + phone_width
+    #     start_x = (page_width - total_width) / 2 + self.l_margin
+        
+    #     self.set_x(start_x)
+    #     self.cell(email_width, 4, email_text, ln=0, link=f"mailto:{email_text}")
+    #     self.cell(separator_width, 4, " | ", ln=0)
+    #     self.cell(phone_width, 4, phone_text, ln=True, link=f"tel:{phone_text.replace(' ', '').replace('+', '')}")
 
+    #     self.cell(0, 4, "www.cminfotech.com", ln=True, align="C", link="https://www.cminfotech.com/")
+        
+    #     self.set_text_color(0, 0, 0)  # Reset to black
 
 def add_clickable_email(pdf, email, label="Email: "):
     """Add clickable email with label - FIXED OVERLAP"""
@@ -1081,6 +1006,7 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
             st.error(f"PDF generation failed: {e}")
             return b""
 
+from fpdf import FPDF
 # --- PDF Class for Tax Invoice ---
 class PDF(FPDF):
     def __init__(self):
@@ -1841,7 +1767,96 @@ def create_invoice_pdf(invoice_data, logo_file="logo_final.jpg", stamp_file="sta
 
     pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
     return pdf_bytes
+    # # --- Signature Boxes (Side by Side) ---
+    # y_signature_start = pdf.get_y()
 
+    # # Left side - Buyer's Company Signature (Blank box for future use)
+    # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.cell(95, 6, "Buyer's Company Signature", border="LRT", ln=0, align="C")
+
+    # # Right side - Our Company Signature
+    # pdf.cell(96, 6, "For CM INFOTECH.", border="LRT", ln=1, align="C")
+
+    # # Create the signature boxes with DIFFERENT heights
+    # left_signature_box_height = 33
+    # right_signature_box_height = 33
+
+    # # Left signature box (Buyer - Blank)
+    # pdf.set_font(pdf.default_font, "I", 10)
+    # pdf.set_text_color(128, 128, 128)
+
+    # # Check if buyer logo is available
+    # buyer_logo_file = invoice_data.get('buyer', {}).get('logo_file')
+
+    # if buyer_logo_file:
+    #     try:
+    #         # Add buyer logo at the top of the left box
+    #         logo_width = 25
+    #         logo_x = 10 + (95 - logo_width) / 2
+    #         logo_y = pdf.get_y() + 4
+            
+    #         # Add buyer company logo
+    #         pdf.image(buyer_logo_file, x=logo_x, y=logo_y, w=logo_width)
+            
+    #         # Add buyer company name below logo
+    #         pdf.set_xy(10, logo_y + logo_width + 2)
+    #         pdf.set_font(pdf.default_font, "B", 9)
+    #         pdf.cell(95, 4, invoice_data['buyer']['name'], border=0, ln=1, align="C")
+            
+    #         # Add signature line and text
+    #         pdf.set_xy(10, pdf.get_y() + 8)
+    #         pdf.set_font(pdf.default_font, "", 9)
+    #         pdf.cell(95, 4, "_________________________", border=0, ln=1, align="C")
+    #         pdf.cell(95, 4, "Authorized Signatory", border=0, ln=1, align="C")
+            
+    #         # Draw the border around everything
+    #         pdf.set_xy(10, y_signature_start + 6)
+    #         pdf.cell(95, left_signature_box_height, "", border="LRB")
+            
+    #         # Update Y position after left box
+    #         y_after_left_signature = y_signature_start + 6 + left_signature_box_height
+            
+    #     except Exception as e:
+    #         st.warning(f"Could not add buyer logo: {e}")
+    #         # Fallback without logo
+    #         pdf.multi_cell(95, left_signature_box_height/5, "\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
+    #         y_after_left_signature = pdf.get_y()
+    # else:
+    #     # No buyer logo available, show original placeholder
+    #     pdf.multi_cell(95, left_signature_box_height/5, "\n\n\n(Space for Buyer's Company\nStamp and Signature)", border="LRB", align="C")
+    #     y_after_left_signature = pdf.get_y()
+
+    # # Right signature box (Our Company)
+    # pdf.set_xy(105, y_signature_start + 5)
+    # pdf.set_text_color(0, 0, 0)
+
+    # # Add stamp if available
+    # if stamp_file:
+    #     try:
+    #         stamp_width = 25
+    #         stamp_x = 105 + (96 - stamp_width) / 2
+    #         stamp_y = pdf.get_y() + 2
+    #         pdf.image(stamp_file, x=stamp_x, y=stamp_y, w=stamp_width)
+    #     except Exception as e:
+    #         st.warning(f"Could not add stamp: {e}")
+
+    # # Position for the signature text in right box
+    # pdf.set_xy(105, y_signature_start + 10 + right_signature_box_height - 10)
+    # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.cell(96, 5, "Authorized Signatory", border=0, ln=True, align="C")
+
+    # # Draw border for right signature box
+    # pdf.set_xy(105, y_signature_start + 6)
+    # pdf.cell(96, right_signature_box_height, "", border="LRB")
+
+    # # Set Y position to continue after both signature boxes
+    # pdf.set_y(max(y_after_left_signature, y_signature_start + 6 + right_signature_box_height))
+    # pdf.ln(6)
+    # pdf.set_font(pdf.default_font, "I", 10)
+    # pdf.cell(0, 4, "SUBJECT TO AHMEDABAD JURISDICTION", ln=True, align="C")
+
+    # pdf_bytes = pdf.output(dest="S").encode('latin-1') if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
+    # return pdf_bytes
 
 # --- PDF Class ---
 class PO_PDF(FPDF):
@@ -1929,7 +1944,24 @@ class PO_PDF(FPDF):
         self.set_text_color(0, 0, 0)
 
 
-
+    # def footer(self):
+    #     self.set_y(-18)
+    #     self.set_font(self.default_font, "", 10)
+    #     self.multi_cell(0, 4, "E402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Ahmedabad - 382481\n", align="C")
+    #     self.set_text_color(0, 0, 255)
+    #     self.set_font(self.default_font, "U", 10)
+    #     # email1 = "cad@cmi.com"
+    #     email1 = "info@cminfotech.com "
+    #     phone_number =" +91 873 391 5721"
+    #     self.set_text_color(0, 0, 255)
+    #     self.cell(0, 4, f"{email1} | {phone_number}", ln=True, align="C", link=f"mailto:{email1}")
+    #     self.set_x((self.w - 80) / 2)
+    #     self.cell(0, 0, "", link=f"tel:{phone_number}")
+    #     self.set_x((self.w - 60) / 2)
+    #     website ="www.cminfotech.com"
+    #     self.set_text_color(0, 0, 255)
+    #     self.cell(60, 4, f"{website}", ln=True, align="C", link=website)
+    #     self.set_text_color(0, 0, 0)
 
     def section_title(self, title):
         self.set_font(self.default_font, "B", 12)
@@ -1979,7 +2011,22 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     sanitized_authorized_by = pdf.sanitize_text(po_data['authorized_by'])
     sanitized_company_name = pdf.sanitize_text(po_data['company_name'])
     
-
+    # # --- Vendor & Bill/Ship ---
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # pdf.section_title("To:")
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # pdf.multi_cell(95, 5, sanitized_vendor_name)
+    # pdf.set_font(pdf.default_font, "", 12)
+    # pdf.multi_cell(95, 5, f"{sanitized_vendor_address}\nKind Attend: {sanitized_vendor_contact}\nMobile: {sanitized_vendor_mobile}")
+    # pdf.ln(5)
+    # # pdf.set_xy(110, pdf.get_y() - 20)
+    # # pdf.set_font(pdf.default_font, "B", 10)
+    # pdf.multi_cell(70, 5, f"Bill To: \n{sanitized_bill_to_company}\n{sanitized_bill_to_address}")
+    # pdf.set_xy(125, pdf.get_y() - 25)
+    # pdf.multi_cell(0, 5, f"Ship To: \n{sanitized_ship_to_company}\n{sanitized_ship_to_address}")
+    # pdf.ln(2)
+    # pdf.multi_cell(0, 5, f"GST NO: {sanitized_gst_no}\nPAN NO: {sanitized_pan_no}\nMSME Registration No: {sanitized_msme_no}")
+    # pdf.ln(2)
     # --- Vendor & Bill/Ship ---
     pdf.set_font(pdf.default_font, "B", 12)
     pdf.section_title("To:")
@@ -2199,6 +2246,14 @@ def create_po_pdf(po_data, logo_path = "logo_final.jpg"):
     pdf.set_font(pdf.default_font, "", 12)
     pdf.multi_cell(0, 5, f"{sanitized_end_email}")
 
+    # pdf.ln(2)
+    # pdf.set_font(pdf.default_font, "B", 12)
+    # pdf.cell(45, 5, "Authorized By")
+    # pdf.cell(5, 4, ":")
+    # pdf.set_font(pdf.default_font, "", 12)
+    # pdf.multi_cell(0, 5, f"{sanitized_authorized_by}")
+    
+
     # --- Footer (Company Name + Stamp) that floats) ---
     pdf.ln(5)
     pdf.set_font(pdf.default_font, "", 12)
@@ -2269,115 +2324,105 @@ def save_uploaded_file(uploaded_file, filename):
         st.sidebar.error(f"Error saving {filename}: {str(e)}")
         return None
 
-# --- Custom CSS Theme ---
-def inject_custom_css():
-    """Inject modern premium CSS theme for the dashboard"""
-    css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'theme.css')
-    if os.path.exists(css_path):
-        with open(css_path, 'r') as f:
-            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
 # --- The main function with Logo/Stamp Management ---
 def main():
-    st.set_page_config(page_title="CM INFOTECH | Document Generator", page_icon="📑", layout="wide", initial_sidebar_state="expanded")
-    inject_custom_css()
-    st.markdown(
-        '<div style="text-align:center;padding:8px 0 24px 0">'
-        '<div style="font-size:2.5rem;margin-bottom:4px">📑</div>'
-        '<h1 style="margin:0;font-size:2rem;background:linear-gradient(135deg,#667eea,#764ba2);'
-        '-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">'
-        'CM INFOTECH — Document Generator</h1>'
-        '<p style="color:#999;font-size:0.85rem;margin-top:6px;letter-spacing:3px;'
-        'text-transform:uppercase;font-weight:500">'
-        'Quotation · Purchase Order · Tax Invoice</p></div>',
-        unsafe_allow_html=True
-    )
+    st.set_page_config(page_title="Document Generator", page_icon="📑", layout="wide")
+    st.title("📑 Document Generator - Invoice, PO & Quotation")
 
     # --- Logo and Stamp Configuration in Sidebar ---
-    with st.sidebar.expander("📷 Company Branding", expanded=True):
-        # Option 1: Use GitHub images
-        use_github = st.checkbox("Use GitHub Images", value=True, 
-                                       help="Use logo and stamp from GitHub repository")
-        
-        # Option 2: Upload custom images
-        uploaded_logo = None
-        uploaded_stamp = None
-        
-        if not use_github:
-            st.markdown("---")
-            st.markdown("### Upload Custom Images")
-            uploaded_logo = st.file_uploader("Upload Company Logo", 
-                                                   type=["png", "jpg", "jpeg"], 
-                                                   key="global_logo")
-            uploaded_stamp = st.file_uploader("Upload Company Stamp", 
-                                                    type=["png", "jpg", "jpeg"], 
-                                                    key="global_stamp")
-        
-        # Load images based on selection
-        global_logo_path = None
-        global_stamp_path = None
-        
-        if use_github:
-            with st.status("Loading images from GitHub...", expanded=False) as status:
-                global_logo_path, global_stamp_path = load_images_from_github()
-                if global_logo_path and global_stamp_path:
-                    status.update(label="✓ Logo and Stamp loaded from GitHub", state="complete")
-                else:
-                    status.update(label="⚠ Failed to load all assets", state="error")
-        else:
-            if uploaded_logo:
-                global_logo_path = save_uploaded_file(uploaded_logo, "custom_logo.jpg")
-                if global_logo_path:
-                    st.success("✓ Custom logo loaded")
+    st.sidebar.header("📷 Company Branding")
+    
+    # Option 1: Use GitHub images
+    use_github = st.sidebar.checkbox("Use GitHub Images", value=True, 
+                                   help="Use logo and stamp from GitHub repository")
+    
+    # Option 2: Upload custom images
+    uploaded_logo = None
+    uploaded_stamp = None
+    
+    if not use_github:
+        st.sidebar.subheader("Upload Custom Images")
+        uploaded_logo = st.sidebar.file_uploader("Upload Company Logo", 
+                                               type=["png", "jpg", "jpeg"], 
+                                               key="global_logo")
+        uploaded_stamp = st.sidebar.file_uploader("Upload Company Stamp", 
+                                                type=["png", "jpg", "jpeg"], 
+                                                key="global_stamp")
+    
+    # Load images based on selection
+    global_logo_path = None
+    global_stamp_path = None
+    
+    if use_github:
+        with st.sidebar.status("Loading images from GitHub..."):
+            global_logo_path, global_stamp_path = load_images_from_github()
             
-            if uploaded_stamp:
-                global_stamp_path = save_uploaded_file(uploaded_stamp, "custom_stamp.jpg")
-                if global_stamp_path:
-                    st.success("✓ Custom stamp loaded")
+            if global_logo_path:
+                st.sidebar.success("✓ GitHub logo loaded")
+            else:
+                st.sidebar.error("❌ GitHub logo failed")
+                
+            if global_stamp_path:
+                st.sidebar.success("✓ GitHub stamp loaded")
+            else:
+                st.sidebar.error("❌ GitHub stamp failed")
+    else:
+        if uploaded_logo:
+            global_logo_path = save_uploaded_file(uploaded_logo, "custom_logo.jpg")
+            if global_logo_path:
+                st.sidebar.success("✓ Custom logo loaded")
         
-        # Display image status
-        st.markdown("---")
-        st.markdown("**Image Load Status**")
-        if global_logo_path:
-            st.info("Logo: ✅ Active")
-        else:
-            st.error("Logo: ❌ Missing")
-        
-        if global_stamp_path:
-            st.info("Stamp: ✅ Active")
-        else:
-            st.error("Stamp: ❌ Missing")
+        if uploaded_stamp:
+            global_stamp_path = save_uploaded_file(uploaded_stamp, "custom_stamp.jpg")
+            if global_stamp_path:
+                st.sidebar.success("✓ Custom stamp loaded")
+    
+    # Display image status
+    st.sidebar.subheader("Image Status")
+    if global_logo_path:
+        st.sidebar.info("Logo: ✅ Loaded")
+    else:
+        st.sidebar.error("Logo: ❌ Not available")
+    
+    if global_stamp_path:
+        st.sidebar.info("Stamp: ✅ Loaded")
+    else:
+        st.sidebar.error("Stamp: ❌ Not available")
 
     # Add Data Debug Section
-    with st.sidebar.expander("🔄 Database & Debug Tools", expanded=False):
-        # Force refresh button
-        if st.button("🔄 Force Refresh All Data", key="force_refresh_all", use_container_width=True):
-            st.cache_data.clear()
-            st.success("✅ All caches cleared!")
-            st.rerun()
+    st.sidebar.header("🔄 Data Debug")
+    
+    # Force refresh button
+    if st.sidebar.button("🔄 Force Refresh All Data", key="force_refresh_all"):
+        st.cache_data.clear()
+        st.sidebar.success("✅ All caches cleared! Data will reload.")
+        st.rerun()
+    
+    # Check data files button
+    if st.sidebar.button("📊 Check Data Files"):
+        try:
+            # Check vendor.json
+            with open('vendor.json', 'r', encoding='utf-8') as f:
+                vendor_data = json.load(f)
+            st.sidebar.success(f"✅ vendor.json: {len(vendor_data)} vendors")
+            if vendor_data:
+                first_vendor = list(vendor_data.keys())[0]
+                st.sidebar.info(f"First vendor: {first_vendor}")
+        except Exception as e:
+            st.sidebar.error(f"❌ vendor.json error: {e}")
         
-        # Check data files button
-        if st.button("📊 Check File Integrity", key="check_file_integrity", use_container_width=True):
-            try:
-                # Check vendor.json
-                with open('vendor.json', 'r', encoding='utf-8') as f:
-                    vendor_data = json.load(f)
-                st.success(f"vendor.json: {len(vendor_data)} vendors loaded")
-                if vendor_data:
-                    st.caption(f"First entry: {list(vendor_data.keys())[0]}")
-            except Exception as e:
-                st.error(f"vendor.json error: {e}")
-            
-            try:
-                # Check endusers.json
-                with open('endusers.json', 'r', encoding='utf-8') as f:
-                    enduser_data = json.load(f)
-                st.success(f"endusers.json: {len(enduser_data)} endusers loaded")
-                if enduser_data:
-                    st.caption(f"First entry: {list(enduser_data.keys())[0]}")
-            except Exception as e:
-                st.error(f"endusers.json error: {e}")
+        try:
+            # Check endusers.json
+            with open('endusers.json', 'r', encoding='utf-8') as f:
+                enduser_data = json.load(f)
+            st.sidebar.success(f"✅ endusers.json: {len(enduser_data)} end users")
+            if enduser_data:
+                first_enduser = list(enduser_data.keys())[0]
+                st.sidebar.info(f"First end user: {first_enduser}")
+        except Exception as e:
+            st.sidebar.error(f"❌ endusers.json error: {e}")
 
+    # --- Initialize Session State ---
     # --- Initialize Session State ---
 # Quotation session states
     if "quotation_seq" not in st.session_state:
@@ -2533,7 +2578,7 @@ def main():
         st.info("Vendor & End User details auto-filled from Excel ✅")
 
     # Create tabs for different document types
-    tab1, tab2, tab3 = st.tabs(["📋 Quotation Generator", "🛒 Purchase Order Generator", "🧾 Tax Invoice Generator"])
+    tab1, tab2, tab3 = st.tabs(["Quotation Generator", "Purchase Order Generator", "Tax Invoice Generator"])
 
     # --- Tab 1: Quotation Generator ---
     with tab1:
@@ -2711,12 +2756,6 @@ def main():
             
             # You can also add GST field if needed
             vendor_gst = st.text_input("GST No (Optional)", key="quote_end_gst_no")
-            if vendor_gst.strip():
-                is_valid, msg = validate_gst(vendor_gst)
-                if not is_valid:
-                    show_validation_warning(msg)
-                else:
-                    show_validation_success("GSTIN Format Verified")
 
             st.header("Quotation Details")
             price_validity = st.text_input("Price Validity", "10 days from Quotation date", key="quote_price_validity")
@@ -2803,13 +2842,6 @@ def main():
         with col5:
             st.metric("Grand Total", f"₹{grand_total:,.2f}")
         
-        # Document preview container
-        st.subheader("👀 Live Document Preview")
-        if st.session_state.quotation_products:
-            show_document_preview("Quotation", st.session_state.quotation_number, vendor_name, st.session_state.quotation_products, grand_total)
-        else:
-            st.info("Add products to see live document preview.")
-
         # Use global images
         st.subheader("Company Branding")
         st.info("Using global logo and stamp from sidebar settings")
@@ -2887,44 +2919,6 @@ def main():
                     
                 except Exception as e:
                     st.error(f"Error generating PDF: {str(e)}")
-
-        # --- Quick Transfer Section ---
-        st.markdown("---")
-        st.subheader("📋 Quick Transfer")
-        st.caption("Copy this quotation's details to other generators to save time.")
-        col_copy1, col_copy2 = st.columns(2)
-        with col_copy1:
-            if st.button("🛒 Copy to Purchase Order", key="copy_to_po", use_container_width=True):
-                if not st.session_state.quotation_products:
-                    st.warning("No products to copy.")
-                else:
-                    st.session_state.po_end_company = st.session_state.quote_end_company
-                    st.session_state.po_end_address = st.session_state.quote_end_address
-                    st.session_state.po_end_person = st.session_state.quote_end_person
-                    st.session_state.po_end_mobile = st.session_state.quote_end_mobile
-                    st.session_state.po_end_email = st.session_state.quote_end_email
-                    st.session_state.po_end_gst_no = st.session_state.quote_end_gst_no
-                    st.session_state.products = [dict(p) for p in st.session_state.quotation_products]
-                    st.success("✅ Copied to Purchase Order! Go to 'Purchase Order Generator' tab.")
-        with col_copy2:
-            if st.button("🧾 Copy to Tax Invoice", key="copy_to_invoice", use_container_width=True):
-                if not st.session_state.quotation_products:
-                    st.warning("No products to copy.")
-                else:
-                    st.session_state.invoice_buyer_company = st.session_state.quote_end_company
-                    st.session_state.invoice_buyer_address = st.session_state.quote_end_address
-                    st.session_state.invoice_buyer_mobile = st.session_state.quote_end_mobile
-                    st.session_state.invoice_buyer_email = st.session_state.quote_end_email
-                    st.session_state.invoice_buyer_gst = st.session_state.quote_end_gst_no
-                    
-                    # Copy items
-                    st.session_state.invoice_num_items = len(st.session_state.quotation_products)
-                    for idx, p in enumerate(st.session_state.quotation_products):
-                        st.session_state[f"invoice_desc_{idx}"] = p["name"]
-                        st.session_state[f"invoice_rate_{idx}"] = p["basic"]
-                        st.session_state[f"invoice_qty_{idx}"] = p["qty"]
-                        
-                    st.success("✅ Copied to Tax Invoice! Go to 'Tax Invoice Generator' tab.")
 
                 
     # --- Tab 2: Purchase Order Generator ---
@@ -3263,22 +3257,10 @@ def main():
                 "GST No",
                 key="po_gst_no"
             )
-            if gst_no.strip():
-                is_valid, msg = validate_gst(gst_no)
-                if not is_valid:
-                    show_validation_warning(msg)
-                else:
-                    show_validation_success("GSTIN Format Verified")
             pan_no = st.text_input(
                 "PAN No",
                 key="po_pan_no"
             )
-            if pan_no.strip():
-                is_valid, msg = validate_pan(pan_no)
-                if not is_valid:
-                    show_validation_warning(msg)
-                else:
-                    show_validation_success("PAN Format Verified")
             msme_no = st.text_input(
                 "MSME No",
                 key="po_msme_no"
@@ -3303,12 +3285,7 @@ def main():
             total_gst = sum(p["basic"] * p["gst_percent"] / 100 * p["qty"] for p in st.session_state.products)
             grand_total = total_base + total_gst
             amount_words = num2words(grand_total, to="currency", currency="INR").title()
-            # Document preview container
-            st.subheader("👀 Live Document Preview")
-            if st.session_state.products:
-                show_document_preview("Purchase Order", st.session_state.po_number, end_company, st.session_state.products, grand_total)
-            else:
-                st.info("Add products to see live document preview.")
+            st.metric("Grand Total", f"₹{grand_total:,.2f}")
 
             # Use global logo
             logo_path = global_logo_path
@@ -3589,12 +3566,6 @@ def main():
                 "Buyer GST No.",
                 key="invoice_buyer_gst"
             )
-            if buyer_gst.strip():
-                is_valid, msg = validate_gst(buyer_gst)
-                if not is_valid:
-                    show_validation_warning(msg)
-                else:
-                    show_validation_success("GSTIN Format Verified")
 
             st.subheader("Products")
             items = []
@@ -3658,19 +3629,6 @@ def main():
             if not stamp_path:
                 st.warning("⚠ No company stamp available")
             
-            # Calculate dynamic totals for preview
-            temp_basic_amount = round(sum(item['quantity'] * item['unit_rate'] for item in items), 2)
-            temp_sgst = round(temp_basic_amount * 0.09, 2)
-            temp_cgst = round(temp_basic_amount * 0.09, 2)
-            temp_final_amount = round(temp_basic_amount + temp_sgst + temp_cgst)
-            
-            # Document preview container
-            st.subheader("👀 Live Document Preview")
-            if items:
-                show_document_preview("Tax Invoice", st.session_state.invoice_number, buyer_name, items, temp_final_amount)
-            else:
-                st.info("Add products to see live document preview.")
-
             st.subheader("Invoice Preview & Download")
 
             if st.button("Generate Invoice", key="generate_invoice_button"):
@@ -3784,21 +3742,16 @@ def main():
                     mime="application/pdf",
                     key="invoice_download_button")
                                 
-    # Clean up temporary files
-    for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_stamp.jpg"]:
-        if os.path.exists(path):
-            try:
-                os.remove(path)
-            except:
-                pass
+# Clean up temporary files
+for path in ["github_logo.jpg", "github_stamp.jpg", "custom_logo.jpg", "custom_stamp.jpg"]:
+    if os.path.exists(path):
+        try:
+            os.remove(path)
+        except:
+            pass
 
-    st.divider()
-    st.markdown(
-        '<div style="text-align:center;padding:10px 0;opacity:0.6">'
-        '<p style="font-size:0.8rem;color:#666">© 2025 CM INFOTECH — Document Generator · Built with ❤️ using Streamlit</p>'
-        '</div>',
-        unsafe_allow_html=True
-)
+st.divider()
+st.caption("© 2025 Document Generator - CM INFOTECH")
 
 if __name__ == "__main__":
     main()

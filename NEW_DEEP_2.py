@@ -814,217 +814,255 @@ def add_page_two_commercials(pdf, data):
                 pdf.cell(col_widths[4], 6, f"{qty:.0f}", border=1, align="C")
                 pdf.cell(col_widths[5], 6, f"{total:,.2f}", border=1, align="R")
                 pdf.ln()
-
-    # Round Off Row WITH COMMA FORMATTING
-    round_off = data.get('round_off', 0.0)
-    pdf.set_font(pdf.default_font, "B", 10)
-    # Reset cursor to left margin to prevent misalignment after multi-line rows
-    pdf.set_x(pdf.l_margin)
-    last_col_width = col_widths[-1]
-    summary_width = sum(col_widths[:-1])
-    pdf.cell(summary_width, 7, "Round Off", border=1, align="R")
-    pdf.cell(last_col_width, 7, f"{round_off:,.2f}", border=1, align="R")
-    pdf.ln()
-
-    # Grand Total Row - WITH COMMA FORMATTING
-    grand_total = data.get('grand_total', grand_total_unrounded)
-    pdf.set_font(pdf.default_font, "B", 10)
-    pdf.cell(summary_width, 7, "Final Amount to be Paid", border=1, align="R")
-    pdf.cell(last_col_width, 7, f"{grand_total:,.2f}", border=1, align="R")
-    pdf.ln(15)
-
-    # --- Enhanced Box for Terms & Conditions and Bank Details ---
-    pdf.set_font(pdf.default_font, "", 9)
-
-    # Terms & Conditions with ALL terms in bold
-    price_validity = data.get('price_validity', '10 days from Quotation date')
-    terms = [
-        ("1. Above charges are Inclusive of GST.", ""),
-        ("2. Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.", ""),
-        ("3. TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.", ""),
-        ("4. ELD licenses are paper licenses that do not contain media.", ""),
-        ("5. An Internet connection is required to access cloud services.", ""),
-        ("6. Training will be charged at extra cost depending on no. of participants.", ""),
-        ("7. Price Validity: ", price_validity),
-        ("8. Payment: ", "100% Advance along with purchase order"),
-        ("9. Delivery period: ", "1-2 Weeks from the date of Purchase Order"),
-        ("10. Support: ","Includes 12 months of technical support and software updates from OEM."),
-        ("11. Installation: ","Online"),
-        ("12. Cheque to be issued on name of: ", '"CM INFOTECH"'),
-        ("13. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481")
-    ]
-
-    # Bank Details
-    bank_info = [
-        ("Name", "CM INFOTECH"),
-        ("Account Number", "88130420182"),
-        ("IFSC Code", "IDFB0040335"),
-        ("SWIFT Code", "IDFBINBBMUM"),
-        ("Bank Name", "IDFC FIRST BANK"),
-        ("Branch", "AHMEDABAD - SHYAMAL BRANCH"),
-        ("MSME", "UDYAM-GJ-01-0117646"),
-        ("GSTIN", "24ANMPP4891R1ZX"),
-        ("PAN No", "ANMPP4891R")
-    ]
-
-    # Box dimensions and styling
-    x_start = pdf.get_x()
-    y_start = pdf.get_y()
-    page_width = pdf.w - 1.6 * pdf.l_margin
-    col1_width = page_width * 0.62  # 60% for Terms
-    col2_width = page_width * 0.38  # 40% for Bank Details
-    padding = 2.5
-    line_height = 4
-    section_spacing = 2
-
-    # Calculate required height for both columns
-    def calculate_column_height(items, col_width):
-        height = 0
-        for label, value in items:
-            if value:  # If there's a value part
-                text = f"{label}{value}"
-            else:
-                text = label
-            lines = pdf.multi_cell(col_width - 2*padding, line_height, text, split_only=True)
-            height += len(lines) * line_height + section_spacing
-        return height + 3*padding  # Add padding
-
-    terms_height = calculate_column_height(terms, col1_width)
-
-    # Calculate bank details height WITHOUT signature section
-    bank_items_height = calculate_column_height(bank_info, col2_width)
-    signature_height = 35  # Estimated height for signature section
-    
-    # Use the maximum height between terms and bank items + signature
-    box_height = max(terms_height, bank_items_height + signature_height)
-
-    # Draw the main box
-    pdf.rect(x_start, y_start, page_width, box_height)
-
-    # Draw vertical separator line
-    pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
-
-    # Add section headers
-    pdf.set_font(pdf.default_font, "B", 12)
-
-    # Terms & Conditions header
-    pdf.set_xy(x_start + padding, y_start + padding)
-    pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
-
-    # Terms content - INSIDE THE BOX
-    terms_y = pdf.get_y()
-    for i, (label, value) in enumerate(terms):
-        pdf.set_xy(x_start + padding, terms_y)
-        
-        if i < 6:  # First 6 terms - ALL BOLD
+        # Round Off Row (NEW - like PO) WITH COMMA FORMATTING
+            round_off = data.get('round_off', 0.0)
             pdf.set_font(pdf.default_font, "B", 10)
-            pdf.multi_cell(col1_width - 2*padding, line_height, label)
-            
-        elif value:  # Terms 7-13 with mixed formatting (label + bold value)
-            # Write the regular font part
-            pdf.set_font(pdf.default_font, "", 10)
-            pdf.cell(pdf.get_string_width(label), line_height, label, ln=0)
-            
-            # Write the bold part
+            pdf.cell(sum(col_widths[:-1]), 7, "Round Off", border=1, align="R")
+            pdf.cell(col_widths[5], 7, f"{round_off:,.2f}", border=1, align="R")
+            pdf.ln()
+
+            # Grand Total Row - WITH COMMA FORMATTING
+            grand_total = data.get('grand_total', grand_total_unrounded)
             pdf.set_font(pdf.default_font, "B", 10)
-            remaining_width = col1_width - 2*padding - pdf.get_string_width(label)
-            pdf.multi_cell(remaining_width, line_height, value)
+            pdf.cell(sum(col_widths[:-1]), 7, "Final Amount to be Paid", border=1, align="R")
+            pdf.cell(col_widths[5], 7, f"{grand_total:,.2f}", border=1, align="R")
+            pdf.ln(15)
+
+            # --- Enhanced Box for Terms & Conditions and Bank Details ---
+            pdf.set_font(pdf.default_font, "", 9)
+
+            # Terms & Conditions with ALL terms in bold
+            price_validity = data.get('price_validity', '10 days from Quotation date')
+            terms = [
+                ("1. Above charges are Inclusive of GST.", ""),
+                ("2. Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.", ""),
+                ("3. TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.", ""),
+                ("4. ELD licenses are paper licenses that do not contain media.", ""),
+                ("5. An Internet connection is required to access cloud services.", ""),
+                ("6. Training will be charged at extra cost depending on no. of participants.", ""),
+                ("7. Price Validity: ", price_validity),
+                ("8. Payment: ", "100% Advance along with purchase order"),
+                ("9. Delivery period: ", "1-2 Weeks from the date of Purchase Order"),
+                ("10. Support: ","Includes 12 months of technical support and software updates from OEM."),
+                ("11. Installation: ","Online"),
+                ("12. Cheque to be issued on name of: ", '"CM INFOTECH"'),
+                ("13. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481")
+            ]
+
+            # Bank Details
+            bank_info = [
+                ("Name", "CM INFOTECH"),
+                ("Account Number", "88130420182"),
+                ("IFSC Code", "IDFB0040335"),
+                ("SWIFT Code", "IDFBINBBMUM"),
+                ("Bank Name", "IDFC FIRST BANK"),
+                ("Branch", "AHMEDABAD - SHYAMAL BRANCH"),
+                ("MSME", "UDYAM-GJ-01-0117646"),
+                ("GSTIN", "24ANMPP4891R1ZX"),
+                ("PAN No", "ANMPP4891R")
+            ]
+
+            # Box dimensions and styling
+            x_start = pdf.get_x()
+            y_start = pdf.get_y()
+            page_width = pdf.w - 1.6 * pdf.l_margin
+            col1_width = page_width * 0.62  # 60% for Terms
+            col2_width = page_width * 0.38  # 40% for Bank Details
+            padding = 2.5
+            line_height = 4
+            section_spacing = 2
+
+            # Calculate required height for both columns
+            def calculate_column_height(items, col_width):
+                height = 0
+                for label, value in items:
+                    if value:  # If there's a value part
+                        text = f"{label}{value}"
+                    else:
+                        text = label
+                    lines = pdf.multi_cell(col_width - 2*padding, line_height, text, split_only=True)
+                    height += len(lines) * line_height + section_spacing
+                return height + 3*padding  # Add padding
+
+            terms_height = calculate_column_height(terms, col1_width)
+
+            # Calculate bank details height WITHOUT signature section
+            bank_items_height = calculate_column_height(bank_info, col2_width)
+            signature_height = 35  # Estimated height for signature section
             
-            # Reset to regular font
-            pdf.set_font(pdf.default_font, "", 10)
-        else:
-            # Regular terms without special formatting
-            pdf.multi_cell(col1_width - 2*padding, line_height, label)
-        
-        terms_y = pdf.get_y()
+            # Use the maximum height between terms and bank items + signature
+            box_height = max(terms_height, bank_items_height + signature_height)
 
-    # Bank Details header - INSIDE THE BOX
-    pdf.set_font(pdf.default_font, "B", 12)
-    pdf.set_xy(x_start + col1_width + padding, y_start + padding)
-    pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
-    pdf.set_font(pdf.default_font, "", 12)  # Set to regular for labels
+            # Draw the main box
+            pdf.rect(x_start, y_start, page_width, box_height)
 
-    # Bank details content - INSIDE THE BOX
-    bank_y = pdf.get_y()
-    for label, value in bank_info:
-        pdf.set_xy(x_start + col1_width + padding, bank_y)
-        
-        # Write label in regular font
-        pdf.set_font(pdf.default_font, "", 10)
-        pdf.cell(pdf.get_string_width(f"{label}: "), line_height, f"{label}: ", ln=0)
-        
-        # Write value in BOLD font
-        pdf.set_font(pdf.default_font, "B", 10)
-        remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{label}: ")
-        pdf.multi_cell(remaining_width, line_height, value)
-        
-        bank_y = pdf.get_y()
+            # Draw vertical separator line
+            pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
 
-        # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
-        # Calculate position to place signature near bottom of the box
-        signature_start_y = y_start + box_height - signature_height - 15
+            # Add section headers
+            pdf.set_font(pdf.default_font, "B", 12)
 
-        pdf.set_font(pdf.default_font, "B", 10)
-        pdf.set_xy(x_start + col1_width + padding, signature_start_y)
-        pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
+            # Terms & Conditions header
+            pdf.set_xy(x_start + padding, y_start + padding)
+            pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
 
-        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-        pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
+            # Terms content - INSIDE THE BOX
+            terms_y = pdf.get_y()
+            for i, (label, value) in enumerate(terms):
+                pdf.set_xy(x_start + padding, terms_y)
+                
+                if i < 6:  # First 6 terms - ALL BOLD
+                    pdf.set_font(pdf.default_font, "B", 10)
+                    pdf.multi_cell(col1_width - 2*padding, line_height, label)
+                    
+                elif value:  # Terms 7-13 with mixed formatting (label + bold value)
+                    # Write the regular font part
+                    pdf.set_font(pdf.default_font, "", 10)
+                    pdf.cell(pdf.get_string_width(label), line_height, label, ln=0)
+                    
+                    # Write the bold part
+                    pdf.set_font(pdf.default_font, "B", 10)
+                    remaining_width = col1_width - 2*padding - pdf.get_string_width(label)
+                    pdf.multi_cell(remaining_width, line_height, value)
+                    
+                    # Reset to regular font
+                    pdf.set_font(pdf.default_font, "", 10)
+                else:
+                    # Regular terms without special formatting
+                    pdf.multi_cell(col1_width - 2*padding, line_height, label)
+                
+                terms_y = pdf.get_y()
 
-        # --- Signature Block with Dynamic Sales Person ---
-        sales_person_code = data.get('sales_person_code', 'SD')
-        sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+            # Bank Details header - INSIDE THE BOX
+            pdf.set_font(pdf.default_font, "B", 12)
+            pdf.set_xy(x_start + col1_width + padding, y_start + padding)
+            pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
+            pdf.set_font(pdf.default_font, "", 12)  # Set to regular for labels
 
-        # Add stamp between "For CM INFOTECH" and sales person name
-        if data.get('stamp_path') and os.path.exists(data['stamp_path']):
+            # Bank details content - INSIDE THE BOX
+            bank_y = pdf.get_y()
+            for label, value in bank_info:
+                pdf.set_xy(x_start + col1_width + padding, bank_y)
+                
+                # Write label in regular font
+                pdf.set_font(pdf.default_font, "", 10)
+                pdf.cell(pdf.get_string_width(f"{label}: "), line_height, f"{label}: ", ln=0)
+                
+                # Write value in BOLD font
+                pdf.set_font(pdf.default_font, "B", 10)
+                remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{label}: ")
+                pdf.multi_cell(remaining_width, line_height, value)
+                
+                bank_y = pdf.get_y()
+
+                # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
+                # Calculate position to place signature near bottom of the box
+                signature_start_y = y_start + box_height - signature_height - 15
+
+                pdf.set_font(pdf.default_font, "B", 10)
+                pdf.set_xy(x_start + col1_width + padding, signature_start_y)
+                pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
+
+                pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+                pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
+
+                # --- Signature Block with Dynamic Sales Person ---
+                sales_person_code = data.get('sales_person_code', 'SD')
+                sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+
+                # Add stamp between "For CM INFOTECH" and sales person name
+                if data.get('stamp_path') and os.path.exists(data['stamp_path']):
+                    try:
+                        # Position stamp centered between "For CM INFOTECH" and sales person name
+                        stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
+                        stamp_x = x_start + col1_width + padding  # Center the stamp
+                        pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
+                        # Move cursor down after stamp
+                        pdf.set_y(stamp_y + 20)  # Space for stamp + some padding
+                    except:
+                        pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
+                else:
+                    pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
+
+                # Sales person name
+                pdf.set_font(pdf.default_font, "", 9)
+                pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+                pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
+
+                # DYNAMIC DESIGNATION - Shows different designation based on sales person selected
+                pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+                pdf.cell(col2_width - 2*padding, 4, sales_person_info["designation"], ln=True)  # Changed from hardcoded "Inside Sales Executive"
+
+                # Clickable email in signature
+                pdf.set_font(pdf.default_font, "", 9)
+                pdf.set_text_color(0, 0, 0)
+                pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+                label = "Email: "
+                pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+                pdf.set_font(pdf.default_font, "U", 9)
+                pdf.set_text_color(0, 0, 255)
+                pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
+                        ln=True, link=f"mailto:{sales_person_info['email']}")
+
+                # Clickable phone in signature
+                pdf.set_text_color(0, 0, 0)
+                pdf.set_font(pdf.default_font, "", 9)
+                pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+                label = "Mobile: "
+                pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+                pdf.set_font(pdf.default_font, "U", 9)
+                pdf.set_text_color(0, 0, 255)
+                pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
+                        ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+                pdf.set_text_color(0, 0, 0)
+
+            # Move cursor below the box
+            pdf.set_xy(x_start, y_start + box_height + 10)
+
+            
+        def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
+            """Orchestrates the creation of the two-page PDF."""
+            sales_person_code = quotation_data.get('sales_person_code', 'SD')
+            pdf = QUOTATION_PDF(quotation_number=quotation_data['quotation_number'], 
+                                quotation_date=quotation_data['quotation_date'],
+                                sales_person_code=sales_person_code)
+            
+            # Set logo path for header
+            if logo_path and os.path.exists(logo_path):
+                pdf.logo_path = logo_path
+            
+            quotation_data['stamp_path'] = stamp_path
+
+            pdf.add_page()
+            
+            # 1. Add Page 1 (Introduction Letter)
+            add_page_one_intro(pdf, quotation_data)
+
+            # 2. Add Page 2 (Commercials, Terms, Bank Details)
+            add_page_two_commercials(pdf, quotation_data)
+            
+            # Handle PDF output properly
             try:
-                # Position stamp centered between "For CM INFOTECH" and sales person name
-                stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
-                stamp_x = x_start + col1_width + padding  # Center the stamp
-                pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
-                # Move cursor down after stamp
-                pdf.set_y(stamp_y + 20)  # Space for stamp + some padding
-            except:
-                pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
-        else:
-            pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
+                pdf_output = pdf.output(dest='S')
+                
+                if isinstance(pdf_output, str):
+                    return pdf_output.encode('latin-1')
+                elif isinstance(pdf_output, bytearray):
+                    return bytes(pdf_output)
+                elif isinstance(pdf_output, bytes):
+                    return pdf_output
+                else:
+                    return str(pdf_output).encode('latin-1')
+                    
+            except Exception:
+                # Fallback method
+                try:
+                    buffer = io.BytesIO()
+                    pdf.output(dest=buffer)
+                    return buffer.getvalue()
+                except Exception as e:
+                    st.error(f"PDF generation failed: {e}")
 
-        # Sales person name
-        pdf.set_font(pdf.default_font, "", 9)
-        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-        pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
-
-        # DYNAMIC DESIGNATION - Shows different designation based on sales person selected
-        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-        pdf.cell(col2_width - 2*padding, 4, sales_person_info["designation"], ln=True)  # Changed from hardcoded "Inside Sales Executive"
-
-        # Clickable email in signature
-        pdf.set_font(pdf.default_font, "", 9)
-        pdf.set_text_color(0, 0, 0)
-        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-        label = "Email: "
-        pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-        pdf.set_font(pdf.default_font, "U", 9)
-        pdf.set_text_color(0, 0, 255)
-        pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
-                ln=True, link=f"mailto:{sales_person_info['email']}")
-
-        # Clickable phone in signature
-        pdf.set_text_color(0, 0, 0)
-        pdf.set_font(pdf.default_font, "", 9)
-        pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
-        label = "Mobile: "
-        pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
-        pdf.set_font(pdf.default_font, "U", 9)
-        pdf.set_text_color(0, 0, 255)
-        pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
-                ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
-        pdf.set_text_color(0, 0, 0)
-
-    # Move cursor below the box
-    pdf.set_xy(x_start, y_start + box_height + 10)
-
-    
 def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
     """Orchestrates the creation of the two-page PDF."""
     sales_person_code = quotation_data.get('sales_person_code', 'SD')
@@ -1068,6 +1106,260 @@ def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
         except Exception as e:
             st.error(f"PDF generation failed: {e}")
             return b""
+
+#     # Round Off Row WITH COMMA FORMATTING
+#     round_off = data.get('round_off', 0.0)
+#     pdf.set_font(pdf.default_font, "B", 10)
+#     # Reset cursor to left margin to prevent misalignment after multi-line rows
+#     pdf.set_x(pdf.l_margin)
+#     last_col_width = col_widths[-1]
+#     summary_width = sum(col_widths[:-1])
+#     pdf.cell(summary_width, 7, "Round Off", border=1, align="R")
+#     pdf.cell(last_col_width, 7, f"{round_off:,.2f}", border=1, align="R")
+#     pdf.ln()
+
+#     # Grand Total Row - WITH COMMA FORMATTING
+#     grand_total = data.get('grand_total', grand_total_unrounded)
+#     pdf.set_font(pdf.default_font, "B", 10)
+#     pdf.cell(summary_width, 7, "Final Amount to be Paid", border=1, align="R")
+#     pdf.cell(last_col_width, 7, f"{grand_total:,.2f}", border=1, align="R")
+#     pdf.ln(15)
+
+#     # --- Enhanced Box for Terms & Conditions and Bank Details ---
+#     pdf.set_font(pdf.default_font, "", 9)
+
+#     # Terms & Conditions with ALL terms in bold
+#     price_validity = data.get('price_validity', '10 days from Quotation date')
+#     terms = [
+#         ("1. Above charges are Inclusive of GST.", ""),
+#         ("2. Any changes in Govt. duties, Taxes & Forex rate at the time of dispatch shall be applicable.", ""),
+#         ("3. TDS should not be deducted at the time of payment as per Govt. NOTIFICATION NO. 21/2012 [F.No.142/10/2012-SO (TPL)] S.O. 1323(E), DATED 13-6-2012.", ""),
+#         ("4. ELD licenses are paper licenses that do not contain media.", ""),
+#         ("5. An Internet connection is required to access cloud services.", ""),
+#         ("6. Training will be charged at extra cost depending on no. of participants.", ""),
+#         ("7. Price Validity: ", price_validity),
+#         ("8. Payment: ", "100% Advance along with purchase order"),
+#         ("9. Delivery period: ", "1-2 Weeks from the date of Purchase Order"),
+#         ("10. Support: ","Includes 12 months of technical support and software updates from OEM."),
+#         ("11. Installation: ","Online"),
+#         ("12. Cheque to be issued on name of: ", '"CM INFOTECH"'),
+#         ("13. Order to be placed on: ", "CM INFOTECH \nE/402, Ganesh Glory 11, Near BSNL Office, Jagatpur - Chenpur Road, Jagatpur Village,\nAhmedabad - 382481")
+#     ]
+
+#     # Bank Details
+#     bank_info = [
+#         ("Name", "CM INFOTECH"),
+#         ("Account Number", "88130420182"),
+#         ("IFSC Code", "IDFB0040335"),
+#         ("SWIFT Code", "IDFBINBBMUM"),
+#         ("Bank Name", "IDFC FIRST BANK"),
+#         ("Branch", "AHMEDABAD - SHYAMAL BRANCH"),
+#         ("MSME", "UDYAM-GJ-01-0117646"),
+#         ("GSTIN", "24ANMPP4891R1ZX"),
+#         ("PAN No", "ANMPP4891R")
+#     ]
+
+#     # Box dimensions and styling
+#     x_start = pdf.get_x()
+#     y_start = pdf.get_y()
+#     page_width = pdf.w - 1.6 * pdf.l_margin
+#     col1_width = page_width * 0.62  # 60% for Terms
+#     col2_width = page_width * 0.38  # 40% for Bank Details
+#     padding = 2.5
+#     line_height = 4
+#     section_spacing = 2
+
+#     # Calculate required height for both columns
+#     def calculate_column_height(items, col_width):
+#         height = 0
+#         for label, value in items:
+#             if value:  # If there's a value part
+#                 text = f"{label}{value}"
+#             else:
+#                 text = label
+#             lines = pdf.multi_cell(col_width - 2*padding, line_height, text, split_only=True)
+#             height += len(lines) * line_height + section_spacing
+#         return height + 3*padding  # Add padding
+
+#     terms_height = calculate_column_height(terms, col1_width)
+
+#     # Calculate bank details height WITHOUT signature section
+#     bank_items_height = calculate_column_height(bank_info, col2_width)
+#     signature_height = 35  # Estimated height for signature section
+    
+#     # Use the maximum height between terms and bank items + signature
+#     box_height = max(terms_height, bank_items_height + signature_height)
+
+#     # Draw the main box
+#     pdf.rect(x_start, y_start, page_width, box_height)
+
+#     # Draw vertical separator line
+#     pdf.line(x_start + col1_width, y_start, x_start + col1_width, y_start + box_height)
+
+#     # Add section headers
+#     pdf.set_font(pdf.default_font, "B", 12)
+
+#     # Terms & Conditions header
+#     pdf.set_xy(x_start + padding, y_start + padding)
+#     pdf.cell(col1_width - 2*padding, 5, "Terms & Conditions:", ln=True)
+
+#     # Terms content - INSIDE THE BOX
+#     terms_y = pdf.get_y()
+#     for i, (label, value) in enumerate(terms):
+#         pdf.set_xy(x_start + padding, terms_y)
+        
+#         if i < 6:  # First 6 terms - ALL BOLD
+#             pdf.set_font(pdf.default_font, "B", 10)
+#             pdf.multi_cell(col1_width - 2*padding, line_height, label)
+            
+#         elif value:  # Terms 7-13 with mixed formatting (label + bold value)
+#             # Write the regular font part
+#             pdf.set_font(pdf.default_font, "", 10)
+#             pdf.cell(pdf.get_string_width(label), line_height, label, ln=0)
+            
+#             # Write the bold part
+#             pdf.set_font(pdf.default_font, "B", 10)
+#             remaining_width = col1_width - 2*padding - pdf.get_string_width(label)
+#             pdf.multi_cell(remaining_width, line_height, value)
+            
+#             # Reset to regular font
+#             pdf.set_font(pdf.default_font, "", 10)
+#         else:
+#             # Regular terms without special formatting
+#             pdf.multi_cell(col1_width - 2*padding, line_height, label)
+        
+#         terms_y = pdf.get_y()
+
+#     # Bank Details header - INSIDE THE BOX
+#     pdf.set_font(pdf.default_font, "B", 12)
+#     pdf.set_xy(x_start + col1_width + padding, y_start + padding)
+#     pdf.cell(col2_width - 2*padding, 5, "Bank Details:", ln=True)
+#     pdf.set_font(pdf.default_font, "", 12)  # Set to regular for labels
+
+#     # Bank details content - INSIDE THE BOX
+#     bank_y = pdf.get_y()
+#     for label, value in bank_info:
+#         pdf.set_xy(x_start + col1_width + padding, bank_y)
+        
+#         # Write label in regular font
+#         pdf.set_font(pdf.default_font, "", 10)
+#         pdf.cell(pdf.get_string_width(f"{label}: "), line_height, f"{label}: ", ln=0)
+        
+#         # Write value in BOLD font
+#         pdf.set_font(pdf.default_font, "B", 10)
+#         remaining_width = col2_width - 2*padding - pdf.get_string_width(f"{label}: ")
+#         pdf.multi_cell(remaining_width, line_height, value)
+        
+#         bank_y = pdf.get_y()
+
+#         # --- Signature Block INSIDE BANK DETAILS BOX - POSITIONED NEAR BOTTOM ---
+#         # Calculate position to place signature near bottom of the box
+#         signature_start_y = y_start + box_height - signature_height - 15
+
+#         pdf.set_font(pdf.default_font, "B", 10)
+#         pdf.set_xy(x_start + col1_width + padding, signature_start_y)
+#         pdf.cell(col2_width - 2*padding, 5, "Yours Truly,", ln=True)
+
+#         pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+#         pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
+
+#         # --- Signature Block with Dynamic Sales Person ---
+#         sales_person_code = data.get('sales_person_code', 'SD')
+#         sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+
+#         # Add stamp between "For CM INFOTECH" and sales person name
+#         if data.get('stamp_path') and os.path.exists(data['stamp_path']):
+#             try:
+#                 # Position stamp centered between "For CM INFOTECH" and sales person name
+#                 stamp_y = pdf.get_y() + 2  # Small space after "For CM INFOTECH"
+#                 stamp_x = x_start + col1_width + padding  # Center the stamp
+#                 pdf.image(data['stamp_path'], x=stamp_x, y=stamp_y, w=20)
+#                 # Move cursor down after stamp
+#                 pdf.set_y(stamp_y + 20)  # Space for stamp + some padding
+#             except:
+#                 pdf.set_y(pdf.get_y() + 8)  # If stamp fails, add some space
+#         else:
+#             pdf.set_y(pdf.get_y() + 8)  # Space if no stamp
+
+#         # Sales person name
+#         pdf.set_font(pdf.default_font, "", 9)
+#         pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+#         pdf.cell(col2_width - 2*padding, 4, sales_person_info["name"], ln=True)
+
+#         # DYNAMIC DESIGNATION - Shows different designation based on sales person selected
+#         pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+#         pdf.cell(col2_width - 2*padding, 4, sales_person_info["designation"], ln=True)  # Changed from hardcoded "Inside Sales Executive"
+
+#         # Clickable email in signature
+#         pdf.set_font(pdf.default_font, "", 9)
+#         pdf.set_text_color(0, 0, 0)
+#         pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+#         label = "Email: "
+#         pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+#         pdf.set_font(pdf.default_font, "U", 9)
+#         pdf.set_text_color(0, 0, 255)
+#         pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["email"], 
+#                 ln=True, link=f"mailto:{sales_person_info['email']}")
+
+#         # Clickable phone in signature
+#         pdf.set_text_color(0, 0, 0)
+#         pdf.set_font(pdf.default_font, "", 9)
+#         pdf.set_xy(x_start + col1_width + padding, pdf.get_y())
+#         label = "Mobile: "
+#         pdf.cell(pdf.get_string_width(label), 4, label, ln=0)
+#         pdf.set_font(pdf.default_font, "U", 9)
+#         pdf.set_text_color(0, 0, 255)
+#         pdf.cell(col2_width - 2*padding - pdf.get_string_width(label), 4, sales_person_info["mobile"], 
+#                 ln=True, link=f"tel:{sales_person_info['mobile'].replace(' ', '').replace('+', '')}")
+#         pdf.set_text_color(0, 0, 0)
+
+#     # Move cursor below the box
+#     pdf.set_xy(x_start, y_start + box_height + 10)
+
+    
+# def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
+#     """Orchestrates the creation of the two-page PDF."""
+#     sales_person_code = quotation_data.get('sales_person_code', 'SD')
+#     pdf = QUOTATION_PDF(quotation_number=quotation_data['quotation_number'], 
+#                         quotation_date=quotation_data['quotation_date'],
+#                         sales_person_code=sales_person_code)
+    
+#     # Set logo path for header
+#     if logo_path and os.path.exists(logo_path):
+#         pdf.logo_path = logo_path
+    
+#     quotation_data['stamp_path'] = stamp_path
+
+#     pdf.add_page()
+    
+#     # 1. Add Page 1 (Introduction Letter)
+#     add_page_one_intro(pdf, quotation_data)
+
+#     # 2. Add Page 2 (Commercials, Terms, Bank Details)
+#     add_page_two_commercials(pdf, quotation_data)
+    
+#     # Handle PDF output properly
+#     try:
+#         pdf_output = pdf.output(dest='S')
+        
+#         if isinstance(pdf_output, str):
+#             return pdf_output.encode('latin-1')
+#         elif isinstance(pdf_output, bytearray):
+#             return bytes(pdf_output)
+#         elif isinstance(pdf_output, bytes):
+#             return pdf_output
+#         else:
+#             return str(pdf_output).encode('latin-1')
+            
+#     except Exception:
+#         # Fallback method
+#         try:
+#             buffer = io.BytesIO()
+#             pdf.output(dest=buffer)
+#             return buffer.getvalue()
+#         except Exception as e:
+#             st.error(f"PDF generation failed: {e}")
+#             return b""
 
 from fpdf import FPDF
 # --- PDF Class for Tax Invoice ---

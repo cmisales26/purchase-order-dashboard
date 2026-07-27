@@ -818,6 +818,8 @@ def add_page_two_commercials(pdf, data):
     # Round Off Row WITH COMMA FORMATTING
     round_off = data.get('round_off', 0.0)
     pdf.set_font(pdf.default_font, "B", 10)
+    # Reset cursor to left margin to prevent misalignment after multi-line rows
+    pdf.set_x(pdf.l_margin)
     last_col_width = col_widths[-1]
     summary_width = sum(col_widths[:-1])
     pdf.cell(summary_width, 7, "Round Off", border=1, align="R")
@@ -2945,11 +2947,16 @@ def main():
             if not st.session_state.quotation_products:
                 st.error("Please add at least one product to generate the quotation.")
             else:
-                # Calculate total from all products (same as PO logic)
+                # Calculate total from all products - USE SPECIAL PRICE when enabled
                 products_total = 0
                 for p in st.session_state.quotation_products:
-                    gst_amt = p["basic"] * p["gst_percent"] / 100
-                    per_unit_price = p["basic"] + gst_amt
+                    # Use special price if enabled, otherwise basic price
+                    if p.get("use_special_price") and p.get("special_price", 0) > 0:
+                        effective = p["special_price"]
+                    else:
+                        effective = p["basic"]
+                    gst_amt = effective * p["gst_percent"] / 100
+                    per_unit_price = effective + gst_amt
                     total = per_unit_price * p["qty"]
                     products_total += total
 

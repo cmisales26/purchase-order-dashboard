@@ -709,7 +709,7 @@ def add_page_two_commercials(pdf, data):
 
     if has_special_price:
         # WITH Special Price column (7 columns like img 2)
-        col_widths = [55, 22, 22, 22, 22, 15, 22]
+        col_widths = [60, 22, 22, 22, 22, 15, 22]
         headers = ["Description", "Basic Price", "Special Price", "GST Tax\n@ 18%", "Per Unit\nPrice", "Qty.", "Total\n(INR)"]
     else:
         # Original format WITHOUT Special Price column (6 columns like img 1)

@@ -1019,49 +1019,6 @@ def add_page_two_commercials(pdf, data):
             # Move cursor below the box
             pdf.set_xy(x_start, y_start + box_height + 10)
 
-            
-        def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
-            """Orchestrates the creation of the two-page PDF."""
-            sales_person_code = quotation_data.get('sales_person_code', 'SD')
-            pdf = QUOTATION_PDF(quotation_number=quotation_data['quotation_number'], 
-                                quotation_date=quotation_data['quotation_date'],
-                                sales_person_code=sales_person_code)
-            
-            # Set logo path for header
-            if logo_path and os.path.exists(logo_path):
-                pdf.logo_path = logo_path
-            
-            quotation_data['stamp_path'] = stamp_path
-
-            pdf.add_page()
-            
-            # 1. Add Page 1 (Introduction Letter)
-            add_page_one_intro(pdf, quotation_data)
-
-            # 2. Add Page 2 (Commercials, Terms, Bank Details)
-            add_page_two_commercials(pdf, quotation_data)
-            
-            # Handle PDF output properly
-            try:
-                pdf_output = pdf.output(dest='S')
-                
-                if isinstance(pdf_output, str):
-                    return pdf_output.encode('latin-1')
-                elif isinstance(pdf_output, bytearray):
-                    return bytes(pdf_output)
-                elif isinstance(pdf_output, bytes):
-                    return pdf_output
-                else:
-                    return str(pdf_output).encode('latin-1')
-                    
-            except Exception:
-                # Fallback method
-                try:
-                    buffer = io.BytesIO()
-                    pdf.output(dest=buffer)
-                    return buffer.getvalue()
-                except Exception as e:
-                    st.error(f"PDF generation failed: {e}")
 
 def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
     """Orchestrates the creation of the two-page PDF."""

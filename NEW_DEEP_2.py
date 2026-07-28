@@ -825,10 +825,10 @@ def add_page_two_commercials(pdf, data):
     pdf.ln()
 
     # Grand Total Row - WITH COMMA FORMATTING
-    # grand_total = data.get('grand_total', grand_total_unrounded)
+    grand_total = data.get('grand_total', grand_total_unrounded)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(summary_width, 7, "Final Amount to be Paid", border=1, align="R")
-    pdf.cell(last_col_width, 7, f"{grand_total_unrounded:,.2f}", border=1, align="R")
+    pdf.cell(last_col_width, 7, f"{grand_total:,.2f}", border=1, align="R")
     pdf.ln(15)
 
     # --- Enhanced Box for Terms & Conditions and Bank Details ---
@@ -2947,10 +2947,22 @@ def main():
             else:
                 # Calculate total from all products (same as PO logic)
                 products_total = 0
+
                 for p in st.session_state.quotation_products:
-                    gst_amt = p["basic"] * p["gst_percent"] / 100
-                    per_unit_price = p["basic"] + gst_amt
+
+                    use_special = (
+                        p.get("use_special_price", False)
+                        and p.get("special_price", 0) > 0
+                    )
+
+                    effective_price = (
+                        p["special_price"] if use_special else p["basic"]
+                    )
+
+                    gst_amt = effective_price * p["gst_percent"] / 100
+                    per_unit_price = effective_price + gst_amt
                     total = per_unit_price * p["qty"]
+
                     products_total += total
 
                 # Calculate round off to make final amount whole number (same as PO)

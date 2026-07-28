@@ -2947,10 +2947,22 @@ def main():
             else:
                 # Calculate total from all products (same as PO logic)
                 products_total = 0
+
                 for p in st.session_state.quotation_products:
-                    gst_amt = p["basic"] * p["gst_percent"] / 100
-                    per_unit_price = p["basic"] + gst_amt
+
+                    use_special = (
+                        p.get("use_special_price", False)
+                        and p.get("special_price", 0) > 0
+                    )
+
+                    effective_price = (
+                        p["special_price"] if use_special else p["basic"]
+                    )
+
+                    gst_amt = effective_price * p["gst_percent"] / 100
+                    per_unit_price = effective_price + gst_amt
                     total = per_unit_price * p["qty"]
+
                     products_total += total
 
                 # Calculate round off to make final amount whole number (same as PO)

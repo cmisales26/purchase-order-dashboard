@@ -825,10 +825,10 @@ def add_page_two_commercials(pdf, data):
     pdf.ln()
 
     # Grand Total Row - WITH COMMA FORMATTING
-    grand_total = data.get('grand_total', grand_total_unrounded)
+    # grand_total = data.get('grand_total', grand_total_unrounded)
     pdf.set_font(pdf.default_font, "B", 10)
     pdf.cell(summary_width, 7, "Final Amount to be Paid", border=1, align="R")
-    pdf.cell(last_col_width, 7, f"{grand_total:,.2f}", border=1, align="R")
+    pdf.cell(last_col_width, 7, f"{grand_total_unrounded:,.2f}", border=1, align="R")
     pdf.ln(15)
 
     # --- Enhanced Box for Terms & Conditions and Bank Details ---

@@ -2552,11 +2552,11 @@ def main():
         st.session_state.po_vendor_mobile = "+91 1234567890"
     # GST, PAN, MSME are always CM Infotech's fixed info
     if "po_gst_no" not in st.session_state:
-        st.session_state.po_gst_no = "1111"
+        st.session_state.po_gst_no = "24ANMPP4891R1ZX"
     if "po_pan_no" not in st.session_state:
-        st.session_state.po_pan_no = "1111"
+        st.session_state.po_pan_no = "ANMPP4891R"
     if "po_msme_no" not in st.session_state:
-        st.session_state.po_msme_no = "1111"
+        st.session_state.po_msme_no = "UDYAM-GJ-01-0117646"
 
     # Quotation end user session states
     if "quote_end_company" not in st.session_state:

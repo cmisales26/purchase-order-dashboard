@@ -65,7 +65,7 @@ SALES_PERSON_MAPPING = {
     "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721","designation": "Founder"},
     "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721","designation": "Inside Sales Executive"},
     "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721","designation": "Inside Sales Executive"},
-    "SD": {"name": "Sakshi Darji", "email": "sakshi@cminfotech.com", "mobile": "+91 74051 15721","designation": "Inside Sales Executive"}
+    "DP": {"name": "Digvijaysinh Parmar", "email": "digvijay@cminfotech.com", "mobile": "+91 87992 65721","designation": "Inside Sales Executive"}
 }
 
 # --- Helper: Get contacts from a database entry (supports old & new format) ---
@@ -202,7 +202,7 @@ def parse_po_number(po_number):
         parts = po_number.split('/')
         if len(parts) >= 4:
             prefix = parts[0]  # C
-            sales_person = parts[1]  # CP, SD, HP, KP
+            sales_person = parts[1]  # CP, DP, HP, KP
             year = parts[2]  # 2025
             quarter_sequence = parts[3]  # Q4_001
             quarter = quarter_sequence.split('_')[0]  # Q4
@@ -274,7 +274,7 @@ def parse_quotation_number(quotation_number):
         parts = quotation_number.split('/')
         if len(parts) >= 5:
             prefix = parts[0]  # CMI
-            sales_person = parts[1]  # SD, CP, HP, KP
+            sales_person = parts[1]  # DP, CP, HP, KP
             quarter = parts[2]  # Q1, Q2, Q3, Q4
             date_part = parts[3]  # DD-MM-YYYY
             year_range = parts[4].split('_')[0]  # 2025-2026
@@ -282,7 +282,7 @@ def parse_quotation_number(quotation_number):
             return prefix, sales_person, quarter, date_part, year_range, sequence
     except:
         pass
-    return "CMI", "SD", get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
+    return "CMI", "DP", get_current_quarter(), datetime.datetime.now().strftime("%d-%m-%Y"), f"{datetime.datetime.now().year}-{datetime.datetime.now().year+1}", "001"
 
 def generate_quotation_number(sales_person, sequence_number):
     """Generate quotation number with current quarter and sequence"""
@@ -621,8 +621,8 @@ def add_page_one_intro(pdf, data):
     pdf.write(5, contact_text)
 
     # Get sales person info dynamically
-    sales_person_code = data.get('sales_person_code', 'SD')
-    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+    sales_person_code = data.get('sales_person_code', 'DP')
+    sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['DP'])
     
     # Email clickable - DYNAMIC from sales person
     pdf.set_text_color(0, 0, 255)
@@ -971,8 +971,8 @@ def add_page_two_commercials(pdf, data):
         pdf.cell(col2_width - 2*padding, 5, "For CM INFOTECH", ln=True)
 
         # --- Signature Block with Dynamic Sales Person ---
-        sales_person_code = data.get('sales_person_code', 'SD')
-        sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['SD'])
+        sales_person_code = data.get('sales_person_code', 'DP')
+        sales_person_info = SALES_PERSON_MAPPING.get(sales_person_code, SALES_PERSON_MAPPING['DP'])
 
         # Add stamp between "For CM INFOTECH" and sales person name
         if data.get('stamp_path') and os.path.exists(data['stamp_path']):
@@ -1026,7 +1026,7 @@ def add_page_two_commercials(pdf, data):
     
 def create_quotation_pdf(quotation_data, logo_path=None, stamp_path=None):
     """Orchestrates the creation of the two-page PDF."""
-    sales_person_code = quotation_data.get('sales_person_code', 'SD')
+    sales_person_code = quotation_data.get('sales_person_code', 'DP')
     pdf = QUOTATION_PDF(quotation_number=quotation_data['quotation_number'], 
                         quotation_date=quotation_data['quotation_date'],
                         sales_person_code=sales_person_code)
@@ -2494,9 +2494,9 @@ def main():
     if "last_quotation_number" not in st.session_state:
         st.session_state.last_quotation_number = ""
     if "quotation_number" not in st.session_state:
-        st.session_state.quotation_number = generate_quotation_number("SD", st.session_state.quotation_seq)
+        st.session_state.quotation_number = generate_quotation_number("DP", st.session_state.quotation_seq)
     if "current_quote_sales_person" not in st.session_state:
-        st.session_state.current_quote_sales_person = "SD"
+        st.session_state.current_quote_sales_person = "DP"
 
     # PO session states  
     if "po_seq" not in st.session_state:
@@ -2662,7 +2662,7 @@ def main():
                                         key="quote_sales_person")
         
         # Get current sales person info
-        current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['SD'])
+        current_sales_person_info = SALES_PERSON_MAPPING.get(sales_person, SALES_PERSON_MAPPING['DP'])
         
         # Generate quotation number based on selected sales person
         def get_quotation_number():

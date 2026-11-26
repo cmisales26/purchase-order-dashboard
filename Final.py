@@ -65,7 +65,7 @@ SALES_PERSON_MAPPING = {
     "CP": {"name": "Chirag Prajapati", "email": "chirag@cminfotech.com", "mobile": "+91 87339 15721","designation": "Founder"},
     "HP": {"name": "Hiral Patel", "email": "hiral@cminfotech.com", "mobile": "+91 95581 15721","designation": "Inside Sales Executive"},
     "KP": {"name": "Khushi Patel", "email": "khushi@cminfotech.com", "mobile": "+91 97241 15721","designation": "Inside Sales Executive"},
-    "DP": {"name": "Digvijaysinh Parmar", "email": "digvijay@cminfotech.com", "mobile": "+91 87992 65721","designation": "Inside Sales Executive"}
+    "DP": {"name": "Digvijaysinh Parmar", "email": "digvijay@cminfotech.com", "mobile": "+91 87992 65721","designation": "Business Development Manager"}
 }
 
 # --- Helper: Get contacts from a database entry (supports old & new format) ---
